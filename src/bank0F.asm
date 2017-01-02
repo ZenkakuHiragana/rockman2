@@ -1809,6 +1809,13 @@ DamageRockman:
 
 ;20 A5 D3
 SetRockmanAnimation:
+	lda <zShootPoseTimer
+	beq .noshoot
+	dec <zShootPoseTimer
+	bne .shoot
+.noshoot
+	sta <zShootPose
+.shoot
 	ldx <zStatus
 	clc
 	lda Table_RockmanAnimation,x
@@ -1819,17 +1826,6 @@ SetRockmanAnimation:
 	stx aObjFrame
 	stx aObjWait
 .same
-	sta aObjAnim
-	lda <zShootPoseTimer
-	beq .noshoot
-	dec <zShootPoseTimer
-	rts
-.noshoot
-;D3C4
-	lda #$00
-	sta <zShootPose
-	ldx <zStatus
-	lda Table_RockmanAnimation,x
 	sta aObjAnim
 	rts
 

@@ -70,7 +70,7 @@ DoRockman03_Stand:
 	lda <zKeyDown
 	and #$C0
 	beq .stand
-	mMOV #$04, <zStatus
+	inc <zStatus
 	jsr DoRockman_SetDirection
 .stand
 	jsr DoRockman_SetVX
@@ -87,30 +87,46 @@ DoRockman_CheckJump:
 .jump
 	mMOV <zJumpPowerlo, aObjVYlo
 	mMOV <zJumpPowerhi, aObjVY
-	jmp DoRockman05_InAir
+	bne DoRockman05_InAir
+
 
 ;85A6
 ;ロックマン状態#4歩き始め
+;868C
+;ロックマン状態#7歩行終了
+;ロックマン状態#8着地した瞬間
 DoRockman04_StartWalking:
+DoRockman07_EndWalking:
+DoRockman08_OnLand:
 	jsr DoRockman_ShootWeapon
 	jsr DoRockman_SetDirection
 	jsr DoRockman_SetVX
 	jsr DoRockman_BodyMoveX
 	jsr DoRockman_BodyMoveY
 	lda <$00
-	beq DoRockman05_InAir
+	beq  DoRockman05_InAir
+	ldy <zStatus
 	lda <zKeyDown
 	and #$C0
 	bne .walk
-	lda #$03
-	sta <zStatus
-	bne DoRockman_CheckJump
+		cpy #$04
+		beq .skip_notwalk
+			lda aObjFrame
+			cmp #$02
+			bne DoRockman_CheckJump
+.skip_notwalk
+		mMOV #$03, <zStatus
+		bne DoRockman_CheckJump
 .walk
-	lda aObjFrame
-	cmp #$01
-	bne DoRockman_CheckJump
-	lda #$05
-	sta <zStatus
+	ldx #$04
+	cpy #$04
+	bne .skip_walk
+		ldy aObjFrame
+		dey
+		bne DoRockman_CheckJump
+		inx
+.skip_walk
+	stx <zStatus
 	rts
 
 ;85D3
@@ -132,32 +148,6 @@ DoRockman05_Walking_Skip:
 	bne DoRockman_CheckJump
 	lda #$07
 	sta <zStatus
-	rts
-
-;868C
-;ロックマン状態#7歩行終了
-;ロックマン状態#8着地した瞬間
-DoRockman07_EndWalking:
-DoRockman08_OnLand:
-	jsr DoRockman_ShootWeapon
-	jsr DoRockman_SetDirection
-	jsr DoRockman_SetVX
-	jsr DoRockman_BodyMoveX
-	jsr DoRockman_BodyMoveY
-	lda <$00
-	beq  DoRockman05_InAir
-
-	lda <zKeyDown
-	and #$C0
-	bne .walk
-	lda aObjFrame
-	cmp #$02
-	bne .jmp
-	mMOV #$03, <zStatus
-.jmp
-	jmp DoRockman_CheckJump
-.walk
-	mMOV #$04, <zStatus
 	rts
 
 ;85FB
