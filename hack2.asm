@@ -29,4 +29,4 @@
 	.include "src/bank0F.asm"
 	.include "src/patch.asm"
 	
-	.bank $1F
+;	.bank $1F
