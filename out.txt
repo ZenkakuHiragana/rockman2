@@ -1,0 +1,6 @@
+pass 1
+#[3]   src/titlescreen.asm
+  118  1A:A001                    dex
+       Bank overflow, offset > $1FFF!
+# 1 error(s)
+
