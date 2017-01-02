@@ -2,17 +2,17 @@
 ;デバッグオプション
 ;最適化のためのオプション
 
-___2P                   ;2Pコントローラー用の入力を有効
-___WAITFRAMES           ;20 00 C1 Aフレーム待つ命令を有効
-;___DISABLE_INTRO_PIPI   ;ボス紹介のピピ化を無効化
-;___OPTIMIZE             ;不要な謎コードを無効化
-;___NOCLC                ;不要と思われるclcを無効化
-;___NOSEC                ;不要と思われるsecを無効化
-;___NORTS                ;jsr→rtsとつながる部分をjmpに置き換え
-;___JSRJMP               ;jsr→rtsの部分をjmpに置き換え(ただしrtsを残す)
-;___BUGFIX               ;バグを修正
-;;ディレイスクロール、割り算処理のミスを修正
-;___BUGFIXENEMYBUBBLELEAD;敵バブルリードの地形判定処理に間違いがあるみたい？
+;___2P                   ;2Pコントローラー用の入力を有効
+;___WAITFRAMES           ;20 00 C1 Aフレーム待つ命令を有効
+___DISABLE_INTRO_PIPI   ;ボス紹介のピピ化を無効化
+___OPTIMIZE             ;不要な謎コードを無効化
+___NOCLC                ;不要と思われるclcを無効化
+___NOSEC                ;不要と思われるsecを無効化
+___NORTS                ;jsr→rtsとつながる部分をjmpに置き換え
+___JSRJMP               ;jsr→rtsの部分をjmpに置き換え(ただしrtsを残す)
+___BUGFIX               ;バグを修正
+;ディレイスクロール、割り算処理のミスを修正
+___BUGFIXENEMYBUBBLELEAD;敵バブルリードの地形判定処理に間違いがあるみたい？
 
 ;メモリアドレス
 ;ゼロページアドレスは先頭にz、アブソリュートアドレスは先頭にa
