@@ -4,16 +4,11 @@
 ;DoRockman:
 	lda <zStopFlag
 	and #$04
-	beq .do
-	rts
-.do
-	lda #$00
-	sta <zScrollFlag
+	bne DoRockman01_Fall
+	mSTZ <zScrollFlag
 	ldx <zStatus
-	lda Table_DoRockmanlo,x
-	sta <zPtrlo
-	lda Table_DoRockmanhi,x
-	sta <zPtrhi
+	mMOV Table_DoRockmanlo,x, <zPtrlo
+	mMOV Table_DoRockmanhi,x, <zPtrhi
 	jmp [zPtr]
 
 ;8508
@@ -148,39 +143,40 @@ DoRockman05_Walking_Skip:
 	bne DoRockman_CheckJump
 	lda #$07
 	sta <zStatus
-	rts
+	bne DoRockman_CheckJump
 
 ;85FB
 ;ロックマン状態#6空中
 DoRockman06_Jumping:
 	jsr DoRockman_ShootWeapon
 	mSTZ aObjVXlo, aObjVX
-	lda <zKeyDown
-	and #$C0
-	bne .move
-	lda <zWindFlag ;空中で滑るフラグは常にOFF？
-	beq .slip
-	jsr DoRockman_SetVX_WithoutSlip
-	jmp .nowind
-.slip
+;滑り速度の減速
 	sec
 	lda <zSliplo
 	sbc #$80
 	sta <zSliplo
-	tax
-	bcs .nowind
+	bcs .borrow
 	dec <zSliphi
 	bmi .overflow
-	bne .nowind
-	dex
-	bmi .nowind
+.borrow
+	bit <zSliplo
+	bmi .endslip
+	lda <zSliphi
+	bne .endslip
 .overflow
 	mSTZ <zSliplo, <zSliphi
-	beq .nowind
-.move
+.endslip
+	lda <zKeyDown
+	and #$C0
+	beq .wind
 	jsr DoRockman_SetDirection
 	jsr DoRockman_SetVX
-.nowind
+	jmp .end_vx
+.wind
+	lda <zWindFlag  ;空中で滑るフラグは常にOFF？
+	beq .end_vx
+	jsr DoRockman_SetVX_WithoutSlip
+.end_vx
 	jsr DoRockman_BodyMoveX
 	lda aObjVY
 	pha
@@ -453,77 +449,69 @@ DoRockman_SetVX:
 	sty aObjVXlo
 ;風や滑りの補正
 	lda <zWindFlag
-	bmi .slip
-	lda <zSliplo
-	ora <zSliphi
-	beq DoRockman_SetVX_WithoutSlip
-	bne .slip2
-.slip
+	bpl DoRockman_SetVX_WithoutSlip
+	
 	lda aObjFlags
 	and #$40
 	cmp <zMoveVec
 	beq .accel
-.slip2
+;滑る方向と移動方向が逆
+;滑りに対する抵抗力を決定
+.slipresist
 	ldx #$00
 	lda <zStatus
 	cmp #$06
-	beq .skip
+	beq .jumping
 	inx
 	lda <zKeyDown
 	and #$C0
-	beq .skip
+	beq .jumping
 	inx
-.skip
+.jumping
 	sec
 	lda <zSliplo
 	sbc Table_SlipDeceleration,x
 	sta <zSliplo
-	tax
-	lda <zSliphi
-	sbc #$00
-	sta <zSliphi
+	bcs .borrow
+	dec <zSliphi
 	bmi .overflow
-	bne .stop
-	cpx #$80
-	bcs .stop
-.overflow
-	lda #$00
-	sta <zSliplo
-	sta <zSliphi
-	beq .skip2
-.stop
-	lda <zSliplo
-	sta aObjVXlo
+.borrow
+	bit <zSliplo
+	bmi .endslipresist
 	lda <zSliphi
-	sta aObjVX
-	jmp DoRockman_SetVX_WithoutSlip
+	bne .endslipresist
+.overflow
+	mSTZ <zSliplo, <zSliphi
+	beq .done_slip
+.endslipresist
+	mMOV <zSliplo, aObjVXlo
+	mMOV <zSliphi, aObjVX
+	bpl DoRockman_SetVX_WithoutSlip
+;滑る方向と移動方向が一致
 .accel
 	sec
 	lda aObjVXlo
 	sbc <zSliplo
 	lda aObjVX
 	sbc <zSliphi
-	bcc .slip2
-	lda aObjVXlo
-	sta <zSliplo
-	lda aObjVX
-	sta <zSliphi
-.skip2
+	bcc .slipresist ;if VX < VSlip then
+	mMOV aObjVXlo, <zSliplo
+	mMOV aObjVX, <zSliphi
+.done_slip
 	lda aObjFlags
 	and #$40
 	sta <zMoveVec
 DoRockman_SetVX_WithoutSlip:
 	lda <zWindFlag
-	bpl .wind
-	rts
-;88A3
-.wind
 	and #$0F
-	beq .notwind
+	beq .skipwind
+;88A3
+;風の補正
 	lda aObjFlags
 	and #$40
 	cmp <zWindVec
 	beq .accel_wind
+;風向きと移動方向が逆
 	sec
 	lda aObjVXlo
 	sbc <zWindlo
@@ -531,12 +519,12 @@ DoRockman_SetVX_WithoutSlip:
 	lda aObjVX
 	sbc <zWindhi
 	sta aObjVX
-	bcc .overflow_wind
-	lda aObjFlags
-	and #$40
-	sta <zMoveVec
-	rts
-.overflow_wind
+	bcc .borrow_wind
+		lda aObjFlags
+		and #$40
+		sta <zMoveVec
+		rts
+.borrow_wind
 	lda aObjVXlo
 	eor #$FF
 	adc #$01
@@ -548,6 +536,7 @@ DoRockman_SetVX_WithoutSlip:
 	lda <zWindVec
 	sta <zMoveVec
 	rts
+;風向きと移動方向が一致
 .accel_wind
 	clc
 	lda aObjVXlo
@@ -560,7 +549,7 @@ DoRockman_SetVX_WithoutSlip:
 	sta <zMoveVec
 	rts
 ;88FA
-.notwind
+.skipwind
 	lda <zSliphi
 	ora <zSliplo
 	beq .notslip_wind
@@ -583,7 +572,9 @@ Table_RockmanVXhi:
 ;ロックマンの状態毎のVxlo
 Table_RockmanVXlo:
 	.db $00, $00, $90, $00, $20, $60, $50, $80, $00, $00, $00
-
+	.list
+	mNULL
+	.nolist
 ;8922
 ;ロックマン横移動
 DoRockman_BodyMoveX:
