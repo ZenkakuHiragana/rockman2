@@ -1,0 +1,9 @@
+C:\Users\nanashi\Dropbox\hack\hack\stage\Rock2StageEx\bin\Debug\Rock2StageEx.exe
+C:\Users\nanashi\Dropbox\hack\hack\stage\Rock2StageEx\bin\Debug\Rock2StageEx.pdb
+C:\Users\nanashi\Dropbox\hack\hack\stage\Rock2StageEx\bin\Debug\Rock2StageEx.xml
+C:\Users\nanashi\Dropbox\hack\hack\stage\Rock2StageEx\obj\x86\Debug\Rock2StageEx.Form1.resources
+C:\Users\nanashi\Dropbox\hack\hack\stage\Rock2StageEx\obj\x86\Debug\Rock2StageEx.Resources.resources
+C:\Users\nanashi\Dropbox\hack\hack\stage\Rock2StageEx\obj\x86\Debug\Rock2StageEx.vbproj.GenerateResource.Cache
+C:\Users\nanashi\Dropbox\hack\hack\stage\Rock2StageEx\obj\x86\Debug\Rock2StageEx.exe
+C:\Users\nanashi\Dropbox\hack\hack\stage\Rock2StageEx\obj\x86\Debug\Rock2StageEx.xml
+C:\Users\nanashi\Dropbox\hack\hack\stage\Rock2StageEx\obj\x86\Debug\Rock2StageEx.pdb

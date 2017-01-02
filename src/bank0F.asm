@@ -341,7 +341,7 @@ DieBoss:
 	mCHANGEBANK #$0D
 	jsr Bank0D_BeginEnding
 	lda #$0E
-	jmp $F290 ;------------------------
+	jmp Reset_JMP
 .isnotwily7
 	jmp $8079 ;------------------------
 
@@ -1569,12 +1569,16 @@ CountBlockableObjects:
 	rts
 
 ;20 9F CB
+;$08, $0A = (X, Y)
+;$09: YYYYXXXX: screen
+;$00 result(0～7)
+;$01 block flag(0 or not)
 PickupBlock:
 	ldy <zBlockObjNum
 .loop
 	dey
 	bmi PickupMap
-	ldx <zBlockObjIndex,y ;
+	ldx <zBlockObjIndex,y
 	lda <$08
 	and aObjBlockW10,x
 	cmp aObjBlockX10,x
@@ -1584,14 +1588,20 @@ PickupBlock:
 	cmp aObjBlockY10,x
 	bne .loop
 	lda aObjVar10,x
+	and #$07
+	sta <$01
+	lda aObjVar10,x
+	and #$08
 	sta <$00
 	rts
 
 ;20 C0 CB
 PickupMap:
 .result = $00
+.blk = $01
 .X = $08
-.Xhi = $09
+.R = $09
+.Xhi = $09 ;-----delete
 .Y = $0A
 .Yhi = $0B
 .ptr = $0C
@@ -1599,18 +1609,12 @@ PickupMap:
 	lda <zStage
 	and #$07
 	jsr ChangeBank
-	lda #$00
-	sta <.result
-	lda <.Yhi
-	beq .do
-	bmi .above
-	jmp .skip
-;上にはみ出しているときはY=0に補正して処理
-.above
-	lda #$00
-	sta <.Y
-;処理を開始
-.do
+	mSTZ <.result, <.blk
+	
+	ldx <.R
+	lda Stage_DefMap16,x
+	and #$40
+	bne .skip ;壁判定扱いにする
 	lda <.X
 	lsr a
 	lsr a
@@ -2585,7 +2589,9 @@ Reset_JMP:
 	sta $2001
 	mCHANGEBANK #$0E
 	jmp $8000
-
+;zPtrに示すアドレスへjsr
+IndirectJSR:
+	jmp [zPtr]
 	.include "src/animations.asm"
 
 	mBEGINRAW #$1E, Reset_Start

@@ -500,6 +500,27 @@ aPaletteBackup = $700   ;サブメニューを開いた時のBGパレットバ�
 
 
 
+Stage_Def16x16 = $8000
+Stage_Def32x32 = $8200
+Stage_Def32Pal = $8600
+Stage_Def32Attr = $8700
+;マップ定義(00～3F)
+;Scroll stop -> +80
+;Block flag -> +40
+Stage_DefMap16 = $8800
+Stage_DefEnemiesRoom = $8900
+Stage_DefEnemiesX = $8A00 - 1
+Stage_DefEnemiesY = $8B00 - 2
+Stage_DefEnemies = $8C00 - 3
+Stage_DefItemsRoom = $8D00 - 4
+Stage_DefItemsX = $8D30 - 4
+Stage_DefItemsY = $8D60 - 4
+Stage_DefItems = $8D90 - 4
+Stage_PaletteAnimNum = $8DC0 - 2
+Stage_PaletteAnimWait = $8DC0 - 1
+Stage_Palette = $8DC0
+Stage_PaletteAnim = $8DF0
+Stage_DefRoom = $B000
 
 
 Table_AnimationPointer_Low = $F900

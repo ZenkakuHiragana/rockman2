@@ -1,0 +1,24 @@
+0000-01FF 16x16 tile definition (80h tiles) (LT LB RT RB)
+0200-05FF 32x32 graphics (100h mapchips)
+0600-06FF 32x32 palette
+0700-07FF 32x32 attribute
+0800-08FF 16x16 map
+0900-09FE enemies position(room)
+09FF-0AFD enemies position(X)
+0AFE-0BFC enemies position(Y)
+0BFD-0CFB enemies
+0CFC-0D1B item position(room)
+0D2C-0D5B item position(X)
+0D5C-0D8B item position(Y)
+0D8C-0DBB items
+0DBE the number of palette animation frames
+0DBF palette animation wait
+0DC0-0DEF palettes(default)
+0DF0-0E5F palette animation
+0E60- continue point setting
+
+
+1000-1FFF enemies graphics
+2000-2FFF stage graphics(compressed)
+
+3000-3FFF 8x8 room definition(40h rooms)

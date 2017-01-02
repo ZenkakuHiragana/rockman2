@@ -1,7 +1,18 @@
 
+;ロックマンの処理を最適化して空き領域を得る
+;移動処理とスクロール処理は分離
+
+;$440～$44F: YYYY XXXX
+;Y = Y screen(0～F)
+;X = X screen(0～F)
+
 ;84EE
 ;ロックマン状態別の処理
 ;DoRockman:
+	lda aObjX
+	pha
+	lda aObjY
+	pha
 	lda <zStopFlag
 	and #$04
 	bne DoRockman01_Fall
@@ -9,7 +20,13 @@
 	ldx <zStatus
 	mMOV Table_DoRockmanlo,x, <zPtrlo
 	mMOV Table_DoRockmanhi,x, <zPtrhi
-	jmp [zPtr]
+	jsr IndirectJSR
+	pla
+	tay
+	pla
+	tax
+	rts
+	;jmp DoRockman_DoScroll
 
 ;8508
 ;ロックマン状態#0メニューを閉じたときの「ぴちゃっ」
@@ -572,35 +589,23 @@ Table_RockmanVXhi:
 ;ロックマンの状態毎のVxlo
 Table_RockmanVXlo:
 	.db $00, $00, $90, $00, $20, $60, $50, $80, $00, $00, $00
-	.list
-	mNULL
-	.nolist
+	
 ;8922
 ;ロックマン横移動
 DoRockman_BodyMoveX:
-.r = $2D   ;移動前画面数
-.x = $2E   ;移動前X上位
-.xlo = $2F ;移動前X下位
-	ldx aObjRoom
-	stx <.r
-	ldy aObjX
-	sty <.x
-	lda aObjXlo
-	sta <.xlo
-	lda #$00
-	sta <$00
-	lda <zMoveVec
-	and #$40
-	beq .left
+;.r = $2D   ;移動前画面数
+;.x = $2E   ;移動前X上位
+;.xlo = $2F ;移動前X下位
+;	ldx aObjRoom
+;	stx <.r
+;	ldy aObjX
+;	sty <.x
+;	lda aObjXlo
+;	sta <.xlo
+	mSTZ <$00
+	bit <zMoveVec
+	bvc .left
 ;右へ移動
-	cpx <zScrollRight
-	bne .lim_right
-	cpy #$EC
-	bcc .lim_right
-	lda #$02
-	sta <zScrollFlag
-	jmp .done_right
-.lim_right
 	clc
 	lda aObjXlo
 	adc aObjVXlo
@@ -608,21 +613,20 @@ DoRockman_BodyMoveX:
 	lda aObjX
 	adc aObjVX
 	sta aObjX
-	lda aObjRoom
-	adc #$00
-	sta aObjRoom
+	bcc .carry_right
+	inc aObjRoom
+.carry_right
+;右の地形判定
 	clc
 	lda aObjX
 	adc #$08
 	sta <$08
 	lda aObjRoom
 	adc #$00
-	sta <$09
 	jsr DoRockman_WallCheckX
 	lda <$00
 	beq .nohit_right
-	lda #$00
-	sta aObjXlo
+	mSTZ aObjXlo
 	lda <$08
 	and #$0F
 	sta <$00
@@ -630,29 +634,13 @@ DoRockman_BodyMoveX:
 	lda aObjX
 	sbc <$00
 	sta aObjX
-	lda aObjRoom
-	sbc #$00
-	sta aObjRoom
+	bcs .nohit_right
+	dec aObjRoom
 .nohit_right
-	sec
-	lda aObjX
-	sbc <.x
-	sta <$00
-	bpl .done_right
-	clc
-	eor #$FF
-	adc #$01
-	sta <$00
-	jmp .done_left
+	jmp DoRockman_CheckAttr_Center
 ;89AB
 ;左へ移動
 .left
-	cpx <zScrollLeft
-	bne .lim_left
-	cpy #$14
-	bcs .lim_left
-	jmp .done_left
-.lim_left
 	sec
 	lda aObjXlo
 	sbc aObjVXlo
@@ -660,52 +648,42 @@ DoRockman_BodyMoveX:
 	lda aObjX
 	sbc aObjVX
 	sta aObjX
-	lda aObjRoom
-	sbc #$00
-	sta aObjRoom
+	bcs .borrow_left
+	dec aObjRoom
+.borrow_left
 	sec
 	lda aObjX
 	sbc #$08
 	sta <$08
 	lda aObjRoom
 	sbc #$00
-	sta <$09
 	jsr DoRockman_WallCheckX
 	lda <$00
 	beq .nohit_left
-	lda #$00
-	sta aObjXlo
+	mSTZ aObjXlo
 	lda <$08
 	and #$0F
 	eor #$0F
 	sec
 	adc aObjX
 	sta aObjX
-	lda aObjRoom
-	adc #$00
-	sta aObjRoom
+	bcc .nohit_left
+	inc aObjRoom
 .nohit_left
-	sec
-	lda <.x
-	sbc aObjX
-	sta <$00
-	bpl .done_left
-	eor #$FF
-	clc
-	adc #$01
-	sta <$00
 ;8A12
-.done_right
-	jsr DoRockman_ScrollRight
+;.done_right
+;	jsr DoRockman_ScrollRight
 	mJSR_NORTS DoRockman_CheckAttr_Center
 ;8A19
-.done_left
-	jsr DoRockman_ScrollLeft
-	mJSR_NORTS DoRockman_CheckAttr_Center
+;.done_left
+
 ;8A20
 ;ロックマンの横移動時の壁判定
 DoRockman_WallCheckX:
-.n = $01
+.n = $02
+.blk = $10
+	and #$0F
+	sta <$09
 	lda #$02
 	sta <.n
 .loop
@@ -714,17 +692,28 @@ DoRockman_WallCheckX:
 	lda aObjY
 	adc Table_WallCheckX_dy,x
 	sta <$0A
-	lda <zOffscreen
+	lda <$09
+	and #$F0
+	php
+	lsr a
+	lsr a
+	lsr a
+	lsr a
+	plp
 	adc Table_WallCheckX_dr,x
-	sta <$0B
+	asl a
+	asl a
+	asl a
+	asl a
+	ora <$09
+	sta <$09
 	jsr PickupBlock
 	ldx <.n
-	lda <$00
-	sta <zBGAttr,x
+	mMOV <$00, <zBGAttr,x
+	mMOV <$01, <.blk,x
 	dec <.n
 	bpl .loop
-	lda #$00
-	sta <$00
+	mSTZ <$00
 	ldx #$02
 .loop2
 	ldy <zBGAttr,x
