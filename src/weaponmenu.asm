@@ -1,6 +1,6 @@
 
 ;90EC
-;•Ší‘I‘ğ‰æ–Ê•\¦‚Ìˆ—ŠJn
+;æ­¦å™¨é¸æŠç”»é¢è¡¨ç¤ºã®å‡¦ç†é–‹å§‹
 ;___Bank0D_BeginWeaponMenu:
 	jsr ClearSprites
 	lda #$00
@@ -165,12 +165,12 @@
 	asl <$07
 	rol a
 	sta <$07
-;ƒZƒbƒgƒAƒbƒvI—¹
+;ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—çµ‚äº†
 ;920B
 .startloop_menu
-.cursor = $FD     ;ƒJ[ƒ\ƒ‹ˆÊ’u
-.2ndscrflag = $FE ;— –Êƒtƒ‰ƒO
-.curwait = $FF    ;ƒJ[ƒ\ƒ‹‰Ÿ‚µ‚Á‚Ï‚È‚µˆÚ“®‚ÌƒJƒEƒ“ƒ^
+.cursor = $FD     ;ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®
+.2ndscrflag = $FE ;è£é¢ãƒ•ãƒ©ã‚°
+.curwait = $FF    ;ã‚«ãƒ¼ã‚½ãƒ«æŠ¼ã—ã£ã±ãªã—ç§»å‹•ã®ã‚«ã‚¦ãƒ³ã‚¿
 	lda <zKeyPress
 	and #$08
 	beq .do
@@ -204,7 +204,7 @@
 	and #$30
 	and #$10
 	bne .goup
-;ƒJ[ƒ\ƒ‹‚ª‰º‚ÖˆÚ“®
+;ã‚«ãƒ¼ã‚½ãƒ«ãŒä¸‹ã¸ç§»å‹•
 .loop_godown
 	inc <.cursor
 	cpx <.cursor
@@ -218,7 +218,7 @@
 	and <$07
 	beq .loop_godown
 	bne .done
-;ƒJ[ƒ\ƒ‹‚ªã‚ÖˆÚ“®
+;ã‚«ãƒ¼ã‚½ãƒ«ãŒä¸Šã¸ç§»å‹•
 .goup
 	dec <.cursor
 	bpl .overflow_goup
@@ -230,7 +230,7 @@
 	and <$07
 	beq .goup
 	bne .done
-;ƒL[‚ª‰Ÿ‚³‚ê‚È‚©‚Á‚½ê‡
+;ã‚­ãƒ¼ãŒæŠ¼ã•ã‚Œãªã‹ã£ãŸå ´åˆ
 .skip
 	lda #$00
 	sta <.curwait
@@ -240,11 +240,11 @@
 	jmp .loop_menu
 
 ;9281
-;‘I‘ğ
+;é¸æŠæ™‚
 .decided
 	lda <.cursor
 	bne .isnotnext
-;NEXT‚ğ‰Ÿ‚µ‚½
+;NEXTã‚’æŠ¼ã—ãŸ
 	lda <.2ndscrflag
 	eor #$01
 	sta <.2ndscrflag
@@ -252,7 +252,7 @@
 .isnotnext
 	cmp #$07
 	bne .isweapondecided
-;EŠÊg—p
+;Eç¼¶ä½¿ç”¨
 	lda <zETanks
 	beq .skip
 	dec <zETanks
@@ -270,7 +270,7 @@
 	jsr FrameAdvance1A
 	jmp .loop_etank
 .isweapondecided
-;•Ší‚ğ‘I‘ğ
+;æ­¦å™¨ã‚’é¸æŠ
 	lda <.cursor
 	beq .skip
 	cmp #$07
@@ -400,7 +400,7 @@
 	.db $27, $11, $16
 
 ;9396
-;•Ší‘I‘ğƒƒjƒ…[‚ÌƒXƒvƒ‰ƒCƒg•\¦ˆ—
+;æ­¦å™¨é¸æŠãƒ¡ãƒ‹ãƒ¥ãƒ¼ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆè¡¨ç¤ºå‡¦ç†
 .showsprites
 .basex = $08
 .x = $01
@@ -412,13 +412,13 @@
 	sbc <zHScroll
 	sta <.basex
 	ldy #$00
-.loop_next ;$962C($00…Yƒ$14) ¨NEXT‚ğ•`‚­
+.loop_next ;$962C($00â‰¦Yï¼œ$14) â†’NEXTã‚’æã
 	lda .table_next,y
 	sta aSprite,y
 	iny
 	cpy #$14
 	bne .loop_next
-;$07‚É•Šíæ“¾ƒtƒ‰ƒO‚ÆƒAƒCƒeƒ€æ“¾ƒtƒ‰ƒO‚ğŠi”[
+;$07ã«æ­¦å™¨å–å¾—ãƒ•ãƒ©ã‚°ã¨ã‚¢ã‚¤ãƒ†ãƒ å–å¾—ãƒ•ãƒ©ã‚°ã‚’æ ¼ç´
 	.ifndef ___OPTIMIZE
 	lda <zClearFlags
 	asl a
@@ -442,7 +442,7 @@
 	sta <$07
 .showsprites_2nd
 	lda <$07
-;-------------Å“K‰»ƒR[ƒh-----------
+;-------------æœ€é©åŒ–ã‚³ãƒ¼ãƒ‰-----------
 	.else
 	lda #$05
 	sta <$01
@@ -465,7 +465,7 @@
 	.endif
 ;-------------------------------------
 	sta <$02
-	lda #$44 ;•Ší‚Ì“ª•¶š‚Ìˆê”ÔãYÀ•W
+	lda #$44 ;æ­¦å™¨ã®é ­æ–‡å­—ã®ä¸€ç•ªä¸ŠYåº§æ¨™
 	sta <$00
 .loop_showweaponicon
 	sta aSprite,y
@@ -495,14 +495,14 @@
 	bne .is2nd_showbars
 	ldx #$00
 .loop_e
-	lda .table_1upicon,x ;$964C($00…Xƒ$04) E‚Ì•¶š
+	lda .table_1upicon,x ;$964C($00â‰¦Xï¼œ$04) Eã®æ–‡å­—
 	sta aSprite,y
 	iny
 	inx
 	cpx #$04
 	bne .loop_e
 	sty <$00
-	lda #$44 ;ƒƒbƒNƒ}ƒ“‚Ì‘Ì—Íƒo[YˆÊ’u
+	lda #$44 ;ãƒ­ãƒƒã‚¯ãƒãƒ³ã®ä½“åŠ›ãƒãƒ¼Yä½ç½®
 	sta <.y
 	lda aObjLife
 	jsr .drawbars_specified
@@ -510,7 +510,7 @@
 	lsr a
 	sta <$04
 	ldx #$00
-	lda #$54 ;“Áê•ŠíƒGƒlƒ‹ƒM[—Ê(1”Ôã)YˆÊ’u
+	lda #$54 ;ç‰¹æ®Šæ­¦å™¨ã‚¨ãƒãƒ«ã‚®ãƒ¼é‡(1ç•ªä¸Š)Yä½ç½®
 .loop_bars1
 	stx <$03
 	sta <.y
@@ -525,19 +525,19 @@
 	inx
 	cpx #$05
 	bne .loop_bars1
-;EŠÊ‚Ìœ‚ğ•`‰æ
+;Eç¼¶ã®â—ã‚’æç”»
 	ldy <$00
 	lda <zETanks
 	beq .notanks
 	sta <$02
-	lda #$1C ;EŠÊ‚ÌœXˆÊ’u¶’[
+	lda #$1C ;Eç¼¶ã®â—Xä½ç½®å·¦ç«¯
 .loop_tanks
 	sta <.x
-	lda #$A4 ;EŠÊ‚ÌœYˆÊ’u
+	lda #$A4 ;Eç¼¶ã®â—Yä½ç½®
 	sta aSprite,y
-	lda #$13 ;EŠÊ‚Ìœƒ^ƒCƒ‹”Ô†
+	lda #$13 ;Eç¼¶ã®â—ã‚¿ã‚¤ãƒ«ç•ªå·
 	sta aSprite + 1,y
-	lda #$00 ;ƒpƒŒƒbƒg”Ô†‚Æ‘®«
+	lda #$00 ;ãƒ‘ãƒ¬ãƒƒãƒˆç•ªå·ã¨å±æ€§
 	sta aSprite + 2,y
 	lda <.x
 	sta aSprite + 3,y
@@ -552,10 +552,10 @@
 	bne .loop_tanks
 .notanks
 	jmp .postdrawbars
-;— –Ê
+;è£é¢
 .is2nd_showbars
 	ldx #$04
-.basesprites2 ;$964C($04…Xƒ$17) 1UP‚ÌŠç‚Æ:‚ğ•`‚­
+.basesprites2 ;$964C($04â‰¦Xï¼œ$17) 1UPã®é¡”ã¨:ã‚’æã
 	lda .table_1upicon,x
 	sta aSprite,y
 	iny
@@ -607,7 +607,7 @@
 	lda #$40
 	sta aSprite + 4 + 3,y
 ;94DD
-;ˆ—‡—¬
+;å‡¦ç†åˆæµ
 .postdrawbars
 	ldy #$00
 	lda <zFrameCounter
@@ -648,13 +648,13 @@
 	bne .loop_movex
 	rts
 ;9519
-;‚È‚ñ‚¾‚ë‚±‚ê
+;ãªã‚“ã ã‚ã“ã‚Œ
 .unknown9519
 	.db $2C, $3C, $4C, $5C, $6C, $7C, $8C, $9C
 	.db $3C, $4C, $5C, $6C, $7C, $8C, $9C, $AC
 ;9529
-;ƒGƒlƒ‹ƒM[c—Ê‚Ìƒo[‚ğ•\¦
-;$01‚É—Ê, $02‚ÉYˆÊ’u
+;ã‚¨ãƒãƒ«ã‚®ãƒ¼æ®‹é‡ã®ãƒãƒ¼ã‚’è¡¨ç¤º
+;$01ã«é‡, $02ã«Yä½ç½®
 .drawbars
 	lda <zEnergyArray,x
 .drawbars_specified
@@ -667,7 +667,7 @@
 	lda <$01
 	sbc #$04
 	bcs .over4
-;4–¢–‚Ì
+;4æœªæº€ã®æ™‚
 	ldy <$01
 	lda #$00
 	sta <$01
@@ -675,7 +675,7 @@
 	ldy <$00
 	jmp .merge_drawbars
 .over4
-;4ˆÈã‚Ì
+;4ä»¥ä¸Šã®æ™‚
 	sta <$01
 	lda #$90
 .merge_drawbars
@@ -693,15 +693,15 @@
 	bpl .loop_drawbars
 	rts
 ;9565
-;ƒGƒlƒ‹ƒM[c—Êƒo[‚ÌƒXƒvƒ‰ƒCƒgˆÊ’uX
+;ã‚¨ãƒãƒ«ã‚®ãƒ¼æ®‹é‡ãƒãƒ¼ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆä½ç½®X
 .table_bars_posx
 	.db $4C, $44, $3C, $34, $2C, $24, $1C
 ;956C
-;ƒGƒlƒ‹ƒM[c—Êƒo[‚ÌƒXƒvƒ‰ƒCƒg”Ô†(3`0)
+;ã‚¨ãƒãƒ«ã‚®ãƒ¼æ®‹é‡ãƒãƒ¼ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·(3ï½0)
 .table_bars_sprite
 	.db $94, $93, $92, $91
 ;9570
-;•Šíƒƒjƒ…[BG•”•ª‚Ìƒ}ƒbƒv’è‹`
+;æ­¦å™¨ãƒ¡ãƒ‹ãƒ¥ãƒ¼BGéƒ¨åˆ†ã®ãƒãƒƒãƒ—å®šç¾©
 .table_menubg_map
 	.ifndef ___OPTIMIZE
 	.db 0, 1, 2
@@ -717,7 +717,7 @@
 	.db $60, $70, $80
 	.endif
 ;957F
-;•Šíƒƒjƒ…[‚ÌBG•”•ª‚Ì‘‚«‚İˆÊ’u
+;æ­¦å™¨ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã®BGéƒ¨åˆ†ã®æ›¸ãè¾¼ã¿ä½ç½®
 .table_menubg_writepos
 	.db $00, $20, $40
 	.db $04, $24, $44
@@ -725,7 +725,7 @@
 	.db $0C, $2C, $4C
 	.db $10, $30, $50
 ;958E
-;•Šíƒƒjƒ…[BG•”•ª‚Ìƒ^ƒCƒ‹’è‹`
+;æ­¦å™¨ãƒ¡ãƒ‹ãƒ¥ãƒ¼BGéƒ¨åˆ†ã®ã‚¿ã‚¤ãƒ«å®šç¾©
 .table_menubg_tile
 	.db $40, $40, $40, $40
 	.db $40, $41, $41, $41
@@ -772,33 +772,33 @@
 	.db $41, $41, $41, $40
 	.db $40, $40, $40, $40
 ;961E
-;ƒXƒe[ƒW‚²‚Æ‚Ì•Šíƒƒjƒ…[‚Ì‘®«ƒe[ƒuƒ‹
+;ã‚¹ãƒ†ãƒ¼ã‚¸ã”ã¨ã®æ­¦å™¨ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã®å±æ€§ãƒ†ãƒ¼ãƒ–ãƒ«
 .table_menubg_attr
 	.db $00, $55, $AA, $00, $AA, $00, $00, $00
 	.db $00, $00, $55, $AA, $00, $00
 ;962C
-;¨NEXT ƒXƒvƒ‰ƒCƒgƒe[ƒuƒ‹
+;â†’NEXT ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆãƒ†ãƒ¼ãƒ–ãƒ«
 .table_next
 	.db $34, $11, $01, $0C
 	.db $34, $95, $01, $1C, $34, $96, $01, $24
 	.db $34, $97, $01, $2C, $34, $98, $01, $34
 ;9640
-;•Ší‚Ì“ª•¶š P, H, A, W, B, Q, F, M, C, 1, 2, 3
+;æ­¦å™¨ã®é ­æ–‡å­— P, H, A, W, B, Q, F, M, C, 1, 2, 3
 .table_weapon_letters
 	.db $1F, $9F, $9B, $99, $9D, $9C, $9A, $9E, $10, $15, $16, $17
 ;964C
-;EŠÊ‚ÌE‚ÆA1UP“ª‚Æ:
+;Eç¼¶ã®Eã¨ã€1UPé ­ã¨:
 .table_1upicon
 	.db $A4, $96, $01, $0C
 	.db $A0, $8D, $00, $18, $A0, $8D, $40, $20
 	.db $A8, $8E, $01, $18, $A8, $8E, $41, $20
 	.db $A4, $1E, $01, $2C
 ;9664
-;•ŠíƒOƒ‰ƒtƒBƒbƒN‚Ö‚ÌƒAƒhƒŒƒXãˆÊ
+;æ­¦å™¨ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ã¸ã®ã‚¢ãƒ‰ãƒ¬ã‚¹ä¸Šä½
 .table_weapongraphs_ptr
 	.db $98, $9A, $99, $9C, $98, $98, $9A, $98, $9B, $9B, $9B, $9B
 ;9670
-;ƒJ[ƒ\ƒ‹ˆÚ“®‰Â”\ƒtƒ‰ƒO
+;ã‚«ãƒ¼ã‚½ãƒ«ç§»å‹•å¯èƒ½ãƒ•ãƒ©ã‚°
 .table_cursor_allowflag
 	.db $00, $01, $02, $04, $08, $10, $20, $40
 

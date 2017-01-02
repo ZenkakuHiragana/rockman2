@@ -3,27 +3,27 @@
 	mBEGIN #$0D, #$8000
 	
 Bank0D_BeginStageSelect:
-	jmp ___Bank0D_BeginSelectStage ;ƒXƒe[ƒWƒZƒŒƒNƒg‰æ–ÊŠJn
+	jmp ___Bank0D_BeginSelectStage ;ã‚¹ãƒ†ãƒ¼ã‚¸ã‚»ãƒ¬ã‚¯ãƒˆç”»é¢é–‹å§‹
 Bank0D_BeginWeaponMenu:
-	jmp ___Bank0D_BeginWeaponMenu ;•Ší‘I‘ğ‰æ–Ê•\¦‚Ìˆ—ŠJn
+	jmp ___Bank0D_BeginWeaponMenu ;æ­¦å™¨é¸æŠç”»é¢è¡¨ç¤ºã®å‡¦ç†é–‹å§‹
 Bank0D_BeginEnterWilyCastle:
-	jmp ___Bank0D_BeginEnterWilyCastle ;ƒƒCƒŠ[é“Ë“ü‚Ìˆ—ŠJn
+	jmp ___Bank0D_BeginEnterWilyCastle ;ãƒ¯ã‚¤ãƒªãƒ¼åŸçªå…¥ã®å‡¦ç†é–‹å§‹
 Bank0D_BeginTitleScreen:
-	jmp ___Bank0D_BeginTitleScreen ;ƒ^ƒCƒgƒ‹‰æ–ÊŠJn
+	jmp ___Bank0D_BeginTitleScreen ;ã‚¿ã‚¤ãƒˆãƒ«ç”»é¢é–‹å§‹
 Bank0D_BeginGameOver:
-	jmp ___Bank0D_BeginGameOver ;ƒQ[ƒ€ƒI[ƒo[‰æ–ÊŠJn
+	jmp ___Bank0D_BeginGameOver ;ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼ç”»é¢é–‹å§‹
 Bank0D_BeginEnding:
-	jmp ___Bank0D_BeginEnding ;ƒGƒ“ƒfƒBƒ“ƒOŠJn
+	jmp ___Bank0D_BeginEnding ;ã‚¨ãƒ³ãƒ‡ã‚£ãƒ³ã‚°é–‹å§‹
 Bank0D_BeginGetEquipment:
-	jmp ___Bank0D_BeginGetEquipment ;•Šíæ“¾ŠJn
+	jmp ___Bank0D_BeginGetEquipment ;æ­¦å™¨å–å¾—é–‹å§‹
 
 ;8015
-;ƒXƒe[ƒWƒZƒŒƒNƒg‰æ–ÊŠJn
+;ã‚¹ãƒ†ãƒ¼ã‚¸ã‚»ãƒ¬ã‚¯ãƒˆç”»é¢é–‹å§‹
 ___Bank0D_BeginSelectStage:
 	.include "src/selectstage.asm"
 
 ;829E
-;$8499+X-$1F ` $8499+X‚ğƒpƒŒƒbƒg‚É‘‚«‚İ
+;$8499+X-$1F ï½ $8499+Xã‚’ãƒ‘ãƒ¬ãƒƒãƒˆã«æ›¸ãè¾¼ã¿
 WritePaletteX_1A:
 	ldy #$1F
 .loop_palette_specified
@@ -58,7 +58,7 @@ SelectBossFocus:
 .end
 	rts
 ;82CA
-;•ûŒüƒL[‚Æƒ{ƒX˜g‘I‘ğæ‚ÌŠÖŒWƒe[ƒuƒ‹
+;æ–¹å‘ã‚­ãƒ¼ã¨ãƒœã‚¹æ é¸æŠå…ˆã®é–¢ä¿‚ãƒ†ãƒ¼ãƒ–ãƒ«
 Table_SelectBoss_CursorRelationship:
 	.db $02, $06, $00, $08, $00, $00, $00, $04
 	.db $01, $08, $01, $01, $01, $01, $01, $02
@@ -70,7 +70,7 @@ Table_SelectBoss_CursorRelationship:
 	.db $08, $07, $07, $07, $07, $07, $07, $06
 	.db $01, $07, $08, $08, $08, $08, $08, $00
 ;8312
-;ƒ{ƒX‘I‘ğ‚Ì‘I‘ğ˜gƒXƒvƒ‰ƒCƒg‚ğƒZƒbƒg
+;ãƒœã‚¹é¸æŠã®é¸æŠæ ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’ã‚»ãƒƒãƒˆ
 SelectBoss_SetFocusSprite:
 .dx = $08
 .dy = $09
@@ -113,7 +113,7 @@ SelectBoss_SetFocusSprite:
 	rts
 
 ;8358
-;ƒ{ƒXĞ‰î‚Ì¯ƒXƒvƒ‰ƒCƒg‚ğˆÚ“®‚·‚é
+;ãƒœã‚¹ç´¹ä»‹ã®æ˜Ÿã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’ç§»å‹•ã™ã‚‹
 SelectBoss_MoveIntroStar:
 	ldy #$50
 	ldx #$00
@@ -152,7 +152,7 @@ SelectBoss_MoveIntroStar:
 	bpl .loop
 	rts
 ;83A3
-.table_introstar_num ;¯‚Ì‘å‚«‚³‚²‚Æ‚Ì”
+.table_introstar_num ;æ˜Ÿã®å¤§ãã•ã”ã¨ã®æ•°
 	.db $07, $0D, $15
 .table_introstar_vxlo
 	.db $00, $47, $41
@@ -168,7 +168,7 @@ SelectBoss_MoveIntroStar:
 	iny
 	lda aObjFlags
 	beq .ispipi
-	lda #$40 ;ƒsƒs‚Ü‚İ‚ê‚Ìê‡A¶‰E”½“]‚µ‚Ä‰EŒü‚«‚É‚·‚é
+	lda #$40 ;ãƒ”ãƒ”ã¾ã¿ã‚Œã®å ´åˆã€å·¦å³åè»¢ã—ã¦å³å‘ãã«ã™ã‚‹
 .ispipi
 	sta aSprite,y
 	iny
@@ -183,7 +183,7 @@ SelectBoss_MoveIntroStar:
 	bne .introstar_sprite_setup
 	rts
 ;83D5
-;ƒ{ƒXĞ‰î‚Ìƒ{ƒX‚ÌƒAƒjƒ[ƒVƒ‡ƒ“‚ğ‚·‚é
+;ãƒœã‚¹ç´¹ä»‹ã®ãƒœã‚¹ã®ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚’ã™ã‚‹
 SelectBoss_AnimateBossIntro:
 	ldx <zStage
 	inc aObjWait
@@ -209,7 +209,7 @@ SelectBoss_AnimateBossIntro:
 	sta <zPtrhi
 	ldy #$00
 	lda [zPtr],y
-	sta <$00 ;ƒXƒvƒ‰ƒCƒg‚Ì”
+	sta <$00 ;ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®æ•°
 	iny
 	ldx #$00
 .loop
@@ -273,7 +273,7 @@ SelectBoss_ResetObjX:
 	rts
 
 ;8473
-;ƒXƒvƒ‰ƒCƒgî•ñ‚ğ‰Šú‰»
+;ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆæƒ…å ±ã‚’åˆæœŸåŒ–
 ClearSprite1A:
 	ldx #$00
 	lda #$F8
@@ -284,7 +284,7 @@ ClearSprite1A:
 	rts
 
 ;847E
-;ƒXƒNƒ[ƒ‹ˆÊ’u‚ÆƒpƒŒƒbƒgƒAƒjƒ[ƒVƒ‡ƒ“î•ñ‚ğ0‚É‰Šú‰»
+;ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ä½ç½®ã¨ãƒ‘ãƒ¬ãƒƒãƒˆã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³æƒ…å ±ã‚’0ã«åˆæœŸåŒ–
 ResetScrollPosition1A:
 	lda #$00
 	sta <zHScroll
@@ -306,23 +306,23 @@ ResetScrollPosition1A:
 
 
 ;90EC
-;•Ší‘I‘ğ‰æ–Ê•\¦‚Ìˆ—ŠJn
+;æ­¦å™¨é¸æŠç”»é¢è¡¨ç¤ºã®å‡¦ç†é–‹å§‹
 ___Bank0D_BeginWeaponMenu:
 	.include "src/weaponmenu.asm"
 
 
 ;9678
-;ƒƒCƒŠ[é“Ë“ü‚Ìˆ—
+;ãƒ¯ã‚¤ãƒªãƒ¼åŸçªå…¥æ™‚ã®å‡¦ç†
 ___Bank0D_BeginEnterWilyCastle:
 	.include "src/enterwilycastle.asm"
 
 ;9EE7
-;ƒ^ƒCƒgƒ‹‰æ–Ê‚Ìˆ—
+;ã‚¿ã‚¤ãƒˆãƒ«ç”»é¢ã®å‡¦ç†
 ___Bank0D_BeginTitleScreen:
 	.include "src/titlescreen.asm"
 
 ;A4EB
-;‰æ–Ê‚ğON‚É‚·‚é
+;ç”»é¢ã‚’ONã«ã™ã‚‹
 EnableScreen1A:
 	lda <z2001
 	ora #%00011000
@@ -334,7 +334,7 @@ EnableScreen1A:
 	rts
 
 ;A4FB
-;‰æ–Ê‚ğOFF‚É‚·‚é
+;ç”»é¢ã‚’OFFã«ã™ã‚‹
 DisableScreen1A:
 	lda #%00010000
 	sta <z2000
@@ -345,7 +345,7 @@ DisableScreen1A:
 	rts
 
 ;A50A
-;—\–ñ‚³‚ê‚½PPU‹éŒ`‘‚«‚İ‚ğÀs‚·‚é(‰æ–ÊOFF‚ÉÀs‰Â”\)
+;äºˆç´„ã•ã‚ŒãŸPPUçŸ©å½¢æ›¸ãè¾¼ã¿ã‚’å®Ÿè¡Œã™ã‚‹(ç”»é¢OFFæ™‚ã«å®Ÿè¡Œå¯èƒ½)
 WritePPUSquare1A:
 	lda <$08
 	pha
@@ -363,7 +363,7 @@ WritePPUSquare1A:
 	rts
 
 ;A521
-;$FD‚Åw’è‚µ‚½ƒI[ƒvƒjƒ“ƒO‚ÌƒZƒŠƒt‚ğ‘‚«‚Ş
+;$FDã§æŒ‡å®šã—ãŸã‚ªãƒ¼ãƒ—ãƒ‹ãƒ³ã‚°ã®ã‚»ãƒªãƒ•ã‚’æ›¸ãè¾¼ã‚€
 WriteOpeningQuotes:
 	ldx <$FD
 	ldy #$00
@@ -379,9 +379,9 @@ WriteOpeningQuotes:
 	rts
 
 ;A536
-;ƒI[ƒvƒjƒ“ƒOã¸Aƒ^ƒCƒgƒ‹‰æ–Ê‚ğ‘‚«‚Şˆ—
-;cƒXƒNƒ[ƒ‹’l‚ğ$00‚É•Û‘¶‚µA‚»‚ê‚ªŠï”‚È‚ç‘®«ƒe[ƒuƒ‹‚Ì‘‚«‚İA
-;‹ô”‚È‚çƒl[ƒ€ƒe[ƒuƒ‹‚Ì‘‚«‚İ‚ğs‚¤B
+;ã‚ªãƒ¼ãƒ—ãƒ‹ãƒ³ã‚°ä¸Šæ˜‡æ™‚ã€ã‚¿ã‚¤ãƒˆãƒ«ç”»é¢ã‚’æ›¸ãè¾¼ã‚€å‡¦ç†
+;ç¸¦ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«å€¤ã‚’$00ã«ä¿å­˜ã—ã€ãã‚ŒãŒå¥‡æ•°ãªã‚‰å±æ€§ãƒ†ãƒ¼ãƒ–ãƒ«ã®æ›¸ãè¾¼ã¿ã€
+;å¶æ•°ãªã‚‰ãƒãƒ¼ãƒ ãƒ†ãƒ¼ãƒ–ãƒ«ã®æ›¸ãè¾¼ã¿ã‚’è¡Œã†ã€‚
 Opening_WriteTitleScreenByScroll:
 	sta <$00
 	lda <$00
@@ -406,7 +406,7 @@ Opening_WriteTitleScreenByScroll:
 	rts
 
 ;A562
-;ƒI[ƒvƒjƒ“ƒOã¸Aƒ^ƒCƒgƒ‹‰æ–Ê‚Ìƒl[ƒ€ƒe[ƒuƒ‹•”•ª‚ğ‘‚«‚ŞB
+;ã‚ªãƒ¼ãƒ—ãƒ‹ãƒ³ã‚°ä¸Šæ˜‡æ™‚ã€ã‚¿ã‚¤ãƒˆãƒ«ç”»é¢ã®ãƒãƒ¼ãƒ ãƒ†ãƒ¼ãƒ–ãƒ«éƒ¨åˆ†ã‚’æ›¸ãè¾¼ã‚€ã€‚
 .writenametable
 	lda <$00
 	lsr a
@@ -456,7 +456,7 @@ Opening_WriteTitleScreenByScroll:
 	rts
 
 ;A5AF
-;ƒ^ƒCƒgƒ‹‰æ–Ê‚ÌAƒƒbƒNƒ}ƒ“‚Ì”¯‚ª‚È‚Ñ‚­ƒAƒjƒ[ƒVƒ‡ƒ“‚ğ‚â‚é
+;ã‚¿ã‚¤ãƒˆãƒ«ç”»é¢ã®ã€ãƒ­ãƒƒã‚¯ãƒãƒ³ã®é«ªãŒãªã³ãã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚’ã‚„ã‚‹
 Opening_DoRockmanAnimationHair:
 	dec aObjWait10
 	bne .end
@@ -472,7 +472,7 @@ Opening_DoRockmanAnimationHair:
 	rts
 
 ;A5C9
-;ƒ^ƒCƒgƒ‹ƒƒS‚ÌAN‚ÌƒXƒvƒ‰ƒCƒg‚Å•â‚Á‚Ä‚¢‚é•”•ª‚ğ•\¦‚·‚é
+;ã‚¿ã‚¤ãƒˆãƒ«ãƒ­ã‚´ã®ã€Nã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã§è£œã£ã¦ã„ã‚‹éƒ¨åˆ†ã‚’è¡¨ç¤ºã™ã‚‹
 Titlelogo_ShowSprites:
 	ldx #$14
 .loop
@@ -483,11 +483,11 @@ Titlelogo_ShowSprites:
 	rts
 
 ;A5D5
-;ƒI[ƒvƒjƒ“ƒOAƒrƒ‹‚Ì“Ë‹N•”‚Æ‘‹‚ÌƒXƒvƒ‰ƒCƒgˆÚ“®ˆ—
+;ã‚ªãƒ¼ãƒ—ãƒ‹ãƒ³ã‚°ã€ãƒ“ãƒ«ã®çªèµ·éƒ¨ã¨çª“ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç§»å‹•å‡¦ç†
 Opening_MoveBuildingSprites:
 	ldx #$02
 .loop
-;‘‹‚Æ“Ë‹N•”‚ÌˆÚ“®‚Æ‰æ–ÊŠO”»’è¨Á–Å‚Ü‚Å
+;çª“ã¨çªèµ·éƒ¨ã®ç§»å‹•ã¨ç”»é¢å¤–åˆ¤å®šâ†’æ¶ˆæ»…ã¾ã§
 	stx <zObjIndex
 	lda aObjAnim,x
 	beq .skip
@@ -518,7 +518,7 @@ Opening_MoveBuildingSprites:
 	cmp #$A8
 	bcc .skip_1
 .skip_ascend
-;ã¸’†A‘‹‚ªoŒ»‚·‚éˆ—
+;ä¸Šæ˜‡ä¸­ã€çª“ãŒå‡ºç¾ã™ã‚‹å‡¦ç†
 	sec
 	lda aObjYlo
 	sbc aObjVYlo
@@ -534,7 +534,7 @@ Opening_MoveBuildingSprites:
 	lda #$48
 	sta aObjY
 .skip_0
-;ã¸’†A“Ë‹N•”‚ªoŒ»‚·‚éˆ—
+;ä¸Šæ˜‡ä¸­ã€çªèµ·éƒ¨ãŒå‡ºç¾ã™ã‚‹å‡¦ç†
 	sec
 	lda aObjYlo + 1
 	sbc aObjVYlo
@@ -550,7 +550,7 @@ Opening_MoveBuildingSprites:
 	lda #$48
 	sta aObjY + 1
 .skip_1
-;‰Á‘¬‚·‚é
+;åŠ é€Ÿã™ã‚‹
 	clc
 	lda aObjVYlo
 	adc #$02
@@ -563,7 +563,7 @@ Opening_MoveBuildingSprites:
 	lda #$00
 	sta aObjVYlo
 .accel_max
-;ƒƒbƒNƒ}ƒ“‚ÌˆÚ“®
+;ãƒ­ãƒƒã‚¯ãƒãƒ³ã®ç§»å‹•
 	clc
 	lda aObjY10
 	adc aObjVY
@@ -574,7 +574,7 @@ Opening_MoveBuildingSprites:
 	rts
 
 ;A68D
-;$02…X…$0F‚Ì”ÍˆÍ‚ÉƒI[ƒvƒjƒ“ƒO‚Ìƒrƒ‹‚ÌƒfƒBƒe[ƒ‹‚ğoŒ»‚³‚¹‚é
+;$02â‰¦Xâ‰¦$0Fã®ç¯„å›²ã«ã‚ªãƒ¼ãƒ—ãƒ‹ãƒ³ã‚°ã®ãƒ“ãƒ«ã®ãƒ‡ã‚£ãƒ†ãƒ¼ãƒ«ã‚’å‡ºç¾ã•ã›ã‚‹
 Opening_SpawnDetail:
 	sta <$00
 	ldx #$02
@@ -586,7 +586,7 @@ Opening_SpawnDetail:
 	bne .loop
 	rts
 ;A69C
-;ƒXƒvƒ‰ƒCƒg‚ğoŒ»‚³‚¹‚é
+;ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’å‡ºç¾ã•ã›ã‚‹
 .found
 	lda <$00
 	sta aObjAnim,x
@@ -599,7 +599,7 @@ Opening_SpawnDetail:
 	rts
 
 ;A6B1
-;ƒI[ƒvƒjƒ“ƒO‚ÌŒš•¨ƒfƒBƒe[ƒ‹•”•ª‚ğ•`‰æ‚·‚é
+;ã‚ªãƒ¼ãƒ—ãƒ‹ãƒ³ã‚°ã®å»ºç‰©ãƒ‡ã‚£ãƒ†ãƒ¼ãƒ«éƒ¨åˆ†ã‚’æç”»ã™ã‚‹
 Opening_DrawBuildingSprites:
 	jsr ClearSprite1A
 	lda #$00
@@ -660,7 +660,7 @@ Opening_DrawBuildingSprites:
 	rts
 
 ;A719
-;ƒ^ƒCƒgƒ‹‰æ–Ê‚ÌƒƒbƒNƒ}ƒ“‚ğ•`‚­
+;ã‚¿ã‚¤ãƒˆãƒ«ç”»é¢ã®ãƒ­ãƒƒã‚¯ãƒãƒ³ã‚’æã
 Opening_DrawRockman:
 	ldx aObjAnim10
 	lda Table_Title_RockmanSpriteslo,x
@@ -711,7 +711,7 @@ Opening_DrawRockman:
 	rts
 
 ;A76A
-;ƒI[ƒvƒjƒ“ƒO‚ğƒXƒLƒbƒv‚µ‚½ê‡‚±‚±‚Ö”ò‚Ô
+;ã‚ªãƒ¼ãƒ—ãƒ‹ãƒ³ã‚°ã‚’ã‚¹ã‚­ãƒƒãƒ—ã—ãŸå ´åˆã“ã“ã¸é£›ã¶
 Opening_Skipped:
 	jsr DisableScreen1A
 	mMOV #$50, <$FD
@@ -810,7 +810,7 @@ Opening_Skipped:
 	jmp BeginTitleScreenSkipped
 
 ;A840
-;$08~$09‚Å¦‚µ‚½ƒ}ƒbƒvƒAƒhƒŒƒX‚©‚çƒ}ƒbƒv‚ğ“Ç‚İ‚Ş
+;$08~$09ã§ç¤ºã—ãŸãƒãƒƒãƒ—ã‚¢ãƒ‰ãƒ¬ã‚¹ã‹ã‚‰ãƒãƒƒãƒ—ã‚’èª­ã¿è¾¼ã‚€
 WriteMapAddressOffScreen1A;
 	lda #$00
 	sta <zNTPointer
@@ -827,7 +827,7 @@ WriteMapAddressOffScreen1A;
 	rts
 
 ;A85A
-;BGƒpƒŒƒbƒg#2AƒXƒvƒ‰ƒCƒg‚ÌƒpƒŒƒbƒg‘S•”‚ğ•‚­‚È‚é‚Ü‚ÅƒtƒF[ƒhƒAƒEƒg‚³‚¹‚é
+;BGãƒ‘ãƒ¬ãƒƒãƒˆ#2ã€ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ãƒ‘ãƒ¬ãƒƒãƒˆå…¨éƒ¨ã‚’é»’ããªã‚‹ã¾ã§ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆã•ã›ã‚‹
 FadeoutPalette_BG2_Spr:
 	lda #$04
 	sta <$FD
@@ -843,7 +843,7 @@ FadeoutPalette_BG2_Spr:
 	jmp .loop_wait
 .rts
 	rts
-;X`(A+1)‚Ü‚Å‚ÌƒpƒŒƒbƒg‚ğ1’iŠKƒtƒF[ƒhƒAƒEƒg‚³‚¹‚éB
+;Xï½(A+1)ã¾ã§ã®ãƒ‘ãƒ¬ãƒƒãƒˆã‚’1æ®µéšãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆã•ã›ã‚‹ã€‚
 .fadeout
 	ldx #$07
 	lda #$04
@@ -867,7 +867,7 @@ FadeoutPalette_BG2_Spr:
 	rts
 
 ;A896
-;ƒpƒŒƒbƒg‚ğƒtƒF[ƒhƒCƒ“‚³‚¹‚é
+;ãƒ‘ãƒ¬ãƒƒãƒˆã‚’ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³ã•ã›ã‚‹
 FadeinPaletteA896:
 	lda #$04
 	sta <$FD
@@ -919,7 +919,7 @@ FadeinPaletteSpecified:
 	rts
 
 ;A8E9
-;ƒpƒXƒ[ƒh“ü—Í‰æ–Ê‚ÌAƒJ[ƒ\ƒ‹‚ÆÔ‹Ê‚ğ•`‰æ
+;ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰å…¥åŠ›ç”»é¢ã®ã€ã‚«ãƒ¼ã‚½ãƒ«ã¨èµ¤ç‰ã‚’æç”»
 Password_DrawCursorStones:
 .dx = $08
 .dy = $09
@@ -979,7 +979,7 @@ Password_DrawCursorStones:
 	rts
 
 ;A94D
-;X‚Åw’è‚µ‚½‘‚«‚İˆÊ’uAƒTƒCƒYAƒf[ƒ^‚ğ“Ç‚İæ‚Á‚ÄPPU‚Ö“]‘—
+;Xã§æŒ‡å®šã—ãŸæ›¸ãè¾¼ã¿ä½ç½®ã€ã‚µã‚¤ã‚ºã€ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿å–ã£ã¦PPUã¸è»¢é€
 WriteKeyword1A:
 	lda Table_Keywords_ptr,x
 	tax
@@ -1003,8 +1003,8 @@ WriteKeyword1A:
 	rts
 
 ;A974
-;‰æ–ÊˆÊ’u‚ğw’è‚µ‚Â‚ÂAƒXƒNƒ[ƒ‹ˆÊ’u‚ğƒŠƒZƒbƒg‚µ‚ÄAƒpƒŒƒbƒg‚ğ‘‚«‚ŞB
-;‚³‚ç‚ÉƒXƒvƒ‰ƒCƒg‚ğÁ‚µ‚Ä‰æ–Ê•\¦‚ğ—LŒø‚É‚·‚éB‚È‚ñ‚¾‚±‚êB
+;ç”»é¢ä½ç½®ã‚’æŒ‡å®šã—ã¤ã¤ã€ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ä½ç½®ã‚’ãƒªã‚»ãƒƒãƒˆã—ã¦ã€ãƒ‘ãƒ¬ãƒƒãƒˆã‚’æ›¸ãè¾¼ã‚€ã€‚
+;ã•ã‚‰ã«ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’æ¶ˆã—ã¦ç”»é¢è¡¨ç¤ºã‚’æœ‰åŠ¹ã«ã™ã‚‹ã€‚ãªã‚“ã ã“ã‚Œã€‚
 Password_SetScreenPalette:
 	sta <zRoom
 	lda #$00
@@ -1020,7 +1020,7 @@ Password_SetScreenPalette:
 	mJSR_NORTS EnableScreen1A
 
 ;A98E
-;ƒpƒXƒ[ƒh‰æ–Ê‚ÅA‰E‚ÖƒXƒNƒ[ƒ‹‚·‚é
+;ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ç”»é¢ã§ã€å³ã¸ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ã™ã‚‹
 Password_ScrollRight:
 	clc
 	lda <zHScroll
@@ -1040,7 +1040,7 @@ Password_ScrollRight:
 	rts
 
 ;A9AC
-;$08~$09‚Åw’è‚µ‚½ƒ}ƒbƒvƒAƒhƒŒƒX‚©‚çƒ}ƒbƒv‚ğ“Ç‚İ‚Ş
+;$08~$09ã§æŒ‡å®šã—ãŸãƒãƒƒãƒ—ã‚¢ãƒ‰ãƒ¬ã‚¹ã‹ã‚‰ãƒãƒƒãƒ—ã‚’èª­ã¿è¾¼ã‚€
 WriteMapAddressOnScreen1A:
 	lda #$00
 	sta <zPPUSqr
@@ -1060,7 +1060,7 @@ WriteMapAddressOnScreen1A:
 	rts
 
 ;A9CB
-;ƒpƒXƒ[ƒh‰æ–Ê‚ÅA¶‚ÉƒXƒNƒ[ƒ‹‚·‚é
+;ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ç”»é¢ã§ã€å·¦ã«ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ã™ã‚‹
 Password_ScrollLeft:
 	sec
 	lda <zHScroll
@@ -1078,7 +1078,7 @@ Password_ScrollLeft:
 	rts
 
 ;A9E7
-;Ô‹ÊƒXƒvƒ‰ƒCƒg‚ğ‰Šú‰»‚·‚é
+;èµ¤ç‰ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’åˆæœŸåŒ–ã™ã‚‹
 Password_InitStones:
 	ldx #$00
 	ldy #$40
@@ -1105,30 +1105,30 @@ Password_InitStones:
 	rts
 
 ;AA11
-;ƒI[ƒvƒjƒ“ƒO‚Ì”wŒi‚ÌƒtƒF[ƒhƒCƒ“ƒe[ƒuƒ‹
+;ã‚ªãƒ¼ãƒ—ãƒ‹ãƒ³ã‚°ã®èƒŒæ™¯ã®ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³ãƒ†ãƒ¼ãƒ–ãƒ«
 ;Table_Opening_PaletteFadein:
 	.include "src/titlescreen_data.asm"
 
 
 ;B01A
-;ƒQ[ƒ€ƒI[ƒo[‰æ–Êˆ—ŠJn
+;ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼ç”»é¢å‡¦ç†é–‹å§‹
 ___Bank0D_BeginGameOver:
 	.include "src/gameover.asm"
 
 ;B20A
-;ƒ^ƒCƒgƒ‹‰æ–Ê‚Ìƒf[ƒ^
+;ã‚¿ã‚¤ãƒˆãƒ«ç”»é¢ã®ãƒ‡ãƒ¼ã‚¿
 Table_TitleScreen:
 	.incbin "src/bin/titlescreen.bin"
 
 
 ;B60A
-;ƒGƒ“ƒfƒBƒ“ƒO‚Ìˆ—
+;ã‚¨ãƒ³ãƒ‡ã‚£ãƒ³ã‚°ã®å‡¦ç†
 ___Bank0D_BeginEnding:
 	.include "src/ending.asm"
 
 
 ;B9F9
-;•Šíæ“¾ˆ—
+;æ­¦å™¨å–å¾—å‡¦ç†
 ___Bank0D_BeginGetEquipment:
 	.include "src/geteq.asm"
 

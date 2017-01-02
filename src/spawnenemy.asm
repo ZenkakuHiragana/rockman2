@@ -20,7 +20,7 @@
 	lda <zMoveVec
 	and #$40
 	bne .right
-;¶ƒXƒNƒ[ƒ‹‚ÌƒIƒuƒWƒFƒNƒgoŒ»ˆ—
+;å·¦ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå‡ºç¾å‡¦ç†
 .loopleft
 	ldy <zEnemyIndexPrev
 	beq .skipleft
@@ -88,7 +88,7 @@
 .skipitemleftseek
 	sty <zItemIndexNext
 	jmp .done
-;‰EƒXƒNƒ[ƒ‹‚ÌƒIƒuƒWƒFƒNƒgoŒ»ˆ—‰E’[‚É‚¨‚¯‚é“G‚Ì”z’u
+;å³ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå‡ºç¾å‡¦ç†å³ç«¯ã«ãŠã‘ã‚‹æ•µã®é…ç½®
 .right
 	ldy <zEnemyIndexNext
 	lda <.rhi

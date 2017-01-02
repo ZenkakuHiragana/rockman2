@@ -1,6 +1,6 @@
 
-	.inesprg $10 ;プログラムバンク数
-	.ineschr $00 ;キャラクタバンク数
+	.inesprg $10 ;繝励Ο繧ｰ繝ｩ繝繝舌Φ繧ｯ謨ｰ
+	.ineschr $00 ;繧ｭ繝｣繝ｩ繧ｯ繧ｿ繝舌Φ繧ｯ謨ｰ
 	.inesmir 1   ;
 	.inesmap 1
 

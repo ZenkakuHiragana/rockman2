@@ -1,502 +1,502 @@
 
-;ƒfƒoƒbƒOƒIƒvƒVƒ‡ƒ“
-;Å“K‰»‚Ì‚½‚ß‚ÌƒIƒvƒVƒ‡ƒ“
+;ãƒ‡ãƒãƒƒã‚°ã‚ªãƒ—ã‚·ãƒ§ãƒ³
+;æœ€é©åŒ–ã®ãŸã‚ã®ã‚ªãƒ—ã‚·ãƒ§ãƒ³
 
-___2P                   ;2PƒRƒ“ƒgƒ[ƒ‰[—p‚Ì“ü—Í‚ð—LŒø
-___WAITFRAMES           ;20 00 C1 AƒtƒŒ[ƒ€‘Ò‚Â–½—ß‚ð—LŒø
-;___DISABLE_INTRO_PIPI   ;ƒ{ƒXÐ‰î‚Ìƒsƒs‰»‚ð–³Œø‰»
-;___OPTIMIZE             ;•s—v‚È“äƒR[ƒh‚ð–³Œø‰»
-;___NOCLC                ;•s—v‚ÆŽv‚í‚ê‚éclc‚ð–³Œø‰»
-;___NOSEC                ;•s—v‚ÆŽv‚í‚ê‚ésec‚ð–³Œø‰»
-;___NORTS                ;jsr¨rts‚Æ‚Â‚È‚ª‚é•”•ª‚ðjmp‚É’u‚«Š·‚¦
-;___JSRJMP               ;jsr¨rts‚Ì•”•ª‚ðjmp‚É’u‚«Š·‚¦(‚½‚¾‚µrts‚ðŽc‚·)
-;___BUGFIX               ;ƒoƒO‚ðC³
-;;ƒfƒBƒŒƒCƒXƒNƒ[ƒ‹AŠ„‚èŽZˆ—‚Ìƒ~ƒX‚ðC³
-;___BUGFIXENEMYBUBBLELEAD;“Gƒoƒuƒ‹ƒŠ[ƒh‚Ì’nŒ`”»’èˆ—‚ÉŠÔˆá‚¢‚ª‚ ‚é‚Ý‚½‚¢H
+___2P                   ;2Pã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ãƒ¼ç”¨ã®å…¥åŠ›ã‚’æœ‰åŠ¹
+___WAITFRAMES           ;20 00 C1 Aãƒ•ãƒ¬ãƒ¼ãƒ å¾…ã¤å‘½ä»¤ã‚’æœ‰åŠ¹
+;___DISABLE_INTRO_PIPI   ;ãƒœã‚¹ç´¹ä»‹ã®ãƒ”ãƒ”åŒ–ã‚’ç„¡åŠ¹åŒ–
+;___OPTIMIZE             ;ä¸è¦ãªè¬Žã‚³ãƒ¼ãƒ‰ã‚’ç„¡åŠ¹åŒ–
+;___NOCLC                ;ä¸è¦ã¨æ€ã‚ã‚Œã‚‹clcã‚’ç„¡åŠ¹åŒ–
+;___NOSEC                ;ä¸è¦ã¨æ€ã‚ã‚Œã‚‹secã‚’ç„¡åŠ¹åŒ–
+;___NORTS                ;jsrâ†’rtsã¨ã¤ãªãŒã‚‹éƒ¨åˆ†ã‚’jmpã«ç½®ãæ›ãˆ
+;___JSRJMP               ;jsrâ†’rtsã®éƒ¨åˆ†ã‚’jmpã«ç½®ãæ›ãˆ(ãŸã ã—rtsã‚’æ®‹ã™)
+;___BUGFIX               ;ãƒã‚°ã‚’ä¿®æ­£
+;;ãƒ‡ã‚£ãƒ¬ã‚¤ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ã€å‰²ã‚Šç®—å‡¦ç†ã®ãƒŸã‚¹ã‚’ä¿®æ­£
+;___BUGFIXENEMYBUBBLELEAD;æ•µãƒãƒ–ãƒ«ãƒªãƒ¼ãƒ‰ã®åœ°å½¢åˆ¤å®šå‡¦ç†ã«é–“é•ã„ãŒã‚ã‚‹ã¿ãŸã„ï¼Ÿ
 
-;ƒƒ‚ƒŠƒAƒhƒŒƒX
-;ƒ[ƒƒy[ƒWƒAƒhƒŒƒX‚Íæ“ª‚ÉzAƒAƒuƒ\ƒŠƒ…[ƒgƒAƒhƒŒƒX‚Íæ“ª‚Éa
+;ãƒ¡ãƒ¢ãƒªã‚¢ãƒ‰ãƒ¬ã‚¹
+;ã‚¼ãƒ­ãƒšãƒ¼ã‚¸ã‚¢ãƒ‰ãƒ¬ã‚¹ã¯å…ˆé ­ã«zã€ã‚¢ãƒ–ã‚½ãƒªãƒ¥ãƒ¼ãƒˆã‚¢ãƒ‰ãƒ¬ã‚¹ã¯å…ˆé ­ã«a
 
-zPtr = $08              ;”Ä—pƒ|ƒCƒ“ƒ^
-zPtrlo = $08            ;”Ä—pƒ|ƒCƒ“ƒ^‰ºˆÊ
-zPtrhi = $09            ;”Ä—pƒ|ƒCƒ“ƒ^ãˆÊ
+zPtr = $08              ;æ±Žç”¨ãƒã‚¤ãƒ³ã‚¿
+zPtrlo = $08            ;æ±Žç”¨ãƒã‚¤ãƒ³ã‚¿ä¸‹ä½
+zPtrhi = $09            ;æ±Žç”¨ãƒã‚¤ãƒ³ã‚¿ä¸Šä½
 
-zScrollLeft = $14       ;‰¡ƒXƒNƒ[ƒ‹¶’[
-zScrollRight = $15      ;‰¡ƒXƒNƒ[ƒ‹‰E’[
+zScrollLeft = $14       ;æ¨ªã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«å·¦ç«¯
+zScrollRight = $15      ;æ¨ªã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«å³ç«¯
 
-zNTPrevlo = $16         ;ƒ}ƒbƒv‘‚«ž‚ÝƒAƒhƒŒƒXE–ß‚é•û‰ºˆÊ
-zNTPrevhi = $17         ;ƒ}ƒbƒv‘‚«ž‚ÝƒAƒhƒŒƒXE–ß‚é•ûãˆÊ
-zNTNextlo = $18         ;ƒ}ƒbƒv‘‚«ž‚ÝƒAƒhƒŒƒXEi‚Þ•û‰ºˆÊ
-zNTNexthi = $19         ;ƒ}ƒbƒv‘‚«ž‚ÝƒAƒhƒŒƒXEi‚Þ•ûãˆÊ
-zNTPointer = $1A        ;ƒ}ƒbƒv“Ç‚Ýž‚ÝˆÊ’u
+zNTPrevlo = $16         ;ãƒžãƒƒãƒ—æ›¸ãè¾¼ã¿ã‚¢ãƒ‰ãƒ¬ã‚¹ãƒ»æˆ»ã‚‹æ–¹ä¸‹ä½
+zNTPrevhi = $17         ;ãƒžãƒƒãƒ—æ›¸ãè¾¼ã¿ã‚¢ãƒ‰ãƒ¬ã‚¹ãƒ»æˆ»ã‚‹æ–¹ä¸Šä½
+zNTNextlo = $18         ;ãƒžãƒƒãƒ—æ›¸ãè¾¼ã¿ã‚¢ãƒ‰ãƒ¬ã‚¹ãƒ»é€²ã‚€æ–¹ä¸‹ä½
+zNTNexthi = $19         ;ãƒžãƒƒãƒ—æ›¸ãè¾¼ã¿ã‚¢ãƒ‰ãƒ¬ã‚¹ãƒ»é€²ã‚€æ–¹ä¸Šä½
+zNTPointer = $1A        ;ãƒžãƒƒãƒ—èª­ã¿è¾¼ã¿ä½ç½®
 
-zPPUSqr = $1B           ;PPU‹éŒ`‘‚«ž‚ÝƒTƒCƒY—\–ñ
+zPPUSqr = $1B           ;PPUçŸ©å½¢æ›¸ãè¾¼ã¿ã‚µã‚¤ã‚ºäºˆç´„
 
-zFrameCounter = $1C     ;ƒtƒŒ[ƒ€ƒJƒEƒ“ƒ^
+zFrameCounter = $1C     ;ãƒ•ãƒ¬ãƒ¼ãƒ ã‚«ã‚¦ãƒ³ã‚¿
 
-zIsLag = $1D            ;ƒƒCƒ“ƒ‹[ƒ`ƒ“I—¹Žž‚É0 ˆ——Ž‚¿ƒtƒ‰ƒO
+zIsLag = $1D            ;ãƒ¡ã‚¤ãƒ³ãƒ«ãƒ¼ãƒãƒ³çµ‚äº†æ™‚ã«0 å‡¦ç†è½ã¡ãƒ•ãƒ©ã‚°
 
-zHScrolllo = $1E        ;‰¡ƒXƒNƒ[ƒ‹’l‰ºˆÊ
-zHScroll = $1F          ;‰¡ƒXƒNƒ[ƒ‹’l
+zHScrolllo = $1E        ;æ¨ªã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«å€¤ä¸‹ä½
+zHScroll = $1F          ;æ¨ªã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«å€¤
 
-zRoom = $20             ;‰æ–Ê”Ô†
+zRoom = $20             ;ç”»é¢ç•ªå·
 
-zVScrolllo = $21        ;cƒXƒNƒ[ƒ‹’l‰ºˆÊ
-zVScroll = $22          ;cƒXƒNƒ[ƒ‹’l
+zVScrolllo = $21        ;ç¸¦ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«å€¤ä¸‹ä½
+zVScroll = $22          ;ç¸¦ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«å€¤
 
-zKeyDown = $23          ;ƒL[‰Ÿ‰ºó‘Ô
-zKeyDown2P = $24        ;ƒL[‰Ÿ‰ºó‘ÔE2P
-zKeyDownPrev = $25      ;1ƒtƒŒ[ƒ€‘O‚ÌƒL[‰Ÿ‰ºó‘Ô
-zKeyDownPrev2P = $26    ;1ƒtƒŒ[ƒ€‘O‚ÌƒL[‰Ÿ‰ºó‘ÔE2P
-zKeyPress = $27         ;ƒL[ƒNƒŠƒbƒN
-zKeyPress2P = $28       ;ƒL[ƒNƒŠƒbƒNE2P
+zKeyDown = $23          ;ã‚­ãƒ¼æŠ¼ä¸‹çŠ¶æ…‹
+zKeyDown2P = $24        ;ã‚­ãƒ¼æŠ¼ä¸‹çŠ¶æ…‹ãƒ»2P
+zKeyDownPrev = $25      ;1ãƒ•ãƒ¬ãƒ¼ãƒ å‰ã®ã‚­ãƒ¼æŠ¼ä¸‹çŠ¶æ…‹
+zKeyDownPrev2P = $26    ;1ãƒ•ãƒ¬ãƒ¼ãƒ å‰ã®ã‚­ãƒ¼æŠ¼ä¸‹çŠ¶æ…‹ãƒ»2P
+zKeyPress = $27         ;ã‚­ãƒ¼ã‚¯ãƒªãƒƒã‚¯
+zKeyPress2P = $28       ;ã‚­ãƒ¼ã‚¯ãƒªãƒƒã‚¯ãƒ»2P
 
-zBank = $29             ;$8000`$BFFF‚Ìƒoƒ“ƒN”Ô†
+zBank = $29             ;$8000ï½ž$BFFFã®ãƒãƒ³ã‚¯ç•ªå·
 
-zStage = $2A            ;ƒXƒe[ƒW”Ô† HAWBQFMC
+zStage = $2A            ;ã‚¹ãƒ†ãƒ¼ã‚¸ç•ªå· HAWBQFMC
 
-zObjIndex = $2B         ;ƒIƒuƒWƒFƒNƒgƒCƒ“ƒfƒbƒNƒX
+zObjIndex = $2B         ;ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
 
-zStatus = $2C           ;ƒƒbƒNƒ}ƒ“‚Ìó‘Ô’l
+zStatus = $2C           ;ãƒ­ãƒƒã‚¯ãƒžãƒ³ã®çŠ¶æ…‹å€¤
 
-zRScreenX = $2D         ;ƒƒbƒNƒ}ƒ“‚Ì‰æ–Ê“àXÀ•W(‘¼‚É—p“r‚ ‚è)
-zEScreenX = $2E         ;“G‚Ì‰æ–Ê“àXÀ•W(‘¼‚É—p“r‚ ‚è)
+zRScreenX = $2D         ;ãƒ­ãƒƒã‚¯ãƒžãƒ³ã®ç”»é¢å†…Xåº§æ¨™(ä»–ã«ç”¨é€”ã‚ã‚Š)
+zEScreenX = $2E         ;æ•µã®ç”»é¢å†…Xåº§æ¨™(ä»–ã«ç”¨é€”ã‚ã‚Š)
 zEScreenRoom = $2F      ;$440,x - $20
 
-zGravity = $30          ;d—Í‰Á‘¬“x‰ºˆÊ
-zGravityhi = $31        ;d—Í‰Á‘¬“xãˆÊ
+zGravity = $30          ;é‡åŠ›åŠ é€Ÿåº¦ä¸‹ä½
+zGravityhi = $31        ;é‡åŠ›åŠ é€Ÿåº¦ä¸Šä½
 
-zBGAttr = $32           ;ƒƒbƒNƒ}ƒ“‚ÉÚ‚·‚éBG‘®«¶
-zBGAttr2 = $33          ;ƒƒbƒNƒ}ƒ“‚ÉÚ‚·‚éBG‘®«‰E
-zBGAttr3 = $34          ;ƒƒbƒNƒ}ƒ“‚ÉÚ‚·‚éBG‘®«^‚ñ’†‚È‚Ç
-zBGLadder = $35         ;ƒƒbƒNƒ}ƒ“‚Ì‚Í‚µ‚²Žü‚è‚Ìó‘Ô
+zBGAttr = $32           ;ãƒ­ãƒƒã‚¯ãƒžãƒ³ã«æŽ¥ã™ã‚‹BGå±žæ€§å·¦
+zBGAttr2 = $33          ;ãƒ­ãƒƒã‚¯ãƒžãƒ³ã«æŽ¥ã™ã‚‹BGå±žæ€§å³
+zBGAttr3 = $34          ;ãƒ­ãƒƒã‚¯ãƒžãƒ³ã«æŽ¥ã™ã‚‹BGå±žæ€§çœŸã‚“ä¸­ãªã©
+zBGLadder = $35         ;ãƒ­ãƒƒã‚¯ãƒžãƒ³ã®ã¯ã—ã”å‘¨ã‚Šã®çŠ¶æ…‹
 
-zShootPoseTimer = $36   ;Œ‚‚ÂŽp¨‚Ì•ÛŽŽžŠÔ
+zShootPoseTimer = $36   ;æ’ƒã¤å§¿å‹¢ã®ä¿æŒæ™‚é–“
 
-zScrollFlag = $37       ;ƒXƒNƒ[ƒ‹ƒtƒ‰ƒO
-zScrollNumber = $38     ;ƒXƒNƒ[ƒ‹”Ô†
+zScrollFlag = $37       ;ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ãƒ•ãƒ©ã‚°
+zScrollNumber = $38     ;ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ç•ªå·
 
-zBubbleCounter = $39    ;…’†‚Ì–A‚ªo‚Ä‚­‚é‚Ü‚Å‚ÌƒJƒEƒ“ƒ^
+zBubbleCounter = $39    ;æ°´ä¸­ã®æ³¡ãŒå‡ºã¦ãã‚‹ã¾ã§ã®ã‚«ã‚¦ãƒ³ã‚¿
 
 z3A = $3A
 
-zJumpPowerlo = $3B      ;ƒWƒƒƒ“ƒv—Í‰ºˆÊ
-zJumpPowerhi = $3C      ;ƒWƒƒƒ“ƒv—ÍãˆÊ
+zJumpPowerlo = $3B      ;ã‚¸ãƒ£ãƒ³ãƒ—åŠ›ä¸‹ä½
+zJumpPowerhi = $3C      ;ã‚¸ãƒ£ãƒ³ãƒ—åŠ›ä¸Šä½
 
-zShootPose = $3D        ;Œ‚‚ÂŽp¨‚Ì‚â‚Â
+zShootPose = $3D        ;æ’ƒã¤å§¿å‹¢ã®ã‚„ã¤
 
-zSliplo = $3E      ;ƒXƒŠƒbƒv‘¬“x‰ºˆÊ
-zSliphi = $3F      ;ƒXƒŠƒbƒv‘¬“xãˆÊ
+zSliplo = $3E      ;ã‚¹ãƒªãƒƒãƒ—é€Ÿåº¦ä¸‹ä½
+zSliphi = $3F      ;ã‚¹ãƒªãƒƒãƒ—é€Ÿåº¦ä¸Šä½
 
-zWindFlag = $40         ;•—‚ÆƒXƒŠƒbƒv‚Ìƒtƒ‰ƒO
+zWindFlag = $40         ;é¢¨ã¨ã‚¹ãƒªãƒƒãƒ—ã®ãƒ•ãƒ©ã‚°
 
-zMusicPause = $41       ;‹ÈˆêŽž’âŽ~ƒtƒ‰ƒO
+zMusicPause = $41       ;æ›²ä¸€æ™‚åœæ­¢ãƒ•ãƒ©ã‚°
 
 zMoveVec = $42
 
-zPaletteIndex = $43     ;ƒpƒŒƒbƒg”Ô†
-zPaletteTimer = $44     ;ƒpƒŒƒbƒgƒAƒjƒ[ƒVƒ‡ƒ“‚Ìƒ^ƒCƒ}[
+zPaletteIndex = $43     ;ãƒ‘ãƒ¬ãƒƒãƒˆç•ªå·
+zPaletteTimer = $44     ;ãƒ‘ãƒ¬ãƒƒãƒˆã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã®ã‚¿ã‚¤ãƒžãƒ¼
 
 zConveyorVec = $45
-zConveyorRVec = $45     ;ƒRƒ“ƒxƒA‰E‚Ì—¬‚ê‚éŒü‚«
-zConveyorLVec = $46     ;ƒRƒ“ƒxƒA¶‚Ì—¬‚ê‚éŒü‚«
+zConveyorRVec = $45     ;ã‚³ãƒ³ãƒ™ã‚¢å³ã®æµã‚Œã‚‹å‘ã
+zConveyorLVec = $46     ;ã‚³ãƒ³ãƒ™ã‚¢å·¦ã®æµã‚Œã‚‹å‘ã
 
-zPPULinear = $47        ;PPUüŒ`‘‚«ž‚ÝƒTƒCƒY—\–ñ
+zPPULinear = $47        ;PPUç·šå½¢æ›¸ãè¾¼ã¿ã‚µã‚¤ã‚ºäºˆç´„
 
-zEnemyIndexPrev = $48   ;“G”Ô†E–ß‚é•û
-zEnemyIndexNext = $49   ;“G”Ô†Ei‚Þ•û
+zEnemyIndexPrev = $48   ;æ•µç•ªå·ãƒ»æˆ»ã‚‹æ–¹
+zEnemyIndexNext = $49   ;æ•µç•ªå·ãƒ»é€²ã‚€æ–¹
 
-zRand = $4A             ;—”
+zRand = $4A             ;ä¹±æ•°
 
-zInvincible = $4B       ;–³“GŽžŠÔ
+zInvincible = $4B       ;ç„¡æ•µæ™‚é–“
 
-zItemIndexPrev = $4C    ;ƒAƒCƒeƒ€”Ô†E–ß‚é•û
-zItemIndexNext = $4D    ;ƒAƒCƒeƒ€”Ô†Ei‚Þ•û
+zItemIndexPrev = $4C    ;ã‚¢ã‚¤ãƒ†ãƒ ç•ªå·ãƒ»æˆ»ã‚‹æ–¹
+zItemIndexNext = $4D    ;ã‚¢ã‚¤ãƒ†ãƒ ç•ªå·ãƒ»é€²ã‚€æ–¹
 
-zObjItemFlag = $4E      ;ˆÚ“®ˆ—Žž‚ÉŽg—p‚·‚éAƒAƒCƒeƒ€ƒtƒ‰ƒO
+zObjItemFlag = $4E      ;ç§»å‹•å‡¦ç†æ™‚ã«ä½¿ç”¨ã™ã‚‹ã€ã‚¢ã‚¤ãƒ†ãƒ ãƒ•ãƒ©ã‚°
 
-zWindlo = $4F           ;•—‚Ì‹­‚³‰ºˆÊ
-zWindhi = $50           ;•—‚Ì‹­‚³ãˆÊ
+zWindlo = $4F           ;é¢¨ã®å¼·ã•ä¸‹ä½
+zWindhi = $50           ;é¢¨ã®å¼·ã•ä¸Šä½
 
 zPPULaser = $51
-z52 = $52 ;ƒ|[ƒYƒƒjƒ…[‚ðŠJ‚­Žž‚ÉPPU‚ÖƒAƒhƒŒƒX‚ª‚±‚±‚É‘‚«ž‚Ü‚ê‚Ä‚¢‚é
-z53 = $53 ;‹ï‘Ì“I‚É‰½‚ÉŽg‚Á‚Ä‚é‚Ì‚©‚Í–¢’²¸
-zPPUShutterFlag = $54   ;ƒVƒƒƒbƒ^[‚Ì‘‚«ž‚ÝŽž‚ÉŽg‚¤
+z52 = $52 ;ãƒãƒ¼ã‚ºãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚’é–‹ãæ™‚ã«PPUã¸ã‚¢ãƒ‰ãƒ¬ã‚¹ãŒã“ã“ã«æ›¸ãè¾¼ã¾ã‚Œã¦ã„ã‚‹
+z53 = $53 ;å…·ä½“çš„ã«ä½•ã«ä½¿ã£ã¦ã‚‹ã®ã‹ã¯æœªèª¿æŸ»
+zPPUShutterFlag = $54   ;ã‚·ãƒ£ãƒƒã‚¿ãƒ¼ã®æ›¸ãè¾¼ã¿æ™‚ã«ä½¿ã†
 
-zBlockObjNum = $55      ;ƒuƒƒbƒN‘®«‚ÌƒIƒuƒWƒFƒNƒg‚Ì”
-zBlockObjIndex = $56    ;ƒuƒƒbƒN‘®«‚ÌƒIƒuƒWƒFƒNƒg‚Ö‚ÌƒCƒ“ƒfƒbƒNƒX
-;`$65‚Ü‚Å
+zBlockObjNum = $55      ;ãƒ–ãƒ­ãƒƒã‚¯å±žæ€§ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®æ•°
+zBlockObjIndex = $56    ;ãƒ–ãƒ­ãƒƒã‚¯å±žæ€§ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã¸ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
+;ï½ž$65ã¾ã§
 
-zSoundQueue = $66       ;ˆ—‚·‚éƒgƒ‰ƒbƒN‚Ìƒ|ƒCƒ“ƒ^
-zPostProcessSound = $67 ;ƒoƒ“ƒNØ‚è‘Ö‚¦’†‚ÌNMI‚Æ‹È‚Ìˆ—‚Ì‚½‚ß‚Ìƒtƒ‰ƒO
-zPostProcSemaphore = $68;‹È‚Ìˆ—‚ðŒã‰ñ‚µ‚É‚·‚é‚æ‚¤ƒZƒ}ƒtƒH
-zBankCopy = $69         ;$29‚ÌƒRƒs[‚ç‚µ‚¢H
+zSoundQueue = $66       ;å‡¦ç†ã™ã‚‹ãƒˆãƒ©ãƒƒã‚¯ã®ãƒã‚¤ãƒ³ã‚¿
+zPostProcessSound = $67 ;ãƒãƒ³ã‚¯åˆ‡ã‚Šæ›¿ãˆä¸­ã®NMIã¨æ›²ã®å‡¦ç†ã®ãŸã‚ã®ãƒ•ãƒ©ã‚°
+zPostProcSemaphore = $68;æ›²ã®å‡¦ç†ã‚’å¾Œå›žã—ã«ã™ã‚‹ã‚ˆã†ã‚»ãƒžãƒ•ã‚©
+zBankCopy = $69         ;$29ã®ã‚³ãƒ”ãƒ¼ã‚‰ã—ã„ï¼Ÿ
 
-zClearFlags = $9A      ;•ŠíŽæ“¾ƒtƒ‰ƒO
-zItemFlags = $9B        ;ƒAƒCƒeƒ€Žæ“¾ƒtƒ‰ƒO
+zClearFlags = $9A      ;æ­¦å™¨å–å¾—ãƒ•ãƒ©ã‚°
+zItemFlags = $9B        ;ã‚¢ã‚¤ãƒ†ãƒ å–å¾—ãƒ•ãƒ©ã‚°
 
-zEnergyArray = $9C      ;•ŠíƒGƒlƒ‹ƒM[”z—ñŠJŽn
-nEnergySize = $0B       ;•Ší‚Ì‘”
+zEnergyArray = $9C      ;æ­¦å™¨ã‚¨ãƒãƒ«ã‚®ãƒ¼é…åˆ—é–‹å§‹
+nEnergySize = $0B       ;æ­¦å™¨ã®ç·æ•°
 
-zEnergyHeat = $9C       ;ƒAƒgƒ~ƒbƒNƒtƒ@ƒCƒ„[‚ÌƒGƒlƒ‹ƒM[
-zEnergyAir = $9D        ;ƒGƒA[ƒVƒ…[ƒ^[‚ÌƒGƒlƒ‹ƒM[
-zEnergyWood = $9E       ;ƒŠ[ƒtƒV[ƒ‹ƒh‚ÌƒGƒlƒ‹ƒM[
-zEnergyBubble = $9F     ;ƒoƒuƒ‹ƒŠ[ƒh‚ÌƒGƒlƒ‹ƒM[
-zEnergyQuick = $A0      ;ƒNƒCƒbƒNƒu[ƒƒ‰ƒ“‚ÌƒGƒlƒ‹ƒM[
-zEnergyFlash = $A1      ;ƒ^ƒCƒ€ƒXƒgƒbƒp[‚ÌƒGƒlƒ‹ƒM[
-zEnergyMetal = $A2      ;ƒƒ^ƒ‹ƒuƒŒ[ƒh‚ÌƒGƒlƒ‹ƒM[
-zEnergyCrash = $A3      ;ƒNƒ‰ƒbƒVƒ…ƒ{ƒ€‚ÌƒGƒlƒ‹ƒM[
-zEnergy1 = $A4          ;1†‚ÌƒGƒlƒ‹ƒM[
-zEnergy2 = $A5          ;2†‚ÌƒGƒlƒ‹ƒM[
-zEnergy3 = $A6          ;3†‚ÌƒGƒlƒ‹ƒM[
-zETanks = $A7           ;EŠÊ‚Ì”
-zLives = $A8            ;Žc‹@‚Ì”
-zEquipment = $A9        ;‘•”õ‚µ‚Ä‚¢‚é•Ší
-zStopFlag = $AA         ;ŽžŠÔ’âŽ~ƒtƒ‰ƒO
+zEnergyHeat = $9C       ;ã‚¢ãƒˆãƒŸãƒƒã‚¯ãƒ•ã‚¡ã‚¤ãƒ¤ãƒ¼ã®ã‚¨ãƒãƒ«ã‚®ãƒ¼
+zEnergyAir = $9D        ;ã‚¨ã‚¢ãƒ¼ã‚·ãƒ¥ãƒ¼ã‚¿ãƒ¼ã®ã‚¨ãƒãƒ«ã‚®ãƒ¼
+zEnergyWood = $9E       ;ãƒªãƒ¼ãƒ•ã‚·ãƒ¼ãƒ«ãƒ‰ã®ã‚¨ãƒãƒ«ã‚®ãƒ¼
+zEnergyBubble = $9F     ;ãƒãƒ–ãƒ«ãƒªãƒ¼ãƒ‰ã®ã‚¨ãƒãƒ«ã‚®ãƒ¼
+zEnergyQuick = $A0      ;ã‚¯ã‚¤ãƒƒã‚¯ãƒ–ãƒ¼ãƒ¡ãƒ©ãƒ³ã®ã‚¨ãƒãƒ«ã‚®ãƒ¼
+zEnergyFlash = $A1      ;ã‚¿ã‚¤ãƒ ã‚¹ãƒˆãƒƒãƒ‘ãƒ¼ã®ã‚¨ãƒãƒ«ã‚®ãƒ¼
+zEnergyMetal = $A2      ;ãƒ¡ã‚¿ãƒ«ãƒ–ãƒ¬ãƒ¼ãƒ‰ã®ã‚¨ãƒãƒ«ã‚®ãƒ¼
+zEnergyCrash = $A3      ;ã‚¯ãƒ©ãƒƒã‚·ãƒ¥ãƒœãƒ ã®ã‚¨ãƒãƒ«ã‚®ãƒ¼
+zEnergy1 = $A4          ;1å·ã®ã‚¨ãƒãƒ«ã‚®ãƒ¼
+zEnergy2 = $A5          ;2å·ã®ã‚¨ãƒãƒ«ã‚®ãƒ¼
+zEnergy3 = $A6          ;3å·ã®ã‚¨ãƒãƒ«ã‚®ãƒ¼
+zETanks = $A7           ;Eç¼¶ã®æ•°
+zLives = $A8            ;æ®‹æ©Ÿã®æ•°
+zEquipment = $A9        ;è£…å‚™ã—ã¦ã„ã‚‹æ­¦å™¨
+zStopFlag = $AA         ;æ™‚é–“åœæ­¢ãƒ•ãƒ©ã‚°
 
-zAutoFireTimer = $AB    ;ƒNƒCƒbƒNƒu[ƒƒ‰ƒ“—p˜AŽËƒ^ƒCƒ}[
+zAutoFireTimer = $AB    ;ã‚¯ã‚¤ãƒƒã‚¯ãƒ–ãƒ¼ãƒ¡ãƒ©ãƒ³ç”¨é€£å°„ã‚¿ã‚¤ãƒžãƒ¼
 
-zWeaponEnergy = $AC     ;•Ší‚ÌŽc‚è
-zItemInterrupt = $AD    ;ƒAƒCƒeƒ€‚Ì‚½‚ß‚ÌŠ„‚èž‚Ýƒtƒ‰ƒO
+zWeaponEnergy = $AC     ;æ­¦å™¨ã®æ®‹ã‚Š
+zItemInterrupt = $AD    ;ã‚¢ã‚¤ãƒ†ãƒ ã®ãŸã‚ã®å‰²ã‚Šè¾¼ã¿ãƒ•ãƒ©ã‚°
 
 zScreenMod = $AE
 
-zWindVec = $AF          ;•—‚Ì•ûŒü
+zWindVec = $AF          ;é¢¨ã®æ–¹å‘
 
-zContinuePoint = $B0    ;’†ŠÔ’n“_”Ô†‚ðˆêŽž“I‚É•Û‘¶‚·‚é
-zBossBehaviour = $B1    ;ƒ{ƒX‚Ìs“®‚ÌŽí—Þ
-zBossVar = $B2          ;ƒ{ƒX—p•Ï”
-zBossKind = $B3         ;ƒ{ƒX‚ÌŽí—Þ
+zContinuePoint = $B0    ;ä¸­é–“åœ°ç‚¹ç•ªå·ã‚’ä¸€æ™‚çš„ã«ä¿å­˜ã™ã‚‹
+zBossBehaviour = $B1    ;ãƒœã‚¹ã®è¡Œå‹•ã®ç¨®é¡ž
+zBossVar = $B2          ;ãƒœã‚¹ç”¨å¤‰æ•°
+zBossKind = $B3         ;ãƒœã‚¹ã®ç¨®é¡ž
 
 zB4 = $B4
 
-zVScrollApparentlo = $B5;Œ©‚©‚¯‚Ì‰¡ƒXƒNƒ[ƒ‹‰ºˆÊ
-zVScrollApparenthi = $B6;Œ©‚©‚¯‚Ì‰¡ƒXƒNƒ[ƒ‹ãˆÊ
-zHScrollApparentlo = $B7;Œ©‚©‚¯‚ÌcƒXƒNƒ[ƒ‹‰ºˆÊ
-zHScrollApparenthi = $B8;Œ©‚©‚¯‚ÌcƒXƒNƒ[ƒ‹ãˆÊ
-zRoomApparent = $B9     ;Œ©‚©‚¯‚Ì‰æ–Ê‚ÌˆÊ’u
+zVScrollApparentlo = $B5;è¦‹ã‹ã‘ã®æ¨ªã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ä¸‹ä½
+zVScrollApparenthi = $B6;è¦‹ã‹ã‘ã®æ¨ªã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ä¸Šä½
+zHScrollApparentlo = $B7;è¦‹ã‹ã‘ã®ç¸¦ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ä¸‹ä½
+zHScrollApparenthi = $B8;è¦‹ã‹ã‘ã®ç¸¦ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ä¸Šä½
+zRoomApparent = $B9     ;è¦‹ã‹ã‘ã®ç”»é¢ã®ä½ç½®
 
-zBossRushStage = $BA    ;ƒ{ƒXƒ‰ƒbƒVƒ…‚Å‘I‘ð‚µ‚½ƒ{ƒX”Ô†
-zBossRushProg = $BC     ;ƒ{ƒXƒ‰ƒbƒVƒ…‚Ìisó‹µ
-zNoDamage = $BD         ;“–‚½‚è”»’è–³Œøƒtƒ‰ƒO
+zBossRushStage = $BA    ;ãƒœã‚¹ãƒ©ãƒƒã‚·ãƒ¥ã§é¸æŠžã—ãŸãƒœã‚¹ç•ªå·
+zBossRushProg = $BC     ;ãƒœã‚¹ãƒ©ãƒƒã‚·ãƒ¥ã®é€²è¡ŒçŠ¶æ³
+zNoDamage = $BD         ;å½“ãŸã‚Šåˆ¤å®šç„¡åŠ¹ãƒ•ãƒ©ã‚°
 
-zRestartTitle = $BE     ;ƒ^ƒCƒgƒ‹ƒXƒNƒŠ[ƒ“‚ÌŽžŠÔØ‚ê‚Å1
+zRestartTitle = $BE     ;ã‚¿ã‚¤ãƒˆãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã®æ™‚é–“åˆ‡ã‚Œã§1
 
-zTitleScreenWaitlo = $C0;ƒ^ƒCƒgƒ‹‰æ–Ê‚Ì‘Ò‚¿ŽžŠÔ
-zTitleScreenWaithi = $C1;ƒ^ƒCƒgƒ‹‰æ–Ê‚Ì‘Ò‚¿ŽžŠÔ
+zTitleScreenWaitlo = $C0;ã‚¿ã‚¤ãƒˆãƒ«ç”»é¢ã®å¾…ã¡æ™‚é–“
+zTitleScreenWaithi = $C1;ã‚¿ã‚¤ãƒˆãƒ«ç”»é¢ã®å¾…ã¡æ™‚é–“
 
-zSoundAttr = $E0        ;Œø‰Ê‰¹ã‘‚«—Dæ‡ˆÊ‚È‚Ç
-zSFXChannel = $E1       ;Œø‰Ê‰¹‚Æ‚µ‚Ä–Â‚ç‚·ƒ`ƒƒƒ“ƒlƒ‹ (.... NT21)
+zSoundAttr = $E0        ;åŠ¹æžœéŸ³ä¸Šæ›¸ãå„ªå…ˆé †ä½ãªã©
+zSFXChannel = $E1       ;åŠ¹æžœéŸ³ã¨ã—ã¦é³´ã‚‰ã™ãƒãƒ£ãƒ³ãƒãƒ« (.... NT21)
 
-zTrackPtr = $E2         ;ƒgƒ‰ƒbƒNÝ’è‚ÌŽž‚ÉŽg‚¤ƒ|ƒCƒ“ƒ^
+zTrackPtr = $E2         ;ãƒˆãƒ©ãƒƒã‚¯è¨­å®šã®æ™‚ã«ä½¿ã†ãƒã‚¤ãƒ³ã‚¿
 zTrackPtrhi = $E3
 
-zNMILock = $E4          ;NMI‚Ì‚½‚ß‚ÌƒƒbƒN‹@\B‚ç‚µ‚¢B
-zSoundVar1 = $E5        ;‹È‚Ì‚½‚ß‚ÌˆêŽž•Ï”
+zNMILock = $E4          ;NMIã®ãŸã‚ã®ãƒ­ãƒƒã‚¯æ©Ÿæ§‹ã€‚ã‚‰ã—ã„ã€‚
+zSoundVar1 = $E5        ;æ›²ã®ãŸã‚ã®ä¸€æ™‚å¤‰æ•°
 zSoundVar2 = $E6
 
-zSoundSpeed = $E7       ;‹È‚ð‘‘—‚è‚·‚é‚â‚Â
-zSoundFade = $E8        ;‹È‚ÌƒtƒF[ƒhƒAƒEƒgÝ’è
-zSoundFadeProg = $E9    ;‹È‚ÌƒtƒF[ƒhƒAƒEƒg’iŠK
+zSoundSpeed = $E7       ;æ›²ã‚’æ—©é€ã‚Šã™ã‚‹ã‚„ã¤
+zSoundFade = $E8        ;æ›²ã®ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆè¨­å®š
+zSoundFadeProg = $E9    ;æ›²ã®ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆæ®µéšŽ
 
-zSoundCounter = $EA     ;‰¹ŠÖŒW—pƒtƒŒ[ƒ€ƒJƒEƒ“ƒ^
-zSoundIndex = $EB       ;ƒ`ƒƒƒ“ƒlƒ‹ƒx[ƒXƒ|ƒCƒ“ƒ^[$(4000+$EB)]
-zSoundBase = $EC        ;ƒ`ƒƒƒ“ƒlƒ‹ƒx[ƒXƒ|ƒCƒ“ƒ^[($EC).y]
+zSoundCounter = $EA     ;éŸ³é–¢ä¿‚ç”¨ãƒ•ãƒ¬ãƒ¼ãƒ ã‚«ã‚¦ãƒ³ã‚¿
+zSoundIndex = $EB       ;ãƒãƒ£ãƒ³ãƒãƒ«ãƒ™ãƒ¼ã‚¹ãƒã‚¤ãƒ³ã‚¿[$(4000+$EB)]
+zSoundBase = $EC        ;ãƒãƒ£ãƒ³ãƒãƒ«ãƒ™ãƒ¼ã‚¹ãƒã‚¤ãƒ³ã‚¿[($EC).y]
 zSoundBasehi = $ED      ;
-zProcessChannel = $EE   ;Œ»Ýˆ—’†‚Ìƒ`ƒƒƒ“ƒlƒ‹B4, 3, 2, 1 = SQ1, S2, TRI, NOI
+zProcessChannel = $EE   ;ç¾åœ¨å‡¦ç†ä¸­ã®ãƒãƒ£ãƒ³ãƒãƒ«ã€‚4, 3, 2, 1 = SQ1, S2, TRI, NOI
 zSFXChannel_Copy = $EF  ;$EF = $E1
 
-zSFXPtr = $F0           ;Œø‰Ê‰¹ƒ|ƒCƒ“ƒ^
-zSFXPtrhi = $F1         ;Œø‰Ê‰¹ƒ|ƒCƒ“ƒ^ãˆÊ
-zSFXWait = $F2          ;ŽŸ‚Ì‰¹’·ˆ—’PˆÊ‚Ü‚Å‚ÌŽžŠÔ
-zSFXLoop = $F3          ;Œø‰Ê‰¹‚ÌŒ»Ý‚ÌŒJ‚è•Ô‚µ‰ñ”
-zSoundPtr = $F4         ;”Ä—pƒ|ƒCƒ“ƒ^
-zSoundPtrhi = $F5       ;”Ä—pƒ|ƒCƒ“ƒ^ãˆÊ
+zSFXPtr = $F0           ;åŠ¹æžœéŸ³ãƒã‚¤ãƒ³ã‚¿
+zSFXPtrhi = $F1         ;åŠ¹æžœéŸ³ãƒã‚¤ãƒ³ã‚¿ä¸Šä½
+zSFXWait = $F2          ;æ¬¡ã®éŸ³é•·å‡¦ç†å˜ä½ã¾ã§ã®æ™‚é–“
+zSFXLoop = $F3          ;åŠ¹æžœéŸ³ã®ç¾åœ¨ã®ç¹°ã‚Šè¿”ã—å›žæ•°
+zSoundPtr = $F4         ;æ±Žç”¨ãƒã‚¤ãƒ³ã‚¿
+zSoundPtrhi = $F5       ;æ±Žç”¨ãƒã‚¤ãƒ³ã‚¿ä¸Šä½
 
 zF6 = $F6
 
-z2000 = $F7             ;$2000‚ÖƒRƒs[
-z2001 = $F8             ;$2001‚ÖƒRƒs[
+z2000 = $F7             ;$2000ã¸ã‚³ãƒ”ãƒ¼
+z2001 = $F8             ;$2001ã¸ã‚³ãƒ”ãƒ¼
 
-zOffscreen = $F9        ;‰æ–ÊŠOƒtƒ‰ƒO‚Ý‚½‚¢‚È
+zOffscreen = $F9        ;ç”»é¢å¤–ãƒ•ãƒ©ã‚°ã¿ãŸã„ãª
 
 zFA = $FA
 
-zWaterLevel = $FB       ;…’†ƒtƒ‰ƒO
-zWaterWait = $FC        ;…’†‚Ìƒ‰ƒO‚Ì‚½‚ß‚ÌƒEƒFƒCƒg
+zWaterLevel = $FB       ;æ°´ä¸­ãƒ•ãƒ©ã‚°
+zWaterWait = $FC        ;æ°´ä¸­ã®ãƒ©ã‚°ã®ãŸã‚ã®ã‚¦ã‚§ã‚¤ãƒˆ
 
-zWait1 = $FC            ;ƒEƒFƒCƒg‚Æ‚©Žæ‚é‚â‚Â
+zWait1 = $FC            ;ã‚¦ã‚§ã‚¤ãƒˆã¨ã‹å–ã‚‹ã‚„ã¤
 zWait2 = $FD            ;
 zWait3 = $FE            ;
 zWait4 = $FF            ;
 
 
 
-aEnemyOrder = $F0       ;“G‚Ì‡˜”Ô†
+aEnemyOrder = $F0       ;æ•µã®é †åºç•ªå·
 aEnemyOrder10 = $100
-aEnemyFlash = $100      ;“G‚Ì”í’eŽž‚Ìƒtƒ‰ƒbƒVƒ…î•ñ
+aEnemyFlash = $100      ;æ•µã®è¢«å¼¾æ™‚ã®ãƒ•ãƒ©ãƒƒã‚·ãƒ¥æƒ…å ±
 aEnemyFlash10 = $110
-aEnemyVar = $110       ;“G‚Ì”Ä—p•Ï”
+aEnemyVar = $110       ;æ•µã®æ±Žç”¨å¤‰æ•°
 aEnemyVar10 = $120
-aItemLifeOffset = $110  ;ƒAƒCƒeƒ€‚Ìƒ‰ƒCƒt‚Ì‚½‚ß‚Ìƒ|ƒCƒ“ƒ^
+aItemLifeOffset = $110  ;ã‚¢ã‚¤ãƒ†ãƒ ã®ãƒ©ã‚¤ãƒ•ã®ãŸã‚ã®ãƒã‚¤ãƒ³ã‚¿
 aItemLifeOffset10 = $120
 
-aItemOrder = $120       ;ƒAƒCƒeƒ€‡˜”Ô†
+aItemOrder = $120       ;ã‚¢ã‚¤ãƒ†ãƒ é †åºç•ªå·
 aItemOrder10 = $130
-aItemLife = $140        ;ƒAƒCƒeƒ€‚Ìƒ‰ƒCƒt
+aItemLife = $140        ;ã‚¢ã‚¤ãƒ†ãƒ ã®ãƒ©ã‚¤ãƒ•
 
-aPlatformWidth = $150   ;ƒIƒuƒWƒFƒNƒg‚Ì‘«ê”»’è‚ÌL‚³
+aPlatformWidth = $150   ;ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®è¶³å ´åˆ¤å®šã®åºƒã•
 aPlatformWidth10 = $160
-aPlatformY = $160       ;ƒIƒuƒWƒFƒNƒg‚Ì‘«ê”»’è‚ÌcˆÊ’u
+aPlatformY = $160       ;ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®è¶³å ´åˆ¤å®šã®ç¸¦ä½ç½®
 aPlatformY10 = $170
 
-aSprite = $200          ;ƒXƒvƒ‰ƒCƒgƒƒ‚ƒŠŠJŽn
-aSpriteY = $200         ;ƒXƒvƒ‰ƒCƒgYˆÊ’u
-aSpriteNumber = $201    ;ƒXƒvƒ‰ƒCƒgŽí—Þ
-aSpriteAttr = $202      ;ƒXƒvƒ‰ƒCƒg‘®«
-aSpriteX = $203         ;ƒXƒvƒ‰ƒCƒgXˆÊ’u
+aSprite = $200          ;ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆãƒ¡ãƒ¢ãƒªé–‹å§‹
+aSpriteY = $200         ;ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆYä½ç½®
+aSpriteNumber = $201    ;ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç¨®é¡ž
+aSpriteAttr = $202      ;ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆå±žæ€§
+aSpriteX = $203         ;ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆXä½ç½®
 
-aPPUSqrhi = $300        ;PPU‹éŒ`‘‚«ž‚ÝˆÊ’uãˆÊ
-aPPUSqrlo = $304        ;PPU‹éŒ`‘‚«ž‚ÝˆÊ’u‰ºˆÊ
-aPPUSqrAttrhi = $308    ;PPU‹éŒ`‘‚«ž‚ÝE‘®«ƒe[ƒuƒ‹‚Ö‚Ì‘‚«ž‚ÝãˆÊ
-aPPUSqrAttrlo = $30C    ;PPU‹éŒ`‘‚«ž‚ÝE‘®«ƒe[ƒuƒ‹‚Ö‚Ì‘‚«ž‚Ý‰ºˆÊ
-aPPUSqrData = $310      ;PPU‹éŒ`‘‚«ž‚Ýƒf[ƒ^
-aPPUSqrAttrData = $350  ;PPU‹éŒ`‘‚«ž‚ÝE‘®«ƒe[ƒuƒ‹‚Ìƒf[ƒ^
+aPPUSqrhi = $300        ;PPUçŸ©å½¢æ›¸ãè¾¼ã¿ä½ç½®ä¸Šä½
+aPPUSqrlo = $304        ;PPUçŸ©å½¢æ›¸ãè¾¼ã¿ä½ç½®ä¸‹ä½
+aPPUSqrAttrhi = $308    ;PPUçŸ©å½¢æ›¸ãè¾¼ã¿ãƒ»å±žæ€§ãƒ†ãƒ¼ãƒ–ãƒ«ã¸ã®æ›¸ãè¾¼ã¿ä¸Šä½
+aPPUSqrAttrlo = $30C    ;PPUçŸ©å½¢æ›¸ãè¾¼ã¿ãƒ»å±žæ€§ãƒ†ãƒ¼ãƒ–ãƒ«ã¸ã®æ›¸ãè¾¼ã¿ä¸‹ä½
+aPPUSqrData = $310      ;PPUçŸ©å½¢æ›¸ãè¾¼ã¿ãƒ‡ãƒ¼ã‚¿
+aPPUSqrAttrData = $350  ;PPUçŸ©å½¢æ›¸ãè¾¼ã¿ãƒ»å±žæ€§ãƒ†ãƒ¼ãƒ–ãƒ«ã®ãƒ‡ãƒ¼ã‚¿
 
-aPaletteAnim = $354     ;ƒpƒŒƒbƒgƒAƒjƒ[ƒVƒ‡ƒ“–‡”
-aPaletteAnimWait = $355 ;ƒpƒŒƒbƒgƒAƒjƒ[ƒVƒ‡ƒ“‘¬‚³
-aPalette = $356         ;Œ»Ý‚ÌƒpƒŒƒbƒg
-aPaletteSpr = $366      ;Œ»Ý‚ÌƒXƒvƒ‰ƒCƒg‚ÌƒpƒŒƒbƒg
-aPaletteAnimBuf = $376  ;ƒpƒŒƒbƒgƒAƒjƒ[ƒVƒ‡ƒ“‚Ìƒoƒbƒtƒ@
+aPaletteAnim = $354     ;ãƒ‘ãƒ¬ãƒƒãƒˆã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³æžšæ•°
+aPaletteAnimWait = $355 ;ãƒ‘ãƒ¬ãƒƒãƒˆã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³é€Ÿã•
+aPalette = $356         ;ç¾åœ¨ã®ãƒ‘ãƒ¬ãƒƒãƒˆ
+aPaletteSpr = $366      ;ç¾åœ¨ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ãƒ‘ãƒ¬ãƒƒãƒˆ
+aPaletteAnimBuf = $376  ;ãƒ‘ãƒ¬ãƒƒãƒˆã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã®ãƒãƒƒãƒ•ã‚¡
 
-aPPULinearhi = $3B6     ;PPUüŒ`‘‚«ž‚ÝãˆÊ
-aPPULinearlo = $3B7     ;PPUüŒ`‘‚«ž‚Ý‰ºˆÊ
-aPPULinearData = $3B8   ;PPUüŒ`‘‚«ž‚Ýƒf[ƒ^
+aPPULinearhi = $3B6     ;PPUç·šå½¢æ›¸ãè¾¼ã¿ä¸Šä½
+aPPULinearlo = $3B7     ;PPUç·šå½¢æ›¸ãè¾¼ã¿ä¸‹ä½
+aPPULinearData = $3B8   ;PPUç·šå½¢æ›¸ãè¾¼ã¿ãƒ‡ãƒ¼ã‚¿
 
-aPPULaserhi = $3B6      ;PPUƒŒ[ƒU[‚âƒVƒƒƒbƒ^[—p‚Ì‘‚«ž‚ÝãˆÊ
-aPPULaserlo = $3BC      ;PPUƒŒ[ƒU[‚âƒVƒƒƒbƒ^[—p‚Ì‘‚«ž‚Ý‰ºˆÊ
-aPPULaserData = $3C2    ;PPU‘‚«ž‚Ýƒf[ƒ^
+aPPULaserhi = $3B6      ;PPUãƒ¬ãƒ¼ã‚¶ãƒ¼ã‚„ã‚·ãƒ£ãƒƒã‚¿ãƒ¼ç”¨ã®æ›¸ãè¾¼ã¿ä¸Šä½
+aPPULaserlo = $3BC      ;PPUãƒ¬ãƒ¼ã‚¶ãƒ¼ã‚„ã‚·ãƒ£ãƒƒã‚¿ãƒ¼ç”¨ã®æ›¸ãè¾¼ã¿ä¸‹ä½
+aPPULaserData = $3C2    ;PPUæ›¸ãè¾¼ã¿ãƒ‡ãƒ¼ã‚¿
 
-aPPUShutterAttrhi = $3C2;PPUƒVƒƒƒbƒ^[‘‚«ž‚ÝŽž‚Ì‘®«ƒe[ƒuƒ‹ˆÊ’uãˆÊ
-aPPUShutterAttrlo = $3C8;PPUƒVƒƒƒbƒ^[‘‚«ž‚ÝŽž‚Ì‘®«ƒe[ƒuƒ‹ˆÊ’u‰ºˆÊ
+aPPUShutterAttrhi = $3C2;PPUã‚·ãƒ£ãƒƒã‚¿ãƒ¼æ›¸ãè¾¼ã¿æ™‚ã®å±žæ€§ãƒ†ãƒ¼ãƒ–ãƒ«ä½ç½®ä¸Šä½
+aPPUShutterAttrlo = $3C8;PPUã‚·ãƒ£ãƒƒã‚¿ãƒ¼æ›¸ãè¾¼ã¿æ™‚ã®å±žæ€§ãƒ†ãƒ¼ãƒ–ãƒ«ä½ç½®ä¸‹ä½
 
 
-aObjAnim = $400         ;ƒIƒuƒWƒFƒNƒg‚ÌƒAƒjƒ[ƒVƒ‡ƒ“”Ô†
-aObjAnim10 = $410       ;+10‚·‚éê‡‚Ìƒ‰ƒxƒ‹
-aObjFlags = $420        ;ƒIƒuƒWƒFƒNƒg‚Ìó‘Ô’l
+aObjAnim = $400         ;ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ç•ªå·
+aObjAnim10 = $410       ;+10ã™ã‚‹å ´åˆã®ãƒ©ãƒ™ãƒ«
+aObjFlags = $420        ;ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®çŠ¶æ…‹å€¤
 aObjFlags10 = $430
 
-aObjRoom = $440         ;ƒIƒuƒWƒFƒNƒg‚Ì•”‰®”Ô†
+aObjRoom = $440         ;ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®éƒ¨å±‹ç•ªå·
 aObjRoom10 = $450
-aObjX = $460            ;ƒIƒuƒWƒFƒNƒg‚ÌXˆÊ’uãˆÊ
+aObjX = $460            ;ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®Xä½ç½®ä¸Šä½
 aObjX10 = $470
-aObjXlo = $480          ;ƒIƒuƒWƒFƒNƒg‚ÌXˆÊ’u‰ºˆÊ
+aObjXlo = $480          ;ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®Xä½ç½®ä¸‹ä½
 aObjXlo10 = $490
 
-aObjY = $4A0            ;ƒIƒuƒWƒFƒNƒg‚ÌYˆÊ’uãˆÊ
+aObjY = $4A0            ;ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®Yä½ç½®ä¸Šä½
 aObjY10 = $4B0
-aObjYlo = $4C0          ;ƒIƒuƒWƒFƒNƒg‚ÌYˆÊ’u‰ºˆÊ
+aObjYlo = $4C0          ;ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®Yä½ç½®ä¸‹ä½
 aObjYlo10 = $4D0
 
-aObjVar = $4E0          ;ƒIƒuƒWƒFƒNƒg‚Ì”Ä—p•Ï”
+aObjVar = $4E0          ;ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®æ±Žç”¨å¤‰æ•°
 aObjVar10 = $4F0
 
 
 
-aSQ1Ptr = $500          ;‹éŒ`”g1‹Èƒ|ƒCƒ“ƒ^‰ºˆÊ
-aSQ1Ptrhi = $501        ;‹éŒ`”g1‹Èƒ|ƒCƒ“ƒ^ãˆÊ
-aSQ1Len = $502          ;‹éŒ`”g1‰¹’·‰ºˆÊ
-aSQ1Lenhi = $503        ;‹éŒ`”g1‰¹’·ãˆÊ
-aSQ1Tempo = $504        ;‹éŒ`”g1ƒeƒ“ƒ|
-aSQ1Triplet = $505      ;bit7 ‹éŒ`”g1˜A•„ƒtƒ‰ƒO
-aSQ1LoopCount = $505    ;bit6-0 ‹éŒ`”g1ŒJ‚è•Ô‚µ‰ñ”
-aSQ1Tie = $506          ;bit7-5 ‹éŒ`”g1ƒ^ƒC‚ÌŒÂ”
-aSQ1Mod = $506          ;bit4-0 ‹éŒ`”g1ƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“’è‹`
-aSQ1FreqBase = $507     ;‹éŒ`”g1Žü”g”ƒe[ƒuƒ‹‚Ö‚Ìƒx[ƒXƒ|ƒCƒ“ƒ^‰ºˆÊ
-aSQ1FreqBasehi = $508   ;‹éŒ`”g1Žü”g”ƒe[ƒuƒ‹‚Ö‚Ìƒx[ƒXƒ|ƒCƒ“ƒ^ãˆÊ
-aSQ1Pitch = $509        ;‹éŒ`”g1ƒsƒbƒ`ƒGƒ“ƒxƒ[ƒv•Ï‰»’l
-aSQ1Reg = $50A          ;‹éŒ`”g1‰¹‚ƒŒƒWƒXƒ^’l‰ºˆÊ
-aSQ1Reghi = $50B        ;‹éŒ`”g1‰¹‚ƒŒƒWƒXƒ^’lãˆÊ
-aSQ1RegVol = $50C       ;‹éŒ`”g1‰¹—ÊŒnƒŒƒWƒXƒ^‚Ö‚Ì’l
-aSQ1VolWait = $50D      ;‹éŒ`”g1‰¹—ÊƒGƒ“ƒxƒ[ƒv‚Ì‘¬‚³(07 XX Y0‚ÌXX)
-aSQ1VolCounter = $50E   ;‹éŒ`”g1‰¹—ÊƒGƒ“ƒxƒ[ƒv—pƒJƒEƒ“ƒ^
-aSQ1Vol = $50F          ;‹éŒ`”g1‰¹—ÊƒGƒ“ƒxƒ[ƒv‚Å‚ÌŒ»Ý‚Ì‰¹—Ê
-aSQ1SFXPitch = $510     ;(Œø‰Ê‰¹—p)‹éŒ`”g1ƒsƒbƒ`ƒGƒ“ƒxƒ[ƒv•Ï‰»’l
-aSQ1SFXReg = $511       ;(Œø‰Ê‰¹—p)‹éŒ`”g1‰¹‚ƒŒƒWƒXƒ^’l‰ºˆÊ
-aSQ1SFXReghi = $512     ;(Œø‰Ê‰¹—p)‹éŒ`”g1‰¹‚ƒŒƒWƒXƒ^’lãˆÊ
-aSQ1SFXRegVol = $513    ;(Œø‰Ê‰¹—p)‹éŒ`”g1‰¹—ÊŒnƒŒƒWƒXƒ^‚Ö‚Ì’l
-aSQ1ModDefine1 = $514   ;‹éŒ`”g1ƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“’è‹`WW(WW XX YY ZZ‚ÌWW)
-aSQ1ModDefine2 = $515   ;‹éŒ`”g1ƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“’è‹`XX
-aSQ1ModDefine3 = $516   ;‹éŒ`”g1ƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“’è‹`YY
-aSQ1ModDefine4 = $517   ;‹éŒ`”g1ƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“’è‹`ZZ
-aSQ1PitchCounter = $518 ;‹éŒ`”g1ƒsƒbƒ`ƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“—pƒJƒEƒ“ƒ^
-aSQ1PitchInfo = $519    ;‹éŒ`”g1ƒsƒbƒ`ƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“—pã‰º“®î•ñ
-aSQ1PitchDelta = $51A   ;‹éŒ`”g1ƒsƒbƒ`‚Ì•ÏˆÊ‰ºˆÊ
-aSQ1PithcDeltahi = $51B ;‹éŒ`”g1ƒsƒbƒ`‚Ì•ÏˆÊãˆÊ
-aSQ1Prevent = $51C      ;‹éŒ`”g1“ñ“x‘‚«–hŽ~—p‘Þ”ð•Ï”‚ç‚µ‚¢
-aSQ1VolModCounter = $51D;‹éŒ`”g1‰¹—Êƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“—pƒJƒEƒ“ƒ^
-aSQ1VolModVolume = $51E ;‹éŒ`”g1‰¹—Êƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“‚Å‚ÌŒ»Ý‚Ì‰¹—Ê
+aSQ1Ptr = $500          ;çŸ©å½¢æ³¢1æ›²ãƒã‚¤ãƒ³ã‚¿ä¸‹ä½
+aSQ1Ptrhi = $501        ;çŸ©å½¢æ³¢1æ›²ãƒã‚¤ãƒ³ã‚¿ä¸Šä½
+aSQ1Len = $502          ;çŸ©å½¢æ³¢1éŸ³é•·ä¸‹ä½
+aSQ1Lenhi = $503        ;çŸ©å½¢æ³¢1éŸ³é•·ä¸Šä½
+aSQ1Tempo = $504        ;çŸ©å½¢æ³¢1ãƒ†ãƒ³ãƒ
+aSQ1Triplet = $505      ;bit7 çŸ©å½¢æ³¢1é€£ç¬¦ãƒ•ãƒ©ã‚°
+aSQ1LoopCount = $505    ;bit6-0 çŸ©å½¢æ³¢1ç¹°ã‚Šè¿”ã—å›žæ•°
+aSQ1Tie = $506          ;bit7-5 çŸ©å½¢æ³¢1ã‚¿ã‚¤ã®å€‹æ•°
+aSQ1Mod = $506          ;bit4-0 çŸ©å½¢æ³¢1ãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³å®šç¾©
+aSQ1FreqBase = $507     ;çŸ©å½¢æ³¢1å‘¨æ³¢æ•°ãƒ†ãƒ¼ãƒ–ãƒ«ã¸ã®ãƒ™ãƒ¼ã‚¹ãƒã‚¤ãƒ³ã‚¿ä¸‹ä½
+aSQ1FreqBasehi = $508   ;çŸ©å½¢æ³¢1å‘¨æ³¢æ•°ãƒ†ãƒ¼ãƒ–ãƒ«ã¸ã®ãƒ™ãƒ¼ã‚¹ãƒã‚¤ãƒ³ã‚¿ä¸Šä½
+aSQ1Pitch = $509        ;çŸ©å½¢æ³¢1ãƒ”ãƒƒãƒã‚¨ãƒ³ãƒ™ãƒ­ãƒ¼ãƒ—å¤‰åŒ–å€¤
+aSQ1Reg = $50A          ;çŸ©å½¢æ³¢1éŸ³é«˜ãƒ¬ã‚¸ã‚¹ã‚¿å€¤ä¸‹ä½
+aSQ1Reghi = $50B        ;çŸ©å½¢æ³¢1éŸ³é«˜ãƒ¬ã‚¸ã‚¹ã‚¿å€¤ä¸Šä½
+aSQ1RegVol = $50C       ;çŸ©å½¢æ³¢1éŸ³é‡ç³»ãƒ¬ã‚¸ã‚¹ã‚¿ã¸ã®å€¤
+aSQ1VolWait = $50D      ;çŸ©å½¢æ³¢1éŸ³é‡ã‚¨ãƒ³ãƒ™ãƒ­ãƒ¼ãƒ—ã®é€Ÿã•(07 XX Y0ã®XX)
+aSQ1VolCounter = $50E   ;çŸ©å½¢æ³¢1éŸ³é‡ã‚¨ãƒ³ãƒ™ãƒ­ãƒ¼ãƒ—ç”¨ã‚«ã‚¦ãƒ³ã‚¿
+aSQ1Vol = $50F          ;çŸ©å½¢æ³¢1éŸ³é‡ã‚¨ãƒ³ãƒ™ãƒ­ãƒ¼ãƒ—ã§ã®ç¾åœ¨ã®éŸ³é‡
+aSQ1SFXPitch = $510     ;(åŠ¹æžœéŸ³ç”¨)çŸ©å½¢æ³¢1ãƒ”ãƒƒãƒã‚¨ãƒ³ãƒ™ãƒ­ãƒ¼ãƒ—å¤‰åŒ–å€¤
+aSQ1SFXReg = $511       ;(åŠ¹æžœéŸ³ç”¨)çŸ©å½¢æ³¢1éŸ³é«˜ãƒ¬ã‚¸ã‚¹ã‚¿å€¤ä¸‹ä½
+aSQ1SFXReghi = $512     ;(åŠ¹æžœéŸ³ç”¨)çŸ©å½¢æ³¢1éŸ³é«˜ãƒ¬ã‚¸ã‚¹ã‚¿å€¤ä¸Šä½
+aSQ1SFXRegVol = $513    ;(åŠ¹æžœéŸ³ç”¨)çŸ©å½¢æ³¢1éŸ³é‡ç³»ãƒ¬ã‚¸ã‚¹ã‚¿ã¸ã®å€¤
+aSQ1ModDefine1 = $514   ;çŸ©å½¢æ³¢1ãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³å®šç¾©WW(WW XX YY ZZã®WW)
+aSQ1ModDefine2 = $515   ;çŸ©å½¢æ³¢1ãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³å®šç¾©XX
+aSQ1ModDefine3 = $516   ;çŸ©å½¢æ³¢1ãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³å®šç¾©YY
+aSQ1ModDefine4 = $517   ;çŸ©å½¢æ³¢1ãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³å®šç¾©ZZ
+aSQ1PitchCounter = $518 ;çŸ©å½¢æ³¢1ãƒ”ãƒƒãƒãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³ç”¨ã‚«ã‚¦ãƒ³ã‚¿
+aSQ1PitchInfo = $519    ;çŸ©å½¢æ³¢1ãƒ”ãƒƒãƒãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³ç”¨ä¸Šä¸‹å‹•æƒ…å ±
+aSQ1PitchDelta = $51A   ;çŸ©å½¢æ³¢1ãƒ”ãƒƒãƒã®å¤‰ä½ä¸‹ä½
+aSQ1PithcDeltahi = $51B ;çŸ©å½¢æ³¢1ãƒ”ãƒƒãƒã®å¤‰ä½ä¸Šä½
+aSQ1Prevent = $51C      ;çŸ©å½¢æ³¢1äºŒåº¦æ›¸ãé˜²æ­¢ç”¨é€€é¿å¤‰æ•°ã‚‰ã—ã„
+aSQ1VolModCounter = $51D;çŸ©å½¢æ³¢1éŸ³é‡ãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³ç”¨ã‚«ã‚¦ãƒ³ã‚¿
+aSQ1VolModVolume = $51E ;çŸ©å½¢æ³¢1éŸ³é‡ãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³ã§ã®ç¾åœ¨ã®éŸ³é‡
 
-aSQ2Ptr = $51F          ;‹éŒ`”g2‹Èƒ|ƒCƒ“ƒ^‰ºˆÊ
-aSQ2Ptrhi = $520        ;‹éŒ`”g2‹Èƒ|ƒCƒ“ƒ^ãˆÊ
-aSQ2Len = $521          ;‹éŒ`”g2‰¹’·‰ºˆÊ
-aSQ2Lenhi = $522        ;‹éŒ`”g2‰¹’·ãˆÊ
-aSQ2Tempo = $523        ;‹éŒ`”g2ƒeƒ“ƒ|
-aSQ2Triplet = $524      ;bit7 ‹éŒ`”g2˜A•„ƒtƒ‰ƒO
-aSQ2LoopCount = $524    ;bit6-0 ‹éŒ`”g2ŒJ‚è•Ô‚µ‰ñ”
-aSQ2Tie = $525          ;bit7-5 ‹éŒ`”g2ƒ^ƒC‚ÌŒÂ”
-aSQ2Mod = $525          ;bit4-0 ‹éŒ`”g2ƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“’è‹`
-aSQ2FreqBase = $526     ;‹éŒ`”g2Žü”g”ƒe[ƒuƒ‹‚Ö‚Ìƒx[ƒXƒ|ƒCƒ“ƒ^‰ºˆÊ
-aSQ2FreqBasehi = $527   ;‹éŒ`”g2Žü”g”ƒe[ƒuƒ‹‚Ö‚Ìƒx[ƒXƒ|ƒCƒ“ƒ^ãˆÊ
-aSQ2Pitch = $528        ;‹éŒ`”g2ƒsƒbƒ`ƒGƒ“ƒxƒ[ƒv•Ï‰»’l
-aSQ2Reg = $529          ;‹éŒ`”g2‰¹‚ƒŒƒWƒXƒ^’l‰ºˆÊ
-aSQ2Reghi = $52A        ;‹éŒ`”g2‰¹‚ƒŒƒWƒXƒ^’lãˆÊ
-aSQ2RegVol = $52B       ;‹éŒ`”g2‰¹—ÊŒnƒŒƒWƒXƒ^‚Ö‚Ì’l
-aSQ2VolWait = $52C      ;‹éŒ`”g2‰¹—ÊƒGƒ“ƒxƒ[ƒv‚Ì‘¬‚³(07 XX Y0‚ÌXX)
-aSQ2VolCounter = $52D   ;‹éŒ`”g2‰¹—ÊƒGƒ“ƒxƒ[ƒv—pƒJƒEƒ“ƒ^
-aSQ2Vol = $52E          ;‹éŒ`”g2‰¹—ÊƒGƒ“ƒxƒ[ƒv‚Å‚ÌŒ»Ý‚Ì‰¹—Ê
-aSQ2SFXPitch = $52F     ;(Œø‰Ê‰¹—p)‹éŒ`”g2ƒsƒbƒ`ƒGƒ“ƒxƒ[ƒv•Ï‰»’l
-aSQ2SFXReg = $530       ;(Œø‰Ê‰¹—p)‹éŒ`”g2‰¹‚ƒŒƒWƒXƒ^’l‰ºˆÊ
-aSQ2SFXReghi = $531     ;(Œø‰Ê‰¹—p)‹éŒ`”g2‰¹‚ƒŒƒWƒXƒ^’lãˆÊ
-aSQ2SFXRegVol = $532    ;(Œø‰Ê‰¹—p)‹éŒ`”g2‰¹—ÊŒnƒŒƒWƒXƒ^‚Ö‚Ì’l
-aSQ2ModDefine1 = $533   ;‹éŒ`”g2ƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“’è‹`WW(WW XX YY ZZ‚ÌWW)
-aSQ2ModDefine2 = $534   ;‹éŒ`”g2ƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“’è‹`XX
-aSQ2ModDefine3 = $535   ;‹éŒ`”g2ƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“’è‹`YY
-aSQ2ModDefine4 = $536   ;‹éŒ`”g2ƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“’è‹`ZZ
-aSQ2PitchCounter = $537 ;‹éŒ`”g2ƒsƒbƒ`ƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“—pƒJƒEƒ“ƒ^
-aSQ2PitchInfo = $538    ;‹éŒ`”g2ƒsƒbƒ`ƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“—pã‰º“®î•ñ
-aSQ2PitchDelta = $539   ;‹éŒ`”g2ƒsƒbƒ`‚Ì•ÏˆÊ‰ºˆÊ
-aSQ2PithcDeltahi = $53A ;‹éŒ`”g2ƒsƒbƒ`‚Ì•ÏˆÊãˆÊ
-aSQ2Prevent = $53B      ;‹éŒ`”g2“ñ“x‘‚«–hŽ~—p‘Þ”ð•Ï”‚ç‚µ‚¢
-aSQ2VolModCounter = $53C;‹éŒ`”g2‰¹—Êƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“—pƒJƒEƒ“ƒ^
-aSQ2VolModVolume = $53D ;‹éŒ`”g2‰¹—Êƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“‚Å‚ÌŒ»Ý‚Ì‰¹—Ê
+aSQ2Ptr = $51F          ;çŸ©å½¢æ³¢2æ›²ãƒã‚¤ãƒ³ã‚¿ä¸‹ä½
+aSQ2Ptrhi = $520        ;çŸ©å½¢æ³¢2æ›²ãƒã‚¤ãƒ³ã‚¿ä¸Šä½
+aSQ2Len = $521          ;çŸ©å½¢æ³¢2éŸ³é•·ä¸‹ä½
+aSQ2Lenhi = $522        ;çŸ©å½¢æ³¢2éŸ³é•·ä¸Šä½
+aSQ2Tempo = $523        ;çŸ©å½¢æ³¢2ãƒ†ãƒ³ãƒ
+aSQ2Triplet = $524      ;bit7 çŸ©å½¢æ³¢2é€£ç¬¦ãƒ•ãƒ©ã‚°
+aSQ2LoopCount = $524    ;bit6-0 çŸ©å½¢æ³¢2ç¹°ã‚Šè¿”ã—å›žæ•°
+aSQ2Tie = $525          ;bit7-5 çŸ©å½¢æ³¢2ã‚¿ã‚¤ã®å€‹æ•°
+aSQ2Mod = $525          ;bit4-0 çŸ©å½¢æ³¢2ãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³å®šç¾©
+aSQ2FreqBase = $526     ;çŸ©å½¢æ³¢2å‘¨æ³¢æ•°ãƒ†ãƒ¼ãƒ–ãƒ«ã¸ã®ãƒ™ãƒ¼ã‚¹ãƒã‚¤ãƒ³ã‚¿ä¸‹ä½
+aSQ2FreqBasehi = $527   ;çŸ©å½¢æ³¢2å‘¨æ³¢æ•°ãƒ†ãƒ¼ãƒ–ãƒ«ã¸ã®ãƒ™ãƒ¼ã‚¹ãƒã‚¤ãƒ³ã‚¿ä¸Šä½
+aSQ2Pitch = $528        ;çŸ©å½¢æ³¢2ãƒ”ãƒƒãƒã‚¨ãƒ³ãƒ™ãƒ­ãƒ¼ãƒ—å¤‰åŒ–å€¤
+aSQ2Reg = $529          ;çŸ©å½¢æ³¢2éŸ³é«˜ãƒ¬ã‚¸ã‚¹ã‚¿å€¤ä¸‹ä½
+aSQ2Reghi = $52A        ;çŸ©å½¢æ³¢2éŸ³é«˜ãƒ¬ã‚¸ã‚¹ã‚¿å€¤ä¸Šä½
+aSQ2RegVol = $52B       ;çŸ©å½¢æ³¢2éŸ³é‡ç³»ãƒ¬ã‚¸ã‚¹ã‚¿ã¸ã®å€¤
+aSQ2VolWait = $52C      ;çŸ©å½¢æ³¢2éŸ³é‡ã‚¨ãƒ³ãƒ™ãƒ­ãƒ¼ãƒ—ã®é€Ÿã•(07 XX Y0ã®XX)
+aSQ2VolCounter = $52D   ;çŸ©å½¢æ³¢2éŸ³é‡ã‚¨ãƒ³ãƒ™ãƒ­ãƒ¼ãƒ—ç”¨ã‚«ã‚¦ãƒ³ã‚¿
+aSQ2Vol = $52E          ;çŸ©å½¢æ³¢2éŸ³é‡ã‚¨ãƒ³ãƒ™ãƒ­ãƒ¼ãƒ—ã§ã®ç¾åœ¨ã®éŸ³é‡
+aSQ2SFXPitch = $52F     ;(åŠ¹æžœéŸ³ç”¨)çŸ©å½¢æ³¢2ãƒ”ãƒƒãƒã‚¨ãƒ³ãƒ™ãƒ­ãƒ¼ãƒ—å¤‰åŒ–å€¤
+aSQ2SFXReg = $530       ;(åŠ¹æžœéŸ³ç”¨)çŸ©å½¢æ³¢2éŸ³é«˜ãƒ¬ã‚¸ã‚¹ã‚¿å€¤ä¸‹ä½
+aSQ2SFXReghi = $531     ;(åŠ¹æžœéŸ³ç”¨)çŸ©å½¢æ³¢2éŸ³é«˜ãƒ¬ã‚¸ã‚¹ã‚¿å€¤ä¸Šä½
+aSQ2SFXRegVol = $532    ;(åŠ¹æžœéŸ³ç”¨)çŸ©å½¢æ³¢2éŸ³é‡ç³»ãƒ¬ã‚¸ã‚¹ã‚¿ã¸ã®å€¤
+aSQ2ModDefine1 = $533   ;çŸ©å½¢æ³¢2ãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³å®šç¾©WW(WW XX YY ZZã®WW)
+aSQ2ModDefine2 = $534   ;çŸ©å½¢æ³¢2ãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³å®šç¾©XX
+aSQ2ModDefine3 = $535   ;çŸ©å½¢æ³¢2ãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³å®šç¾©YY
+aSQ2ModDefine4 = $536   ;çŸ©å½¢æ³¢2ãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³å®šç¾©ZZ
+aSQ2PitchCounter = $537 ;çŸ©å½¢æ³¢2ãƒ”ãƒƒãƒãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³ç”¨ã‚«ã‚¦ãƒ³ã‚¿
+aSQ2PitchInfo = $538    ;çŸ©å½¢æ³¢2ãƒ”ãƒƒãƒãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³ç”¨ä¸Šä¸‹å‹•æƒ…å ±
+aSQ2PitchDelta = $539   ;çŸ©å½¢æ³¢2ãƒ”ãƒƒãƒã®å¤‰ä½ä¸‹ä½
+aSQ2PithcDeltahi = $53A ;çŸ©å½¢æ³¢2ãƒ”ãƒƒãƒã®å¤‰ä½ä¸Šä½
+aSQ2Prevent = $53B      ;çŸ©å½¢æ³¢2äºŒåº¦æ›¸ãé˜²æ­¢ç”¨é€€é¿å¤‰æ•°ã‚‰ã—ã„
+aSQ2VolModCounter = $53C;çŸ©å½¢æ³¢2éŸ³é‡ãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³ç”¨ã‚«ã‚¦ãƒ³ã‚¿
+aSQ2VolModVolume = $53D ;çŸ©å½¢æ³¢2éŸ³é‡ãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³ã§ã®ç¾åœ¨ã®éŸ³é‡
 
-aTRIPtr = $53E          ;ŽOŠp”g‹Èƒ|ƒCƒ“ƒ^‰ºˆÊ
-aTRIPtrhi = $53F        ;ŽOŠp”g‹Èƒ|ƒCƒ“ƒ^ãˆÊ
-aTRILen = $540          ;ŽOŠp”g‰¹’·‰ºˆÊ
-aTRILenhi = $541        ;ŽOŠp”g‰¹’·ãˆÊ
-aTRITempo = $542        ;ŽOŠp”gƒeƒ“ƒ|
-aTRITriplet = $543      ;bit7 ŽOŠp”g˜A•„ƒtƒ‰ƒO
-aTRILoopCount = $543    ;bit6-0 ŽOŠp”gŒJ‚è•Ô‚µ‰ñ”
-aTRITie = $544          ;bit7-5 ŽOŠp”gƒ^ƒC‚ÌŒÂ”
-aTRIMod = $544          ;bit4-0 ŽOŠp”gƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“’è‹`
-aTRIFreqBase = $545     ;ŽOŠp”gŽü”g”ƒe[ƒuƒ‹‚Ö‚Ìƒx[ƒXƒ|ƒCƒ“ƒ^‰ºˆÊ
-aTRIFreqBasehi = $546   ;ŽOŠp”gŽü”g”ƒe[ƒuƒ‹‚Ö‚Ìƒx[ƒXƒ|ƒCƒ“ƒ^ãˆÊ
-aTRIPitch = $547        ;ŽOŠp”gƒsƒbƒ`ƒGƒ“ƒxƒ[ƒv•Ï‰»’l
-aTRIReg = $548          ;ŽOŠp”g‰¹‚ƒŒƒWƒXƒ^’l‰ºˆÊ
-aTRIReghi = $549        ;ŽOŠp”g‰¹‚ƒŒƒWƒXƒ^’lãˆÊ
-aTRIRegVol = $54A       ;ŽOŠp”g‰¹—ÊŒnƒŒƒWƒXƒ^‚Ö‚Ì’l
-aTRIVolWait = $54B      ;ŽOŠp”g‰¹—ÊƒGƒ“ƒxƒ[ƒv‚Ì‘¬‚³(07 XX Y0‚ÌXX)
-aTRIVolCounter = $54C   ;ŽOŠp”g‰¹—ÊƒGƒ“ƒxƒ[ƒv—pƒJƒEƒ“ƒ^
-aTRIVol = $54D          ;ŽOŠp”g‰¹—ÊƒGƒ“ƒxƒ[ƒv‚Å‚ÌŒ»Ý‚Ì‰¹—Ê
-aTRISFXPitch = $54E     ;(Œø‰Ê‰¹—p)ŽOŠp”gƒsƒbƒ`ƒGƒ“ƒxƒ[ƒv•Ï‰»’l
-aTRISFXReg = $54F       ;(Œø‰Ê‰¹—p)ŽOŠp”g‰¹‚ƒŒƒWƒXƒ^’l‰ºˆÊ
-aTRISFXReghi = $550     ;(Œø‰Ê‰¹—p)ŽOŠp”g‰¹‚ƒŒƒWƒXƒ^’lãˆÊ
-aTRISFXRegVol = $551    ;(Œø‰Ê‰¹—p)ŽOŠp”g‰¹—ÊŒnƒŒƒWƒXƒ^‚Ö‚Ì’l
-aTRIModDefine1 = $552   ;ŽOŠp”gƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“’è‹`WW(WW XX YY ZZ‚ÌWW)
-aTRIModDefine2 = $553   ;ŽOŠp”gƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“’è‹`XX
-aTRIModDefine3 = $554   ;ŽOŠp”gƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“’è‹`YY
-aTRIModDefine4 = $555   ;ŽOŠp”gƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“’è‹`ZZ
-aTRIPitchCounter = $556 ;ŽOŠp”gƒsƒbƒ`ƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“—pƒJƒEƒ“ƒ^
-aTRIPitchInfo = $557    ;ŽOŠp”gƒsƒbƒ`ƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“—pã‰º“®î•ñ
-aTRIPitchDelta = $558   ;ŽOŠp”gƒsƒbƒ`‚Ì•ÏˆÊ‰ºˆÊ
-aTRIPithcDeltahi = $559 ;ŽOŠp”gƒsƒbƒ`‚Ì•ÏˆÊãˆÊ
-aTRIPrevent = $55A      ;ŽOŠp”g“ñ“x‘‚«–hŽ~—p‘Þ”ð•Ï”‚ç‚µ‚¢
-aTRIVolModCounter = $55B;ŽOŠp”g‰¹—Êƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“—pƒJƒEƒ“ƒ^
-aTRIVolModVolume = $55C ;ŽOŠp”g‰¹—Êƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“‚Å‚ÌŒ»Ý‚Ì‰¹—Ê
+aTRIPtr = $53E          ;ä¸‰è§’æ³¢æ›²ãƒã‚¤ãƒ³ã‚¿ä¸‹ä½
+aTRIPtrhi = $53F        ;ä¸‰è§’æ³¢æ›²ãƒã‚¤ãƒ³ã‚¿ä¸Šä½
+aTRILen = $540          ;ä¸‰è§’æ³¢éŸ³é•·ä¸‹ä½
+aTRILenhi = $541        ;ä¸‰è§’æ³¢éŸ³é•·ä¸Šä½
+aTRITempo = $542        ;ä¸‰è§’æ³¢ãƒ†ãƒ³ãƒ
+aTRITriplet = $543      ;bit7 ä¸‰è§’æ³¢é€£ç¬¦ãƒ•ãƒ©ã‚°
+aTRILoopCount = $543    ;bit6-0 ä¸‰è§’æ³¢ç¹°ã‚Šè¿”ã—å›žæ•°
+aTRITie = $544          ;bit7-5 ä¸‰è§’æ³¢ã‚¿ã‚¤ã®å€‹æ•°
+aTRIMod = $544          ;bit4-0 ä¸‰è§’æ³¢ãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³å®šç¾©
+aTRIFreqBase = $545     ;ä¸‰è§’æ³¢å‘¨æ³¢æ•°ãƒ†ãƒ¼ãƒ–ãƒ«ã¸ã®ãƒ™ãƒ¼ã‚¹ãƒã‚¤ãƒ³ã‚¿ä¸‹ä½
+aTRIFreqBasehi = $546   ;ä¸‰è§’æ³¢å‘¨æ³¢æ•°ãƒ†ãƒ¼ãƒ–ãƒ«ã¸ã®ãƒ™ãƒ¼ã‚¹ãƒã‚¤ãƒ³ã‚¿ä¸Šä½
+aTRIPitch = $547        ;ä¸‰è§’æ³¢ãƒ”ãƒƒãƒã‚¨ãƒ³ãƒ™ãƒ­ãƒ¼ãƒ—å¤‰åŒ–å€¤
+aTRIReg = $548          ;ä¸‰è§’æ³¢éŸ³é«˜ãƒ¬ã‚¸ã‚¹ã‚¿å€¤ä¸‹ä½
+aTRIReghi = $549        ;ä¸‰è§’æ³¢éŸ³é«˜ãƒ¬ã‚¸ã‚¹ã‚¿å€¤ä¸Šä½
+aTRIRegVol = $54A       ;ä¸‰è§’æ³¢éŸ³é‡ç³»ãƒ¬ã‚¸ã‚¹ã‚¿ã¸ã®å€¤
+aTRIVolWait = $54B      ;ä¸‰è§’æ³¢éŸ³é‡ã‚¨ãƒ³ãƒ™ãƒ­ãƒ¼ãƒ—ã®é€Ÿã•(07 XX Y0ã®XX)
+aTRIVolCounter = $54C   ;ä¸‰è§’æ³¢éŸ³é‡ã‚¨ãƒ³ãƒ™ãƒ­ãƒ¼ãƒ—ç”¨ã‚«ã‚¦ãƒ³ã‚¿
+aTRIVol = $54D          ;ä¸‰è§’æ³¢éŸ³é‡ã‚¨ãƒ³ãƒ™ãƒ­ãƒ¼ãƒ—ã§ã®ç¾åœ¨ã®éŸ³é‡
+aTRISFXPitch = $54E     ;(åŠ¹æžœéŸ³ç”¨)ä¸‰è§’æ³¢ãƒ”ãƒƒãƒã‚¨ãƒ³ãƒ™ãƒ­ãƒ¼ãƒ—å¤‰åŒ–å€¤
+aTRISFXReg = $54F       ;(åŠ¹æžœéŸ³ç”¨)ä¸‰è§’æ³¢éŸ³é«˜ãƒ¬ã‚¸ã‚¹ã‚¿å€¤ä¸‹ä½
+aTRISFXReghi = $550     ;(åŠ¹æžœéŸ³ç”¨)ä¸‰è§’æ³¢éŸ³é«˜ãƒ¬ã‚¸ã‚¹ã‚¿å€¤ä¸Šä½
+aTRISFXRegVol = $551    ;(åŠ¹æžœéŸ³ç”¨)ä¸‰è§’æ³¢éŸ³é‡ç³»ãƒ¬ã‚¸ã‚¹ã‚¿ã¸ã®å€¤
+aTRIModDefine1 = $552   ;ä¸‰è§’æ³¢ãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³å®šç¾©WW(WW XX YY ZZã®WW)
+aTRIModDefine2 = $553   ;ä¸‰è§’æ³¢ãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³å®šç¾©XX
+aTRIModDefine3 = $554   ;ä¸‰è§’æ³¢ãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³å®šç¾©YY
+aTRIModDefine4 = $555   ;ä¸‰è§’æ³¢ãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³å®šç¾©ZZ
+aTRIPitchCounter = $556 ;ä¸‰è§’æ³¢ãƒ”ãƒƒãƒãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³ç”¨ã‚«ã‚¦ãƒ³ã‚¿
+aTRIPitchInfo = $557    ;ä¸‰è§’æ³¢ãƒ”ãƒƒãƒãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³ç”¨ä¸Šä¸‹å‹•æƒ…å ±
+aTRIPitchDelta = $558   ;ä¸‰è§’æ³¢ãƒ”ãƒƒãƒã®å¤‰ä½ä¸‹ä½
+aTRIPithcDeltahi = $559 ;ä¸‰è§’æ³¢ãƒ”ãƒƒãƒã®å¤‰ä½ä¸Šä½
+aTRIPrevent = $55A      ;ä¸‰è§’æ³¢äºŒåº¦æ›¸ãé˜²æ­¢ç”¨é€€é¿å¤‰æ•°ã‚‰ã—ã„
+aTRIVolModCounter = $55B;ä¸‰è§’æ³¢éŸ³é‡ãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³ç”¨ã‚«ã‚¦ãƒ³ã‚¿
+aTRIVolModVolume = $55C ;ä¸‰è§’æ³¢éŸ³é‡ãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³ã§ã®ç¾åœ¨ã®éŸ³é‡
 
-aNOIPtr = $55D          ;ƒmƒCƒY‹Èƒ|ƒCƒ“ƒ^‰ºˆÊ
-aNOIPtrhi = $55E        ;ƒmƒCƒY‹Èƒ|ƒCƒ“ƒ^ãˆÊ
-aNOILen = $55F          ;ƒmƒCƒY‰¹’·‰ºˆÊ
-aNOILenhi = $560        ;ƒmƒCƒY‰¹’·ãˆÊ
-aNOITempo = $561        ;ƒmƒCƒYƒeƒ“ƒ|
-aNOITriplet = $562      ;bit7 ƒmƒCƒY˜A•„ƒtƒ‰ƒO
-aNOILoopCount = $562    ;bit6-0 ƒmƒCƒYŒJ‚è•Ô‚µ‰ñ”
-aNOITie = $563          ;bit7-5 ƒmƒCƒYƒ^ƒC‚ÌŒÂ”
-aNOIMod = $563          ;bit4-0 ƒmƒCƒYƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“’è‹`
-aNOIFreqBase = $564     ;ƒmƒCƒYŽü”g”ƒe[ƒuƒ‹‚Ö‚Ìƒx[ƒXƒ|ƒCƒ“ƒ^‰ºˆÊ
-aNOIFreqBasehi = $565   ;ƒmƒCƒYŽü”g”ƒe[ƒuƒ‹‚Ö‚Ìƒx[ƒXƒ|ƒCƒ“ƒ^ãˆÊ
-aNOIPitch = $566        ;ƒmƒCƒYƒsƒbƒ`ƒGƒ“ƒxƒ[ƒv•Ï‰»’l
-aNOIReg = $567          ;ƒmƒCƒY‰¹‚ƒŒƒWƒXƒ^’l‰ºˆÊ
-aNOIReghi = $568        ;ƒmƒCƒY‰¹‚ƒŒƒWƒXƒ^’lãˆÊ
-aNOIRegVol = $569       ;ƒmƒCƒY‰¹—ÊŒnƒŒƒWƒXƒ^‚Ö‚Ì’l
-aNOIVolWait = $56A      ;ƒmƒCƒY‰¹—ÊƒGƒ“ƒxƒ[ƒv‚Ì‘¬‚³(07 XX Y0‚ÌXX)
-aNOIVolCounter = $56B   ;ƒmƒCƒY‰¹—ÊƒGƒ“ƒxƒ[ƒv—pƒJƒEƒ“ƒ^
-aNOIVol = $56C          ;ƒmƒCƒY‰¹—ÊƒGƒ“ƒxƒ[ƒv‚Å‚ÌŒ»Ý‚Ì‰¹—Ê
-aNOISFXPitch = $56D     ;(Œø‰Ê‰¹—p)ƒmƒCƒYƒsƒbƒ`ƒGƒ“ƒxƒ[ƒv•Ï‰»’l
-aNOISFXReg = $56E       ;(Œø‰Ê‰¹—p)ƒmƒCƒY‰¹‚ƒŒƒWƒXƒ^’l‰ºˆÊ
-aNOISFXReghi = $56F     ;(Œø‰Ê‰¹—p)ƒmƒCƒY‰¹‚ƒŒƒWƒXƒ^’lãˆÊ
-aNOISFXRegVol = $570    ;(Œø‰Ê‰¹—p)ƒmƒCƒY‰¹—ÊŒnƒŒƒWƒXƒ^‚Ö‚Ì’l
-aNOIModDefine1 = $571   ;ƒmƒCƒYƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“’è‹`WW(WW XX YY ZZ‚ÌWW)
-aNOIModDefine2 = $572   ;ƒmƒCƒYƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“’è‹`XX
-aNOIModDefine3 = $573   ;ƒmƒCƒYƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“’è‹`YY
-aNOIModDefine4 = $574   ;ƒmƒCƒYƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“’è‹`ZZ
-aNOIPitchCounter = $575 ;ƒmƒCƒYƒsƒbƒ`ƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“—pƒJƒEƒ“ƒ^
-aNOIPitchInfo = $576    ;ƒmƒCƒYƒsƒbƒ`ƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“—pã‰º“®î•ñ
-aNOIPitchDelta = $577   ;ƒmƒCƒYƒsƒbƒ`‚Ì•ÏˆÊ‰ºˆÊ
-aNOIPithcDeltahi = $578 ;ƒmƒCƒYƒsƒbƒ`‚Ì•ÏˆÊãˆÊ
-aNOIPrevent = $579      ;ƒmƒCƒY“ñ“x‘‚«–hŽ~—p‘Þ”ð•Ï”‚ç‚µ‚¢
-aNOIVolModCounter = $57A;ƒmƒCƒY‰¹—Êƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“—pƒJƒEƒ“ƒ^
-aNOIVolModVolume = $57B ;ƒmƒCƒY‰¹—Êƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“‚Å‚ÌŒ»Ý‚Ì‰¹—Ê
+aNOIPtr = $55D          ;ãƒŽã‚¤ã‚ºæ›²ãƒã‚¤ãƒ³ã‚¿ä¸‹ä½
+aNOIPtrhi = $55E        ;ãƒŽã‚¤ã‚ºæ›²ãƒã‚¤ãƒ³ã‚¿ä¸Šä½
+aNOILen = $55F          ;ãƒŽã‚¤ã‚ºéŸ³é•·ä¸‹ä½
+aNOILenhi = $560        ;ãƒŽã‚¤ã‚ºéŸ³é•·ä¸Šä½
+aNOITempo = $561        ;ãƒŽã‚¤ã‚ºãƒ†ãƒ³ãƒ
+aNOITriplet = $562      ;bit7 ãƒŽã‚¤ã‚ºé€£ç¬¦ãƒ•ãƒ©ã‚°
+aNOILoopCount = $562    ;bit6-0 ãƒŽã‚¤ã‚ºç¹°ã‚Šè¿”ã—å›žæ•°
+aNOITie = $563          ;bit7-5 ãƒŽã‚¤ã‚ºã‚¿ã‚¤ã®å€‹æ•°
+aNOIMod = $563          ;bit4-0 ãƒŽã‚¤ã‚ºãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³å®šç¾©
+aNOIFreqBase = $564     ;ãƒŽã‚¤ã‚ºå‘¨æ³¢æ•°ãƒ†ãƒ¼ãƒ–ãƒ«ã¸ã®ãƒ™ãƒ¼ã‚¹ãƒã‚¤ãƒ³ã‚¿ä¸‹ä½
+aNOIFreqBasehi = $565   ;ãƒŽã‚¤ã‚ºå‘¨æ³¢æ•°ãƒ†ãƒ¼ãƒ–ãƒ«ã¸ã®ãƒ™ãƒ¼ã‚¹ãƒã‚¤ãƒ³ã‚¿ä¸Šä½
+aNOIPitch = $566        ;ãƒŽã‚¤ã‚ºãƒ”ãƒƒãƒã‚¨ãƒ³ãƒ™ãƒ­ãƒ¼ãƒ—å¤‰åŒ–å€¤
+aNOIReg = $567          ;ãƒŽã‚¤ã‚ºéŸ³é«˜ãƒ¬ã‚¸ã‚¹ã‚¿å€¤ä¸‹ä½
+aNOIReghi = $568        ;ãƒŽã‚¤ã‚ºéŸ³é«˜ãƒ¬ã‚¸ã‚¹ã‚¿å€¤ä¸Šä½
+aNOIRegVol = $569       ;ãƒŽã‚¤ã‚ºéŸ³é‡ç³»ãƒ¬ã‚¸ã‚¹ã‚¿ã¸ã®å€¤
+aNOIVolWait = $56A      ;ãƒŽã‚¤ã‚ºéŸ³é‡ã‚¨ãƒ³ãƒ™ãƒ­ãƒ¼ãƒ—ã®é€Ÿã•(07 XX Y0ã®XX)
+aNOIVolCounter = $56B   ;ãƒŽã‚¤ã‚ºéŸ³é‡ã‚¨ãƒ³ãƒ™ãƒ­ãƒ¼ãƒ—ç”¨ã‚«ã‚¦ãƒ³ã‚¿
+aNOIVol = $56C          ;ãƒŽã‚¤ã‚ºéŸ³é‡ã‚¨ãƒ³ãƒ™ãƒ­ãƒ¼ãƒ—ã§ã®ç¾åœ¨ã®éŸ³é‡
+aNOISFXPitch = $56D     ;(åŠ¹æžœéŸ³ç”¨)ãƒŽã‚¤ã‚ºãƒ”ãƒƒãƒã‚¨ãƒ³ãƒ™ãƒ­ãƒ¼ãƒ—å¤‰åŒ–å€¤
+aNOISFXReg = $56E       ;(åŠ¹æžœéŸ³ç”¨)ãƒŽã‚¤ã‚ºéŸ³é«˜ãƒ¬ã‚¸ã‚¹ã‚¿å€¤ä¸‹ä½
+aNOISFXReghi = $56F     ;(åŠ¹æžœéŸ³ç”¨)ãƒŽã‚¤ã‚ºéŸ³é«˜ãƒ¬ã‚¸ã‚¹ã‚¿å€¤ä¸Šä½
+aNOISFXRegVol = $570    ;(åŠ¹æžœéŸ³ç”¨)ãƒŽã‚¤ã‚ºéŸ³é‡ç³»ãƒ¬ã‚¸ã‚¹ã‚¿ã¸ã®å€¤
+aNOIModDefine1 = $571   ;ãƒŽã‚¤ã‚ºãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³å®šç¾©WW(WW XX YY ZZã®WW)
+aNOIModDefine2 = $572   ;ãƒŽã‚¤ã‚ºãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³å®šç¾©XX
+aNOIModDefine3 = $573   ;ãƒŽã‚¤ã‚ºãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³å®šç¾©YY
+aNOIModDefine4 = $574   ;ãƒŽã‚¤ã‚ºãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³å®šç¾©ZZ
+aNOIPitchCounter = $575 ;ãƒŽã‚¤ã‚ºãƒ”ãƒƒãƒãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³ç”¨ã‚«ã‚¦ãƒ³ã‚¿
+aNOIPitchInfo = $576    ;ãƒŽã‚¤ã‚ºãƒ”ãƒƒãƒãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³ç”¨ä¸Šä¸‹å‹•æƒ…å ±
+aNOIPitchDelta = $577   ;ãƒŽã‚¤ã‚ºãƒ”ãƒƒãƒã®å¤‰ä½ä¸‹ä½
+aNOIPithcDeltahi = $578 ;ãƒŽã‚¤ã‚ºãƒ”ãƒƒãƒã®å¤‰ä½ä¸Šä½
+aNOIPrevent = $579      ;ãƒŽã‚¤ã‚ºäºŒåº¦æ›¸ãé˜²æ­¢ç”¨é€€é¿å¤‰æ•°ã‚‰ã—ã„
+aNOIVolModCounter = $57A;ãƒŽã‚¤ã‚ºéŸ³é‡ãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³ç”¨ã‚«ã‚¦ãƒ³ã‚¿
+aNOIVolModVolume = $57B ;ãƒŽã‚¤ã‚ºéŸ³é‡ãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³ã§ã®ç¾åœ¨ã®éŸ³é‡
 
-aModDefine = $57C       ;ƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“’è‹`‚Ö‚Ìƒ|ƒCƒ“ƒ^‰ºˆÊ
-aModDefinehi = $57D     ;ƒ‚ƒWƒ…ƒŒ[ƒVƒ‡ƒ“’è‹`‚Ö‚Ìƒ|ƒCƒ“ƒ^ãˆÊ
+aModDefine = $57C       ;ãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³å®šç¾©ã¸ã®ãƒã‚¤ãƒ³ã‚¿ä¸‹ä½
+aModDefinehi = $57D     ;ãƒ¢ã‚¸ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³å®šç¾©ã¸ã®ãƒã‚¤ãƒ³ã‚¿ä¸Šä½
 
 a57E = $57E
 a57F = $57F
 
-aSoundQueue = $580      ;ˆ—‚·‚é‹È‚ÌƒŠƒXƒg
-aWeaponCollision = $590 ;•Ší‚Ì“–‚½‚è”»’è
-aWeaponPlatformW = $5A0 ;•Ší‚Ì‘«ê”»’èL‚³
-aWeaponPlatformY = $5A3 ;•Ší‚Ì‘«ê”»’èYˆÊ’u
+aSoundQueue = $580      ;å‡¦ç†ã™ã‚‹æ›²ã®ãƒªã‚¹ãƒˆ
+aWeaponCollision = $590 ;æ­¦å™¨ã®å½“ãŸã‚Šåˆ¤å®š
+aWeaponPlatformW = $5A0 ;æ­¦å™¨ã®è¶³å ´åˆ¤å®šåºƒã•
+aWeaponPlatformY = $5A3 ;æ­¦å™¨ã®è¶³å ´åˆ¤å®šYä½ç½®
 
-aTimeStopper = $5A6     ;‚È‚ñ‚Å‚·‚©‚±‚ê‚Í
+aTimeStopper = $5A6     ;ãªã‚“ã§ã™ã‹ã“ã‚Œã¯
 
-aBossTiwnWait = $5A7    ;ƒ{ƒX‚ª’e‚¯”ò‚Ô‚Ü‚Å‚ÌƒtƒŒ[ƒ€B‚ç‚µ‚¢B
+aBossTiwnWait = $5A7    ;ãƒœã‚¹ãŒå¼¾ã‘é£›ã¶ã¾ã§ã®ãƒ•ãƒ¬ãƒ¼ãƒ ã€‚ã‚‰ã—ã„ã€‚
 aBossVar1 = $5A7
-aBossPtrhi = $5A7       ;ƒƒCƒŠ[ƒXƒe[ƒW‚Ìƒ{ƒX‚ªƒ|ƒCƒ“ƒ^‚Æ‚µ‚ÄŽg‚Á‚Ä‚¢‚½‹C‚ª‚·‚é
-aBossInvincible = $5A8  ;ƒ{ƒX‚Ì–³“GŽžŠÔ
+aBossPtrhi = $5A7       ;ãƒ¯ã‚¤ãƒªãƒ¼ã‚¹ãƒ†ãƒ¼ã‚¸ã®ãƒœã‚¹ãŒãƒã‚¤ãƒ³ã‚¿ã¨ã—ã¦ä½¿ã£ã¦ã„ãŸæ°—ãŒã™ã‚‹
+aBossInvincible = $5A8  ;ãƒœã‚¹ã®ç„¡æ•µæ™‚é–“
 
 aBossPtrlo = $5A9
-aBossVar2 = $5A9         ;‚È‚ñ‚¾‚Á‚¯‚±‚ê‚Í
+aBossVar2 = $5A9         ;ãªã‚“ã ã£ã‘ã“ã‚Œã¯
 
-aBossDeath = $5AA       ;ƒ{ƒXƒeƒBƒEƒ“ƒtƒ‰ƒO
+aBossDeath = $5AA       ;ãƒœã‚¹ãƒ†ã‚£ã‚¦ãƒ³ãƒ•ãƒ©ã‚°
 
 
 
-aObjVX = $600           ;ƒIƒuƒWƒFƒNƒg‚Ì‘¬“xXãˆÊ
+aObjVX = $600           ;ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®é€Ÿåº¦Xä¸Šä½
 aObjVX10 = $610
-aObjVXlo = $620         ;ƒIƒuƒWƒFƒNƒg‚Ì‘¬“xX‰ºˆÊ
+aObjVXlo = $620         ;ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®é€Ÿåº¦Xä¸‹ä½
 aObjVXlo10 = $630
 
-aObjBlockW = $600       ;ƒIƒuƒWƒFƒNƒg‚Ì•Ç”»’è”ÍˆÍX
+aObjBlockW = $600       ;ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®å£åˆ¤å®šç¯„å›²X
 aObjBlockW10 = $610
-aObjBlockH = $620       ;ƒIƒuƒWƒFƒNƒg‚Ì•Ç”»’è”ÍˆÍY
+aObjBlockH = $620       ;ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®å£åˆ¤å®šç¯„å›²Y
 aObjBlockH10 = $630
 
-aObjVY = $640           ;ƒIƒuƒWƒFƒNƒg‚Ì‘¬“xYãˆÊ
+aObjVY = $640           ;ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®é€Ÿåº¦Yä¸Šä½
 aObjVY10 = $650
-aObjVYlo = $660         ;ƒIƒuƒWƒFƒNƒg‚Ì‘¬“xY‰ºˆÊ
+aObjVYlo = $660         ;ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®é€Ÿåº¦Yä¸‹ä½
 aObjVYlo10 = $670
 
-aObjBlockX = $640       ;ƒIƒuƒWƒFƒNƒg‚Ì•Ç”»’èˆÊ’uX
+aObjBlockX = $640       ;ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®å£åˆ¤å®šä½ç½®X
 aObjBlockX10 = $650
-aObjBlockY = $660       ;ƒIƒuƒWƒFƒNƒg‚Ì•Ç”»’èˆÊ’uY
+aObjBlockY = $660       ;ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®å£åˆ¤å®šä½ç½®Y
 aObjBlockY10 = $670
 
-aObjWait = $680         ;ƒIƒuƒWƒFƒNƒg‚ÌƒAƒjƒ[ƒVƒ‡ƒ“‚ÌƒJƒEƒ“ƒ^
+aObjWait = $680         ;ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã®ã‚«ã‚¦ãƒ³ã‚¿
 aObjWait10 = $690
-aObjFrame = $6A0        ;ƒIƒuƒWƒFƒNƒg‚ÌƒAƒjƒ[ƒVƒ‡ƒ“‚ÌƒRƒ}”
+aObjFrame = $6A0        ;ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã®ã‚³ãƒžæ•°
 aObjFrame10 = $6B0
 
-aObjLife = $6C0         ;ƒIƒuƒWƒFƒNƒg‚Ì‘Ì—Í
+aObjLife = $6C0         ;ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ä½“åŠ›
 aObjLife10 = $6D0
 
-aWeaponScreenX = $6E0   ;•ŠíƒIƒuƒWƒFƒNƒg‚Ì‰æ–Ê“àX
-aObjCollision = $6E0    ;ƒIƒuƒWƒFƒNƒg‚Ì“–‚½‚è”»’è”Ô†
+aWeaponScreenX = $6E0   ;æ­¦å™¨ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ç”»é¢å†…X
+aObjCollision = $6E0    ;ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®å½“ãŸã‚Šåˆ¤å®šç•ªå·
 aObjCollision10 = $6F0
 
-aPaletteBackup = $700   ;ƒTƒuƒƒjƒ…[‚ðŠJ‚¢‚½Žž‚ÌBGƒpƒŒƒbƒgƒoƒbƒNƒAƒbƒv
+aPaletteBackup = $700   ;ã‚µãƒ–ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚’é–‹ã„ãŸæ™‚ã®BGãƒ‘ãƒ¬ãƒƒãƒˆãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—
 
 
 

@@ -1,12 +1,12 @@
-;����ƈ�v���Ȃ��f�[�^�Ȃǂ��C�����邽�߂̃t�@�C���B
+;原作と一致しないデータなどを修正するためのファイル。
 
-;��~���̃I�u�W�F�N�g�̏����A�h���X�ŕςȕ���������
+;停止中のオブジェクトの処理アドレスで変な部分がある
 ;9489
 	.bank $1C
 	.org $9489
 	.db $E6
 
-;�����蔻��e�[�u���̏C��
+;当たり判定テーブルの修正
 ;D4E1
 	.bank $1E
 	.org Table_CollisionSizeX + $0A
@@ -14,7 +14,7 @@
 	.org Table_CollisionSizeX + CollisionDataLength * 2 + $10
 	.db $0A
 
-;�A�j���[�V�����̃|�C���^�̏C��
+;アニメーションのポインタの修正
 ;F900
 	.bank $1E
 	.org Table_AnimationPointerEnemy_Low + $4D

@@ -232,7 +232,7 @@ WritePPUSquare:
 	dec <zPPUSqr
 	bne .nloop
 	rts
-;cƒXƒNƒ[ƒ‹ŠÖ˜A‚ç‚µ‚¢‚¯‚Ç‚È‚É‚±‚êH
+;ç¸¦ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«é–¢é€£ã‚‰ã—ã„ã‘ã©ãªã«ã“ã‚Œï¼Ÿ
 .isminus
 	ldx #$00
 	stx <zPPUSqr

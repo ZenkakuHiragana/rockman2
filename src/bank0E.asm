@@ -55,7 +55,7 @@ Reset_Continue;
 	sta <zETanks
 .restart
 	jsr BeginTitleScreen
-	lda <zRestartTitle ;ƒ^ƒCƒgƒ‹‰æ–Ê‚ð‚à‚¤ˆê“x‚â‚é‚È‚ç1
+	lda <zRestartTitle ;ã‚¿ã‚¤ãƒˆãƒ«ç”»é¢ã‚’ã‚‚ã†ä¸€åº¦ã‚„ã‚‹ãªã‚‰1
 	bne .restart
 	lda <zClearFlags
 	cmp #$FF
@@ -64,13 +64,13 @@ Reset_Continue;
 	sta <zStage
 	bne StartStage_All
 ;8072
-;ƒXƒe[ƒWƒZƒŒƒNƒgˆ—‚ÌŒãƒXƒe[ƒWŠJŽn
+;ã‚¹ãƒ†ãƒ¼ã‚¸ã‚»ãƒ¬ã‚¯ãƒˆå‡¦ç†ã®å¾Œã‚¹ãƒ†ãƒ¼ã‚¸é–‹å§‹
 StartStageSelect:
 	lda #$03
 	sta <zLives
 	jsr ChangeBank_DoStageSelect
 ;8079
-;ƒXƒe[ƒWƒZƒŒƒNƒgˆ—‚ÌŒã‚©‚ç
+;ã‚¹ãƒ†ãƒ¼ã‚¸ã‚»ãƒ¬ã‚¯ãƒˆå‡¦ç†ã®å¾Œã‹ã‚‰
 StartStage_All:
 	lda <zStage
 	cmp #$08
@@ -80,7 +80,7 @@ StartStage_All:
 	cmp #$09
 	bcs StartStage_NoEnergyRegen
 ;8088
-;•ŠíƒGƒlƒ‹ƒM[‚ð‰ñ•œ‚µ‚Â‚ÂƒXƒe[ƒWŠJŽn
+;æ­¦å™¨ã‚¨ãƒãƒ«ã‚®ãƒ¼ã‚’å›žå¾©ã—ã¤ã¤ã‚¹ãƒ†ãƒ¼ã‚¸é–‹å§‹
 StartStage_FillingEnergy:
 	ldx #nEnergySize - 1
 	lda #$1C
@@ -89,7 +89,7 @@ StartStage_FillingEnergy:
 	dex
 	bpl .regenerateloop
 ;8091
-;•ŠíƒGƒlƒ‹ƒM[‰ñ•œˆ—‚ð”ò‚Î‚µ‚ÄƒXƒe[ƒWŠJŽn
+;æ­¦å™¨ã‚¨ãƒãƒ«ã‚®ãƒ¼å›žå¾©å‡¦ç†ã‚’é£›ã°ã—ã¦ã‚¹ãƒ†ãƒ¼ã‚¸é–‹å§‹
 StartStage_NoEnergyRegen:
 	ldx #$00
 	lda <zStage
@@ -107,7 +107,7 @@ StartStage_NoEnergyRegen:
 	lda #$00
 	sta <zBossRushProg
 ;80AB
-;Ž€–SŽž‚ÌƒRƒ“ƒeƒBƒjƒ…[ˆÊ’u
+;æ­»äº¡æ™‚ã®ã‚³ãƒ³ãƒ†ã‚£ãƒ‹ãƒ¥ãƒ¼ä½ç½®
 StartStage_Continue:
 	lda #$00
 	sta <zConveyorLVec
@@ -538,13 +538,13 @@ Item_TeleporterIn:
 	dec <zBossKind
 	mJSR_NORTS SpawnBoss_BossRushBegin
 ;83D7
-;ƒ{ƒXƒ‰ƒbƒVƒ…‚ÌƒJƒvƒZƒ‹‚É“ü‚Á‚½ŽžAƒpƒ^[ƒ“ƒe[ƒuƒ‹‚Ì‘‚«Š·‚¦‚ðŽw’è
-;ƒXƒe[ƒW‚²‚Æ‚ÌƒXƒNƒ[ƒ‹”Ô†‚ðŽw’è‚·‚é
+;ãƒœã‚¹ãƒ©ãƒƒã‚·ãƒ¥ã®ã‚«ãƒ—ã‚»ãƒ«ã«å…¥ã£ãŸæ™‚ã€ãƒ‘ã‚¿ãƒ¼ãƒ³ãƒ†ãƒ¼ãƒ–ãƒ«ã®æ›¸ãæ›ãˆã‚’æŒ‡å®š
+;ã‚¹ãƒ†ãƒ¼ã‚¸ã”ã¨ã®ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ç•ªå·ã‚’æŒ‡å®šã™ã‚‹
 .teleporter_patterntable
 	.db $06, $04, $0D, $07, $11, $09, $04, $10
 
 ;83DF
-;ƒJƒvƒZƒ‹‚É“ü‚Á‚½Žž‚ÌƒAƒjƒ[ƒVƒ‡ƒ“ˆ—
+;ã‚«ãƒ—ã‚»ãƒ«ã«å…¥ã£ãŸæ™‚ã®ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³å‡¦ç†
 Item_IntoCapsule:
 	mPLAYTRACK #$30
 	lda #$0B
@@ -564,7 +564,7 @@ Item_IntoCapsule:
 	mJSR_NORTS SpriteSetup
 
 ;8407
-;ƒJƒvƒZƒ‹‚©‚ço‚Ä‚«‚½Žž‚ÌƒAƒjƒ[ƒVƒ‡ƒ“ˆ—
+;ã‚«ãƒ—ã‚»ãƒ«ã‹ã‚‰å‡ºã¦ããŸæ™‚ã®ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³å‡¦ç†
 Item_OutofCapsule:
 	lda #%11000000
 	sta aObjFlags
@@ -574,7 +574,7 @@ Item_OutofCapsule:
 	mJSR_NORTS SetRockmanAnimation
 
 ;8416
-;$FD = #$60‚Ü‚Åƒpƒ^[ƒ“ƒe[ƒuƒ‹‚É“G‚Ì‰æ‘œ‚ð“]‘—
+;$FD = #$60ã¾ã§ãƒ‘ã‚¿ãƒ¼ãƒ³ãƒ†ãƒ¼ãƒ–ãƒ«ã«æ•µã®ç”»åƒã‚’è»¢é€
 Item_DrawEnemyPattern:
 	jsr Unknown_CB09
 	jsr FrameAdvance1C
@@ -697,12 +697,12 @@ Table_ItemInterrupthi:
 	.db HIGH(Item_TeleporterWily)
 
 ;84EE
-;ƒƒbƒNƒ}ƒ“ó‘Ô•Ê‚Ìˆ—
+;ãƒ­ãƒƒã‚¯ãƒžãƒ³çŠ¶æ…‹åˆ¥ã®å‡¦ç†
 DoRockman:
 	.include "src/dorockman.asm"
 
 ;8EDD
-;u–ß‚évƒXƒNƒ[ƒ‹‚Ìˆ—
+;ã€Œæˆ»ã‚‹ã€ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ã®å‡¦ç†
 Scroll_GoBack:
 	jsr EraseEnemiesByScroll
 	ldx <zScrollLeft
@@ -751,7 +751,7 @@ Scroll_GoBack:
 	mJSR_NORTS SpawnEnemyByScroll
 
 ;8F39
-;ui‚ÞvƒXƒNƒ[ƒ‹‚Ìˆ—
+;ã€Œé€²ã‚€ã€ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ã®å‡¦ç†
 Scroll_GoForward:
 	jsr EraseEnemiesByScroll
 	ldx <zScrollRight
@@ -767,7 +767,7 @@ Scroll_GoForward:
 	sta <$FD
 	lda #$00
 	sta <$FE
-;ƒVƒƒƒbƒ^[‚Ìˆ—
+;ã‚·ãƒ£ãƒƒã‚¿ãƒ¼ã®å‡¦ç†
 .loop_open
 	ldx <zStage
 	lda <zRoom
@@ -837,7 +837,7 @@ Scroll_GoForward:
 	lda <zScrollFlag
 	and #$01
 	bne .done
-;ƒVƒƒƒbƒ^[•Â‚¶‚éˆ—
+;ã‚·ãƒ£ãƒƒã‚¿ãƒ¼é–‰ã˜ã‚‹å‡¦ç†
 	lda #$00
 	sta <$FD
 	sta <$FE
@@ -886,31 +886,31 @@ Scroll_GoForward:
 	mJSR_NORTS SpawnEnemyByScroll
 
 ;9045
-;ƒXƒe[ƒW‚²‚Æ‚ÌƒVƒƒƒbƒ^[‚Ì‚‚³
+;ã‚¹ãƒ†ãƒ¼ã‚¸ã”ã¨ã®ã‚·ãƒ£ãƒƒã‚¿ãƒ¼ã®é«˜ã•
 Table_ShutterHeight:
 	.db $60, $40, $40, $40, $40, $40, $40, $40
 	.db $00, $00, $80, $80, $00, $80
 
 ;9053
-;ƒXƒe[ƒW‚²‚Æ‚ÌƒVƒƒƒbƒ^[‚ÌF
+;ã‚¹ãƒ†ãƒ¼ã‚¸ã”ã¨ã®ã‚·ãƒ£ãƒƒã‚¿ãƒ¼ã®è‰²
 Table_ShutterAttr:
 	.db $00, $55, $AA, $00, $00, $55, $00, $AA
 	.db $00, $00, $00, $00, $00, $00
 
 ;9061
-;ƒVƒƒƒbƒ^[”z’uˆÊ’u
+;ã‚·ãƒ£ãƒƒã‚¿ãƒ¼é…ç½®ä½ç½®
 Table_ShutterStart:
 	.db $15, $13, $15, $13, $15, $11, $13, $11
 	.db $00, $00, $26, $25, $00, $1E
 
 ;906F
-;ƒ{ƒX‚Ì‹‚é‰æ–Ê”
+;ãƒœã‚¹ã®å±…ã‚‹ç”»é¢æ•°
 Table_BossRoom:
 	.db $17, $15, $17, $15, $17, $13, $15, $13
 	.db $00, $27, $27, $26, $00, $1F
 
 ;907D
-;ŽŸ‚Ì‰æ–Ê‚ð•`‰æ
+;æ¬¡ã®ç”»é¢ã‚’æç”»
 DrawRoom:
 	ldx #$00
 	stx <$08
@@ -958,7 +958,7 @@ DrawRoom:
 	rts
 
 ;90C9
-;ŽÀÛ‚Éƒ‹[ƒv‚µ‚ÄƒXƒNƒ[ƒ‹‚³‚¹‚éˆ—‚ðŒÄ‚Ô
+;å®Ÿéš›ã«ãƒ«ãƒ¼ãƒ—ã—ã¦ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ã•ã›ã‚‹å‡¦ç†ã‚’å‘¼ã¶
 DoScroll_Loop:
 	lda <zScrollFlag
 	and #$01
@@ -1030,37 +1030,37 @@ PaletteChange_RightScroll:
 .skip
 	rts
 ;9148
-;‰EƒXƒNƒ[ƒ‹Žž‚ÌƒpƒŒƒbƒg•ÏXE‘‚«ž‚ÝˆÊ’u
+;å³ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«æ™‚ã®ãƒ‘ãƒ¬ãƒƒãƒˆå¤‰æ›´ãƒ»æ›¸ãè¾¼ã¿ä½ç½®
 .ptr
 	.db $00, $0B, $00, $0B, $00, $00, $00, $0F
 	.db $00, $00, $03, $00, $00, $0B
 ;9156
-;‰EƒXƒNƒ[ƒ‹Žž‚ÌƒpƒŒƒbƒg•ÏXEƒf[ƒ^ŠJŽnˆÊ’u
+;å³ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«æ™‚ã®ãƒ‘ãƒ¬ãƒƒãƒˆå¤‰æ›´ãƒ»ãƒ‡ãƒ¼ã‚¿é–‹å§‹ä½ç½®
 .begin
 	.db $00, $02, $00, $05, $00, $00, $00, $0C
 	.db $00, $00, $0F, $00, $00, $12
 ;9164
-;‰EƒXƒNƒ[ƒ‹Žž‚ÌƒpƒŒƒbƒg•ÏXE‘‚«ž‚ÝƒTƒCƒY
+;å³ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«æ™‚ã®ãƒ‘ãƒ¬ãƒƒãƒˆå¤‰æ›´ãƒ»æ›¸ãè¾¼ã¿ã‚µã‚¤ã‚º
 .size
 	.db $00, $03, $00, $03, $00, $00, $00, $07
 	.db $00, $00, $03, $00, $00, $03
 ;9172
-;‰EƒXƒNƒ[ƒ‹Žž‚ÌƒpƒŒƒbƒg•ÏXE‘‚«ž‚Þƒf[ƒ^
+;å³ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«æ™‚ã®ãƒ‘ãƒ¬ãƒƒãƒˆå¤‰æ›´ãƒ»æ›¸ãè¾¼ã‚€ãƒ‡ãƒ¼ã‚¿
 .data
-	.db $2B, $1B, $0B ;ƒGƒA[ƒ}ƒ“ƒXƒe[ƒW(–¢Žg—p)
-	.db $21, $01, $0F ;ƒoƒuƒ‹ƒ}ƒ“ƒXƒe[ƒW(ƒ{ƒX‘O‚Ì–Ô–Í—l•Ç)
-	.db $39, $18, $01, $0F, $39, $18, $0F ;ƒNƒ‰ƒbƒVƒ…ƒ}ƒ“ƒXƒe[ƒW(¯‹ó)
-	.db $27, $37, $30 ;W3(ƒKƒbƒcƒ^ƒ“ƒN—p)
-	.db $0F, $0F, $0F ;W6(ƒGƒCƒŠƒAƒ“í‘O”wŒiˆÃ“])
+	.db $2B, $1B, $0B ;ã‚¨ã‚¢ãƒ¼ãƒžãƒ³ã‚¹ãƒ†ãƒ¼ã‚¸(æœªä½¿ç”¨)
+	.db $21, $01, $0F ;ãƒãƒ–ãƒ«ãƒžãƒ³ã‚¹ãƒ†ãƒ¼ã‚¸(ãƒœã‚¹å‰ã®ç¶²æ¨¡æ§˜å£)
+	.db $39, $18, $01, $0F, $39, $18, $0F ;ã‚¯ãƒ©ãƒƒã‚·ãƒ¥ãƒžãƒ³ã‚¹ãƒ†ãƒ¼ã‚¸(æ˜Ÿç©º)
+	.db $27, $37, $30 ;W3(ã‚¬ãƒƒãƒ„ã‚¿ãƒ³ã‚¯ç”¨)
+	.db $0F, $0F, $0F ;W6(ã‚¨ã‚¤ãƒªã‚¢ãƒ³æˆ¦å‰èƒŒæ™¯æš—è»¢)
 
 ;9185
-;ã‰ºƒXƒNƒ[ƒ‹‚ÌŽÀsˆ—
+;ä¸Šä¸‹ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ã®å®Ÿè¡Œå‡¦ç†
 DoVerticalScroll_Loop:
 .counter = $39
 	lda <zScrollFlag
 	lsr a
 	bne .down
-;ãƒXƒNƒ[ƒ‹
+;ä¸Šã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«
 	ldx #$09
 	stx <zStatus
 	pha
@@ -1118,7 +1118,7 @@ DoVerticalScroll_Loop:
 	mJSR_NORTS SpriteSetup
 
 ;91FA
-;ƒAƒgƒ~ƒbƒNƒtƒ@ƒCƒ„[ƒIƒuƒWƒFƒNƒg‚ÌˆÊ’uC³
+;ã‚¢ãƒˆãƒŸãƒƒã‚¯ãƒ•ã‚¡ã‚¤ãƒ¤ãƒ¼ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ä½ç½®ä¿®æ­£
 FixAtomicFireObject:
 	lda aObjX
 	sta aObjX + 2
@@ -1131,36 +1131,36 @@ FixAtomicFireObject:
 	rts
 
 ;9212
-;ã‰ºƒXƒNƒ[ƒ‹ƒJƒEƒ“ƒ^[‰Šú’l
+;ä¸Šä¸‹ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ã‚«ã‚¦ãƒ³ã‚¿ãƒ¼åˆæœŸå€¤
 Table_VScrollCounter_Init:
 	.db $3B, $00
 ;9214
-;ã‰ºƒXƒNƒ[ƒ‹ƒJƒEƒ“ƒ^[‘Œ¸’l
+;ä¸Šä¸‹ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ã‚«ã‚¦ãƒ³ã‚¿ãƒ¼å¢—æ¸›å€¤
 Table_VScrollCounter_Delta:
 	.db $FF, $01
 ;9216
-;ƒƒbƒNƒ}ƒ“YˆÊ’uloFix@ã‰ºƒXƒNƒ[ƒ‹
+;ãƒ­ãƒƒã‚¯ãƒžãƒ³Yä½ç½®loFix@ä¸Šä¸‹ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«
 Table_VScroll_dylo:
 	.db $BF, $41
 ;9218
-;ƒƒbƒNƒ}ƒ“YˆÊ’uhiFix@ã‰ºƒXƒNƒ[ƒ‹
+;ãƒ­ãƒƒã‚¯ãƒžãƒ³Yä½ç½®hiFix@ä¸Šä¸‹ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«
 Table_VScroll_dy:
 	.db $03, $FC
 ;921A
-;‰æ–ÊˆÊ’uFix@ã‰ºƒXƒNƒ[ƒ‹
+;ç”»é¢ä½ç½®Fix@ä¸Šä¸‹ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«
 Table_VScroll_dyhi:
 	.db $FC, $04
 ;921C
-;‰Šú‰æ–ÊˆÊ’u@ã‰ºƒXƒNƒ[ƒ‹
+;åˆæœŸç”»é¢ä½ç½®@ä¸Šä¸‹ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«
 Table_VScroll_Init:
 	.db $EF, $00
 ;921E
-;‰æ–ÊŠOƒtƒ‰ƒO‘Œ¸’l@ã‰ºƒXƒNƒ[ƒ‹
+;ç”»é¢å¤–ãƒ•ãƒ©ã‚°å¢—æ¸›å€¤@ä¸Šä¸‹ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«
 Table_VScroll_dOffscreen:
 	.db $00, $FF
 
 ;9220
-;ƒXƒNƒ[ƒ‹Žž‚É“G‚ðÁ‚·
+;ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«æ™‚ã«æ•µã‚’æ¶ˆã™
 EraseEnemiesByScroll:
 	ldx #$00
 	lda <zEquipment
@@ -1196,7 +1196,7 @@ EraseEnemiesByScroll:
 	rts
 
 ;925B
-;“G‚Ì‹““®
+;æ•µã®æŒ™å‹•
 DoEnemyObjects:
 	sec
 	lda aObjX
@@ -1236,7 +1236,7 @@ DoEnemyObjects:
 	bne .loop_normal
 	rts
 ;92A2
-;ŽžŠÔ’âŽ~’†
+;æ™‚é–“åœæ­¢ä¸­
 .stopping
 	ldx #$10
 	stx <zObjIndex

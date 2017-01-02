@@ -1,6 +1,6 @@
 
 ;8015
-;ƒXƒe[ƒWƒZƒŒƒNƒg‰æ–ÊŠJn
+;ã‚¹ãƒ†ãƒ¼ã‚¸ã‚»ãƒ¬ã‚¯ãƒˆç”»é¢é–‹å§‹
 ;___Bank0D_BeginStageSelect:
 	lda #%00010000
 	sta <z2000
@@ -10,7 +10,7 @@
 	sta $2001
 	jsr ResetScrollPosition1A
 	jsr LoadNameTable843C
-;ƒ{ƒXŒ‚”jó‹µ‚É‰‚¶•“h‚è‚Â‚Ô‚µ
+;ãƒœã‚¹æ’ƒç ´çŠ¶æ³ã«å¿œã˜é»’å¡—ã‚Šã¤ã¶ã—
 	ldx #$00
 	lda <zClearFlags
 	sta <$01
@@ -50,7 +50,7 @@
 	jsr WritePaletteX_1A
 	jsr ClearSprite1A
 ;8070
-;ƒXƒvƒ‰ƒCƒgî•ñƒZƒbƒg
+;ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆæƒ…å ±ã‚»ãƒƒãƒˆ
 	ldx #$00
 	lda <zClearFlags
 	sta <$02
@@ -76,7 +76,7 @@
 	cpx #$08
 	bne .loop_sprite_boss
 ;809A
-;ƒXƒe[ƒWƒZƒŒƒNƒg‰æ–Êƒ‹[ƒvŠJn
+;ã‚¹ãƒ†ãƒ¼ã‚¸ã‚»ãƒ¬ã‚¯ãƒˆç”»é¢ãƒ«ãƒ¼ãƒ—é–‹å§‹
 	jsr EnableScreen1A
 	mPLAYTRACK #$0C
 	lda #$00
@@ -206,12 +206,12 @@
 	lda #$01
 	sta <zRoom
 	.ifndef ___DISABLE_INTRO_PIPI
-		jsr SelectStage_LoadPipiGraphics ;ƒsƒs‚Ì‰æ‘œ‚ğ“Ç‚İ‚Şê—pƒ‹[ƒ`ƒ“
+		jsr SelectStage_LoadPipiGraphics ;ãƒ”ãƒ”ã®ç”»åƒã‚’èª­ã¿è¾¼ã‚€å°‚ç”¨ãƒ«ãƒ¼ãƒãƒ³
 	.endif
 	lda #$18
 	sta <$FD
 	mPLAYTRACK #$0A
-;ƒ{ƒXĞ‰îEƒ{ƒX—‰º
+;ãƒœã‚¹ç´¹ä»‹ãƒ»ãƒœã‚¹è½ä¸‹
 .loop_wait_boss
 	jsr ClearSprite1A
 	jsr FrameAdvance1A
@@ -240,7 +240,7 @@
 	jsr FrameAdvance1A
 	jmp .loop_fall_boss
 ;81EE
-;ƒ{ƒXĞ‰îEƒ{ƒX’…’n¨¯ƒtƒF[ƒhƒCƒ“
+;ãƒœã‚¹ç´¹ä»‹ãƒ»ãƒœã‚¹ç€åœ°â†’æ˜Ÿãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³
 .land_boss
 	inc aObjFrame
 	.ifndef ___DISABLE_INTRO_PIPI
@@ -277,7 +277,7 @@
 	jmp .loop_intro_star_fade
 
 ;8232
-;ƒ{ƒXĞ‰îEƒAƒjƒ[ƒVƒ‡ƒ“ŠJn
+;ãƒœã‚¹ç´¹ä»‹ãƒ»ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³é–‹å§‹
 .end_intro_star_fade
 	lda #$50
 	sta <$FD
@@ -288,7 +288,7 @@
 	jsr FrameAdvance1A
 	dec <$FD
 	bne .loop_wait_animate_boss
-;ƒ{ƒXĞ‰îE•¶š•\¦
+;ãƒœã‚¹ç´¹ä»‹ãƒ»æ–‡å­—è¡¨ç¤º
 	lda #$28
 	sta <$FD
 	lda #$26
@@ -321,7 +321,7 @@
 	dec <$FD
 	bne .loop_write_letter_boss
 ;8286
-;ƒ{ƒXĞ‰îEƒEƒFƒCƒg
+;ãƒœã‚¹ç´¹ä»‹ãƒ»ã‚¦ã‚§ã‚¤ãƒˆ
 	lda #$BB
 	sta <$FD
 .loop_wait_bossintro_end

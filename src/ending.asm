@@ -1,6 +1,6 @@
 
 ;B60A
-;ƒGƒ“ƒfƒBƒ“ƒO‚Ìˆ—
+;ã‚¨ãƒ³ãƒ‡ã‚£ãƒ³ã‚°ã®å‡¦ç†
 ;___Bank0D_BeginEnding:
 	jsr ResetScrollPosition1A
 	inc <zRoom
@@ -94,7 +94,7 @@
 	lda aObjFrame
 	cmp #$06
 	bne .loop_walk
-;ƒXƒ^ƒbƒtƒ[ƒ‹ŠJn
+;ã‚¹ã‚¿ãƒƒãƒ•ãƒ­ãƒ¼ãƒ«é–‹å§‹
 	jsr DisableScreen1A
 	jsr LoadNameTable843C
 	lda #$05
@@ -206,7 +206,7 @@
 	mJSR_NORTS DisableScreen1A
 
 ;B812
-;ƒGƒ“ƒfƒBƒ“ƒO‚Ì•à‚­ƒƒbƒNƒ}ƒ“‚Æ—‚¿‚é‚ ‚ê‚ğ•\¦‚·‚é
+;ã‚¨ãƒ³ãƒ‡ã‚£ãƒ³ã‚°ã®æ­©ããƒ­ãƒƒã‚¯ãƒãƒ³ã¨è½ã¡ã‚‹ã‚ã‚Œã‚’è¡¨ç¤ºã™ã‚‹
 Ending_ShowRockman1A:
 	jsr ClearSprite1A
 	lda aObjFrame
@@ -256,7 +256,7 @@ Ending_ShowRockman1A:
 	mJSR_NORTS ChangeBank_ShowEndingRockmanY
 .walking
 	jsr ChangeBank_ShowEndingRockman
-;‚±‚±‚©‚ç—‚¿‚é‚ ‚ê
+;ã“ã“ã‹ã‚‰è½ã¡ã‚‹ã‚ã‚Œ
 	ldx aObjFrame
 	clc
 	lda aObjYlo + 1
@@ -318,7 +318,7 @@ Ending_ShowRockman1A:
 	rts
 
 ;B8F9
-;ƒGƒ“ƒfƒBƒ“ƒO‚Ì•à‚­ƒƒbƒNƒ}ƒ“‚ÌF‚ğw’è
+;ã‚¨ãƒ³ãƒ‡ã‚£ãƒ³ã‚°ã®æ­©ããƒ­ãƒƒã‚¯ãƒãƒ³ã®è‰²ã‚’æŒ‡å®š
 Ending_SetRockmanPalette:
 	ldx aObjFrame
 	lda <$FF
@@ -341,7 +341,7 @@ Ending_SetRockmanPalette:
 	rts
 
 ;B918
-;ƒGƒ“ƒfƒBƒ“ƒO‚ÌŒiF‚ÌF‚ğw’è
+;ã‚¨ãƒ³ãƒ‡ã‚£ãƒ³ã‚°ã®æ™¯è‰²ã®è‰²ã‚’æŒ‡å®š
 Ending_SetPalette:
 	ldx aObjFrame
 	beq .rts
@@ -369,7 +369,7 @@ Ending_SetPalette:
 	rts
 
 ;B93D
-;A‚ğ#$20ƒoƒCƒg˜A‘±‚³‚¹‚½ƒf[ƒ^‚ğPPU‚Ö“]‘—
+;Aã‚’#$20ãƒã‚¤ãƒˆé€£ç¶šã•ã›ãŸãƒ‡ãƒ¼ã‚¿ã‚’PPUã¸è»¢é€
 Ending_PPUDrawLine:
 	ldx #$20
 	stx <zPPULinear
@@ -381,7 +381,7 @@ Ending_PPUDrawLine:
 	mJSR_NORTS FrameAdvance1A
 
 ;B94C
-;ƒGƒ“ƒfƒBƒ“ƒO‚Ì”wŒi‚ÌƒpƒŒƒbƒg
+;ã‚¨ãƒ³ãƒ‡ã‚£ãƒ³ã‚°ã®èƒŒæ™¯ã®ãƒ‘ãƒ¬ãƒƒãƒˆ
 Table_EndingViewPalette:
 	.db $0F, $26, $26, $27, $0F, $17, $28, $05, $0F, $17, $27, $18
 	.db $0F, $11, $11, $20, $0F, $10, $28, $20, $0F, $10, $20, $18
@@ -390,7 +390,7 @@ Table_EndingViewPalette:
 	.db $0F, $30, $21, $1C, $0F, $19, $37, $16, $0F, $19, $2A, $18
 
 ;B988
-;ƒGƒ“ƒfƒBƒ“ƒO‚Ì•à‚­ƒƒbƒNƒ}ƒ“‚ÌƒpƒŒƒbƒg
+;ã‚¨ãƒ³ãƒ‡ã‚£ãƒ³ã‚°ã®æ­©ããƒ­ãƒƒã‚¯ãƒãƒ³ã®ãƒ‘ãƒ¬ãƒƒãƒˆ
 Table_EndingRockmanPalette:
 	.db $2C, $11
 	.db $28, $15
@@ -400,7 +400,7 @@ Table_EndingRockmanPalette:
 	.db $2C, $11
 
 ;B994
-;ƒGƒ“ƒfƒBƒ“ƒO‚ÌŒiF‚ªØ‚è‘Ö‚í‚é‚Ü‚Å‚ÌŠÔ
+;ã‚¨ãƒ³ãƒ‡ã‚£ãƒ³ã‚°ã®æ™¯è‰²ãŒåˆ‡ã‚Šæ›¿ã‚ã‚‹ã¾ã§ã®æ™‚é–“
 wait1 = $32C
 wait2 = $232
 wait3 = $290
@@ -411,19 +411,19 @@ Table_EndingWaitshi:
 	.db HIGH(wait1), HIGH(wait2), HIGH(wait2), HIGH(wait2), HIGH(wait2), HIGH(wait3)
 
 ;B9A0
-;~‚Á‚Ä‚­‚é‚à‚Ì‚ÌYÀ•W
+;é™ã£ã¦ãã‚‹ã‚‚ã®ã®Yåº§æ¨™
 Table_EndingFallingY:
 	.db $00, $08, $10, $20, $28, $30, $40, $48, $50, $58, $68, $78, $80, $88, $90, $A8
 	.db $B8, $C0, $D0, $D8, $E0, $E8
 
 ;B9B6
-;~‚Á‚Ä‚­‚é‚à‚Ì‚ÌXÀ•W
+;é™ã£ã¦ãã‚‹ã‚‚ã®ã®Xåº§æ¨™
 Table_EndingFallingX:
 	.db $D8, $70, $18, $B0, $88, $40, $A0, $F8, $20, $58, $C8, $08, $88, $38, $B0, $D8
 	.db $70, $28, $B8, $08, $98, $48
 
 ;B9CC
-;~‚Á‚Ä‚­‚é‚à‚Ì‚ÌƒAƒjƒ[ƒVƒ‡ƒ“’è‹`
+;é™ã£ã¦ãã‚‹ã‚‚ã®ã®ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³å®šç¾©
 Table_EndingFallingAnimation:
 	.db $0C, $0D, $0E, $0D
 	.db $1B, $1C, $1B, $1C
@@ -431,7 +431,7 @@ Table_EndingFallingAnimation:
 	.db $3B, $3B, $3B, $3B
 
 ;B9DC
-;~‚Á‚Ä‚­‚é‚à‚Ì‚ÌˆÚ‚è•Ï‚í‚é•û‚ÌƒAƒjƒ[ƒVƒ‡ƒ“’è‹`
+;é™ã£ã¦ãã‚‹ã‚‚ã®ã®ç§»ã‚Šå¤‰ã‚ã‚‹æ–¹ã®ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³å®šç¾©
 Table_EndingFallingAnimation2:
 	.db $1B, $1A, $19, $0F
 	.db $2C, $1F, $1E, $1D
@@ -439,7 +439,7 @@ Table_EndingFallingAnimation2:
 	.db $3D, $3D, $3D, $3C
 
 ;B9EC
-;~‚Á‚Ä‚­‚é‚à‚Ì‚ÌY‘¬“x‰ºˆÊ
+;é™ã£ã¦ãã‚‹ã‚‚ã®ã®Yé€Ÿåº¦ä¸‹ä½
 endingfallvy1 = $0080
 endingfallvy2 = $0080
 endingfallvy3 = $00E5
@@ -447,12 +447,12 @@ endingfallvy4 = $0800
 Table_EndingFallingVYlo:
 	.db $80, $80, $E5, $00
 ;B9F0
-;~‚Á‚Ä‚­‚é‚à‚Ì‚ÌY‘¬“xãˆÊ
+;é™ã£ã¦ãã‚‹ã‚‚ã®ã®Yé€Ÿåº¦ä¸Šä½
 Table_EndingFallingVYhi:
 	.db 0, 0, 0, 8
 
 ;B9F4
-;STAFF‚Ì•¶š—ñ
+;STAFFã®æ–‡å­—åˆ—
 Table_EndingString_STAFF:
 	.db $13, $14, $01, $06, $06
 

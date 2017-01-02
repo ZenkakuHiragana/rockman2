@@ -5,19 +5,19 @@
 	mCHANGEBANK #$0A
 	jsr ClearSprites
 	lda #$00
-	sta <.offset ;ƒÑDMAŒ³‚Ì‘‚«ž‚ÝˆÊ’u
+	sta <.offset ;Ï„DMAå…ƒã®æ›¸ãè¾¼ã¿ä½ç½®
 	sta <$0D
 	sta <$0C
 	lda <zStopFlag
 	beq .standard
 	jmp .stopping
 
-;ƒXƒvƒ‰ƒCƒgƒZƒbƒgƒAƒbƒv(•W€Žž)
+;ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—(æ¨™æº–æ™‚)
 .standard
 	lda <zFrameCounter
 	and #$01
 	bne .oddframe
-;ƒXƒvƒ‰ƒCƒgƒZƒbƒgƒAƒbƒv•W€/‹ô”ƒtƒŒ[ƒ€iObj[00->1F]->ƒQ[ƒWj
+;ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—æ¨™æº–/å¶æ•°ãƒ•ãƒ¬ãƒ¼ãƒ ï¼ˆObj[00->1F]->ã‚²ãƒ¼ã‚¸ï¼‰
 	lda #$FF
 	sta <$0C
 	lda #$00
@@ -41,7 +41,7 @@
 	jsr DrawBar
 .overflow
 	jmp .done
-;ƒXƒvƒ‰ƒCƒgƒZƒbƒgƒAƒbƒv•W€/Šï”ƒtƒŒ[ƒ€iƒQ[ƒW->Obj[1F->00]j
+;ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—æ¨™æº–/å¥‡æ•°ãƒ•ãƒ¬ãƒ¼ãƒ ï¼ˆã‚²ãƒ¼ã‚¸->Obj[1F->00]ï¼‰
 .oddframe
 	jsr DrawBar
 	lda <.offset
@@ -64,7 +64,7 @@
 	sta <$0C
 
 .done
-;ƒGƒA[ƒ}ƒ“ƒXƒe[ƒW‚Å‚ÍƒXƒvƒ‰ƒCƒg‚ª”w–Ê‚É‰ñ‚é¨rts
+;ã‚¨ã‚¢ãƒ¼ãƒžãƒ³ã‚¹ãƒ†ãƒ¼ã‚¸ã§ã¯ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆãŒèƒŒé¢ã«å›žã‚‹â†’rts
 	lda <zStage
 	cmp #$01
 	bne .notairman
@@ -85,15 +85,15 @@
 	;rts
 
 ;4C 02 CD
-;ƒXƒvƒ‰ƒCƒgƒZƒbƒgƒAƒbƒv(“ÁŽêŽž ƒ^ƒCƒ€ƒXƒgƒbƒp[‚È‚Ç)
-;$AA, 04‚Ìƒrƒbƒg‚ª1‚È‚çAƒƒbƒNƒ}ƒ“‚ÌƒAƒjƒ[ƒVƒ‡ƒ“ˆ—‚ðs‚í‚È‚¢
-;$AA, 02‚Ìƒrƒbƒg‚ª1‚È‚çAObj[00-0F]‚ÌƒAƒjƒ[ƒVƒ‡ƒ“ˆ—‚ðs‚í‚È‚¢
-;‚Ç‚Ìê‡‚Å‚àAObj[10-1F]‚ÌƒAƒjƒ[ƒVƒ‡ƒ“ˆ—‚ðs‚í‚È‚¢
+;ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—(ç‰¹æ®Šæ™‚ ã‚¿ã‚¤ãƒ ã‚¹ãƒˆãƒƒãƒ‘ãƒ¼ãªã©)
+;$AA, 04ã®ãƒ“ãƒƒãƒˆãŒ1ãªã‚‰ã€ãƒ­ãƒƒã‚¯ãƒžãƒ³ã®ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³å‡¦ç†ã‚’è¡Œã‚ãªã„
+;$AA, 02ã®ãƒ“ãƒƒãƒˆãŒ1ãªã‚‰ã€Obj[00-0F]ã®ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³å‡¦ç†ã‚’è¡Œã‚ãªã„
+;ã©ã®å ´åˆã§ã‚‚ã€Obj[10-1F]ã®ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³å‡¦ç†ã‚’è¡Œã‚ãªã„
 .stopping
 	lda <zFrameCounter
 	and #$01
 	bne .odd_stop
-;ƒXƒvƒ‰ƒCƒgƒZƒbƒgƒAƒbƒv“ÁŽê/‹ô”ƒtƒŒ[ƒ€iObj[00->1F]->ƒQ[ƒWj
+;ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—ç‰¹æ®Š/å¶æ•°ãƒ•ãƒ¬ãƒ¼ãƒ ï¼ˆObj[00->1F]->ã‚²ãƒ¼ã‚¸ï¼‰
 	lda #$FF
 	sta <$0C
 	lda #$00
@@ -133,7 +133,7 @@
 	jsr DrawBar
 .overflow_stop
 	jmp .done
-;ƒXƒvƒ‰ƒCƒgƒZƒbƒgƒAƒbƒv“ÁŽê/Šï”ƒtƒŒ[ƒ€iƒQ[ƒW->Obj[1F->00]j
+;ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—ç‰¹æ®Š/å¥‡æ•°ãƒ•ãƒ¬ãƒ¼ãƒ ï¼ˆã‚²ãƒ¼ã‚¸->Obj[1F->00]ï¼‰
 .odd_stop
 	jsr DrawBar
 	lda <.offset
@@ -173,7 +173,7 @@
 	jmp .done
 
 ;20 94 CD
-;ƒAƒjƒ[ƒVƒ‡ƒ“ˆ—‚ð‚¹‚¸‚ÉƒXƒvƒ‰ƒCƒg•`‰æ(X = 00`0F)
+;ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³å‡¦ç†ã‚’ã›ãšã«ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆæç”»(X = 00ï½ž0F)
 DontAnimateObjects:
 	ldx <zObjIndex
 	lda aObjFlags,x
@@ -199,7 +199,7 @@ DontAnimateObjects:
 	rts
 
 ;20 BC CD
-;ƒAƒjƒ[ƒVƒ‡ƒ“ˆ—‚ð‚¹‚¸‚ÉƒXƒvƒ‰ƒCƒg•`‰æ(X = 10`1F)
+;ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³å‡¦ç†ã‚’ã›ãšã«ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆæç”»(X = 10ï½ž1F)
 DontAnimateEnemies:
 	ldx <zObjIndex
 	lda aObjFlags,x
@@ -225,7 +225,7 @@ DontAnimateEnemies:
 	rts
 
 ;20 E4 CD
-;ƒAƒjƒ[ƒVƒ‡ƒ“ˆ—‚ð‚µ‚ÄƒXƒvƒ‰ƒCƒg•`‰æ(X = 00`0F)
+;ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³å‡¦ç†ã‚’ã—ã¦ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆæç”»(X = 00ï½ž0F)
 AnimateObjects:
 	ldx <zObjIndex
 	lda aObjFlags,x
@@ -303,16 +303,16 @@ DrawObjectSprites:
 
 ;4C 66 CE
 DrawSprites:
-.x = $00      ;ƒÑ‰æ–Ê‘Š‘Î’†SX
-.y = $01      ;ƒÑ‰æ–Ê‘Š‘Î’†SY
-.dir = $02    ;ƒÑ‰EŒü‚«ƒtƒ‰ƒO
-.attr = $03   ;ƒÑAttr‚Ìor’l
-.n = $04      ;ƒÑƒXƒvƒ‰ƒCƒg”
-.offset = $06 ;ƒÑ$200+offset
-.itr = $07    ;ƒÑƒXƒvƒ‰ƒCƒgƒf[ƒ^‚ÌƒCƒeƒŒ[ƒ^
-.shape = $0A  ;ƒÑƒ¢ˆÊ’uƒf[ƒ^ƒAƒhƒŒƒX
-.slo = $0A    ;ƒÑƒ¢ˆÊ’uƒf[ƒ^ƒAƒhƒŒƒXlo
-.shi = $0B    ;ƒÑƒ¢ˆÊ’uƒf[ƒ^ƒAƒhƒŒƒXhi
+.x = $00      ;Ï„ç”»é¢ç›¸å¯¾ä¸­å¿ƒX
+.y = $01      ;Ï„ç”»é¢ç›¸å¯¾ä¸­å¿ƒY
+.dir = $02    ;Ï„å³å‘ããƒ•ãƒ©ã‚°
+.attr = $03   ;Ï„Attrã®orå€¤
+.n = $04      ;Ï„ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆæ•°
+.offset = $06 ;Ï„$200+offset
+.itr = $07    ;Ï„ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆãƒ‡ãƒ¼ã‚¿ã®ã‚¤ãƒ†ãƒ¬ãƒ¼ã‚¿
+.shape = $0A  ;Ï„Î”ä½ç½®ãƒ‡ãƒ¼ã‚¿ã‚¢ãƒ‰ãƒ¬ã‚¹
+.slo = $0A    ;Ï„Î”ä½ç½®ãƒ‡ãƒ¼ã‚¿ã‚¢ãƒ‰ãƒ¬ã‚¹lo
+.shi = $0B    ;Ï„Î”ä½ç½®ãƒ‡ãƒ¼ã‚¿ã‚¢ãƒ‰ãƒ¬ã‚¹hi
 	ldy #$00
 	lda [zPtr],y
 	sta <.n
@@ -400,7 +400,7 @@ DrawSprites_sprite_overflow:
 
 
 ;20 F6 CE
-;ƒAƒjƒ[ƒVƒ‡ƒ“ˆ—‚ð‚µ‚ÄƒXƒvƒ‰ƒCƒg•`‰æ(X = 10`1F)
+;ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³å‡¦ç†ã‚’ã—ã¦ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆæç”»(X = 10ï½ž1F)
 AnimateEnemies:
 	ldx <zObjIndex
 	lda aObjFlags,x
@@ -459,7 +459,7 @@ DrawEnemySprites;
 	rts
 
 ;20 5A CF
-;ƒQ[ƒW‚ÌƒXƒvƒ‰ƒCƒg‚ðƒZƒbƒgƒAƒbƒv
+;ã‚²ãƒ¼ã‚¸ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—
 DrawBar:
 .amount = $00
 .x = $01

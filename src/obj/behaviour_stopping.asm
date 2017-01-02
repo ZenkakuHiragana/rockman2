@@ -1,6 +1,6 @@
 
 ;EDB6
-;タイムストッパーで止められている間の敵の挙動
+;繧ｿ繧､繝繧ｹ繝医ャ繝代�ｼ縺ｧ豁｢繧√ｉ繧後※縺�繧矩俣縺ｮ謨ｵ縺ｮ謖吝虚
 EnemyBehaviour_Stopping1:
 	lda #$14
 	sta aPlatformWidth,x

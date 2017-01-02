@@ -4,7 +4,7 @@
 	jmp Sound_ProcessTracks:
 	
 ;8003
-;20 51 C0�ŗ\�񂳂ꂽ�Ȃ�炵�n�߂鏈��
+;20 51 C0で予約された曲を鳴らし始める処理
 SOUND_STARTPLAY:
 	cmp #$FC
 	bne .continue1
@@ -41,7 +41,7 @@ SOUND_STARTPLAY:
 	cpx <zSoundVar1
 	bcs .continue5
 	rts
-;�Ȃ̏㏑���D�揇��00�`0F���傫�����炷
+;曲の上書き優先順位00～0Fが大きい時鳴らす
 .continue5
 	stx <zSoundVar1
 	lda <zSoundAttr
@@ -108,7 +108,7 @@ Bank0CStartSound_IsSFX:
 	cpx <zSoundVar1
 	bcs .dosfx
 	rts
-;���ʉ��㏑���D�揇��00�`F0���傫�����ɑ���
+;効果音上書き優先順位00～F0が大きい時に続く
 .dosfx
 	stx <zSoundVar1
 	lda <zSoundAttr
@@ -161,13 +161,13 @@ Bank0CStartSound_IsSFX:
 	mSTZ <zNMILock
 	rts
 ;8129
-;#FC�����s �Ȃ𑁂�����
+;#FCを実行 曲を早くする
 Bank0CStartFC:
 	iny
 	sty <zSoundSpeed
 	rts
 ;812D
-;#FD�����s �Ȃ��t�F�[�h�A�E�g/�C������
+;#FDを実行 曲をフェードアウト/インする
 Bank0CStartFD:
 	sty <zSoundFade
 	lda #$01
@@ -177,7 +177,7 @@ Bank0CStartFD:
 	sta <zSoundCounter
 	rts
 ;813A
-;#FE�����s ���ʉ����~�߂�
+;#FEを実行 効果音を止める
 Bank0CStartFE:
 	lda <zSoundAttr
 	and #$0F
@@ -207,7 +207,7 @@ Bank0CStartFE:
 	sta <zNMILock
 	rts
 ;816C
-;�Ȃ񂾂��ꂻ��1
+;なんだこれその1
 Sound_816C:
 	lda <zSoundBase
 	clc
@@ -225,7 +225,7 @@ Sound_816C:
 	bne Sound_CopyModulation
 	rts
 ;818C
-;#FF�����s �Ȃ��~�߂�
+;#FFを実行 曲を止める
 Bank0CStartFF:
 	lda <zSoundAttr
 	and #$F0
@@ -246,7 +246,7 @@ Bank0CStartFF:
 	rts
 
 ;81B2
-;���̕ϒ��֌W��0�ɂ���
+;音の変調関係を0にする
 Sound_ClearLFOs:
 	ldy #$0F
 	lda #$10
@@ -255,14 +255,14 @@ Sound_ClearLFOs:
 	tax
 	lda #$00
 .loop
-	sta aSQ1Ptr,x ;SFXPitch�`VolModVolume($510�`$51E) = 0
+	sta aSQ1Ptr,x ;SFXPitch～VolModVolume($510～$51E) = 0
 	inx
 	dey
 	bne .loop
 	rts
 
 ;81C4
-;���W�����[�V������`���R�s�[����
+;モジュレーション定義をコピーする
 Sound_CopyModulation:
 	lda <zSoundVar1
 	pha
@@ -275,7 +275,7 @@ Sound_CopyModulation:
 	adc #$06
 	tax
 	lda aSQ1Ptr,x
-	and #$1F ;���݂̃��W�����[�V������`�ԍ��ɃA�N�Z�X
+	and #$1F ;現在のモジュレーション定義番号にアクセス
 	beq .nomod
 		tay
 		lda #$00
@@ -285,11 +285,11 @@ Sound_CopyModulation:
 		dey
 		bne .loop_mod
 .nomod
-	tay ;Y = ���W�����[�V������`�ւ̃|�C���^
+	tay ;Y = モジュレーション定義へのポインタ
 	txa
 	clc
 	adc #$0E
-	tax ;X = 6 + E = 14, ���W�����[�V������`�̓��e���i�[
+	tax ;X = 6 + E = 14, モジュレーション定義の内容を格納
 	lda #$04
 .loop_copy
 	pha
@@ -299,7 +299,7 @@ Sound_CopyModulation:
 	pla
 	sec
 	sbc #$01
-	bne .loop_copy ;4�o�C�g�R�s�[
+	bne .loop_copy ;4バイトコピー
 	pla
 	sta <zSoundVar2
 	pla
@@ -307,7 +307,7 @@ Sound_CopyModulation:
 	rts
 
 ;8207
-;���̃`�����l���̏��������邽�߂̏����H
+;次のチャンネルの処理をするための処理？
 Sound_GotoNextTrack:
 	lsr <zSFXChannel
 	bcc .skip_sfx
@@ -322,7 +322,7 @@ Sound_GotoNextTrack:
 	rts
 
 ;8219
-;���ʉ���炷�`�����l���̗\���S������
+;効果音を鳴らすチャンネルの予約を全部消す
 Sound_ClearSFXReserve:
 	lsr <zSFXChannel
 	lsr <zSFXChannel
@@ -331,7 +331,7 @@ Sound_ClearSFXReserve:
 	rts
 
 ;8222
-;�����~�߂�H
+;音を止める？
 Sound_8222:
 	cpy #$01
 	beq .play
@@ -342,7 +342,7 @@ Sound_8222:
 	rts
 
 ;8235
-;$8000������ł��� �Ȃ̏���
+;$8000から飛んでくる 曲の処理
 Sound_ProcessTracks:
 	inc <zSoundCounter
 	lda <zNMILock

@@ -1,6 +1,6 @@
 
 ;AA11
-;�I�[�v�j���O�̔w�i�̃t�F�[�h�C���e�[�u��
+;オープニングの背景のフェードインテーブル
 Table_Opening_PaletteFadein:
 	.db $0F, $0F, $0F, $04, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $07, $0F, $0F, $0F, $00
 	.db $0F, $0F, $2C, $11, $0F, $0F, $30, $38, $0F, $0F, $0C, $00, $0F, $0F, $0F, $00
@@ -8,39 +8,39 @@ Table_Opening_PaletteFadein:
 	.db $0F, $00, $03, $14, $0F, $0F, $01, $00, $0F, $00, $04, $17, $0F, $00, $00, $10
 	.db $0F, $0F, $2C, $11, $0F, $0F, $30, $38, $0F, $10, $1C, $01, $0F, $00, $00, $10
 ;AA51
-;�I�[�v�j���O�̔w�i�̃p���b�g
+;オープニングの背景のパレット
 Table_Opening_Palette:
 	.db $0F, $03, $13, $24, $0F, $0F, $11, $0C, $0F, $04, $14, $27, $0F, $00, $10, $30
 	.db $0F, $0F, $2C, $11, $0F, $0F, $30, $38, $0F, $30, $2C, $11, $0F, $00, $10, $30
 
 ;AA71
-;�^�C�g����ʂɍs�����O��BG�p���b�g
+;タイトル画面に行く直前のBGパレット
 Table_Opening_PaletteBuilding:
 	.db $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $00, $10, $30
 
 ;AA81
-;�^�C�g����ʂ̃p���b�g
+;タイトル画面のパレット
 Table_Title_Palette:
 	.db $0F, $11, $2C, $15, $0F, $30, $2C, $15, $0F, $26, $27, $15, $0F, $00, $10, $30
 
 ;AA91
-;�^�C�g����ʂ�N�̕����̃X�v���C�g�e�[�u��
+;タイトル画面のNの部分のスプライトテーブル
 Table_Title_Sprites_N:
 	.db $2F, $3C, $02, $C0, $37, $3D, $02, $C0, $3F, $3B, $02, $C0, $3F, $3A, $02, $B8
 	.db $3F, $39, $02, $B0
 
 ;AAA5
-;�I�[�v�j���O�̃r���̃X�v���C�g
+;オープニングのビルのスプライト
 Table_BuildingSprites:
-;��
+;窓
 	.db $00, $30, $02, $C0, $00, $31, $02, $C8, $08, $32, $02, $C0, $08, $33, $02, $C8
 	.db $10, $34, $02, $C0, $10, $35, $02, $C8, $00, $30, $02, $E0, $00, $31, $02, $E8
 	.db $08, $32, $02, $E0, $08, $33, $02, $E8, $10, $34, $02, $E0, $10, $35, $02, $E8
-;�o������
+;出っ張り
 	.db $00, $36, $03, $98, $08, $37, $03, $98, $10, $37, $03, $98, $18, $38, $03, $98
 
 ;AAE5
-;�^�C�g����ʂ̃��b�N�}���̃X�v���C�gptrlo
+;タイトル画面のロックマンのスプライトptrlo
 Table_Title_RockmanSpriteslo:
 	.db LOW(Table_Title_RockmanSprites0), LOW(Table_Title_RockmanSprites1)
 	.db LOW(Table_Title_RockmanSprites2), LOW(Table_Title_RockmanSprites3)
@@ -50,7 +50,7 @@ Table_Title_RockmanSpriteslo:
 	.db LOW(Table_Title_RockmanSpritesA), LOW(Table_Title_RockmanSpritesB)
 	.db LOW(Table_Title_RockmanSpritesC)
 ;AAF2
-;�^�C�g����ʂ̃��b�N�}���̃X�v���C�gptrhi
+;タイトル画面のロックマンのスプライトptrhi
 Table_Title_RockmanSpriteshi:
 	.db HIGH(Table_Title_RockmanSprites0), HIGH(Table_Title_RockmanSprites1)
 	.db HIGH(Table_Title_RockmanSprites2), HIGH(Table_Title_RockmanSprites3)
@@ -60,7 +60,7 @@ Table_Title_RockmanSpriteshi:
 	.db HIGH(Table_Title_RockmanSpritesA), HIGH(Table_Title_RockmanSpritesB)
 	.db HIGH(Table_Title_RockmanSpritesC)
 ;AAFF
-;�^�C�g����ʂ̃��b�N�}���̃X�v���C�g�e�[�u��
+;タイトル画面のロックマンのスプライトテーブル
 Table_Title_RockmanSprites0:
 	.db $0B
 	.db $00, $00, $01, $C8, $00, $01, $01, $D0, $00, $02, $01, $D8, $08, $03, $00, $C8
@@ -137,64 +137,64 @@ Table_Title_RockmanSpritesC:
 	.db $08, $2F, $00, $D0, $10, $2B, $00, $C8, $10, $2E, $00, $D0, $10, $2B, $40, $D8
 
 ;AD08
-;�I�[�v�j���O�̃Z���t
+;オープニングのセリフ
 Table_Opening_Quotes:
-;200X�N- Dr.���C�g�̐��ݏo����
+;200X年- Dr.ライトの生み出した
 	.db $A2, $A0, $A0, $D8, $9E, $80, $00, $00, $C4, $DB, $86, $7A, $87, $6A, $88, $6C
 	.db $89, $64, $66, $00, $00
-;�X�[�p�[���{�b�g ���b�N�}�� �ɂ����
+;スーパーロボット ロックマン によって
 	.db $8A, $80, $8B, $7C, $80, $77, $8C, $7E, $74, $87, $00, $77, $74, $76, $79, $78
 	.db $00, $68, $6E, $75, $69
-;�i�]�̓V�ˉȊw��Dr.���C���[�̖�]�͑j�~
+;ナゾの天才科学者Dr.ワイリーの野望は阻止
 	.db $8D, $8E, $7E, $6A, $8F, $90, $91, $92, $93, $C4, $DB, $7D, $7A, $7F, $80, $6A
 	.db $9A, $9B, $6B, $98, $99
-;���� ���E�ɕ��a����݂��������B
+;され 世界に平和がよみがえった。
 	.db $67, $73, $00, $94, $95, $68, $82, $9C, $62, $7E, $6E, $6C, $62, $7E, $63, $75
 	.db $66, $7B, $00, $00, $00
-;�������A���E������������� Dr.���C���[
+;しかし、世界征服をたくらむ Dr.ワイリー
 	.db $64, $62, $64, $AB, $94, $95, $96, $97, $A8, $66, $65, $70, $6F, $00, $C4, $DB
 	.db $7D, $7A, $7F, $80, $00
-;�́A�Ă� ���b�N�}���ɓ����𒧂ނׂ��A
+;は、再び ロックマンに闘いを挑むべく、
 	.db $6B, $AB, $81, $A9, $7E, $00, $77, $74, $76, $79, $78, $68, $61, $AA, $A8, $9D
 	.db $6F, $6D, $7E, $65, $AB
-;�V���ɑ���o����8�̂̃��{�b�g��
+;新たに造り出した8体のロボットを
 	.db $9F, $66, $68, $84, $71, $89, $64, $66, $00, $A1, $85, $6A, $77, $8C, $7E, $74
 	.db $87, $A8, $00, $00, $00
-;����o�����̂ł���E�E�E�B
+;送り出したのである・・・。
 	.db $83, $71, $89, $64, $66, $6A, $69, $7E, $60, $72, $DC, $DC, $DC, $7B, $00, $00
 	.db $00, $00, $00, $00, $00
 
 ;ADB0
-;�Z���t�̐F�ω��e�[�u��
+;セリフの色変化テーブル
 Table_Opening_QuotesColor:
 	.db $0F, $00, $10, $20, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30
 	.db $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30
 	.db $30, $30, $30, $20, $10, $00, $0F
 
 ;ADD7
-;���b�N�}������яオ��A�j���[�V�����̃e�[�u��
+;ロックマンが飛び上がるアニメーションのテーブル
 Table_Title_RockmanAnimation:
 	.db $0C, $0B, $0A, $06, $06, $09, $09, $08, $08, $07, $07, $06, $06, $06, $06, $06
 	.db $06, $05, $05, $04, $04, $03, $03, $02, $02, $01
 
 ;ADF1
-; 1988 BG�e�[�u��
+; 1988 BGテーブル
 Table_Opening_1988:
 	.db $00, $A7, $A5, $A1, $A1, $00
 
 ;ADF7
-;CAPCOMBG�e�[�u��
+;CAPCOMBGテーブル
 Table_Opening_CAPCOM:
 	.db $C3, $C1, $D0, $C3, $CF, $CD
 
 ;ADFD
-;1988 �t�F�[�h�C���e�[�u��
+;1988 フェードインテーブル
 Table_1988_Fadein:
 	.db $0F, $00, $10, $20, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $20
 	.db $10, $00, $0F
 
 ;AE10
-;�p�X���[�h��ʂ̃p���b�g�e�[�u��
+;パスワード画面のパレットテーブル
 Table_Password_PaletteData:
 	.db $00, $00
 Table_Password_Palette:
@@ -208,7 +208,7 @@ Table_UnknownPaletteAE32:
 	.db $0F, $20, $2C, $11, $0F, $20, $26, $36, $0F, $00, $2C, $11, $0F, $16, $35, $20
 
 ;AE52
-;PPU�������݈ʒu�A�T�C�Y�A�f�[�^�̏���BG�ɕ������`���e�[�u��
+;PPU書き込み位置、サイズ、データの順でBGに文字列を描くテーブル
 Table_Keywords:
 ; START   
 	.db $25, $8C
@@ -251,17 +251,17 @@ Table_Keywords:
 	.db $0C
 	.db $53, $54, $41, $47, $45, $40, $53, $45, $4C, $45, $43, $54
 ;AED6
-;�������`���e�[�u���J�n�ʒu
+;文字列を描くテーブル開始位置
 Table_Keywords_ptr:
 	.db $00, $0C, $19, $25, $32, $3D, $4C, $58, $69, $75
 
 ;AEE0
-;�J�[�\���̃X�v���C�g
+;カーソルのスプライト
 Table_Password_CursorSprite:
 	.db $F8, $22, $00, $58
 
 ;AEE4
-;�p�X���[�h���͉�ʂ�12345, ABCDE, ���ƌ��̃X�v���C�g�e�[�u��
+;パスワード入力画面の12345, ABCDE, ●と個数のスプライトテーブル
 Table_Password_UISprites:
 ;12345
 	.db $30, $25, $00, $44, $30, $26, $00, $54, $30, $27, $00, $64, $30, $28, $00, $74
@@ -269,11 +269,11 @@ Table_Password_UISprites:
 ;ABCDE
 	.db $44, $E1, $02, $30, $54, $E2, $02, $30, $64, $E3, $02, $30, $74, $E4, $02, $30
 	.db $84, $E5, $02, $30
-;���ƌ�
+;●と個数
 	.db $A0, $3F, $00, $D0, $B4, $2D, $01, $D0
 
 ;AF14
-;�p�X���[�h���͉�ʂ̃J�[�\���ʒu�ƃ}�X��Y
+;パスワード入力画面のカーソル位置とマス目Y
 Table_PasswordCursorPositionY:
 	.db $40, $40, $40, $40, $40
 	.db $50, $50, $50, $50, $50
@@ -282,7 +282,7 @@ Table_PasswordCursorPositionY:
 	.db $80, $80, $80, $80, $80
 
 ;AF2D
-;�p�X���[�h���͉�ʂ̃J�[�\���ʒu�ƃ}�X��X
+;パスワード入力画面のカーソル位置とマス目X
 Table_PasswordCursorPositionX:
 	.db $41, $51, $61, $71, $81
 	.db $41, $51, $61, $71, $81
@@ -291,7 +291,7 @@ Table_PasswordCursorPositionX:
 	.db $41, $51, $61, $71, $81
 
 ;AF46
-;�p�X���[�h���͉�ʂ̃J�[�\�����ǂ��Ɉړ����邩�E
+;パスワード入力画面のカーソルがどこに移動するか右
 Table_PasswordCursorMoveTo_Right:
 	.db $01, $02, $03, $04, $00
 	.db $06, $07, $08, $09, $05
@@ -300,7 +300,7 @@ Table_PasswordCursorMoveTo_Right:
 	.db $15, $16, $17, $18, $14
 
 ;AF5F
-;�p�X���[�h���͉�ʂ̃J�[�\�����ǂ��Ɉړ����邩��
+;パスワード入力画面のカーソルがどこに移動するか左
 Table_PasswordCursorMoveTo_Left:
 	.db $04, $00, $01, $02, $03
 	.db $09, $05, $06, $07, $08
@@ -309,7 +309,7 @@ Table_PasswordCursorMoveTo_Left:
 	.db $18, $14, $15, $16, $17
 
 ;AF78
-;�p�X���[�h���͉�ʂ̃J�[�\�����ǂ��Ɉړ����邩��
+;パスワード入力画面のカーソルがどこに移動するか上
 Table_PasswordCursorMoveTo_Up:
 	.db $14, $15, $16, $17, $18
 	.db $00, $01, $02, $03, $04
@@ -318,7 +318,7 @@ Table_PasswordCursorMoveTo_Up:
 	.db $0F, $10, $11, $12, $13
 
 ;AF91
-;�p�X���[�h���͉�ʂ̃J�[�\�����ǂ��Ɉړ����邩��
+;パスワード入力画面のカーソルがどこに移動するか下
 Table_PasswordCursorMoveTo_Down:
 	.db $05, $06, $07, $08, $09
 	.db $0A, $0B, $0C, $0D, $0E
@@ -327,41 +327,41 @@ Table_PasswordCursorMoveTo_Down:
 	.db $00, $01, $02, $03, $04
 
 ;AFAA
-;�p�X���[�h���͉�ʂ̃J�[�\���̓_�ł���F�̃e�[�u��
+;パスワード入力画面のカーソルの点滅する色のテーブル
 Table_PasswordCursorColor:
 	.db $0F, $00, $10, $20, $30, $20, $10, $00
 
 ;AFB2
-;�p�X���[�h���͉�ʂ̃J�[�\���̃X�v���C�g�e�[�u��
+;パスワード入力画面のカーソルのスプライトテーブル
 Table_PasswordCursorSprites:
 	.db $00, $3E, $01, $00, $00, $3E, $41, $08
 	.db $08, $3E, $81, $00, $08, $3E, $C1, $08
 
 ;AFC2
-;�p�X���[�h�̍��۔���Ɏg��1
-;B1�`E5�܂ł̃}�X�ƃ{�X�̎�ނ��Ή����Ă���
+;パスワードの合否判定に使う1
+;B1～E5までのマスとボスの種類が対応している
 Table_Password_Process1:
 	.db $00, $01, $00, $10, $04
 	.db $20, $00, $08, $10, $80
 	.db $08, $02, $04, $00, $01
 	.db $40, $80, $02, $20, $40
 ;AFD6
-;�p�X���[�h�̍��۔���Ɏg��2
-;0�̃}�X�ɒu���Γ|���������A1�Ȃ�|���Ă��Ȃ������ɂȂ�
+;パスワードの合否判定に使う2
+;0のマスに置けば倒した扱い、1なら倒していない扱いになる
 Table_Password_Process2:
 	.db 0, 0, 0, 0, 1
 	.db 0, 0, 1, 1, 0
 	.db 0, 1, 0, 0, 1
 	.db 1, 1, 0, 1, 0
 
-;�p�X���[�h�̃}�X�ƃ{�X�̊֌W���܂Ƃ߂�
+;パスワードのマスとボスの関係をまとめる
 ;(    ) (A, 0) (    ) (Q, 0) (W, 1)
 ;(F, 0) (    ) (B, 1) (Q, 1) (C, 0)
 ;(B, 0) (A, 1) (W, 0) (    ) (H, 1)
 ;(M, 1) (C, 1) (A, 0) (F, 1) (M, 0)
 
 ;AFEA
-;�p�X���[�h���͌�̃X�v���C�g
+;パスワード入力後のスプライト
 Table_Password_ResultSprite:
 	.db $60, $2F, $00, $60, $70, $1F, $00, $60, $60, $1B, $00, $80, $70, $19, $00, $70
 	.db $60, $1D, $00, $70, $60, $1C, $00, $90, $70, $1A, $00, $90, $70, $1E, $00, $80

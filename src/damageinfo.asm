@@ -1,6 +1,6 @@
 
 ;20 57 E5
-;Obj[x]‚ÌƒƒbƒNƒ}ƒ“‚Ö‚ÌÚGˆ—/x”j‰ó
+;Obj[x]ã®ãƒ­ãƒƒã‚¯ãƒãƒ³ã¸ã®æ¥è§¦å‡¦ç†/xç ´å£Š
 ;RockmanTakeDamage:
 	lda #$00
 	sta <$01
@@ -77,20 +77,20 @@
 	rts
 
 ;20 E9 E5
-;Obj[x]‚ÆƒƒbƒNƒ}ƒ“‚Ì•Ší‚Æ‚Ìƒqƒbƒgˆ—
+;Obj[x]ã¨ãƒ­ãƒƒã‚¯ãƒãƒ³ã®æ­¦å™¨ã¨ã®ãƒ’ãƒƒãƒˆå‡¦ç†
 EnemyTakeDamage:
 	lda aObjY,x
 	sta <$00
 	lda aObjCollision,x
 	sta <$08
-;ŠÔ•ûŒü‚Ö‚ÌŠÔˆø‚«‚É‚æ‚éÅ“K‰»‚ç‚µ‚¢
+;æ™‚é–“æ–¹å‘ã¸ã®é–“å¼•ãã«ã‚ˆã‚‹æœ€é©åŒ–ã‚‰ã—ã„
 	ldx #$09
 	lda <zFrameCounter
 	and #$01
 	bne .loop
 	dex
 .loop
-;•Šíˆê‚Â‚¸‚Â‚É‘Î‚µ‚Ä‚Ìƒ‹[ƒv
+;æ­¦å™¨ä¸€ã¤ãšã¤ã«å¯¾ã—ã¦ã®ãƒ«ãƒ¼ãƒ—
 	lda aObjFlags,x
 	bpl .skip
 	and #%00000001
@@ -100,7 +100,7 @@ EnemyTakeDamage:
 	lda Table_WeaponCollisionOffset,y
 	adc <$08
 	tay
-;|ƒ¢X|‚ğŒvZ
+;|Î”X|ã‚’è¨ˆç®—
 	sec
 	lda <zEScreenX
 	sbc aWeaponScreenX,x
@@ -108,7 +108,7 @@ EnemyTakeDamage:
 	eor #$FF
 	adc #$01
 .inv_x
-;”äŠr
+;æ¯”è¼ƒ
 	cmp Table_CollisionSizeX,y
 	bcs .skip
 	sec
@@ -139,7 +139,7 @@ EnemyTakeDamage:
 	jmp [zPtr]
 
 ;E64F
-;ƒƒbƒNƒoƒXƒ^[ƒ_ƒ[ƒWˆ—
+;ãƒ­ãƒƒã‚¯ãƒã‚¹ã‚¿ãƒ¼ãƒ€ãƒ¡ãƒ¼ã‚¸å‡¦ç†
 EnemyTakeDamageByRockBuster:
 	ldy <zObjIndex
 	lda aObjFlags,y
@@ -182,7 +182,7 @@ EnemyTakeDamageByRockBuster:
 	rts
 
 ;E6A4
-;ƒAƒgƒ~ƒbƒNƒtƒ@ƒCƒA[ƒ_ƒ[ƒWˆ—
+;ã‚¢ãƒˆãƒŸãƒƒã‚¯ãƒ•ã‚¡ã‚¤ã‚¢ãƒ¼ãƒ€ãƒ¡ãƒ¼ã‚¸å‡¦ç†
 EnemyTakeDamageByAtomicFire:
 	ldy <zObjIndex
 	lda aObjFlags,y
@@ -240,7 +240,7 @@ AtomicFire_TakeDamageAbort:
 	rts
 
 ;E70D
-;ƒGƒA[ƒVƒ…[ƒ^[ƒ_ƒ[ƒWˆ—
+;ã‚¨ã‚¢ãƒ¼ã‚·ãƒ¥ãƒ¼ã‚¿ãƒ¼ãƒ€ãƒ¡ãƒ¼ã‚¸å‡¦ç†
 EnemyTakeDamageByAirShooter:
 	ldy <zObjIndex
 	lda aObjFlags,y
@@ -287,7 +287,7 @@ EnemyTakeDamageByAirShooter:
 	rts
 
 ;E766
-;ƒŠ[ƒtƒV[ƒ‹ƒhƒ_ƒ[ƒWˆ—
+;ãƒªãƒ¼ãƒ•ã‚·ãƒ¼ãƒ«ãƒ‰ãƒ€ãƒ¡ãƒ¼ã‚¸å‡¦ç†
 EnemyTakeDamageByLeafShield:
 	ldy <zObjIndex
 	lda aObjFlags,y
@@ -341,7 +341,7 @@ LeafShield_TakeDamageAlive:
 	beq LeafShield_TakeDamageAlive_Done
 
 ;E7CC
-;ƒoƒuƒ‹ƒŠ[ƒhƒ_ƒ[ƒWˆ—
+;ãƒãƒ–ãƒ«ãƒªãƒ¼ãƒ‰ãƒ€ãƒ¡ãƒ¼ã‚¸å‡¦ç†
 EnemyTakeDamageByBubbleLead:
 	ldy <zObjIndex
 	lda aObjFlags,y
@@ -388,7 +388,7 @@ EnemyTakeDamageByBubbleLead:
 	rts
 
 ;E825
-;ƒNƒCƒbƒNƒu[ƒƒ‰ƒ“ƒ_ƒ[ƒWˆ—
+;ã‚¯ã‚¤ãƒƒã‚¯ãƒ–ãƒ¼ãƒ¡ãƒ©ãƒ³ãƒ€ãƒ¡ãƒ¼ã‚¸å‡¦ç†
 EnemyTakeDamageByQuickBoomerang:
 	ldy <zObjIndex
 	lda aObjFlags,y
@@ -448,7 +448,7 @@ QuickBoomerang_TakeDamageAlive:
 	beq QuickBoomerang_TakeDamageAlive_Done
 
 ;E899
-;ƒNƒ‰ƒbƒVƒ…ƒ{ƒ€ƒ_ƒ[ƒWˆ—
+;ã‚¯ãƒ©ãƒƒã‚·ãƒ¥ãƒœãƒ ãƒ€ãƒ¡ãƒ¼ã‚¸å‡¦ç†
 EnemyTakeDamageByCrashBomb:
 	ldy <zObjIndex
 	lda aObjFlags,y
@@ -483,11 +483,11 @@ EnemyTakeDamageByCrashBomb:
 	lda aObjAnim,x
 	cmp #$2F
 	beq .abort
-;u”š’e–{‘Ì”š”­’†v‚Í’e‚©‚ê‚Ä‚àƒXƒ‹[
+;ã€Œçˆ†å¼¾æœ¬ä½“çˆ†ç™ºä¸­ã€ã¯å¼¾ã‹ã‚Œã¦ã‚‚ã‚¹ãƒ«ãƒ¼
 	lda aObjVar,x
 	cmp #$02
 	beq .abort
-;”š”­‚ÖˆÚs‚·‚é
+;çˆ†ç™ºã¸ç§»è¡Œã™ã‚‹
 	lda #$05
 	sta aObjFrame,x
 	lda #$00
@@ -502,7 +502,7 @@ EnemyTakeDamageByCrashBomb:
 	rts
 
 ;E8FD
-;ƒƒ^ƒ‹ƒuƒŒ[ƒhƒ_ƒ[ƒWˆ—
+;ãƒ¡ã‚¿ãƒ«ãƒ–ãƒ¬ãƒ¼ãƒ‰ãƒ€ãƒ¡ãƒ¼ã‚¸å‡¦ç†
 EnemyTakeDamageByMetalBlade:
 	ldy <zObjIndex
 	lda aObjFlags,y
@@ -556,9 +556,9 @@ EnemyTakeDamageByMetalBlade:
 	sta aObjFlags,y
 	beq .alive_done
 ;E964
-;ƒ^ƒCƒ€ƒXƒgƒbƒp[ƒ_ƒ[ƒWˆ—i—ˆ‚È‚¢j
+;ã‚¿ã‚¤ãƒ ã‚¹ãƒˆãƒƒãƒ‘ãƒ¼ãƒ€ãƒ¡ãƒ¼ã‚¸å‡¦ç†ï¼ˆæ¥ãªã„ï¼‰
 EnemyTakeDamageByTimeStopper:
-;•Šíƒqƒbƒg‚Ìƒ‹[ƒ`ƒ“lo
+;æ­¦å™¨ãƒ’ãƒƒãƒˆæ™‚ã®ãƒ«ãƒ¼ãƒãƒ³lo
 Table_EnemyTakeDamageInfolo:
 	.db LOW(EnemyTakeDamageByRockBuster)
 	.db LOW(EnemyTakeDamageByAtomicFire)
@@ -570,7 +570,7 @@ Table_EnemyTakeDamageInfolo:
 	.db LOW(EnemyTakeDamageByMetalBlade)
 	.db LOW(EnemyTakeDamageByCrashBomb)
 ;E96D
-;•Šíƒqƒbƒg‚Ìƒ‹[ƒ`ƒ“hi
+;æ­¦å™¨ãƒ’ãƒƒãƒˆæ™‚ã®ãƒ«ãƒ¼ãƒãƒ³hi
 Table_EnemyTakeDamageInfohi:
 	.db HIGH(EnemyTakeDamageByRockBuster)
 	.db HIGH(EnemyTakeDamageByAtomicFire)
@@ -583,39 +583,39 @@ Table_EnemyTakeDamageInfohi:
 	.db HIGH(EnemyTakeDamageByCrashBomb)
 
 ;E976
-;ƒIƒuƒWƒFƒNƒg‚²‚Æ‚Ìƒ_ƒ[ƒW, ƒƒbƒNƒoƒXƒ^[
+;ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã”ã¨ã®ãƒ€ãƒ¡ãƒ¼ã‚¸, ãƒ­ãƒƒã‚¯ãƒã‚¹ã‚¿ãƒ¼
 Table_DamageAmount_RockBuster:
 	.incbin "src/bin/obj/dmg_RockBuster.bin"
 ;E9F2
-;ƒIƒuƒWƒFƒNƒg‚²‚Æ‚Ìƒ_ƒ[ƒW, ƒAƒgƒ~ƒbƒNƒtƒ@ƒCƒ„[
+;ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã”ã¨ã®ãƒ€ãƒ¡ãƒ¼ã‚¸, ã‚¢ãƒˆãƒŸãƒƒã‚¯ãƒ•ã‚¡ã‚¤ãƒ¤ãƒ¼
 Table_DamageAmount_AtomicFire:
 	.incbin "src/bin/obj/dmg_AtomicFire.bin"
 ;EA6A
-;ƒIƒuƒWƒFƒNƒg‚²‚Æ‚Ìƒ_ƒ[ƒW, ƒGƒA[ƒVƒ…[ƒ^[
+;ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã”ã¨ã®ãƒ€ãƒ¡ãƒ¼ã‚¸, ã‚¨ã‚¢ãƒ¼ã‚·ãƒ¥ãƒ¼ã‚¿ãƒ¼
 Table_DamageAmount_AirShooter:
 	.incbin "src/bin/obj/dmg_AirShooter.bin"
 ;EAE2
-;ƒIƒuƒWƒFƒNƒg‚²‚Æ‚Ìƒ_ƒ[ƒW, ƒŠ[ƒtƒV[ƒ‹ƒh
+;ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã”ã¨ã®ãƒ€ãƒ¡ãƒ¼ã‚¸, ãƒªãƒ¼ãƒ•ã‚·ãƒ¼ãƒ«ãƒ‰
 Table_DamageAmount_LeafShield:
 	.incbin "src/bin/obj/dmg_LeafShield.bin"
 ;EB5A
-;ƒIƒuƒWƒFƒNƒg‚²‚Æ‚Ìƒ_ƒ[ƒW, ƒoƒuƒ‹ƒŠ[ƒh
+;ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã”ã¨ã®ãƒ€ãƒ¡ãƒ¼ã‚¸, ãƒãƒ–ãƒ«ãƒªãƒ¼ãƒ‰
 Table_DamageAmount_BubbleLead:
 	.incbin "src/bin/obj/dmg_BubbleLead.bin"
 ;EBD2
-;ƒIƒuƒWƒFƒNƒg‚²‚Æ‚Ìƒ_ƒ[ƒW, ƒNƒCƒbƒNƒu[ƒƒ‰ƒ“
+;ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã”ã¨ã®ãƒ€ãƒ¡ãƒ¼ã‚¸, ã‚¯ã‚¤ãƒƒã‚¯ãƒ–ãƒ¼ãƒ¡ãƒ©ãƒ³
 Table_DamageAmount_QuickBoomerang:
 	.incbin "src/bin/obj/dmg_QuickBoomerang.bin"
 ;EC4A
-;ƒIƒuƒWƒFƒNƒg‚²‚Æ‚Ìƒ_ƒ[ƒW, ƒNƒ‰ƒbƒVƒ…ƒ{ƒ€
+;ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã”ã¨ã®ãƒ€ãƒ¡ãƒ¼ã‚¸, ã‚¯ãƒ©ãƒƒã‚·ãƒ¥ãƒœãƒ 
 Table_DamageAmount_CrashBomb:
 	.incbin "src/bin/obj/dmg_CrashBomb.bin"
 ;ECC2
-;ƒIƒuƒWƒFƒNƒg‚²‚Æ‚Ìƒ_ƒ[ƒW, ƒƒ^ƒ‹ƒuƒŒ[ƒh
+;ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã”ã¨ã®ãƒ€ãƒ¡ãƒ¼ã‚¸, ãƒ¡ã‚¿ãƒ«ãƒ–ãƒ¬ãƒ¼ãƒ‰
 Table_DamageAmount_MetalBlade:
 	.incbin "src/bin/obj/dmg_MetalBlade.bin"
 ;ED3A
-;ƒIƒuƒWƒFƒNƒg‚Ì‘Ì“–‚½‚èƒ_ƒ[ƒW
+;ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ä½“å½“ãŸã‚Šãƒ€ãƒ¡ãƒ¼ã‚¸
 Table_DamageAmount_Enemy:
 	.incbin "src/bin/obj/dmg_Enemy.bin"
 

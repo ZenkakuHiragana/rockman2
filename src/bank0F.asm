@@ -77,7 +77,7 @@ Write_Reg0_A:
 	rts
 
 ;20 71 C0
-;ƒƒCƒŠ[é“üêƒCƒxƒ“ƒg
+;ãƒ¯ã‚¤ãƒªãƒ¼åŸå…¥å ´ã‚¤ãƒ™ãƒ³ãƒˆ
 ChangeBank_DoEnterWilyCastle:
 	mCHANGEBANK #$0D
 	jsr Bank0D_BeginEnterWilyCastle
@@ -270,11 +270,11 @@ DieRockman:
 	mCHANGEBANK #$0E
 	lda <$FD
 	bne .stageselect
-	jmp StartStage_FillingEnergy ;ƒQ[ƒ€ƒI[ƒo[¨ƒRƒ“ƒeƒBƒjƒ…[
+	jmp StartStage_FillingEnergy ;ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼â†’ã‚³ãƒ³ãƒ†ã‚£ãƒ‹ãƒ¥ãƒ¼
 .stageselect
-	jmp StartStageSelect ;ƒQ[ƒ€ƒI[ƒo[¨ƒXƒe[ƒWƒZƒŒƒNƒg
+	jmp StartStageSelect ;ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼â†’ã‚¹ãƒ†ãƒ¼ã‚¸ã‚»ãƒ¬ã‚¯ãƒˆ
 .notgameover
-	jmp StartStage_Continue ;c‹@‚ª‚Ü‚¾‚ ‚é
+	jmp StartStage_Continue ;æ®‹æ©ŸãŒã¾ã ã‚ã‚‹
 
 
 .tiwnround_y
@@ -784,8 +784,8 @@ LoadBossBG:
 	;rts
 
 ;20 28 C6
-;ƒoƒ“ƒNA‚ÉØ‚è‘Ö‚¦‚ÄA[zPtr]‚©‚ç‚Ìƒe[ƒuƒ‹‚ğ$400ƒoƒCƒgPPU‚Ö‘‚«‚İ
-;ƒl[ƒ€ƒe[ƒuƒ‹‘‚«Š·‚¦—p‚©‚È
+;ãƒãƒ³ã‚¯Aã«åˆ‡ã‚Šæ›¿ãˆã¦ã€[zPtr]ã‹ã‚‰ã®ãƒ†ãƒ¼ãƒ–ãƒ«ã‚’$400ãƒã‚¤ãƒˆPPUã¸æ›¸ãè¾¼ã¿
+;ãƒãƒ¼ãƒ ãƒ†ãƒ¼ãƒ–ãƒ«æ›¸ãæ›ãˆç”¨ã‹ãª
 LoadScreenData:
 	jsr ChangeBank
 	lda #$00
@@ -861,7 +861,7 @@ Table_GraphicsAmount:
 	.db $01, $01, $01, $01, $01, $02
 
 ;20 09 C7
-;[$08],y‚©‚ç0x20ƒoƒCƒg•ª‚ğPPU‘‚«‚İ—\–ñ A‚Éƒoƒ“ƒN
+;[$08],yã‹ã‚‰0x20ãƒã‚¤ãƒˆåˆ†ã‚’PPUæ›¸ãè¾¼ã¿äºˆç´„ Aã«ãƒãƒ³ã‚¯
 WritePPUData:
 	jsr ChangeBank
 	ldy #$1F
@@ -896,7 +896,7 @@ SelectStage_LoadPipiGraphics:
 	.endif
 
 ;20 44 C7
-;$FE~$FF‚ÌƒAƒhƒŒƒX‚É‚ ‚é’l‚ğ#$20ƒoƒCƒg•ª$3B8`$3D8‚Ö‘‚«‚İ
+;$FE~$FFã®ã‚¢ãƒ‰ãƒ¬ã‚¹ã«ã‚ã‚‹å€¤ã‚’#$20ãƒã‚¤ãƒˆåˆ†$3B8ï½$3D8ã¸æ›¸ãè¾¼ã¿
 WriteTableToPPULinear:
 	mCHANGEBANK #$09
 	ldy #$1F
@@ -960,7 +960,7 @@ GetScrollInfo:
 	mCHANGEBANK #$0E, 1
 	;rts
 
-;20 B2 C7: –_ó‚É‚È‚Á‚Ä~‚è‚Ä‚«‚Ä’…’n‚Ü‚Å
+;20 B2 C7: æ£’çŠ¶ã«ãªã£ã¦é™ã‚Šã¦ãã¦ç€åœ°ã¾ã§
 Rockman_Warp_to_Land:
 	lda #%11000000
 	sta aObjFlags
@@ -1036,7 +1036,7 @@ SpawnBoss_Loop_Begin:
 	rts
 
 ;20 4B C8 Random: $04 = math.random(0, $02)
-;$01 / $02 = $03~$02 + $04
+;$01 / $02 = $03Ã—$02 + $04
 Divide8:
 	lda #$00
 	sta <$03
@@ -1115,7 +1115,7 @@ Divide:
 	sta <.A
 	rts
 
-;20 AE C8: $300, $304, $308, $30C = ‰æ–Ê$09, ˆÊ’u$08
+;20 AE C8: $300, $304, $308, $30C = ç”»é¢$09, ä½ç½®$08
 SetPPUSquareInfo:
 	ldx <zPPUSqr
 	ldy #$20
@@ -1154,7 +1154,7 @@ SetPPUSquareInfo:
 	sta aPPUSqrAttrlo,x
 	rts
 
-;20 EC C8: $3B6, $3BC = ‰æ–Ê$09, ‰¡$08, c$0A
+;20 EC C8: $3B6, $3BC = ç”»é¢$09, æ¨ª$08, ç¸¦$0A
 SetPPUPos:
 	ldx <zPPULaser
 	ldy #$08
@@ -1182,7 +1182,7 @@ SetPPUPos:
 	rts
 
 ;20 18 C9
-;ƒVƒƒƒbƒ^[‚Ì‘®«ƒe[ƒuƒ‹‚Ìİ’è‚©‚ÈccH
+;ã‚·ãƒ£ãƒƒã‚¿ãƒ¼ã®å±æ€§ãƒ†ãƒ¼ãƒ–ãƒ«ã®è¨­å®šã‹ãªâ€¦â€¦ï¼Ÿ
 SetPPUPos_Attr:
 	pha
 	lda <$08
@@ -1235,7 +1235,7 @@ Table_C918:
 	.db $03, $0C, $30, $C0
 
 ;20 68 C9
-;ƒƒbƒNƒ}ƒ“‚Ìi‚İ‹ï‡‚É‰‚¶‚Äƒ}ƒbƒv‚ğBG‚Ö‘‚«‚İ
+;ãƒ­ãƒƒã‚¯ãƒãƒ³ã®é€²ã¿å…·åˆã«å¿œã˜ã¦ãƒãƒƒãƒ—ã‚’BGã¸æ›¸ãè¾¼ã¿
 WriteNameTableByScroll:
 	lda <zStage
 	and #$07
@@ -1338,7 +1338,7 @@ WriteNameTableByScroll_AnyBank:
 	jsr ChangeBank
 	rts
 
-;20 13 CA: ã‰ºƒXƒNƒ[ƒ‹‚ÌNameTable‚Ì•`‰æ‚É–§Ú‚ÉŠÖ‚í‚é
+;20 13 CA: ä¸Šä¸‹ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«æ™‚ã®NameTableã®æç”»ã«å¯†æ¥ã«é–¢ã‚ã‚‹
 VerticalScroll_DrawNT:
 .VertScrollCounter = $39
 	lda <zStage
@@ -1474,7 +1474,7 @@ VerticalScroll_DrawNT:
 	;rts
 
 ;20 09 CB
-;ã‰ºƒXƒNƒ[ƒ‹‚Ìƒpƒ^[ƒ“ƒe[ƒuƒ‹•`‰æ‚É–§Ú‚ÉŠÖ‚í‚é
+;ä¸Šä¸‹ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«æ™‚ã®ãƒ‘ã‚¿ãƒ¼ãƒ³ãƒ†ãƒ¼ãƒ–ãƒ«æç”»ã«å¯†æ¥ã«é–¢ã‚ã‚‹
 Unknown_CB09:
 	lda <$FD
 	cmp #$60
@@ -1531,17 +1531,17 @@ Unknown_CB09:
 Unknown_CB61:
 	ldy $B42C,x
 	lda $B46C,y
-	sta aPaletteSpr + $09 ;Œ»Pal[19]
+	sta aPaletteSpr + $09 ;ç¾Pal[19]
 	lda $B46D,y
-	sta aPaletteSpr + $0A ;Œ»Pal[1A]
+	sta aPaletteSpr + $0A ;ç¾Pal[1A]
 	lda $B46E,y
-	sta aPaletteSpr + $0B ;Œ»Pal[1B]
+	sta aPaletteSpr + $0B ;ç¾Pal[1B]
 	lda $B46F,y
-	sta aPaletteSpr + $0D ;Œ»Pal[1D]
+	sta aPaletteSpr + $0D ;ç¾Pal[1D]
 	lda $B470,y
-	sta aPaletteSpr + $0E ;Œ»Pal[1E]
+	sta aPaletteSpr + $0E ;ç¾Pal[1E]
 	lda $B471,y
-	sta aPaletteSpr + $0F ;Œ»Pal[1F]
+	sta aPaletteSpr + $0F ;ç¾Pal[1F]
 	rts
 
 ;20 89 CB
@@ -1598,11 +1598,11 @@ PickupMap:
 	beq .do
 	bmi .above
 	jmp .skip
-;ã‚É‚Í‚İo‚µ‚Ä‚¢‚é‚Æ‚«‚ÍY=0‚É•â³‚µ‚Äˆ—
+;ä¸Šã«ã¯ã¿å‡ºã—ã¦ã„ã‚‹ã¨ãã¯Y=0ã«è£œæ­£ã—ã¦å‡¦ç†
 .above
 	lda #$00
 	sta <.Y
-;ˆ—‚ğŠJn
+;å‡¦ç†ã‚’é–‹å§‹
 .do
 	lda <.X
 	lsr a
@@ -1666,7 +1666,7 @@ PickupMap:
 	asl a
 	adc <.result
 	tax
-	lda Table_Terrain,x ;ƒXƒe[ƒW
+	lda Table_Terrain,x ;ã‚¹ãƒ†ãƒ¼ã‚¸
 	sta <.result
 .skip
 	mCHANGEBANK #$0E, 1
@@ -1674,21 +1674,21 @@ PickupMap:
 
 ;1ECC44
 Table_Terrain:
-	.db $02, $03 ;ƒq[ƒgƒ}ƒ“
-	.db $02, $03 ;ƒGƒA[ƒ}ƒ“
-	.db $02, $00 ;ƒEƒbƒhƒ}ƒ“
-	.db $04, $03 ;ƒoƒuƒ‹ƒ}ƒ“
-	.db $00, $03 ;ƒNƒCƒbƒNƒ}ƒ“
-	.db $02, $07 ;ƒtƒ‰ƒbƒVƒ…ƒ}ƒ“
-	.db $05, $06 ;ƒƒ^ƒ‹ƒ}ƒ“
-	.db $02, $03 ;ƒNƒ‰ƒbƒVƒ…ƒ}ƒ“
+	.db $02, $03 ;ãƒ’ãƒ¼ãƒˆãƒãƒ³
+	.db $02, $03 ;ã‚¨ã‚¢ãƒ¼ãƒãƒ³
+	.db $02, $00 ;ã‚¦ãƒƒãƒ‰ãƒãƒ³
+	.db $04, $03 ;ãƒãƒ–ãƒ«ãƒãƒ³
+	.db $00, $03 ;ã‚¯ã‚¤ãƒƒã‚¯ãƒãƒ³
+	.db $02, $07 ;ãƒ•ãƒ©ãƒƒã‚·ãƒ¥ãƒãƒ³
+	.db $05, $06 ;ãƒ¡ã‚¿ãƒ«ãƒãƒ³
+	.db $02, $03 ;ã‚¯ãƒ©ãƒƒã‚·ãƒ¥ãƒãƒ³
 
-	.db $02, $00 ;ƒƒCƒŠ[ƒXƒe[ƒW1
-	.db $02, $03 ;ƒƒCƒŠ[ƒXƒe[ƒW2
-	.db $04, $03 ;ƒƒCƒŠ[ƒXƒe[ƒW3
-	.db $02, $03 ;ƒƒCƒŠ[ƒXƒe[ƒW4
-	.db $00, $00 ;ƒƒCƒŠ[ƒXƒe[ƒW5
-	.db $00, $00 ;ƒƒCƒŠ[ƒXƒe[ƒW6
+	.db $02, $00 ;ãƒ¯ã‚¤ãƒªãƒ¼ã‚¹ãƒ†ãƒ¼ã‚¸1
+	.db $02, $03 ;ãƒ¯ã‚¤ãƒªãƒ¼ã‚¹ãƒ†ãƒ¼ã‚¸2
+	.db $04, $03 ;ãƒ¯ã‚¤ãƒªãƒ¼ã‚¹ãƒ†ãƒ¼ã‚¸3
+	.db $02, $03 ;ãƒ¯ã‚¤ãƒªãƒ¼ã‚¹ãƒ†ãƒ¼ã‚¸4
+	.db $00, $00 ;ãƒ¯ã‚¤ãƒªãƒ¼ã‚¹ãƒ†ãƒ¼ã‚¸5
+	.db $00, $00 ;ãƒ¯ã‚¤ãƒªãƒ¼ã‚¹ãƒ†ãƒ¼ã‚¸6
 
 ;20 60 CC
 Unknown_CC60:
@@ -1734,18 +1734,18 @@ ChangeBodyColor_Specified:
 
 ;D2FF
 Table_BodyColor:
-	.db $0F, $0F, $2C, $11 ;ƒƒbƒNƒoƒXƒ^[
-	.db $0F, $0F, $28, $15 ;ƒAƒgƒ~ƒbƒNƒtƒ@ƒCƒ„[
-	.db $0F, $0F, $30, $11 ;ƒGƒA[ƒVƒ…[ƒ^[
-	.db $0F, $0F, $30, $19 ;ƒŠ[ƒtƒV[ƒ‹ƒh
-	.db $0F, $0F, $30, $00 ;ƒoƒuƒ‹ƒŠ[ƒh
-	.db $0F, $0F, $34, $25 ;ƒNƒCƒbƒNƒu[ƒƒ‰ƒ“
-	.db $0F, $0F, $34, $14 ;ƒ^ƒCƒ€ƒXƒgƒbƒp[
-	.db $0F, $0F, $37, $18 ;ƒƒ^ƒ‹ƒuƒŒ[ƒh
-	.db $0F, $0F, $30, $26 ;ƒNƒ‰ƒbƒVƒ…ƒ{ƒ€
-	.db $0F, $0F, $30, $16 ;ƒAƒCƒeƒ€1†
-	.db $0F, $0F, $30, $16 ;ƒAƒCƒeƒ€2†
-	.db $0F, $0F, $30, $16 ;ƒAƒCƒeƒ€3†
+	.db $0F, $0F, $2C, $11 ;ãƒ­ãƒƒã‚¯ãƒã‚¹ã‚¿ãƒ¼
+	.db $0F, $0F, $28, $15 ;ã‚¢ãƒˆãƒŸãƒƒã‚¯ãƒ•ã‚¡ã‚¤ãƒ¤ãƒ¼
+	.db $0F, $0F, $30, $11 ;ã‚¨ã‚¢ãƒ¼ã‚·ãƒ¥ãƒ¼ã‚¿ãƒ¼
+	.db $0F, $0F, $30, $19 ;ãƒªãƒ¼ãƒ•ã‚·ãƒ¼ãƒ«ãƒ‰
+	.db $0F, $0F, $30, $00 ;ãƒãƒ–ãƒ«ãƒªãƒ¼ãƒ‰
+	.db $0F, $0F, $34, $25 ;ã‚¯ã‚¤ãƒƒã‚¯ãƒ–ãƒ¼ãƒ¡ãƒ©ãƒ³
+	.db $0F, $0F, $34, $14 ;ã‚¿ã‚¤ãƒ ã‚¹ãƒˆãƒƒãƒ‘ãƒ¼
+	.db $0F, $0F, $37, $18 ;ãƒ¡ã‚¿ãƒ«ãƒ–ãƒ¬ãƒ¼ãƒ‰
+	.db $0F, $0F, $30, $26 ;ã‚¯ãƒ©ãƒƒã‚·ãƒ¥ãƒœãƒ 
+	.db $0F, $0F, $30, $16 ;ã‚¢ã‚¤ãƒ†ãƒ 1å·
+	.db $0F, $0F, $30, $16 ;ã‚¢ã‚¤ãƒ†ãƒ 2å·
+	.db $0F, $0F, $30, $16 ;ã‚¢ã‚¤ãƒ†ãƒ 3å·
 
 ;20 2F D3
 DamageRockman:
@@ -1922,13 +1922,13 @@ Table_WeaponObjectCollision:
 Table_WeaponCollisionOffset:
 	.db $00, $20, $40, $60, $80
 ;D4E1
-CollisionSizeRX = $06 ;ƒƒbƒNƒ}ƒ“‚Ì“–‚½‚è”»’èƒTƒCƒY
+CollisionSizeRX = $06 ;ãƒ­ãƒƒã‚¯ãƒãƒ³ã®å½“ãŸã‚Šåˆ¤å®šã‚µã‚¤ã‚º
 CollisionSizeRY = $08
-CollisionSizeW0 = $04 ;•Ší‚Ì“–‚½‚è”»’èƒTƒCƒY
+CollisionSizeW0 = $04 ;æ­¦å™¨ã®å½“ãŸã‚Šåˆ¤å®šã‚µã‚¤ã‚º
 CollisionSizeW1 = $08
 CollisionSizeW2 = $0C
 CollisionSizeW3 = $10
-CollisionDataLength = $20 ;“–‚½‚è”»’èƒf[ƒ^‚Ì’·‚³
+CollisionDataLength = $20 ;å½“ãŸã‚Šåˆ¤å®šãƒ‡ãƒ¼ã‚¿ã®é•·ã•
 
 ;CollisionSizeRX[$0A] = $06 -> $09
 ;CollisionSizeW1[$10] = $0C -> $0A
@@ -1947,7 +1947,7 @@ Table_CollisionSizeY:
 	_collisiony CollisionSizeW3
 
 ;20 21 D6
-;ƒGƒ“ƒfƒBƒ“ƒO‚Ì•à‚­ƒƒbƒNƒ}ƒ“‚Ì•\¦
+;ã‚¨ãƒ³ãƒ‡ã‚£ãƒ³ã‚°ã®æ­©ããƒ­ãƒƒã‚¯ãƒãƒ³ã®è¡¨ç¤º
 ChangeBank_ShowEndingRockman:
 	ldy aObjAnim
 ChangeBank_ShowEndingRockmanY:
@@ -1965,7 +1965,7 @@ DrawStaffRollBossName:
 	jmp ChangeBank_ShowEndingRockman_JMP
 
 ;20 3F D6
-;ƒXƒ^ƒbƒtƒ[ƒ‹—pB$6A0‚É]‚¢ƒXƒ^ƒbƒtƒ[ƒ‹‚Ì•¶š‚ğ•`‚­
+;ã‚¹ã‚¿ãƒƒãƒ•ãƒ­ãƒ¼ãƒ«ç”¨ã€‚$6A0ã«å¾“ã„ã‚¹ã‚¿ãƒƒãƒ•ãƒ­ãƒ¼ãƒ«ã®æ–‡å­—ã‚’æã
 DrawStaffRollText:
 	mCHANGEBANK #$09
 	jsr $8606 ;-----------------------
@@ -1982,17 +1982,17 @@ SpawnEnemyByScroll:
 	.include "src/spawnenemy.asm"
 
 ;20 4E DA
-;•Ší‚Ì”­Ëˆ—/•ŠíƒIƒuƒWƒFƒNƒg‚Ì‹““®
+;æ­¦å™¨ã®ç™ºå°„å‡¦ç†/æ­¦å™¨ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®æŒ™å‹•
 FireWeapon:
 	.include "src/weapons.asm"
 
 ;20 57 E5
-;Obj[x]‚ÌƒƒbƒNƒ}ƒ“‚Ö‚ÌÚGˆ—/x”j‰ó
+;Obj[x]ã®ãƒ­ãƒƒã‚¯ãƒãƒ³ã¸ã®æ¥è§¦å‡¦ç†/xç ´å£Š
 RockmanTakeDamage:
 	.include "src/damageinfo.asm"
 
 ;EDB6
-;ƒ^ƒCƒ€ƒXƒgƒbƒp[‚Å~‚ß‚ç‚ê‚Ä‚¢‚éŠÔ‚Ì“G‚Ì‹““®
+;ã‚¿ã‚¤ãƒ ã‚¹ãƒˆãƒƒãƒ‘ãƒ¼ã§æ­¢ã‚ã‚‰ã‚Œã¦ã„ã‚‹é–“ã®æ•µã®æŒ™å‹•
 	.include "src/obj/behaviour_stopping.asm"
 
 ;20 94 EE
@@ -2017,7 +2017,7 @@ MoveEnemy_Start:
 	beq MoveObjectForWeapon
 	jsr EnemyTakeDamage
 	bcc MoveObjectForWeapon
-;Œ‚”j
+;æ’ƒç ´æ™‚
 	jsr CreateItemFromEnemy
 ;20 B8 EE
 MoveEnemy_Break:
@@ -2040,7 +2040,7 @@ MoveObjectForWeapon:
 	sta aObjY,x
 	cmp #$F0
 	bcc .continue
-;c‰æ–ÊŠO”»’è
+;ç¸¦ç”»é¢å¤–åˆ¤å®š
 	jmp SafeRemoveEnemy
 .continue
 	lda aObjFlags,x
@@ -2146,7 +2146,7 @@ CheckOffscreenEnemy_Start:
 	beq .check
 	jsr EnemyTakeDamage
 	bcc .check
-;Œ‚”j
+;æ’ƒç ´æ™‚
 	jsr CreateItemFromEnemy
 	lda #$06
 	sta aObjAnim,x
@@ -2208,7 +2208,7 @@ FindObjectY:
 	rts
 
 ;20 0A F0
-;’nŒ`‚Æ‚Ìƒqƒbƒgˆ—(ƒ¢‚w=$01,}ƒ¢‚x=$02) c
+;åœ°å½¢ã¨ã®ãƒ’ãƒƒãƒˆå‡¦ç†(Î”ï¼¸=$01,Â±Î”ï¼¹=$02) ç¸¦
 WallCollisionY:
 .result = $00
 .dx = $01
@@ -2305,7 +2305,7 @@ WallCollisionY:
 	rts
 
 ;20 AD F0
-;’nŒ`‚Æ‚Ìƒqƒbƒgˆ—(ƒ¢‚w=$01,}ƒ¢‚x=$02) c‰¡
+;åœ°å½¢ã¨ã®ãƒ’ãƒƒãƒˆå‡¦ç†(Î”ï¼¸=$01,Â±Î”ï¼¹=$02) ç¸¦æ¨ª
 WallCollisionXY:
 .result = $00
 .res_v = $00
@@ -2416,7 +2416,7 @@ CreateEnemyHere_Error:
 	rts
 
 ;20 75 F1
-;‘¬‚³$09~$08‚ÅAƒƒbƒNƒ}ƒ“‚Ì•ûŒü‚É‘¬“x‚ğ•ÏX
+;é€Ÿã•$09~$08ã§ã€ãƒ­ãƒƒã‚¯ãƒãƒ³ã®æ–¹å‘ã«é€Ÿåº¦ã‚’å¤‰æ›´
 SetVelocityAtRockman:
 .lx = $00
 .ly = $01
@@ -2518,7 +2518,7 @@ SetVelocityAtRockman:
 	rts
 
 ;20 38 F2
-;Obj[10-1F]‚ÌˆÊ’u‚Éƒ‰ƒ“ƒ_ƒ€‚Å‰ñ•œƒAƒCƒeƒ€‚ğ¶¬‚·‚éB
+;Obj[10-1F]ã®ä½ç½®ã«ãƒ©ãƒ³ãƒ€ãƒ ã§å›å¾©ã‚¢ã‚¤ãƒ†ãƒ ã‚’ç”Ÿæˆã™ã‚‹ã€‚
 CreateItemFromEnemy:
 	lda <zBossBehaviour
 	beq .create

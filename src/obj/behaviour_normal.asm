@@ -1,6 +1,6 @@
 
 ;948D
-;ƒVƒ…ƒŠƒ“ƒN
+;ã‚·ãƒ¥ãƒªãƒ³ã‚¯
 EN00:
 EN01:
 	lda aObjVar,x
@@ -71,7 +71,7 @@ EN01:
 	.db $19, $4A
 
 ;9523
-;ƒVƒ…ƒŠƒ“ƒN¶¬Ší
+;ã‚·ãƒ¥ãƒªãƒ³ã‚¯ç”Ÿæˆå™¨
 EN02:
 	lda aObjVar,x
 	bne .skip
@@ -102,7 +102,7 @@ EN02:
 	mJSR_NORTS CheckOffscreenItem
 
 ;9555
-;M-445¶¬Ší
+;M-445ç”Ÿæˆå™¨
 EN03:
 	lda aObjVXlo,x
 	bne .do
@@ -150,7 +150,7 @@ EN03:
 	.db $00, $FF
 
 ;95B5
-;–³ŒÀƒWƒFƒlƒŒ[ƒ^ˆ—/Šù‚É‘¶Ý‚µ‚Ä‚¢‚ê‚Îsec‚ÅŽ©”š/ˆ—‚·‚é‚È‚çVXlo‚ð”ñƒ[ƒ‚É
+;ç„¡é™ã‚¸ã‚§ãƒãƒ¬ãƒ¼ã‚¿å‡¦ç†/æ—¢ã«å­˜åœ¨ã—ã¦ã„ã‚Œã°secã§è‡ªçˆ†/å‡¦ç†ã™ã‚‹ãªã‚‰VXloã‚’éžã‚¼ãƒ­ã«
 Spawner_Check:
 	sta <$00
 	ldy #$0F
@@ -234,12 +234,12 @@ EN04:
 	.db $F5, $E3, $AD, $5E, $5E, $AD, $E3, $F5
 
 ;964E
-;M-445¶¬Šííœ
+;M-445ç”Ÿæˆå™¨å‰Šé™¤
 EN05:
 	lda #$03
 	sta <$00
 ;9652
-;$00‚ÅŽw’è‚µ‚½ƒIƒuƒWƒFƒNƒg‚ðíœ
+;$00ã§æŒ‡å®šã—ãŸã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’å‰Šé™¤
 EN05_DeleteObjects:
 	ldy #$0F
 .loop
@@ -259,12 +259,12 @@ EN05_DeleteObjects:
 	rts
 
 ;9671
-;Á–ÅƒGƒtƒFƒNƒg
+;æ¶ˆæ»…ã‚¨ãƒ•ã‚§ã‚¯ãƒˆ
 EN06:
 	mJSR_NORTS CheckOffscreenEnemy
 
 ;9675
-;ƒNƒƒE¶¬Ší
+;ã‚¯ãƒ­ã‚¦ç”Ÿæˆå™¨
 EN07:
 	lda aObjVXlo,x
 	bne .do
@@ -310,7 +310,7 @@ EN07:
 	.db $00, $FF
 
 ;96CF
-;objA‚ª$01ŒÂˆÈã‘¶Ý‚·‚ê‚ÎCƒtƒ‰ƒOƒZƒbƒg
+;objAãŒ$01å€‹ä»¥ä¸Šå­˜åœ¨ã™ã‚Œã°Cãƒ•ãƒ©ã‚°ã‚»ãƒƒãƒˆ
 FindObjectsA:
 	sta <$00
 	ldy #$0F
@@ -330,7 +330,7 @@ FindObjectsA:
 	rts
 
 ;96E5
-;ƒNƒƒE
+;ã‚¯ãƒ­ã‚¦
 EN08:
 	lda #$0B
 	sta <$01
@@ -394,14 +394,14 @@ EN08:
 	mJSR_NORTS MoveEnemy
 
 ;976F
-;ƒNƒƒE¶¬Šííœ
+;ã‚¯ãƒ­ã‚¦ç”Ÿæˆå™¨å‰Šé™¤
 EN09:
 	lda #$07
 	sta <$00
 	jmp EN05_DeleteObjects
 
 ;9776
-;ƒ^ƒjƒbƒV[
+;ã‚¿ãƒ‹ãƒƒã‚·ãƒ¼
 EN0A:
 	lda aObjVar,x
 	bne .noshell
@@ -490,22 +490,22 @@ EN0A:
 	mJSR_NORTS MoveEnemy
 
 ;982B
-;ƒ^ƒjƒbƒV[‚ÌŠk
-;ƒƒbƒNƒ}ƒ“‚Ì–A
-;ƒƒrƒbƒg‚Ì’e
-;ƒ`ƒƒƒ“ƒL[
-;ƒlƒIƒƒbƒg[ƒ‹‚Ì’e
-;ƒsƒs‚Ì—‘‚ÌŠk
-;ƒJƒ~ƒiƒŠƒSƒ[‚ÌƒJƒ~ƒiƒŠ
-;ƒVƒ‡ƒbƒgƒ}ƒ“‚Ì’e
-;ƒoƒuƒ‹ƒ}ƒ“‚Ì’e
-;ƒƒ^ƒ‹ƒuƒŒ[ƒh
-;ƒNƒ‰ƒbƒVƒ…ƒ{ƒ€‚Ì”š•—
-;ƒ{ƒX‚ÌƒeƒBƒEƒ“‚Ì›
-;ƒŠ[ƒtƒV[ƒ‹ƒh
-;ƒƒJƒhƒ‰ƒSƒ“‚Ì‰Š
-;ƒƒCƒŠ[ƒ}ƒVƒ“‚Ì•ÏŒ`Žž‚ÌÔ‚¢‚Ì
-;ƒu[ƒr[ƒ€ƒgƒ‰ƒbƒv‚Ì’e
+;ã‚¿ãƒ‹ãƒƒã‚·ãƒ¼ã®æ®»
+;ãƒ­ãƒƒã‚¯ãƒžãƒ³ã®æ³¡
+;ãƒ­ãƒ“ãƒƒãƒˆã®å¼¾
+;ãƒãƒ£ãƒ³ã‚­ãƒ¼
+;ãƒã‚ªãƒ¡ãƒƒãƒˆãƒ¼ãƒ«ã®å¼¾
+;ãƒ”ãƒ”ã®åµã®æ®»
+;ã‚«ãƒŸãƒŠãƒªã‚´ãƒ­ãƒ¼ã®ã‚«ãƒŸãƒŠãƒª
+;ã‚·ãƒ§ãƒƒãƒˆãƒžãƒ³ã®å¼¾
+;ãƒãƒ–ãƒ«ãƒžãƒ³ã®å¼¾
+;ãƒ¡ã‚¿ãƒ«ãƒ–ãƒ¬ãƒ¼ãƒ‰
+;ã‚¯ãƒ©ãƒƒã‚·ãƒ¥ãƒœãƒ ã®çˆ†é¢¨
+;ãƒœã‚¹ã®ãƒ†ã‚£ã‚¦ãƒ³ã®â—‹
+;ãƒªãƒ¼ãƒ•ã‚·ãƒ¼ãƒ«ãƒ‰
+;ãƒ¡ã‚«ãƒ‰ãƒ©ã‚´ãƒ³ã®ç‚Ž
+;ãƒ¯ã‚¤ãƒªãƒ¼ãƒžã‚·ãƒ³ã®å¤‰å½¢æ™‚ã®èµ¤ã„ã®
+;ãƒ–ãƒ¼ãƒ“ãƒ¼ãƒ ãƒˆãƒ©ãƒƒãƒ—ã®å¼¾
 EN0B:
 EN0E:
 EN18:
@@ -526,7 +526,7 @@ EN6F:
 	mJSR_NORTS MoveEnemy
 
 ;982F
-;ƒPƒƒbƒO
+;ã‚±ãƒ­ãƒƒã‚°
 EN0C:
 	lda aObjFrame,x
 	cmp #$09
@@ -575,7 +575,7 @@ EN0C:
 	.db $04, $02, $01
 
 ;988F
-;ŽqƒPƒƒbƒO
+;å­ã‚±ãƒ­ãƒƒã‚°
 EN0D:
 	lda #$00
 	sta aObjWait,x
@@ -614,8 +614,8 @@ EN0D:
 	mJSR_NORTS MoveEnemy
 
 ;89E3
-;ƒAƒ“ƒRƒE‚Ì’ñ“”
-;ˆ—“Ç‚ñ‚Å‚È‚¢‚âcc
+;ã‚¢ãƒ³ã‚³ã‚¦ã®æç¯
+;å‡¦ç†èª­ã‚“ã§ãªã„ã‚„â€¦â€¦
 EN0F:
 	lda aObjVXlo,x
 	bne .1
@@ -777,7 +777,7 @@ EN0F_DestroyEffectY:
 	.db $88, $98, $88, $B8, $B8, $88, $A8, $A8, $98
 
 ;9A43
-;ƒAƒ“ƒRƒE‚Ìƒ{ƒfƒB
+;ã‚¢ãƒ³ã‚³ã‚¦ã®ãƒœãƒ‡ã‚£
 EN10:
 	lda aObjVar,x
 	bne .1
@@ -796,7 +796,7 @@ EN10:
 	mJSR_NORTS CheckOffscreenItem
 
 ;9A65
-;ƒAƒ“ƒRƒE‚Ì‚½‚ß‚ÌƒpƒŒƒbƒg•Ï‰»
+;ã‚¢ãƒ³ã‚³ã‚¦ã®ãŸã‚ã®ãƒ‘ãƒ¬ãƒƒãƒˆå¤‰åŒ–
 EN11:
 	ldy #$02
 	jsr EN0F_ChangePalette
@@ -806,7 +806,7 @@ EN11:
 	rts
 
 ;9A73
-;ƒNƒ‰ƒbƒVƒ…ƒ}ƒ“ƒXƒe[ƒW‚ÌƒŠƒtƒg
+;ã‚¯ãƒ©ãƒƒã‚·ãƒ¥ãƒžãƒ³ã‚¹ãƒ†ãƒ¼ã‚¸ã®ãƒªãƒ•ãƒˆ
 EN12:
 	lda #$14
 	sta aPlatformWidth,x
@@ -938,7 +938,7 @@ EN12:
 	.db $01
 
 ;9C5B
-;—Ž‰ºƒuƒƒbƒN
+;è½ä¸‹ãƒ–ãƒ­ãƒƒã‚¯
 EN13:
 	lda #$18
 	sta aPlatformWidth,x
@@ -967,7 +967,7 @@ EN13:
 	rts
 
 ;9C90
-;ƒŒ[ƒU[oŒ»
+;ãƒ¬ãƒ¼ã‚¶ãƒ¼å‡ºç¾
 EN14:
 	sec
 	lda aObjRoom,x
@@ -1045,7 +1045,7 @@ EN14:
 	.db $01, $1F, $3E, $5D
 
 ;9DCE
-;ƒŒ[ƒU[
+;ãƒ¬ãƒ¼ã‚¶ãƒ¼
 EN15:
 	lda aObjVar,x
 	beq .do
@@ -1135,7 +1135,7 @@ EN15:
 	rts
 
 ;9E81
-;ƒoƒbƒgƒ“
+;ãƒãƒƒãƒˆãƒ³
 EN16:
 	lda aObjVar,x
 	bne .1
@@ -1215,7 +1215,7 @@ EN16_wait_time:
 	.db $3E, $9C
 
 ;9F22
-;ƒƒrƒbƒg
+;ãƒ­ãƒ“ãƒƒãƒˆ
 EN17:
 	lda aObjVY,x
 	sta <$04
@@ -1299,7 +1299,7 @@ EN17:
 	.db $00, $02, $00, $00, $00
 
 ;9FD1
-;ƒtƒŒƒ“ƒ_[oŒ»
+;ãƒ•ãƒ¬ãƒ³ãƒ€ãƒ¼å‡ºç¾
 EN19:
 .life_prev = $660
 	ldy #$02
@@ -1474,7 +1474,7 @@ EN19_Destroydy:
 	.db $E8, $F8, $F0, $08
 
 ;A136
-;ƒtƒŒƒ“ƒ_[‚ÌK”ö
+;ãƒ•ãƒ¬ãƒ³ãƒ€ãƒ¼ã®å°»å°¾
 EN1A:
 	lda aObjVar,x
 	bne .skip
@@ -1491,7 +1491,7 @@ EN1A:
 	mJSR_NORTS CheckOffscreenEnemy
 
 ;A154
-;ƒtƒŒƒ“ƒ_[‚Ì’e
+;ãƒ•ãƒ¬ãƒ³ãƒ€ãƒ¼ã®å¼¾
 EN1B:
 	clc
 	lda aObjVYlo,x
@@ -1503,7 +1503,7 @@ EN1B:
 	mJSR_NORTS MoveEnemy
 
 ;A169
-;ƒtƒŒƒ“ƒ_[–{‘Ì
+;ãƒ•ãƒ¬ãƒ³ãƒ€ãƒ¼æœ¬ä½“
 EN1C:
 	sec
 	lda aObjRoom,x
@@ -1629,19 +1629,19 @@ EN1C:
 .rts
 	rts
 ;A269
-;ƒtƒŒƒ“ƒ_[’…’nYÀ•W
+;ãƒ•ãƒ¬ãƒ³ãƒ€ãƒ¼ç€åœ°Yåº§æ¨™
 .table_land
 	.db $88, $68, $48
 ;A26C
-;BG‘‚«ž‚Ý‘Š‘ÎˆÊ’uY
+;BGæ›¸ãè¾¼ã¿ç›¸å¯¾ä½ç½®Y
 .table_bgy
 	.db $F0, $00, $F0, $00
 ;A270
-;BG‘‚«ž‚Ý‘Š‘ÎˆÊ’uX
+;BGæ›¸ãè¾¼ã¿ç›¸å¯¾ä½ç½®X
 .table_bgx
 	.db $00, $00, $20, $20
 ;A274
-;BG‘‚«ž‚Ýƒf[ƒ^
+;BGæ›¸ãè¾¼ã¿ãƒ‡ãƒ¼ã‚¿
 .table_data
 	.db $88, $8A, $84, $86, $89, $8B, $85, $87, $84, $86, $8C, $8E, $85, $87, $8D, $8F
 	.db $84, $86, $74, $76, $85, $87, $75, $77, $90, $92, $94, $96, $91, $93, $95, $97
@@ -1653,7 +1653,7 @@ EN1C:
 	.db $84, $86, $84, $86, $85, $87, $85, $87, $84, $86, $84, $86, $85, $87, $85, $87
 
 ;A2F4
-;ƒ‚ƒ“ƒLƒ“ƒO
+;ãƒ¢ãƒ³ã‚­ãƒ³ã‚°
 EN1D:
 	jsr FaceTowards
 	lda aObjFlags,x
@@ -1768,7 +1768,7 @@ EN1D:
 	mJSR_NORTS MoveEnemy
 
 ;A3ED
-;ƒNƒbƒN¶¬
+;ã‚¯ãƒƒã‚¯ç”Ÿæˆ
 EN1E:
 	lda aObjVXlo,x
 	bne .do
@@ -1814,7 +1814,7 @@ EN1E:
 	rts
 
 ;A446
-;ƒNƒbƒN
+;ã‚¯ãƒƒã‚¯
 EN1F:
 	lda #$08
 	sta <$01
@@ -1844,14 +1844,14 @@ EN1F:
 	mJSR_NORTS MoveEnemy
 
 ;A47E
-;ƒNƒbƒN¶¬Šííœ
+;ã‚¯ãƒƒã‚¯ç”Ÿæˆå™¨å‰Šé™¤
 EN20:
 	lda #$1E
 	sta <$00
 	jmp EN05_DeleteObjects
 
 ;A485
-;ƒeƒŠ[¶¬Ší
+;ãƒ†ãƒªãƒ¼ç”Ÿæˆå™¨
 EN21:
 	lda aObjVar,x
 	bne .skip
@@ -1870,7 +1870,7 @@ EN21:
 	mJSR_NORTS CheckOffscreenEnemy
 
 ;A4A6
-;ƒeƒŠ[
+;ãƒ†ãƒªãƒ¼
 EN22:
 	lda aObjVar,x
 	bne .skip
@@ -1886,7 +1886,7 @@ EN22:
 	mJSR_NORTS MoveEnemy
 
 ;A4C2
-;ƒ`ƒƒƒ“ƒL[ƒ[ƒJ[
+;ãƒãƒ£ãƒ³ã‚­ãƒ¼ãƒ¡ãƒ¼ã‚«ãƒ¼
 EN23:
 	lda aObjVXlo,x
 	bne .do
@@ -1964,7 +1964,7 @@ EN23:
 	.db $12, $1F, $1F, $3D
 
 ;A55A
-;ƒpƒŒƒbƒg•ÏXEˆÃˆÅ
+;ãƒ‘ãƒ¬ãƒƒãƒˆå¤‰æ›´ãƒ»æš—é—‡
 EN25:
 	lda aPalette + 1
 	cmp #$0F
@@ -2011,7 +2011,7 @@ EN25_Wait:
 	rts
 
 ;A5AB
-;ƒpƒŒƒbƒg•ÏXEƒ`ƒƒƒ“ƒL[
+;ãƒ‘ãƒ¬ãƒƒãƒˆå¤‰æ›´ãƒ»ãƒãƒ£ãƒ³ã‚­ãƒ¼
 EN26:
 	lda aObjVar,x
 	bne EN25_Wait
@@ -2021,7 +2021,7 @@ EN26:
 	bne EN25_Write
 
 ;A5B8
-;ƒpƒŒƒbƒg•ÏXEŒ³‚É–ß‚·
+;ãƒ‘ãƒ¬ãƒƒãƒˆå¤‰æ›´ãƒ»å…ƒã«æˆ»ã™
 EN27:
 	lda aObjVar,x
 	bne EN25_Wait
@@ -2030,7 +2030,7 @@ EN27:
 	jmp EN25_Write
 
 ;A5C5
-;ƒpƒŒƒbƒg•ÏXEƒ`ƒƒƒ“ƒL[Œ‚”j
+;ãƒ‘ãƒ¬ãƒƒãƒˆå¤‰æ›´ãƒ»ãƒãƒ£ãƒ³ã‚­ãƒ¼æ’ƒç ´
 EN28:
 	lda aObjVar,x
 	bne EN25_Wait
@@ -2042,7 +2042,7 @@ EN28:
 	jmp EN25_Write
 
 ;A5D6
-;ƒpƒŒƒbƒg•ÏXƒe[ƒuƒ‹
+;ãƒ‘ãƒ¬ãƒƒãƒˆå¤‰æ›´ãƒ†ãƒ¼ãƒ–ãƒ«
 Table_EN25PaletteChange:
 	.db $0F, $2C, $10, $1C, $0F, $37, $27, $07, $0F, $28, $16, $07, $0F, $1C, $00, $0C
 	.db $0F, $37, $27, $08, $0F, $17, $06, $08, $0F, $0C, $0C, $0F, $0F, $37, $27, $08
@@ -2052,7 +2052,7 @@ Table_EN25PaletteChange:
 	.db $0F, $27, $16, $07
 
 ;A62A
-;ƒsƒGƒƒ{ƒbƒgŽ•ŽÔ
+;ãƒ”ã‚¨ãƒ­ãƒœãƒƒãƒˆæ­¯è»Š
 EN29:
 	lda aEnemyVar,x
 	bne .do
@@ -2145,7 +2145,7 @@ EN29:
 	rts
 
 ;A6F1
-;ƒsƒGƒƒ{ƒbƒg
+;ãƒ”ã‚¨ãƒ­ãƒœãƒƒãƒˆ
 EN2A:
 	jsr MoveEnemy
 	bcc .rts
@@ -2162,7 +2162,7 @@ EN2A:
 	rts
 
 ;A70D
-;ƒtƒ‰ƒCƒ{[ƒC¶¬Ší
+;ãƒ•ãƒ©ã‚¤ãƒœãƒ¼ã‚¤ç”Ÿæˆå™¨
 EN2B:
 	lda aObjVar,x
 	bne .wait
@@ -2181,7 +2181,7 @@ EN2B:
 	mJSR_NORTS CheckOffscreenEnemy
 
 ;A72E
-;ƒtƒ‰ƒCƒ{[ƒC
+;ãƒ•ãƒ©ã‚¤ãƒœãƒ¼ã‚¤
 EN2C:
 	lda aEnemyVar,x
 	bne .inc
@@ -2258,12 +2258,12 @@ EN2C:
 	mJSR_NORTS MoveEnemy
 
 ;A7D3
-;ƒVƒƒƒbƒ^[•Ç
+;ã‚·ãƒ£ãƒƒã‚¿ãƒ¼å£
 EN2F:
 	lda #$08
 	bne Obj_BreakableWall
 ;A7D7
-;”j‰ó‰Â”\•ÇAƒtƒŒƒ“ƒ_[•Ç
+;ç ´å£Šå¯èƒ½å£ã€ãƒ•ãƒ¬ãƒ³ãƒ€ãƒ¼å£
 EN2D:
 EN2E:
 EN57:
@@ -2279,7 +2279,7 @@ Obj_BreakableWall:
 	mJSR_NORTS CheckOffscreenItem
 
 ;A7F2
-;ƒvƒŒƒX
+;ãƒ—ãƒ¬ã‚¹
 EN30:
 	lda aEnemyVar,x
 	bne .fall
@@ -2341,7 +2341,7 @@ EN30:
 	mJSR_NORTS MoveEnemy
 
 ;A877
-;ƒuƒƒbƒL[‚Ìˆ—‚Ìˆê•”, ”í’eŽž
+;ãƒ–ãƒ­ãƒƒã‚­ãƒ¼ã®å‡¦ç†ã®ä¸€éƒ¨, è¢«å¼¾æ™‚
 EN31_Part:
 	lda #$07
 	sta <$01
@@ -2398,7 +2398,7 @@ EN31_Part:
 	mJSR_NORTS MoveEnemy
 
 ;A8EA
-;ƒuƒƒbƒL[
+;ãƒ–ãƒ­ãƒƒã‚­ãƒ¼
 EN31:
 	lda aEnemyVar,x
 	bne .skip
@@ -2414,7 +2414,7 @@ EN31:
 	jmp EN31_Part
 
 ;A905
-;ƒuƒƒbƒL[‚Ìˆ—‚Ìˆê•”, ‚¤‚Ë‚¤‚Ë
+;ãƒ–ãƒ­ãƒƒã‚­ãƒ¼ã®å‡¦ç†ã®ä¸€éƒ¨, ã†ã­ã†ã­
 .part:
 	lda #$07
 	sta <$01
@@ -2507,7 +2507,7 @@ Table_EN31PartsWait:
 	.db $01, $06, $0B
 
 ;A9C3
-;ƒuƒƒbƒL[‚Ì”»’è•”•ª
+;ãƒ–ãƒ­ãƒƒã‚­ãƒ¼ã®åˆ¤å®šéƒ¨åˆ†
 EN32:
 	ldy aObjVar,x
 	lda aObjFlags,y
@@ -2529,7 +2529,7 @@ EN32:
 	mJSR_NORTS CheckOffscreenEnemy
 
 ;A9EC
-;•ö‚ê‚½ƒuƒƒbƒL[
+;å´©ã‚ŒãŸãƒ–ãƒ­ãƒƒã‚­ãƒ¼
 EN33:
 	ldy aEnemyVar,x
 	bpl .skip
@@ -2577,7 +2577,7 @@ EN33:
 	mJSR_NORTS MoveEnemy
 
 ;AA4E
-;ƒlƒIƒƒbƒg[ƒ‹
+;ãƒã‚ªãƒ¡ãƒƒãƒˆãƒ¼ãƒ«
 EN34:
 	lda <zStage
 	cmp #$0A
@@ -2695,7 +2695,7 @@ EN34:
 	.db $01, $02, $01
 
 ;AB44
-;ƒlƒIƒƒbƒg[ƒ‹(ƒKƒbƒcƒ^ƒ“ƒN‚©‚ç”­ŽË)
+;ãƒã‚ªãƒ¡ãƒƒãƒˆãƒ¼ãƒ«(ã‚¬ãƒƒãƒ„ã‚¿ãƒ³ã‚¯ã‹ã‚‰ç™ºå°„)
 .guts
 	lda aObjVar,x
 	bne .skip_guts
@@ -2730,7 +2730,7 @@ EN34:
 	mJSR_NORTS MoveEnemy
 
 ;AB89
-;ƒ}ƒ^ƒTƒuƒ[
+;ãƒžã‚¿ã‚µãƒ–ãƒ­ãƒ¼
 EN36:
 	sec
 	lda <zRScreenX
@@ -2748,7 +2748,7 @@ EN36:
 	mJSR_NORTS CheckOffscreenEnemy
 
 ;ABA4
-;ƒsƒs¶¬Ší
+;ãƒ”ãƒ”ç”Ÿæˆå™¨
 EN37:
 	lda aObjVXlo,x
 	bne .do
@@ -2803,12 +2803,12 @@ EN37:
 	.db %10000011, %11000011
 
 ;AC0E
-;ƒsƒs‚Ìˆ—ˆê•”
+;ãƒ”ãƒ”ã®å‡¦ç†ä¸€éƒ¨
 EN38_Delete:
 	lsr aObjFlags,x
 	rts
 ;AC12
-;ƒsƒs
+;ãƒ”ãƒ”
 EN38:
 	lda aEnemyVar,x
 	bne .eggexists
@@ -2871,14 +2871,14 @@ EN38:
 	rts
 
 ;AC8F
-;ƒsƒs¶¬Šííœ
+;ãƒ”ãƒ”ç”Ÿæˆå™¨å‰Šé™¤
 EN39:
 	lda #$37
 	sta <$00
 	jmp EN05_DeleteObjects
 
 ;AC96
-;ƒsƒs‚Ì—‘
+;ãƒ”ãƒ”ã®åµ
 EN3A:
 	lda aObjFlags,x
 	and #%00000100
@@ -2895,9 +2895,9 @@ EN3A:
 	lda <$01
 	bne .explode
 	rts
-.explode ;—‘‚ª”j—ô
+.explode ;åµãŒç ´è£‚
 	lda #$3B
-	jsr CreateEnemyHere ;Šk‚ð2‚Â¶¬
+	jsr CreateEnemyHere ;æ®»ã‚’2ã¤ç”Ÿæˆ
 	lda #$3B
 	jsr CreateEnemyHere
 	lda #%11000100
@@ -2941,7 +2941,7 @@ EN3A:
 	.db $0B, $21, $1C, $0B, $21, $10, $19, $19
 
 ;AD30
-;Žqƒsƒs
+;å­ãƒ”ãƒ”
 EN3C:
 	lda aEnemyVar,x
 	bne .move
@@ -2957,7 +2957,7 @@ EN3C:
 	mJSR_NORTS MoveEnemy
 
 ;AD4C
-;ƒJƒ~ƒiƒŠƒSƒ[
+;ã‚«ãƒŸãƒŠãƒªã‚´ãƒ­ãƒ¼
 EN3D:
 	ldy aEnemyVar,x
 	lda aObjFlags,y
@@ -2998,7 +2998,7 @@ EN3D:
 	rts
 
 ;ADA3
-;ƒJƒ~ƒiƒŠƒSƒ[‚Ì‰_
+;ã‚«ãƒŸãƒŠãƒªã‚´ãƒ­ãƒ¼ã®é›²
 EN3E:
 	lda #$18
 	sta aPlatformWidth,x
@@ -3055,7 +3055,7 @@ EN3E:
 	.db $80, $80, $80, $80, $C0, $C0, $C0, $C0, $C0, $C0, $C0, $C0, $80, $80, $80, $80
 
 ;AE49
-;ƒSƒuƒŠƒ“
+;ã‚´ãƒ–ãƒªãƒ³
 EN40:
 EN41:
 	jsr FaceTowards
@@ -3209,7 +3209,7 @@ Goblin_dr:
 	.db $00, $FF
 
 ;AF81
-;ƒSƒuƒŠƒ“‚ðÁ‚·
+;ã‚´ãƒ–ãƒªãƒ³ã‚’æ¶ˆã™
 EN42:
 EN43:
 	lsr aObjFlags,x
@@ -3227,7 +3227,7 @@ EN43:
 	mJSR_NORTS Goblin_ChangePalette
 
 ;AFA1
-;ƒSƒuƒŠƒ“‚ÌŠp
+;ã‚´ãƒ–ãƒªãƒ³ã®è§’
 EN44:
 	lda aObjVar,x
 	bne .wait
@@ -3259,7 +3259,7 @@ EN44:
 	mJSR_NORTS MoveEnemy
 
 ;AFE0
-;ƒvƒ`ƒSƒuƒŠƒ“
+;ãƒ—ãƒã‚´ãƒ–ãƒªãƒ³
 EN45:
 	lda aEnemyVar,x
 	cmp #$02
@@ -3289,7 +3289,7 @@ EN45:
 	mJSR_NORTS MoveEnemy
 
 ;B01B
-;ƒXƒvƒŠƒ“ƒK[
+;ã‚¹ãƒ—ãƒªãƒ³ã‚¬ãƒ¼
 EN46:
 	lda aEnemyVar,x
 	beq .do
@@ -3398,7 +3398,7 @@ EN46:
 	.db $00, $FF
 
 ;B0FA
-;ƒ‚[ƒ‹¶¬Ší
+;ãƒ¢ãƒ¼ãƒ«ç”Ÿæˆå™¨
 EN47:
 	lda aObjVXlo,x
 	bne .do
@@ -3465,7 +3465,7 @@ EN47:
 	.db $10, $D0, $10, $D0, $10, $D0
 
 ;B18A
-;ƒ‚[ƒ‹ã
+;ãƒ¢ãƒ¼ãƒ«ä¸Š
 EN48:
 	lda #$00
 	sta <$01
@@ -3475,7 +3475,7 @@ EN48:
 	jmp EN49_Do
 
 ;B197
-;ƒ‚[ƒ‹‰º
+;ãƒ¢ãƒ¼ãƒ«ä¸‹
 EN49:
 	lda #$04
 	sta <$01
@@ -3536,14 +3536,14 @@ EN49_Do:
 	.db $FF, $FF
 
 ;B20B
-;ƒ‚[ƒ‹¶¬Šííœ
+;ãƒ¢ãƒ¼ãƒ«ç”Ÿæˆå™¨å‰Šé™¤
 EN4A:
 	lda #$47
 	sta <$00
 	jmp EN05_DeleteObjects
 
 ;B212
-;ƒVƒ‡ƒbƒgƒ}ƒ“¶‰E
+;ã‚·ãƒ§ãƒƒãƒˆãƒžãƒ³å·¦å³
 EN4B:
 EN4C:
 	lda aEnemyVar,x
@@ -3638,18 +3638,18 @@ EN4C:
 	ldx <zObjIndex
 	rts
 ;B2DC
-;ƒVƒ‡ƒbƒgƒ}ƒ“‚ÌŽËŒ‚ƒf[ƒ^
-;—”‚ÆAND‰‰ŽZA‚»‚ÌŒã‚É‘«‚·’lAŠ„‚é’l‰ºˆÊAc‘¬“x‰ºˆÊAc‘¬“xãˆÊAc‚ÌˆÊ’u•â³
-;‰E‚ÌˆÊ’u•â³‰ºˆÊãˆÊA¶‚ÌˆÊ’u•â³
+;ã‚·ãƒ§ãƒƒãƒˆãƒžãƒ³ã®å°„æ’ƒãƒ‡ãƒ¼ã‚¿
+;ä¹±æ•°ã¨ANDæ¼”ç®—ã€ãã®å¾Œã«è¶³ã™å€¤ã€å‰²ã‚‹å€¤ä¸‹ä½ã€ç¸¦é€Ÿåº¦ä¸‹ä½ã€ç¸¦é€Ÿåº¦ä¸Šä½ã€ç¸¦ã®ä½ç½®è£œæ­£
+;å³ã®ä½ç½®è£œæ­£ä¸‹ä½ä¸Šä½ã€å·¦ã®ä½ç½®è£œæ­£
 .table_shotman1
 	.db $23, $18, $30, $E6, $04, $0C, $0C, $00, $F4, $FF
 ;B2E6
-;X = $01 = #$0A‚ÌŽž
+;X = $01 = #$0Aã®æ™‚
 .table_shotman2
 	.db $1F, $60, $18, $D4, $02, $00, $08, $00, $F8, $FF
 
 ;B2F0
-;ƒXƒiƒCƒp[ƒA[ƒ}[
+;ã‚¹ãƒŠã‚¤ãƒ‘ãƒ¼ã‚¢ãƒ¼ãƒžãƒ¼
 EN4E:
 	lda aEnemyVar,x
 	bne .1
@@ -3771,7 +3771,7 @@ EN4E:
 	jmp .destroyed
 .rts2
 	rts
-.destroyed ;”j‰óŽž‚Ìˆ—
+.destroyed ;ç ´å£Šæ™‚ã®å‡¦ç†
 	lda aObjLife,x
 	bne .rts2
 	lda #$4F
@@ -3790,7 +3790,7 @@ EN4E:
 	.db $06, $07, $07, $07, $07
 
 ;B421
-;ƒXƒiƒCƒp[ƒWƒ‡[
+;ã‚¹ãƒŠã‚¤ãƒ‘ãƒ¼ã‚¸ãƒ§ãƒ¼
 EN4F:
 	jsr FaceTowards
 	lda #$00
@@ -3843,7 +3843,7 @@ EN4F:
 	mJSR_NORTS MoveEnemy
 
 ;B496
-;ƒXƒNƒ[ƒ€¶¬Ší
+;ã‚¹ã‚¯ãƒ¯ãƒ¼ãƒ ç”Ÿæˆå™¨
 EN50:
 	lda aObjVar,x
 	bne .wait
@@ -3872,7 +3872,7 @@ EN50:
 	mJSR_NORTS CheckOffscreenEnemy
 
 ;B4D0
-;ƒXƒNƒ[ƒ€
+;ã‚¹ã‚¯ãƒ¯ãƒ¼ãƒ 
 EN51:
 	lda aEnemyVar,x
 	bne .1
@@ -3944,7 +3944,7 @@ EN51:
 	mJSR_NORTS CheckOffscreenEnemy
 
 ;B55C
-;ƒvƒŒƒX‚Ì½”»’è
+;ãƒ—ãƒ¬ã‚¹ã®éŽ–åˆ¤å®š
 EN52:
 	dec aObjVar,x
 	beq .del
@@ -3954,21 +3954,21 @@ EN52:
 	rts
 
 ;B569
-;ƒu[ƒ“ƒuƒƒbƒN#1
+;ãƒ–ãƒ¼ãƒ³ãƒ–ãƒ­ãƒƒã‚¯#1
 EN53:
 	lda #$7D
 	bne EN53_55_Begin
 ;B56D
-;ƒu[ƒ“ƒuƒƒbƒN#2
+;ãƒ–ãƒ¼ãƒ³ãƒ–ãƒ­ãƒƒã‚¯#2
 EN54:
 	lda #$BB
 	bne EN53_55_Begin
 ;B571
-;ƒu[ƒ“ƒuƒƒbƒN#3
+;ãƒ–ãƒ¼ãƒ³ãƒ–ãƒ­ãƒƒã‚¯#3
 EN55:
 	lda #$FA
 ;B573
-;ƒu[ƒ“ƒuƒƒbƒN‹¤—L•”•ª
+;ãƒ–ãƒ¼ãƒ³ãƒ–ãƒ­ãƒƒã‚¯å…±æœ‰éƒ¨åˆ†
 EN53_55_Begin:
 .waittimer = $160
 	sta <$00
@@ -3981,7 +3981,7 @@ EN53_55_Begin:
 .initialized
 	cmp #$01
 	bne .boom
-;Á‚¦‚Ä‚¢‚éŽž
+;æ¶ˆãˆã¦ã„ã‚‹æ™‚
 	lda .waittimer,x
 	bne .wait
 	lda #%10010000
@@ -3994,7 +3994,7 @@ EN53_55_Begin:
 	sta aObjWait,x
 	sta aObjFrame,x
 	beq .wait
-;Œ»‚ê‚½Žž
+;ç¾ã‚ŒãŸæ™‚
 .boom
 	lda aObjFrame,x
 	cmp #$05
@@ -4022,7 +4022,7 @@ EN53_55_Begin:
 	mJSR_NORTS CheckOffscreenEnemy
 
 ;B5E5
-;ƒpƒŒƒbƒg•ÏXEƒNƒ‰ƒbƒVƒ…ƒ}ƒ“ƒXƒe[ƒW
+;ãƒ‘ãƒ¬ãƒƒãƒˆå¤‰æ›´ãƒ»ã‚¯ãƒ©ãƒƒã‚·ãƒ¥ãƒžãƒ³ã‚¹ãƒ†ãƒ¼ã‚¸
 EN56:
 	lda <zStage
 	cmp #$0C
@@ -4144,7 +4144,7 @@ EN58:
 	.db $00, $00, $00, $00, $01
 
 ;B6E3
-;“GƒNƒCƒbƒNƒu[ƒƒ‰ƒ“
+;æ•µã‚¯ã‚¤ãƒƒã‚¯ãƒ–ãƒ¼ãƒ¡ãƒ©ãƒ³
 EN59:
 	lda aEnemyVar,x
 	bne .1
@@ -4174,7 +4174,7 @@ EN59:
 	mJSR_NORTS MoveEnemy
 
 ;B720
-;“Gƒoƒuƒ‹ƒŠ[ƒh
+;æ•µãƒãƒ–ãƒ«ãƒªãƒ¼ãƒ‰
 EN5B:
 	lda aObjVY,x
 	php
@@ -4205,7 +4205,7 @@ EN5B:
 	mJSR_NORTS MoveEnemy
 
 ;B74B
-;“GƒGƒA[ƒVƒ…[ƒ^[
+;æ•µã‚¨ã‚¢ãƒ¼ã‚·ãƒ¥ãƒ¼ã‚¿ãƒ¼
 EN5D:
 	lda aObjVar,x
 	beq .move
@@ -4220,11 +4220,11 @@ EN5D:
 	mJSR_NORTS MoveEnemy
 
 ;B767
-;“GƒNƒ‰ƒbƒVƒ…ƒ{ƒ€
+;æ•µã‚¯ãƒ©ãƒƒã‚·ãƒ¥ãƒœãƒ 
 EN5E:
 	lda aObjVar,x
 	bne .deployed
-;”òãÄ’†
+;é£›ç¿”ä¸­
 	lda #$00
 	sta aObjFrame,x
 	sta aObjWait,x
@@ -4248,18 +4248,18 @@ EN5E:
 	sta aEnemyVar,x
 	inc aObjVar,x
 	bne .move
-;Ý’uŒã‚Ìˆ—ŠJŽnˆÊ’u
+;è¨­ç½®å¾Œã®å‡¦ç†é–‹å§‹ä½ç½®
 .deployed
 	cmp #$01
 	bne .explode
-;Ý’u’¼Œã
+;è¨­ç½®ç›´å¾Œ
 	dec aEnemyVar,x
 	bne .move
-;”š”­‚·‚éuŠÔ
+;çˆ†ç™ºã™ã‚‹çž¬é–“
 	inc aObjVar,x
 	lda #$38
 	sta aEnemyVar,x
-;”š”­‚µ‚Ä‚¢‚é
+;çˆ†ç™ºã—ã¦ã„ã‚‹
 .explode
 	lda aEnemyVar,x
 	and #$07
@@ -4271,7 +4271,7 @@ EN5E:
 	sta <$02
 	ldx #$04
 	sta <$01
-;”š”­‹Ê”z’uƒ‹[ƒv
+;çˆ†ç™ºçŽ‰é…ç½®ãƒ«ãƒ¼ãƒ—
 .loop
 	lda #$5F
 	jsr CreateEnemyHere
@@ -4308,7 +4308,7 @@ EN5E:
 	mJSR_NORTS MoveEnemy
 
 ;B818
-;ƒEƒbƒhƒ}ƒ“‚Ì—Ž‚¿‚Ä‚­‚é—t‚Á‚Ï
+;ã‚¦ãƒƒãƒ‰ãƒžãƒ³ã®è½ã¡ã¦ãã‚‹è‘‰ã£ã±
 EN62:
 	lda aObjVar,x
 	bne .do
@@ -4337,7 +4337,7 @@ EN62:
 	mJSR_NORTS MoveEnemy
 
 ;B855
-;ƒƒJƒhƒ‰ƒSƒ“‚Ì‘«ê
+;ãƒ¡ã‚«ãƒ‰ãƒ©ã‚´ãƒ³ã®è¶³å ´
 EN63:
 	lda <zStage
 	cmp #$08
@@ -4370,7 +4370,7 @@ EN63:
 	mJSR_NORTS CheckOffscreenEnemy
 
 ;B891
-;ƒƒJƒhƒ‰ƒSƒ“oŒ»
+;ãƒ¡ã‚«ãƒ‰ãƒ©ã‚´ãƒ³å‡ºç¾
 EN64:
 	lda aObjVar,x
 	bpl .do
@@ -4486,7 +4486,7 @@ EN64:
 	.db $98, $98, $48, $78
 
 ;B97A
-;ƒƒJƒhƒ‰ƒSƒ“‚Ì‰H
+;ãƒ¡ã‚«ãƒ‰ãƒ©ã‚´ãƒ³ã®ç¾½
 EN65:
 	lda aObjVY + 1
 	sta aObjVY,x
@@ -4510,14 +4510,14 @@ EN65_GutsHand:
 	ora #%00100011
 	sta aObjFlags,x
 	rts
-;ƒƒJƒhƒ‰ƒSƒ“‚ÌŽž‚ÆAƒKƒbƒcƒ^ƒ“ƒN‚Ì‰EŽè‚ÌŽž
+;ãƒ¡ã‚«ãƒ‰ãƒ©ã‚´ãƒ³ã®æ™‚ã¨ã€ã‚¬ãƒƒãƒ„ã‚¿ãƒ³ã‚¯ã®å³æ‰‹ã®æ™‚
 .wilyobj
 	lda #%10001011
 	sta aObjFlags,x
 	rts
 
 ;B9B7
-;ƒƒJƒhƒ‰ƒSƒ“‚ÌK”ö
+;ãƒ¡ã‚«ãƒ‰ãƒ©ã‚´ãƒ³ã®å°»å°¾
 EN66:
 	lda #$00
 	sta aObjFrame,x
@@ -4531,7 +4531,7 @@ EN66:
 	jmp EN65
 
 ;B9CE
-;ƒƒJƒhƒ‰ƒSƒ“oŒ»Žž‚Ìc–_
+;ãƒ¡ã‚«ãƒ‰ãƒ©ã‚´ãƒ³å‡ºç¾æ™‚ã®ç¸¦æ£’
 EN67:
 	lda <zStage
 	cmp #$08
@@ -4558,7 +4558,7 @@ EN67:
 	rts
 
 ;B9FE
-;ƒKƒbƒcƒ^ƒ“ƒN‚Ì‰EŽè
+;ã‚¬ãƒƒãƒ„ã‚¿ãƒ³ã‚¯ã®å³æ‰‹
 EN69:
 	lda aObjVar,x
 	bne .goup
@@ -4586,7 +4586,7 @@ EN69:
 	jmp EN65_GutsHand
 
 ;BA32
-;ƒsƒRƒsƒRŒN
+;ãƒ”ã‚³ãƒ”ã‚³å›
 EN6A:
 	lda aObjFrame,x
 	bne .1
@@ -4678,7 +4678,7 @@ EN6A:
 	.db $01, $01, $02, $02
 
 ;BAEF
-;ƒƒCƒŠ[ƒ}ƒVƒ“‚Ì’e
+;ãƒ¯ã‚¤ãƒªãƒ¼ãƒžã‚·ãƒ³ã®å¼¾
 EN6B:
 	lda <zBossBehaviour
 	cmp #$04
@@ -4707,7 +4707,7 @@ EN6B:
 	bne .move
 
 ;BB25
-;ƒu[ƒr[ƒ€ƒgƒ‰ƒbƒv
+;ãƒ–ãƒ¼ãƒ“ãƒ¼ãƒ ãƒˆãƒ©ãƒƒãƒ—
 EN6D:
 	sec
 	lda aObjVXlo,x
@@ -4722,7 +4722,7 @@ EN6D:
 	beq .fire
 	cpy #$3E
 	bcs .loopanim
-;“_–Å
+;ç‚¹æ»…
 	lda aObjFrame,x
 	cmp #$06
 	bne .done
@@ -4772,7 +4772,7 @@ EN6D:
 	rts
 
 ;BB98
-;ƒGƒCƒŠƒAƒ“í‚Ì”wŒi‚Ì”’‹Ê
+;ã‚¨ã‚¤ãƒªã‚¢ãƒ³æˆ¦ã®èƒŒæ™¯ã®ç™½çŽ‰
 EN70:
 	lda #$00
 	sta aObjWait,x
@@ -4786,7 +4786,7 @@ EN70:
 	.db $03, $02
 
 ;BBAD
-;ƒrƒbƒOƒtƒBƒbƒVƒ…
+;ãƒ“ãƒƒã‚°ãƒ•ã‚£ãƒƒã‚·ãƒ¥
 EN71:
 	jsr FaceTowards
 	lda aObjVar,x
@@ -4850,7 +4850,7 @@ EN71:
 	.db $1F, $2E, $7D
 
 ;BC30
-;—n‰ð‰t‚»‚Ì1A‚»‚Ì2
+;æº¶è§£æ¶²ãã®1ã€ãã®2
 EN72:
 EN73:
 	lda aObjVar,x
@@ -4887,7 +4887,7 @@ EN73:
 	mJSR_NORTS CheckOffscreenEnemy
 
 ;BC79
-;—n‰ð‰t‚Ì‚µ‚¸‚­
+;æº¶è§£æ¶²ã®ã—ãšã
 EN74:
 	lda aObjFrame,x
 	beq .do
@@ -4912,7 +4912,7 @@ EN74:
 	.db $3D, $3E
 
 ;BCA9
-;obj75A‘Ì—Í‰ñ•œ‘åA•Ší‰ñ•œ‘åAEŠÊA1UP
+;obj75ã€ä½“åŠ›å›žå¾©å¤§ã€æ­¦å™¨å›žå¾©å¤§ã€Eç¼¶ã€1UP
 EN75:
 EN76:
 EN78:
@@ -4923,14 +4923,14 @@ EN7B:
 	ldy #$08
 	bne Obj_Item_Behaviour
 ;BCB1
-;‘Ì—Í‰ñ•œ¬A•Ší‰ñ•œ¬
+;ä½“åŠ›å›žå¾©å°ã€æ­¦å™¨å›žå¾©å°
 EN77:
 EN79:
 	lda #$03
 	sta <$01
 	ldy #$04
 ;BCB7
-;ƒAƒCƒeƒ€ˆ—‡—¬
+;ã‚¢ã‚¤ãƒ†ãƒ å‡¦ç†åˆæµ
 Obj_Item_Behaviour:
 	lda aObjFlags,x
 	cmp #%10000001
@@ -4975,7 +4975,7 @@ Obj_Item_Behaviour:
 	mJSR_NORTS CheckOffscreenItem
 
 ;BD08
-;ƒeƒŒƒ|[ƒ^[
+;ãƒ†ãƒ¬ãƒãƒ¼ã‚¿ãƒ¼
 EN7C:
 EN7D:
 EN7E:
@@ -4997,6 +4997,6 @@ EN7E:
 	rts
 
 ;BD24
-;‹ó‚«—Ìˆæ
+;ç©ºãé ˜åŸŸ
 EN7F:
 

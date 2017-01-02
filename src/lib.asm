@@ -178,8 +178,8 @@ _selectbossanimhi .macro
 	.db HIGH(Table_SelectBossAnim\7), HIGH(Table_SelectBossAnim\8)
 	.endm
 
-;ƒTƒCƒY‘ª’è
-;‘ª’èn“_‚ÆI“_‚ğlist, mNULL, nolist‚Å‹²‚Ş
-;o‚Ä‚«‚½.lstƒtƒ@ƒCƒ‹‚É‚ ‚éƒAƒhƒŒƒX‚Ì·‚ğ“Ç‚Ş
+;ã‚µã‚¤ã‚ºæ¸¬å®š
+;æ¸¬å®šå§‹ç‚¹ã¨çµ‚ç‚¹ã‚’list, mNULL, nolistã§æŒŸã‚€
+;å‡ºã¦ããŸ.lstãƒ•ã‚¡ã‚¤ãƒ«ã«ã‚ã‚‹ã‚¢ãƒ‰ãƒ¬ã‚¹ã®å·®ã‚’èª­ã‚€
 mNULL .macro
 	.endm

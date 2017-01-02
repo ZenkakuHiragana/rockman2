@@ -1,6 +1,6 @@
 
 ;9EE7
-;ƒ^ƒCƒgƒ‹‰æ–Ê‚Ìˆ—
+;ã‚¿ã‚¤ãƒˆãƒ«ç”»é¢ã®å‡¦ç†
 ;___Bank0D_BeginTitleScreen:
 	mMOV #$10, <z2000, $2000
 	mMOV #$06, <z2001, $2001
@@ -223,7 +223,7 @@ Bank0E_Start:
 	cmp #$A8
 	bne .loop_opening_quotes
 ;A0DF
-;ã¸ŠJn
+;ä¸Šæ˜‡é–‹å§‹
 	mMOV #$02, <zScreenMod
 	mMOV #$F0, <zVScroll
 .loop_goup
@@ -395,7 +395,7 @@ BeginTitleScreenSkipped:
 	jsr FrameAdvance1A
 	jmp .loop_animate_rockman
 ;A244
-;ƒƒbƒg‚ğ”í‚Á‚½ŒãAƒƒbƒNƒ}ƒ“ƒ[ƒv
+;ãƒ¡ãƒƒãƒˆã‚’è¢«ã£ãŸå¾Œã€ãƒ­ãƒƒã‚¯ãƒãƒ³ãƒ¯ãƒ¼ãƒ—
 .beginwarp
 	lda #$0A
 	sta aObjAnim10
@@ -417,7 +417,7 @@ BeginTitleScreenSkipped:
 	jsr FrameAdvance1A
 	jmp .beginwarp
 ;A272
-;ƒtƒF[ƒhƒAƒEƒg‚Ü‚Å‚ÌŠÔ
+;ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆã¾ã§ã®é–“
 .wait_reset
 	jsr Opening_DrawBuildingSprites
 	jsr Titlelogo_ShowSprites
@@ -429,7 +429,7 @@ BeginTitleScreenSkipped:
 	bne .loop_wait_reset
 	jsr DisableScreen1A
 ;A286
-;ƒQ[ƒ€ƒƒjƒ…[‚Ö
+;ã‚²ãƒ¼ãƒ ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã¸
 	lda #$00
 	sta <zScreenMod
 	lda #$0E
@@ -438,7 +438,7 @@ BeginTitleScreenSkipped:
 	beq .notreset
 	rts
 ;A294
-;ƒQ[ƒ€ƒƒjƒ…[
+;ã‚²ãƒ¼ãƒ ãƒ¡ãƒ‹ãƒ¥ãƒ¼
 .notreset
 	lda #$03
 	jsr LoadGraphicsSet
@@ -455,7 +455,7 @@ BeginTitleScreenSkipped:
 	sta <zPtrhi
 	jsr WriteMapAddressOffScreen1A
 	ldx #$00
-;START, PASS WORD‚Ì•¶š‚ğ‘‚­
+;START, PASS WORDã®æ–‡å­—ã‚’æ›¸ã
 .loop_write_word
 	lda Table_Keywords,x
 	sta $2006
@@ -481,7 +481,7 @@ BeginTitleScreenSkipped:
 	sta <$FD
 	sta <zClearFlags
 	sta <zItemFlags
-;‚Ç‚Á‚¿‚©‘I‚Ô‚Ü‚Åƒ‹[ƒv
+;ã©ã£ã¡ã‹é¸ã¶ã¾ã§ãƒ«ãƒ¼ãƒ—
 .loop_wait_selectstage
 	ldx #$03
 .loop_sprite_cursor
@@ -512,23 +512,23 @@ BeginTitleScreenSkipped:
 .wait_selectstage
 	jsr FrameAdvance1A
 	jmp .loop_wait_selectstage
-;‘I‘ğ‚µ‚½($FD = 0‚È‚çƒXƒe[ƒWƒZƒŒƒNƒg‚Ö)
+;é¸æŠã—ãŸ($FD = 0ãªã‚‰ã‚¹ãƒ†ãƒ¼ã‚¸ã‚»ãƒ¬ã‚¯ãƒˆã¸)
 .start_selectstage
 	lda <$FD
 	bne .enterpassword
 	jmp .start_stage_select
 ;A325
-;ƒpƒXƒ[ƒh“ü—Í‰æ–ÊŠJn
+;ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰å…¥åŠ›ç”»é¢é–‹å§‹
 .enterpassword
 	jsr FadeoutPalette_BG2_Spr
 	jsr ClearSprite1A
 	jsr Password_ScrollRight
 	ldx #$2F
-;ƒpƒXƒ[ƒh“ü—Í‰æ–Ê‚ÌA12345, ABCDE, œ‚Æ”š‚Ì•”•ª
-.curwait = $FE ;ƒJ[ƒ\ƒ‹˜A‘±ˆÚ“®‚ÌƒJƒEƒ“ƒ^
-.curptr = $6A0 ;ƒJ[ƒ\ƒ‹ˆÊ’u(x, y) = ($6A0 mod 5, $6A0 / 5)
-.numstones = $680 ;Ô‹Êc‚è”
-.stoneplacement = $420 ;ƒ}ƒX–Ú‚²‚Æ‚ÉÔ‹Ê‚ª’u‚©‚ê‚Ä‚¢‚éƒtƒ‰ƒO
+;ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰å…¥åŠ›ç”»é¢ã®ã€12345, ABCDE, â—ã¨æ•°å­—ã®éƒ¨åˆ†
+.curwait = $FE ;ã‚«ãƒ¼ã‚½ãƒ«é€£ç¶šç§»å‹•ã®ã‚«ã‚¦ãƒ³ã‚¿
+.curptr = $6A0 ;ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®(x, y) = ($6A0 mod 5, $6A0 / 5)
+.numstones = $680 ;èµ¤ç‰æ®‹ã‚Šæ•°
+.stoneplacement = $420 ;ãƒã‚¹ç›®ã”ã¨ã«èµ¤ç‰ãŒç½®ã‹ã‚Œã¦ã„ã‚‹ãƒ•ãƒ©ã‚°
 .loop_spr_password_ui
 	lda Table_Password_UISprites,x
 	sta aSprite,x
@@ -548,7 +548,7 @@ BeginTitleScreenSkipped:
 	sta .numstones
 	lda #$00
 	sta <.curwait
-;ƒpƒXƒ[ƒh“ü—Í‰æ–Ê‚Ìƒ‹[ƒv
+;ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰å…¥åŠ›ç”»é¢ã®ãƒ«ãƒ¼ãƒ—
 .loop_enter_password
 	lda <zKeyPress
 	and #$F0
@@ -565,7 +565,7 @@ BeginTitleScreenSkipped:
 	bcc .cursor_moved
 	lda #$08
 	sta <.curwait
-;ƒJ[ƒ\ƒ‹ˆÚ“®
+;ã‚«ãƒ¼ã‚½ãƒ«ç§»å‹•
 .movecursor
 	mPLAYTRACK #$2F
 	ldx .curptr
@@ -604,7 +604,7 @@ BeginTitleScreenSkipped:
 	ldx .curptr
 	and #$01
 	beq .delstone
-;Ô‹Ê‚ğ’u‚­
+;èµ¤ç‰ã‚’ç½®ã
 	lda .stoneplacement,x
 	bne .done_password
 	mPLAYTRACK #$42
@@ -612,20 +612,20 @@ BeginTitleScreenSkipped:
 	dec .numstones
 	beq .end_placement
 	bne .done_password
-;Ô‹Ê‚ğæ‚é
+;èµ¤ç‰ã‚’å–ã‚‹
 .delstone
 	lda .stoneplacement,x
 	beq .done_password
 	dec .stoneplacement,x
 	inc .numstones
-;ˆ—‡—¬
+;å‡¦ç†åˆæµ
 .done_password
 	jsr Password_DrawCursorStones
 	jsr FrameAdvance1A
 	jmp .loop_enter_password
 
 ;A3E3
-;ƒpƒXƒ[ƒh“ü—ÍI—¹
+;ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰å…¥åŠ›çµ‚äº†
 .end_placement
 .numetanks = $04
 	jsr Password_DrawCursorStones
@@ -648,8 +648,8 @@ BeginTitleScreenSkipped:
 	sta <$01
 	sta <$02
 	sta <$03
-.loop_process_stones      ;Y = #$00`#$13
-	lda .stoneplacement,x ;X = NumETanks + 5 ¨ (#$05`#$09)`#$18
+.loop_process_stones      ;Y = #$00ï½#$13
+	lda .stoneplacement,x ;X = NumETanks + 5 â†’ (#$05ï½#$09)ï½#$18
 	beq .not_placed
 	ldy <$01
 	lda Table_Password_Process1,y
@@ -663,7 +663,7 @@ BeginTitleScreenSkipped:
 	inx
 	cpx #$19
 	bne .isrightdown
-	ldx #$05 ;n“_‚ªB1`B5‚Å•Ï‰»‚·‚é‚Ì‚ÅAE5‚És‚Á‚½‚çB1‚ÉŒü‚©‚¤
+	ldx #$05 ;å§‹ç‚¹ãŒB1ï½B5ã§å¤‰åŒ–ã™ã‚‹ã®ã§ã€E5ã«è¡Œã£ãŸã‚‰B1ã«å‘ã‹ã†
 .isrightdown
 	inc <$01
 	lda <$01

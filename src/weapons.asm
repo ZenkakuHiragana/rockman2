@@ -282,7 +282,7 @@ FireTimeStopper:
 	ldy #$08
 	jsr CreateWeaponObject
 	lda #$01
-	sta aTimeStopper ;--------------------------�ړI���悭������Ȃ��̂ł��ƂŒ��ׂ�
+	sta aTimeStopper ;--------------------------目的がよく分かんないのであとで調べて
 	mPLAYTRACK #$21
 FireTimeStopper_SetThrowPose:
 	lda #$0F
@@ -1333,9 +1333,9 @@ DoItem3:
 	rts
 
 ;E3EA
-;�c���n�`����炵��
-;$01: ������͈�, $02: ������͈� $03: �㔻��͈�
-;$00: �c���茋��, $03: �����茋�� ... �ǂȂ�1, ����0
+;縦横地形判定らしい
+;$01: 横判定範囲, $02: 下判定範囲 $03: 上判定範囲
+;$00: 縦判定結果, $03: 横判定結果 ... 壁なら1, 他は0
 CheckWallXY:
 	lda aObjFlags,x
 	and #%01000000
@@ -1460,7 +1460,7 @@ DoWaterSplash:
 	rts
 
 ;20 E6 E4
-;Obj[x]�������ɉ�ʊO�Ȃ����
+;Obj[x]横方向に画面外なら消す
 CheckOffscreen_Easy:
 	sec
 	lda aObjX,x

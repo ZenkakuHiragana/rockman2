@@ -1,6 +1,6 @@
 
 ;B01A
-;ƒQ[ƒ€ƒI[ƒo[‰æ–Êˆ—ŠJn
+;ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼ç”»é¢å‡¦ç†é–‹å§‹
 ;___Bank0D_BeginGameOver:
 	lda #$03
 	jsr LoadGraphicsSet
@@ -46,7 +46,7 @@
 .start_3
 	jsr FadeinPaletteA896
 	mSTZ <$FD
-;ƒQ[ƒ€ƒI[ƒo[‚ÌŒã‚Ì‘I‘ğˆ3‚Â‚Ìƒ‹[ƒv
+;ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼ã®å¾Œã®é¸æŠè‚¢3ã¤ã®ãƒ«ãƒ¼ãƒ—
 .loop_3
 	lda <zKeyPress
 	and #$3C
@@ -82,7 +82,7 @@
 .hide
 	jsr FrameAdvance1A
 	jmp .loop_3
-;Œˆ’è
+;æ±ºå®šæ™‚
 .decided
 	lda <$FD
 	cmp #$02
@@ -99,33 +99,33 @@
 	rts
 
 ;B0F9
-;GAME OVER‚Ì•¶š—ñ
+;GAME OVERã®æ–‡å­—åˆ—
 Table_GameOverChar:
 	.db $47, $41, $4D, $45, $40, $4F, $56, $45, $52
 
 ;B102
-;GAME OVER‚ÌƒJ[ƒ\ƒ‹ƒXƒvƒ‰ƒCƒgƒf[ƒ^
+;GAME OVERã®ã‚«ãƒ¼ã‚½ãƒ«ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆãƒ‡ãƒ¼ã‚¿
 Table_GameOverCurSprite:
 	.db $F8, $22, $00, $48
 
 ;B106
-;GAME OVERŒã‚ÌƒJ[ƒ\ƒ‹YˆÊ’u3‚Â
+;GAME OVERå¾Œã®ã‚«ãƒ¼ã‚½ãƒ«Yä½ç½®3ã¤
 Table_GameOverCursorY:
 	.db $60, $70, $80
 
 ;B109
-;ƒQ[ƒ€ƒI[ƒo[‚ÌŒãAƒpƒXƒ[ƒh•\¦‚ÌƒJ[ƒ\ƒ‹
+;ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼ã®å¾Œã€ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰è¡¨ç¤ºæ™‚ã®ã‚«ãƒ¼ã‚½ãƒ«
 Table_ShowPasswordCursor:
 	.db $98, $22, $00, $28
 ;B10D
-;ƒQ[ƒ€ƒI[ƒo[‚ÌŒãAƒpƒXƒ[ƒh•\¦‚Ì‰E‚Ì•Ší—“‚ÌƒXƒvƒ‰ƒCƒg
+;ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼ã®å¾Œã€ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰è¡¨ç¤ºæ™‚ã®å³ã®æ­¦å™¨æ¬„ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
 Table_ShowPasswordWeaponSprites:
 	.db $68, $2F, $00, $C8, $88, $1F, $00, $C8, $78, $1B, $00, $C8, $88, $19, $00, $D8
 	.db $68, $1D, $00, $D8, $78, $1C, $00, $D8, $98, $1A, $00, $D8, $98, $1E, $00, $C8
 	.db $A8, $20, $00, $C8, $A8, $25, $00, $D8, $B8, $26, $00, $C8, $B8, $27, $00, $D8
 
 ;B13D
-;ƒQ[ƒ€ƒI[ƒo[‚ÌŒãAƒpƒXƒ[ƒh•\¦
+;ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼ã®å¾Œã€ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰è¡¨ç¤º
 ShowPassword:
 .stones = $420
 	jsr FadeoutPalette_BG2_Spr

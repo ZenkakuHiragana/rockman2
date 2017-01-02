@@ -1,6 +1,6 @@
 
 ;84EE
-;ƒƒbƒNƒ}ƒ“ó‘Ô•Ê‚Ìˆ—
+;ãƒ­ãƒƒã‚¯ãƒžãƒ³çŠ¶æ…‹åˆ¥ã®å‡¦ç†
 ;DoRockman:
 	lda <zStopFlag
 	and #$04
@@ -17,7 +17,7 @@
 	jmp [zPtr]
 
 ;8508
-;ƒƒbƒNƒ}ƒ“ó‘Ô#0ƒƒjƒ…[‚ð•Â‚¶‚½‚Æ‚«‚Ìu‚Ò‚¿‚á‚Áv
+;ãƒ­ãƒƒã‚¯ãƒžãƒ³çŠ¶æ…‹#0ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚’é–‰ã˜ãŸã¨ãã®ã€Œã´ã¡ã‚ƒã£ã€
 DoRockman00_Land:
 	lda aObjFrame
 	cmp #$04
@@ -49,12 +49,12 @@ DoRockman00_Land:
 	rts
 
 ;8545
-;ƒƒbƒNƒ}ƒ“ó‘Ô#1“]—Ž
+;ãƒ­ãƒƒã‚¯ãƒžãƒ³çŠ¶æ…‹#1è»¢è½
 DoRockman01_Fall:
 	rts
 
 ;8546
-;ƒƒbƒNƒ}ƒ“ó‘Ô#2ƒmƒbƒNƒoƒbƒN
+;ãƒ­ãƒƒã‚¯ãƒžãƒ³çŠ¶æ…‹#2ãƒŽãƒƒã‚¯ãƒãƒƒã‚¯
 DoRockman02_KnockBack:
 	lda aObjFlags
 	and #$40
@@ -75,7 +75,7 @@ DoRockman02_KnockBack:
 	rts
 
 ;8569
-;ƒƒbƒNƒ}ƒ“ó‘Ô#3’âŽ~’†
+;ãƒ­ãƒƒã‚¯ãƒžãƒ³çŠ¶æ…‹#3åœæ­¢ä¸­
 DoRockman03_Stand:
 	jsr DoRockman_ShootWeapon
 	lda <zKeyDown
@@ -109,7 +109,7 @@ DoRockman_CheckJump:
 	mJSR_NORTS SetRockmanAnimation
 
 ;85A6
-;ƒƒbƒNƒ}ƒ“ó‘Ô#4•à‚«Žn‚ß
+;ãƒ­ãƒƒã‚¯ãƒžãƒ³çŠ¶æ…‹#4æ­©ãå§‹ã‚
 DoRockman04_StartWalking:
 	jsr DoRockman_ShootWeapon
 	jsr DoRockman_SetDirection
@@ -134,7 +134,7 @@ DoRockman04_StartWalking:
 	jmp DoRockman_CheckJump
 
 ;85D3
-;ƒƒbƒNƒ}ƒ“ó‘Ô#5•às’†
+;ãƒ­ãƒƒã‚¯ãƒžãƒ³çŠ¶æ…‹#5æ­©è¡Œä¸­
 DoRockman05_Walking:
 	jsr DoRockman_ShootWeapon
 	jsr DoRockman_SetDirection
@@ -157,7 +157,7 @@ DoRockman05_Walking_Skip:
 	jmp DoRockman_CheckJump
 
 ;85FB
-;ƒƒbƒNƒ}ƒ“ó‘Ô#6‹ó’†
+;ãƒ­ãƒƒã‚¯ãƒžãƒ³çŠ¶æ…‹#6ç©ºä¸­
 DoRockman06_Jumping:
 	jsr DoRockman_ShootWeapon
 	lda #$00
@@ -233,8 +233,8 @@ DoRockman06_Jumping:
 	mJSR_NORTS SetRockmanAnimation
 
 ;868C
-;ƒƒbƒNƒ}ƒ“ó‘Ô#7•àsI—¹
-;ƒƒbƒNƒ}ƒ“ó‘Ô#8’…’n‚µ‚½uŠÔ
+;ãƒ­ãƒƒã‚¯ãƒžãƒ³çŠ¶æ…‹#7æ­©è¡Œçµ‚äº†
+;ãƒ­ãƒƒã‚¯ãƒžãƒ³çŠ¶æ…‹#8ç€åœ°ã—ãŸçž¬é–“
 DoRockman07_EndWalking:
 DoRockman08_OnLand:
 	jsr DoRockman_ShootWeapon
@@ -262,8 +262,8 @@ DoRockman08_OnLand:
 	jmp DoRockman_CheckJump
 
 ;86BC
-;ƒƒbƒNƒ}ƒ“ó‘Ô#9‚Í‚µ‚²
-;ƒƒbƒNƒ}ƒ“ó‘Ô#A‚Í‚µ‚²“o‚è‚«‚éŽž
+;ãƒ­ãƒƒã‚¯ãƒžãƒ³çŠ¶æ…‹#9ã¯ã—ã”
+;ãƒ­ãƒƒã‚¯ãƒžãƒ³çŠ¶æ…‹#Aã¯ã—ã”ç™»ã‚Šãã‚‹æ™‚
 DoRockman09_Ladder:
 DoRockman0A_LadderTop:
 	lda #$09
@@ -290,7 +290,7 @@ DoRockman0A_LadderTop:
 	lda <zBGLadder
 	and #$0C
 	bne .middle
-	lda aObjY ;“o‚è‚«‚Á‚½ŽžA—§‚¿Žp‚É‚·‚é
+	lda aObjY ;ç™»ã‚Šãã£ãŸæ™‚ã€ç«‹ã¡å§¿ã«ã™ã‚‹
 	and #$F0
 	sec
 	sbc #$0C
@@ -367,7 +367,7 @@ DoRockman0A_LadderTop:
 	jmp .jump
 
 ;8776
-;ƒƒbƒNƒ}ƒ“ó‘Ô#Bƒ[ƒv–_ã¸
+;ãƒ­ãƒƒã‚¯ãƒžãƒ³çŠ¶æ…‹#Bãƒ¯ãƒ¼ãƒ—æ£’ä¸Šæ˜‡
 DoRockman0B_Warp:
 	lda aObjFrame
 	cmp #$03
@@ -378,7 +378,7 @@ DoRockman0B_Warp:
 	rts
 
 ;8783
-;ƒƒbƒNƒ}ƒ“ó‘Ô•Ê‚Ìˆ—ƒAƒhƒŒƒXlo
+;ãƒ­ãƒƒã‚¯ãƒžãƒ³çŠ¶æ…‹åˆ¥ã®å‡¦ç†ã‚¢ãƒ‰ãƒ¬ã‚¹lo
 Table_DoRockmanlo:
 	.db LOW(DoRockman00_Land)
 	.db LOW(DoRockman01_Fall)
@@ -393,7 +393,7 @@ Table_DoRockmanlo:
 	.db LOW(DoRockman0A_LadderTop)
 	.db LOW(DoRockman0B_Warp)
 ;878F
-;ƒƒbƒNƒ}ƒ“ó‘Ô•Ê‚Ìˆ—ƒAƒhƒŒƒXhi
+;ãƒ­ãƒƒã‚¯ãƒžãƒ³çŠ¶æ…‹åˆ¥ã®å‡¦ç†ã‚¢ãƒ‰ãƒ¬ã‚¹hi
 Table_DoRockmanhi:
 	.db HIGH(DoRockman00_Land)
 	.db HIGH(DoRockman01_Fall)
@@ -409,7 +409,7 @@ Table_DoRockmanhi:
 	.db HIGH(DoRockman0B_Warp)
 
 ;879B
-;ƒƒbƒNƒ}ƒ“‚Ì•Ší‚ÌƒVƒ‡ƒbƒgˆ—
+;ãƒ­ãƒƒã‚¯ãƒžãƒ³ã®æ­¦å™¨ã®ã‚·ãƒ§ãƒƒãƒˆå‡¦ç†
 DoRockman_ShootWeapon:
 .x = $2E
 	lda <zKeyDown
@@ -461,7 +461,7 @@ DoRockman_ShootWeapon:
 	jmp DoRockman09_Ladder
 
 ;87F2
-;ƒƒbƒNƒ}ƒ“‚ÌŒü‚«‚ðƒL[“ü—Íó‘Ô‚É‰ž‚¶‚Ä•Ï‚¦‚é
+;ãƒ­ãƒƒã‚¯ãƒžãƒ³ã®å‘ãã‚’ã‚­ãƒ¼å…¥åŠ›çŠ¶æ…‹ã«å¿œã˜ã¦å¤‰ãˆã‚‹
 DoRockman_SetDirection:
 	lda <zKeyDown
 	and #$C0
@@ -478,7 +478,7 @@ DoRockman_SetDirection:
 	rts
 
 ;880D
-;ƒƒbƒNƒ}ƒ“‚Ìó‘Ô–ˆ‚ÉVx‚ðƒZƒbƒg
+;ãƒ­ãƒƒã‚¯ãƒžãƒ³ã®çŠ¶æ…‹æ¯Žã«Vxã‚’ã‚»ãƒƒãƒˆ
 DoRockman_SetVX:
 	ldx <zStatus
 	lda Table_RockmanVXhi,x
@@ -618,21 +618,21 @@ Table_SlipDeceleration:
 	.db $80, $02, $04
 
 ;890C
-;ƒƒbƒNƒ}ƒ“‚Ìó‘Ô–ˆ‚ÌVxhi
+;ãƒ­ãƒƒã‚¯ãƒžãƒ³ã®çŠ¶æ…‹æ¯Žã®Vxhi
 Table_RockmanVXhi:
 	.db $00, $00, $00, $00, $00, $01, $01, $00, $00, $00, $00
 
 ;8917
-;ƒƒbƒNƒ}ƒ“‚Ìó‘Ô–ˆ‚ÌVxlo
+;ãƒ­ãƒƒã‚¯ãƒžãƒ³ã®çŠ¶æ…‹æ¯Žã®Vxlo
 Table_RockmanVXlo:
 	.db $00, $00, $90, $00, $20, $60, $50, $80, $00, $00, $00
 
 ;8922
-;ƒƒbƒNƒ}ƒ“‰¡ˆÚ“®
+;ãƒ­ãƒƒã‚¯ãƒžãƒ³æ¨ªç§»å‹•
 DoRockman_BodyMoveX:
-.r = $2D   ;ˆÚ“®‘O‰æ–Ê”
-.x = $2E   ;ˆÚ“®‘OXãˆÊ
-.xlo = $2F ;ˆÚ“®‘OX‰ºˆÊ
+.r = $2D   ;ç§»å‹•å‰ç”»é¢æ•°
+.x = $2E   ;ç§»å‹•å‰Xä¸Šä½
+.xlo = $2F ;ç§»å‹•å‰Xä¸‹ä½
 	ldx aObjRoom
 	stx <.r
 	ldy aObjX
@@ -644,7 +644,7 @@ DoRockman_BodyMoveX:
 	lda <zMoveVec
 	and #$40
 	beq .left
-;‰E‚ÖˆÚ“®
+;å³ã¸ç§»å‹•
 	cpx <zScrollRight
 	bne .lim_right
 	cpy #$EC
@@ -697,7 +697,7 @@ DoRockman_BodyMoveX:
 	sta <$00
 	jmp .done_left
 ;89AB
-;¶‚ÖˆÚ“®
+;å·¦ã¸ç§»å‹•
 .left
 	cpx <zScrollLeft
 	bne .lim_left
@@ -755,7 +755,7 @@ DoRockman_BodyMoveX:
 	jsr DoRockman_ScrollLeft
 	mJSR_NORTS DoRockman_CheckAttr_Center
 ;8A20
-;ƒƒbƒNƒ}ƒ“‚Ì‰¡ˆÚ“®Žž‚Ì•Ç”»’è
+;ãƒ­ãƒƒã‚¯ãƒžãƒ³ã®æ¨ªç§»å‹•æ™‚ã®å£åˆ¤å®š
 DoRockman_WallCheckX:
 .n = $01
 	lda #$02
@@ -823,7 +823,7 @@ Table_WallCheckX_dr:
 	.db $FF, $FF, $00
 
 ;8A84
-;‚Í‚µ‚²‚â…’†”»’è‚Ì‚½‚ß‚Ì’nŒ`”»’è
+;ã¯ã—ã”ã‚„æ°´ä¸­åˆ¤å®šã®ãŸã‚ã®åœ°å½¢åˆ¤å®š
 DoRockman_CheckAttr_Center:
 	lda aObjX
 	sta <$08
@@ -957,11 +957,11 @@ DoRockman_CheckAttr_Center:
 	rts
 
 ;8B83
-;ƒƒbƒNƒ}ƒ“cˆÚ“®
+;ãƒ­ãƒƒã‚¯ãƒžãƒ³ç¸¦ç§»å‹•
 DoRockman_BodyMoveY:
-.vyhi = $00;c‘¬“x‚Ì•„†
-.y = $2E   ;ˆÚ“®‘OYãˆÊ
-.ylo = $2F ;ˆÚ“®‘OY‰ºˆÊ
+.vyhi = $00;ç¸¦é€Ÿåº¦ã®ç¬¦å·
+.y = $2E   ;ç§»å‹•å‰Yä¸Šä½
+.ylo = $2F ;ç§»å‹•å‰Yä¸‹ä½
 	lda aObjY
 	sta <.y
 	lda aObjYlo
@@ -1004,7 +1004,7 @@ DoRockman_BodyMoveY:
 .skip
 	lda aObjVY
 	bmi DoRockman_BodyMoveY_CheckWallDown
-;•Ç”»’èEã•ûŒü
+;å£åˆ¤å®šãƒ»ä¸Šæ–¹å‘
 	sec
 	lda aObjY
 	sbc #$0C
@@ -1023,7 +1023,7 @@ DoRockman_BodyMoveY:
 	sec
 	adc aObjY
 	sta aObjY
-;•Ç”»’èE‰º•ûŒü‚©‚ç‡—¬ d—Í‰Á‘¬“x‚Ì“K—p‚È‚Ç
+;å£åˆ¤å®šãƒ»ä¸‹æ–¹å‘ã‹ã‚‰åˆæµ é‡åŠ›åŠ é€Ÿåº¦ã®é©ç”¨ãªã©
 DoRockman_BodyMoveY_Done:
 	lda #$00
 	sta aObjVYlo
@@ -1046,7 +1046,7 @@ DoRockman_BodyMoveY_NoHit_up:
 .done_up
 	rts
 ;8C28
-;•Ç”»’èE‰º•ûŒü
+;å£åˆ¤å®šãƒ»ä¸‹æ–¹å‘
 DoRockman_BodyMoveY_CheckWallDown
 	clc
 	lda aObjY
@@ -1083,7 +1083,7 @@ DoRockman_BodyMoveY_CheckWallDown
 	rts
 
 ;8C6A
-;Y•ûŒü‚Ì•Ç”»’è
+;Yæ–¹å‘ã®å£åˆ¤å®š
 DoRockman_WallCheckY:
 .x = $08
 .r = $09
@@ -1173,11 +1173,11 @@ Table_ConveyorFlag:
 	.db $01, $02, $80
 
 ;8CF4
-;ƒAƒCƒeƒ€A“GƒŠƒtƒg‚Ì’…’n”»’è
+;ã‚¢ã‚¤ãƒ†ãƒ ã€æ•µãƒªãƒ•ãƒˆã®ç€åœ°åˆ¤å®š
 DoRockman_CheckLift:
 .x = $08
 .y = $09
-.yprev = $2E ;ˆÚ“®‘OYãˆÊ
+.yprev = $2E ;ç§»å‹•å‰Yä¸Šä½
 	sec
 	lda aObjX
 	sbc <zHScroll
@@ -1197,7 +1197,7 @@ DoRockman_CheckLift:
 	dex
 	bpl .loop_item
 ;8D13
-;“GƒŠƒtƒg”»’è‚Ìƒ‹[ƒvŠJŽn
+;æ•µãƒªãƒ•ãƒˆåˆ¤å®šã®ãƒ«ãƒ¼ãƒ—é–‹å§‹
 .enemylift_begin
 	ldx #$0F
 .loop_enemy
@@ -1209,7 +1209,7 @@ DoRockman_CheckLift:
 	clc
 	rts
 ;8D1F
-;“GƒŠƒtƒg”»’èŠJŽn
+;æ•µãƒªãƒ•ãƒˆåˆ¤å®šé–‹å§‹
 .enemylift
 	lda <zOffscreen
 	bne .done_enemy
@@ -1234,11 +1234,11 @@ DoRockman_CheckLift:
 	bcs .done_enemy
 .cont_enemy
 	lda aObjAnim10,x
-	cmp #$13 ;—Ž‰ºƒuƒƒbƒN‚È‚ç
+	cmp #$13 ;è½ä¸‹ãƒ–ãƒ­ãƒƒã‚¯ãªã‚‰
 	bne .droplift
 	inc aObjVar10,x
 .droplift
-;YˆÊ’u‚ð’²®A’…’n‚³‚¹‚é
+;Yä½ç½®ã‚’èª¿æ•´ã€ç€åœ°ã•ã›ã‚‹
 	sec
 	lda aPlatformY10,x
 	sbc #$0C
@@ -1263,7 +1263,7 @@ DoRockman_CheckLift:
 	sec
 	rts
 ;8D86
-;ƒAƒCƒeƒ€Œn‘«ê”»’èŠJŽn
+;ã‚¢ã‚¤ãƒ†ãƒ ç³»è¶³å ´åˆ¤å®šé–‹å§‹
 .itemlift
 	lda <zOffscreen
 	bne .skip_item
@@ -1294,7 +1294,7 @@ DoRockman_CheckLift:
 	ora #$80
 	sta aObjVar + 2,x
 .item3
-;YˆÊ’u‚ð’²®A’…’n‚³‚¹‚é
+;Yä½ç½®ã‚’èª¿æ•´ã€ç€åœ°ã•ã›ã‚‹
 	sec
 	lda aWeaponPlatformY,x
 	sbc #$0C
@@ -1322,10 +1322,10 @@ DoRockman_CheckLift:
 	jmp .done_item
 
 ;8DF5
-;ƒƒbƒNƒ}ƒ“‚Ì‰E•ûŒüƒXƒNƒ[ƒ‹ˆ—
+;ãƒ­ãƒƒã‚¯ãƒžãƒ³ã®å³æ–¹å‘ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«å‡¦ç†
 DoRockman_ScrollRight:
-.d = $00 ;ƒXƒNƒ[ƒ‹—Ê
-.bg = $01;BGƒ^ƒCƒ‹‘‚«ž‚Ý–‡”
+.d = $00 ;ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«é‡
+.bg = $01;BGã‚¿ã‚¤ãƒ«æ›¸ãè¾¼ã¿æžšæ•°
 	sec
 	lda aObjX
 	sbc <zHScroll
@@ -1393,7 +1393,7 @@ DoRockman_ScrollRight:
 	rts
 
 ;8E65
-;ƒƒbƒNƒ}ƒ“‚Ì¶•ûŒüƒXƒNƒ[ƒ‹ˆ—
+;ãƒ­ãƒƒã‚¯ãƒžãƒ³ã®å·¦æ–¹å‘ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«å‡¦ç†
 DoRockman_ScrollLeft:
 .d = $00
 .bg = $01
