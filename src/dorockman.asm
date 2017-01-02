@@ -158,12 +158,8 @@ DoRockman06_Jumping:
 	lda <zKeyDown
 	and #$C0
 	bne .move
-	lda <zSliplo
-	ora <zSliphi
-	bne .slip
-	lda <zWindFlag
-	and #$0F
-	beq .nowind
+	lda <zWindFlag ;空中で滑るフラグは常にOFF？
+	beq .slip
 	jsr DoRockman_SetVX_WithoutSlip
 	jmp .nowind
 .slip
@@ -172,17 +168,14 @@ DoRockman06_Jumping:
 	sbc #$80
 	sta <zSliplo
 	tax
-	lda <zSliphi
-	sbc #$00
-	sta <zSliphi
+	bcs .nowind
+	dec <zSliphi
 	bmi .overflow
 	bne .nowind
-	cpx #$80
-	bcs .nowind
+	dex
+	bmi .nowind
 .overflow
-	lda #$00
-	sta <zSliplo
-	sta <zSliphi
+	mSTZ <zSliplo, <zSliphi
 	beq .nowind
 .move
 	jsr DoRockman_SetDirection
@@ -190,26 +183,25 @@ DoRockman06_Jumping:
 .nowind
 	jsr DoRockman_BodyMoveX
 	lda aObjVY
-	bmi .fall
+	pha
 	jsr DoRockman_BodyMoveY
+	pla
+	bmi .fall
 	lda <$00
 	bne .done
 	lda <zKeyDown
-	and #$01
-	bne .done
+	lsr a
+	bcs .done
 	lda aObjVY
+	sbc #$01
 	bmi .done
-	cmp #$01
-	bcc .done
-	beq .done
-	lda #$01
-	sta aObjVY
-	lda #$00
-	sta aObjVYlo
+	ldy #$01
+	sty aObjVY
+	dey
+	sty aObjVYlo
 .done
 	rts
 .fall
-	jsr DoRockman_BodyMoveY
 	lda <$00
 	beq .done_fall
 	mPLAYTRACK #$29
@@ -332,10 +324,10 @@ DoRockman0A_LadderTop:
 ;8776
 ;ロックマン状態#Bワープ棒上昇
 DoRockman0B_Warp:
+	sec
 	lda aObjFrame
-	cmp #$03
+	sbc #$03
 	bne .skip
-	lda #$00
 	sta aObjWait
 .skip
 	rts
@@ -378,12 +370,12 @@ DoRockman_ShootWeapon:
 	lda <zKeyDown
 	and #$02
 	bne .shoot
-	lda #$00
-	sta <zAutoFireTimer
-	beq .noladder
+	mSTZ <zAutoFireTimer
+	beq .dontshoot
 .shoot
 	jsr FireWeapon
-.noladder
+.dontshoot
+;はしごに掴まる判定
 	lda <zBGLadder
 	bne .ladder
 .rts
@@ -393,9 +385,9 @@ DoRockman_ShootWeapon:
 	and #$30
 	beq .rts
 	ora <zBGLadder
-	cmp #$11
+	cmp #%00010001
 	beq .rts
-	cmp #$2E
+	cmp #%00101110
 	beq .rts
 	lda aObjX
 	sta <.x
@@ -415,9 +407,10 @@ DoRockman_ShootWeapon:
 	sta <$00
 	jsr DoRockman_ScrollLeft
 .jump
-	lda aObjFlags
-	eor #%01000000
-	sta aObjFlags
+;掴んだ時、向きを反転。これいる？
+;	lda aObjFlags
+;	eor #%01000000
+;	sta aObjFlags
 	jsr SetRockmanAnimation
 	pla
 	pla
@@ -444,20 +437,21 @@ DoRockman_SetDirection:
 ;ロックマンの状態毎にVxをセット
 DoRockman_SetVX:
 	ldx <zStatus
-	lda Table_RockmanVXhi,x
-	sta aObjVX
-	lda Table_RockmanVXlo,x
-	sta aObjVXlo
+	cpx #$06
+	beq .skip_throwstop
 	lda <zShootPose
 	cmp #$03
-	bne .throw
-	lda <zStatus
-	cmp #$06
-	beq .throw
+	bne .skip_throwstop
 	lda #$00
-	sta aObjVXlo
+	ldy #$00
+	beq .write
+.skip_throwstop
+	lda Table_RockmanVXhi,x
+	ldy Table_RockmanVXlo,x
+.write
 	sta aObjVX
-.throw
+	sty aObjVXlo
+;風や滑りの補正
 	lda <zWindFlag
 	bmi .slip
 	lda <zSliplo
