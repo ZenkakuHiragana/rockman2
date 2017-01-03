@@ -16,7 +16,6 @@
 
 ;アニメーションのポインタの修正
 ;F900
-	.bank $1E
 	.org Table_AnimationPointerEnemy_Low + $4D
 	.db LOW(en35)
 	.org Table_AnimationPointerEnemy_Low + $52
