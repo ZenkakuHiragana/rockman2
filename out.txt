@@ -1,4 +1,2 @@
-NES Assembler (v2.51+autozp beta3)
-
 pass 1
 pass 2

@@ -1,6 +1,6 @@
 
 ;F900
-	mBEGINRAW #$1E, Table_AnimationPointer_Low
+	.org Table_AnimationPointer_Low
 	.db LOW(anim00), LOW(anim01), LOW(anim02), LOW(anim03)
 	.db LOW(anim04), LOW(anim05), LOW(anim06), LOW(anim07)
 	.db LOW(anim08), LOW(anim09), LOW(anim0A), LOW(anim0B)
@@ -34,7 +34,7 @@
 	.db LOW(anim78), LOW(anim79), LOW(anim7A), LOW(anim7B)
 	.db LOW(anim7C), LOW(anim7D), LOW(anim7E), LOW(anim7F)
 ;F980
-	mBEGINRAW #$1E, Table_AnimationPointerEnemy_Low
+	.org Table_AnimationPointerEnemy_Low
 	.db LOW(en00), LOW(en01), LOW(en02), LOW(en03)
 	.db LOW(en04), LOW(en05), LOW(en06), LOW(en07)
 	.db LOW(en08), LOW(en09), LOW(en0A), LOW(en0B)
@@ -69,7 +69,7 @@
 	.db LOW(en7C), LOW(en7D), LOW(en7E), LOW(en7F)
 
 ;FA00
-	mBEGINRAW #$1E, Table_AnimationPointer_High
+	.org Table_AnimationPointer_High
 	.db HIGH(anim00), HIGH(anim01), HIGH(anim02), HIGH(anim03)
 	.db HIGH(anim04), HIGH(anim05), HIGH(anim06), HIGH(anim07)
 	.db HIGH(anim08), HIGH(anim09), HIGH(anim0A), HIGH(anim0B)
@@ -103,7 +103,7 @@
 	.db HIGH(anim78), HIGH(anim79), HIGH(anim7A), HIGH(anim7B)
 	.db HIGH(anim7C), HIGH(anim7D), HIGH(anim7E), HIGH(anim7F)
 ;FA80
-	mBEGINRAW #$1E, Table_AnimationPointerEnemy_High
+	.org Table_AnimationPointerEnemy_High
 	.db HIGH(en00), HIGH(en01), HIGH(en02), HIGH(en03)
 	.db HIGH(en04), HIGH(en05), HIGH(en06), HIGH(en07)
 	.db HIGH(en08), HIGH(en09), HIGH(en0A), HIGH(en0B)
@@ -176,7 +176,7 @@ en\8:
 	.endm
 
 ;FB00
-	mBEGINRAW #$1E, Table_AnimationData_Start
+	.org Table_AnimationData_Start
 	inc_anim 00, 01, 02, 03, 04, 05, 06, 07
 	inc_anim 08, 09, 0A, 0B, 0C, 0D, 0E, 0F
 	inc_anim 10, 11, 12, 13, 14, 15, 16, 17

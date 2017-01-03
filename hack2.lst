@@ -1,0 +1,15 @@
+#[1]   hack2.asm
+  248  1E:D8FE            Table_ObjectInitialVY:
+  249  1E:D8FE                    .incbin "src/bin/obj/InitialVY.bin"
+#[2]   src/bank0F.asm
+#[3]   src/weapons.asm
+#[2]   src/bank0F.asm
+#[3]   src/damageinfo.asm
+#[2]   src/bank0F.asm
+#[3]   src/obj/behaviour_stopping.asm
+#[2]   src/bank0F.asm
+#[3]   src/animations.asm
+#[2]   src/bank0F.asm
+#[1]   hack2.asm
+#[2]   src/patch.asm
+#[1]   hack2.asm

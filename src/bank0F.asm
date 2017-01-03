@@ -2592,12 +2592,12 @@ Reset_JMP:
 
 	.include "src/animations.asm"
 
-	mBEGINRAW #$1E, Reset_Start
+	.org Reset_Start
 	sei
 	inc $FFE1
 	jmp Reset_JMP
 	
-	mBEGINRAW #$1E, NMI_VECTOR
+	.org NMI_VECTOR
 	.dw NMI_Start
 	.dw Reset_Start
 	.dw Reset_Start
