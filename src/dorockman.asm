@@ -1,6 +1,7 @@
 
 ;ロックマンの処理を最適化して空き領域を得る
 ;移動処理とスクロール処理は分離
+;TODO: スクロール時のネームテーブル書き込み予約処理を書く
 
 ;$440～$44F: YYYY XXXX
 ;Y = Y screen(0～F)
@@ -25,8 +26,7 @@
 	tay
 	pla
 	tax
-	rts
-	;jmp DoRockman_DoScroll
+	jmp DoRockman_DoScroll
 
 ;8508
 ;ロックマン状態#0メニューを閉じたときの「ぴちゃっ」
@@ -402,24 +402,6 @@ DoRockman_ShootWeapon:
 	beq .rts
 	cmp #%00101110
 	beq .rts
-	lda aObjX
-	sta <.x
-	and #$F0
-	ora #$08
-	sec
-	sta aObjX
-	sbc <.x
-	bcc .right
-	sta <$00
-	jsr DoRockman_ScrollRight
-	jmp .jump
-.right
-	eor #$FF
-	clc
-	adc #$01
-	sta <$00
-	jsr DoRockman_ScrollLeft
-.jump
 ;掴んだ時、向きを反転。これいる？
 ;	lda aObjFlags
 ;	eor #%01000000
@@ -680,9 +662,8 @@ DoRockman_BodyMoveX:
 ;8A20
 ;ロックマンの横移動時の壁判定
 DoRockman_WallCheckX:
-.n = $02
+.n = $01
 .blk = $10
-	and #$0F
 	sta <$09
 	lda #$02
 	sta <.n
@@ -710,27 +691,26 @@ DoRockman_WallCheckX:
 	jsr PickupBlock
 	ldx <.n
 	mMOV <$00, <zBGAttr,x
-	mMOV <$01, <.blk,x
 	dec <.n
 	bpl .loop
 	mSTZ <$00
 	ldx #$02
 .loop2
-	ldy <zBGAttr,x
-	lda Table_WallCheck_Attr,y
-	bpl .notshutter
+	lda <zBGAttr,x
+	cmp #$0F
+	bne .notshutter
 	ldy #$02
 	sty <zScrollFlag
 	bne .continue
 .notshutter
-	cmp #$03
+	cmp #$09
 	bne .continue
 	ldy <zInvincible
 	bne .continue
-	lda #$00
-	sta <zStatus
+	mSTZ <zStatus
 	jmp DieRockman
 .continue
+	and #$08
 	ora <$00
 	sta <$00
 	dex
@@ -740,8 +720,8 @@ DoRockman_WallCheckX:
 Table_Gravity:
 	.db $40, $1E
 ;8A6F
-Table_WaterLevel:
-	.db $00, $04
+;Table_WaterLevel:
+;	.db $00, $04
 ;8A71
 Table_JumpPowerhi:
 	.db $04, $05
@@ -750,8 +730,8 @@ Table_JumpPowerlo:
 	.db $DF, $80
 
 ;8A75
-Table_WallCheck_Attr:
-	.db $00, $01, $00, $03, $00, $01, $01, $01, $81
+;Table_WallCheck_Attr:
+;	.db $00, $01, $00, $03, $00, $01, $01, $01, $81
 ;8A7E
 Table_WallCheckX_dy:
 	.db $F4, $FC, $0B
@@ -762,27 +742,37 @@ Table_WallCheckX_dr:
 ;8A84
 ;はしごや水中判定のための地形判定
 DoRockman_CheckAttr_Center:
-	lda aObjX
-	sta <$08
+	mMOV aObjX, <$08
 	lda aObjRoom
 	sta <$09
-	lda #$02
-	sta <$01
+	mMOV #$02, <$01
 .loop
 	ldx <$01
 	clc
 	lda aObjY
 	adc Table_WallCheckX_dy,x
 	sta <$0A
-	lda <zOffscreen
+	lda <$09
+	php
+	lsr a
+	lsr a
+	lsr a
+	lsr a
+	plp
 	adc Table_WallCheckX_dr,x
-	sta <$0B
+	asl a
+	asl a
+	asl a
+	asl a
+	ora <$09
+	sta <$09
 	jsr PickupMap
 	ldx <$01
 	lda <$00
 	sta <zBGAttr,x
 	dec <$01
 	bpl .loop
+	
 	ldx #$00
 	lda <zBossBehaviour
 	beq .notboss
@@ -791,7 +781,7 @@ DoRockman_CheckAttr_Center:
 	beq .water
 .notboss
 	lda <zBGAttr2
-	cmp #$04
+	cmp #$01
 	bne .air
 	lda <zWaterLevel
 	bne .water
@@ -816,8 +806,7 @@ DoRockman_CheckAttr_Center:
 	beq .createbubble
 	cmp #$80
 	bcc .skip
-	lda #$00
-	sta <zBubbleCounter
+	mSTZ <zBubbleCounter
 .createbubble
 	lda <zOffscreen
 	bne .skip
@@ -829,23 +818,16 @@ DoRockman_CheckAttr_Center:
 	and #%11110000
 	sta aObjFlags10,y
 .skip
-	ldx #$00
-	inx
+	ldx #$01
 .air
-	lda Table_Gravity,x
-	sta <zGravity
-	lda Table_WaterLevel,x
-	sta <zWaterLevel
-	lda Table_JumpPowerhi,x
-	sta <zJumpPowerhi
-	lda Table_JumpPowerlo,x
-	sta <zJumpPowerlo
-	lda #$00
-	sta <zBGLadder
-	lda #$02
-	sta <$01
+	mMOV Table_Gravity,x, <zGravity
+	stx <zWaterLevel
+	mMOV Table_JumpPowerhi,x, <zJumpPowerhi
+	mMOV Table_JumpPowerlo,x, <zJumpPowerlo
+	mSTZ <zBGLadder
+	mMOV #$02, <$01
 	ldx #$02
-.loop2
+.loopladder
 	lda <zBGAttr,x
 	cmp #$02
 	bne .notladder
@@ -855,7 +837,8 @@ DoRockman_CheckAttr_Center:
 .notladder
 	asl <$01
 	dex
-	bpl .loop2
+	bpl .loopladder
+	
 	sec
 	lda aObjYlo
 	sbc aObjVYlo
@@ -866,17 +849,36 @@ DoRockman_CheckAttr_Center:
 	sec
 	sbc #$0C
 	sta <$0A
-	lda <zOffscreen
+	lda <$09
+	and #$F0
+	php
+	lsr a
+	lsr a
+	lsr a
+	lsr a
+	plp
 	sbc #$00
 	jmp .jump
 .fall
 	clc
 	adc #$0C
 	sta <$0A
-	lda <zOffscreen
+	lda <$09
+	and #$F0
+	php
+	lsr a
+	lsr a
+	lsr a
+	lsr a
+	plp
 	adc #$00
 .jump
-	sta <$0B
+	asl a
+	asl a
+	asl a
+	asl a
+	ora <$09
+	sta <$09
 	jsr PickupMap
 	lda <$00
 	cmp #$02
@@ -892,19 +894,25 @@ DoRockman_CheckAttr_Center:
 	sta <zBGLadder
 .done
 	rts
-
+	
 ;8B83
 ;ロックマン縦移動
 DoRockman_BodyMoveY:
-.vyhi = $00;縦速度の符号
-.y = $2E   ;移動前Y上位
-.ylo = $2F ;移動前Y下位
-	lda aObjY
-	sta <.y
-	lda aObjYlo
-	sta <.ylo
-	lda #$00
-	sta <.vyhi
+.r = $00 ;縦の画面数
+.vyhi = $00 ;画面単位縦速度の符号
+;.y = $2E   ;移動前Y上位
+;.ylo = $2F ;移動前Y下位
+;	lda aObjY
+;	sta <.y
+;	lda aObjYlo
+;	sta <.ylo
+	mSTZ <.vyhi
+	lda aObjRoom
+	lsr a
+	lsr a
+	lsr a
+	lsr a
+	sta <.r
 	lda aObjVY
 	bpl .up
 	dec <.vyhi
@@ -917,28 +925,9 @@ DoRockman_BodyMoveY:
 	sbc aObjVY
 	sta aObjY
 	tax
-	lda <zOffscreen
+	lda <.r
 	sbc <.vyhi
-	sta <zOffscreen
-	cpx #$04
-	bcs .godown
-	lda <zStatus
-	cmp #$09
-	beq .scrollup
-	cmp #$0A
-	bne .skip
-.scrollup
-	lda #$01
-	sta <zScrollFlag
-	bne .skip
-.godown
-	cpx #$E8
-	bcc .skip
-	lda <zOffscreen
-	bmi .skip
-	lda #$03
-	sta <zScrollFlag
-.skip
+	sta <.r
 	lda aObjVY
 	bmi DoRockman_BodyMoveY_CheckWallDown
 ;壁判定・上方向
@@ -946,26 +935,28 @@ DoRockman_BodyMoveY:
 	lda aObjY
 	sbc #$0C
 	sta <$0A
-	lda <zOffscreen
+	lda <.r
 	sbc #$00
-	sta <$0B
 	jsr DoRockman_WallCheckY
 	lda <$00
-	beq DoRockman_BodyMoveY_NoHit_up
-	lda #$00
-	sta aObjYlo
+	beq DoRockman_BodyMoveY_NoHit
+	mSTZ aObjYlo
 	lda <$0A
 	and #$0F
 	eor #$0F
 	sec
 	adc aObjY
 	sta aObjY
+	bcc DoRockman_BodyMoveY_Done
+	lda <$09
+	adc #$0F
+	sta <.r
+	
 ;壁判定・下方向から合流 重力加速度の適用など
 DoRockman_BodyMoveY_Done:
-	lda #$00
-	sta aObjVYlo
-	sta aObjVY
-DoRockman_BodyMoveY_NoHit_up:
+	mSTZ aObjVYlo, aObjVY
+DoRockman_BodyMoveY_NoHit:
+.r = $09
 	sec
 	lda aObjVYlo
 	sbc <zGravity
@@ -976,31 +967,35 @@ DoRockman_BodyMoveY_NoHit_up:
 	bpl .done_up
 	cmp #$F4
 	bcs .done_up
-	lda #$00
-	sta aObjVYlo
-	lda #$F4
-	sta aObjVY
+	mSTZ aObjVYlo
+	mMOV #$F4, aObjVY
+	lda aObjRoom
+	and #$0F
+	sta aObjRoom
+	lda <.r
+	asl a
+	asl a
+	asl a
+	asl a
+	ora aObjRoom
+	sta aObjRoom
 .done_up
 	rts
 ;8C28
 ;壁判定・下方向
 DoRockman_BodyMoveY_CheckWallDown
+.r = $09
 	clc
 	lda aObjY
 	adc #$0C
 	sta <$0A
-	lda <zOffscreen
+	lda <.r
 	adc #$00
-	sta <$0B
 	jsr DoRockman_WallCheckY
 	jsr DoRockman_CheckLift
 	lda <$00
-	bne .hit_down
-	bcs .hit_lift
-	bcc DoRockman_BodyMoveY_NoHit_up
-.hit_down
-	lda #$00
-	sta aObjYlo
+	beq DoRockman_BodyMoveY_NoHit
+	mSTZ aObjYlo
 	lda aObjY
 	pha
 	lda <$0A
@@ -1010,24 +1005,26 @@ DoRockman_BodyMoveY_CheckWallDown
 	sec
 	sbc aObjY
 	sta aObjY
-	lda <zOffscreen
-	sbc #$00
-	sta <zOffscreen
+	bcs .borrow_wallhitdown
+	lda <$09
+	sbc #$0F
+	sta <.r
+.borrow_wallhitdown
 	jmp DoRockman_BodyMoveY_Done
-.hit_lift
-	lda #$01
-	sta <$00
-	rts
 
 ;8C6A
 ;Y方向の壁判定
 DoRockman_WallCheckY:
+;a = 0000 YYYY, Y = room Y
 .x = $08
 .r = $09
 .y = $0A
-.yhi = $0B
-	lda #$01
-	sta <$01
+	asl a
+	asl a
+	asl a
+	asl a
+	sta <.r
+	mMOV #$01, <$01
 .loop
 	ldx <$01
 	clc
@@ -1035,6 +1032,8 @@ DoRockman_WallCheckY:
 	adc Table_WallCheckY_dx,x
 	sta <.x
 	lda aObjRoom
+	and #$0F
+	ora <.r
 	adc Table_WallCheckY_dr,x
 	sta <.r
 	jsr PickupBlock
@@ -1043,16 +1042,16 @@ DoRockman_WallCheckY:
 	sta <zBGAttr,x
 	dec <$01
 	bpl .loop
-	lda #$00
-	sta <zWindFlag
+	
+	mSTZ <zWindFlag
 	ldx #$01
 .loop2
 	lda <zBGAttr,x
-	cmp #$08
+	cmp #$0F
 	bcs .skip
-	cmp #$05
+	cmp #$0A
 	bcc .skip
-	sbc #$05
+	sbc #$0A
 	tay
 	lda Table_ConveyorFlag,y
 	sta <zWindFlag
@@ -1060,24 +1059,22 @@ DoRockman_WallCheckY:
 	tay
 	lda zConveyorVec - 1,y
 	sta <zWindVec
-	lda #$01
-	sta <zWindhi
-	lda #$00
-	sta <zWindlo
+	mMOV #$01, <zWindhi
+	mMOV #$00, <zWindlo
 .slip
 	lda #$01
 	bne .done
 .skip
-	cmp #$03
+	cmp #$09
 	bne .spike
 	ldy <zInvincible
 	bne .spike
-	lda #$00
-	sta <zStatus
+	mSTZ <zStatus
 	jmp DieRockman
 .spike
 	dex
 	bpl .loop2
+	
 	lda <zBGAttr
 	ora <zBGAttr2
 	and #$01
@@ -1085,16 +1082,6 @@ DoRockman_WallCheckY:
 	sta <$00
 	lda <zBGLadder
 	beq .ladder
-	cmp #$01
-	beq .ladder2
-	ldx <zOffscreen
-	bpl .ladder
-	lda <zKeyDown
-	and #$30
-	beq .ladder
-	ldx #$01
-	stx <zScrollFlag
-.ladder2
 	sta <$00
 .ladder
 	rts
@@ -1113,14 +1100,14 @@ Table_ConveyorFlag:
 ;アイテム、敵リフトの着地判定
 DoRockman_CheckLift:
 .x = $08
-.y = $09
-.yprev = $2E ;移動前Y上位
+.r = $09
+.y = $0A
 	sec
 	lda aObjX
 	sbc <zHScroll
 	sta <.x
 	clc
-	lda <.yprev
+	lda aObjY
 	adc #$0C
 	sta <.y
 	lda <zEquipment
@@ -1180,23 +1167,19 @@ DoRockman_CheckLift:
 	lda aPlatformY10,x
 	sbc #$0C
 	sta aObjY
-	lda <zOffscreen
-	sbc #$00
-	sta <zOffscreen
-	lda #$00
-	sta aObjYlo
-	sta aObjVYlo
-	lda #$FF
-	sta aObjVY
-	lda #$01
-	sta <zWindFlag
+	bcs .borrow_enemylift
+	lda <.r
+	sbc #$0F
+	sta <.r
+.borrow_enemylift
+	mSTZ aObjYlo, aObjVYlo
+	mMOV #$FF, aObjVY
+	mMOV #$01, <zWindFlag
 	lda aObjFlags10,x
 	and #$40
 	sta <zWindVec
-	lda aObjVXlo10,x
-	sta <zWindlo
-	lda aObjVX10,x
-	sta <zWindhi
+	mMOV aObjVXlo10,x, <zWindlo
+	mMOV aObjVX10,x, <zWindhi
 	sec
 	rts
 ;8D86
@@ -1236,23 +1219,19 @@ DoRockman_CheckLift:
 	lda aWeaponPlatformY,x
 	sbc #$0C
 	sta aObjY
-	lda <zOffscreen
-	sbc #$00
-	sta <zOffscreen
-	lda #$00
-	sta aObjYlo
-	sta aObjVYlo
-	lda #$FF
-	sta aObjVY
-	lda #$01
-	sta <zWindFlag
+	bcs .borrow_itemlift
+	lda <.r
+	sbc #$0F
+	sta <.r
+.borrow_itemlift
+	mSTZ aObjYlo, aObjVYlo
+	mMOV #$FF, aObjVY
+	mMOV #$01, <zWindFlag
 	lda aObjFlags + 2,x
 	and #$40
 	sta <zWindVec
-	lda aObjVXlo + 2,x
-	sta <zWindlo
-	lda aObjVX + 2,x
-	sta <zWindhi
+	mMOV aObjVXlo + 2,x, <zWindlo
+	mMOV aObjVX + 2,x, <zWindhi
 	sec
 	rts
 .skip_item
@@ -1260,147 +1239,139 @@ DoRockman_CheckLift:
 
 ;8DF5
 ;ロックマンの右方向スクロール処理
-DoRockman_ScrollRight:
-.d = $00 ;スクロール量
-.bg = $01;BGタイル書き込み枚数
+;ロックマンのスクロール処理
+;y = 移動前y
+;x = 移動前x
+DoRockman_DoScroll:
+.nth = $00 ;ネームテーブル書き込み予約判定(横スクロール)
+.ntv = $01 ;ネームテーブル書き込み予約判定(縦スクロール)
+.f = $02 ;スクロール方向フラグ: L... ...U(U: 上, L: 左)
+.dx = $03 ;移動差X
+.dy = $04 ;移動差Y
+	mSTZ <.nth, <.ntv, <.f
 	sec
-	lda aObjX
-	sbc <zHScroll
-	cmp #$80
-	bcs .do
-	rts
-.do
-	clc
-	lda <zHScroll
-	pha
-	adc <.d
-	sta <zHScroll
-	lda <zRoom
-	adc #$00
-	sta <zRoom
-	cmp <zScrollRight
-	bne .stop
-	sec
-	lda <.d
-	sbc <zHScroll
-	sta <.d
-	lda #$00
-	sta <zHScroll
-	sta <zHScrolllo
-.stop
-	pla
-	and #$03
-	adc <.d
-	lsr a
-	lsr a
-	sta <.bg
-	beq .skip
-	clc
-	lda <zNTNextlo
-	sta <zPtrlo
-	adc <.bg
-	sta <zNTNextlo
-	lda <zNTNexthi
-	sta <zPtrhi
-	adc #$00
-	sta <zNTNexthi
-	clc
-	lda <zNTPrevlo
-	adc <.bg
-	sta <zNTPrevlo
-	lda <zNTPrevhi
-	adc #$00
-	sta <zNTPrevhi
-.loop
-	jsr WriteNameTableByScroll
-	inc <zNTPointer
-	lda <zNTPointer
-	and #$3F
-	sta <zNTPointer
-	clc
-	lda <zPtrlo
-	adc #$01
-	sta <zPtrlo
-	lda <zPtrhi
-	adc #$00
-	sta <zPtrhi
-	dec <.bg
-	bne .loop
-.skip
-	rts
-
-;8E65
-;ロックマンの左方向スクロール処理
-DoRockman_ScrollLeft:
-.d = $00
-.bg = $01
-	sec
-	lda aObjX
-	sbc <zHScroll
-	cmp #$80
-	bcc .do
-	rts
-.do
-	sec
-	lda <zHScroll
-	pha
-	sbc <.d
-	sta <zHScroll
-	lda <zRoom
-	sbc #$00
-	sta <zRoom
-	ldx <zScrollLeft
-	dex
-	cpx <zRoom
-	bne .stop
-	inc <zRoom
-	clc
-	lda <.d
-	adc <zHScroll
-	sta <.d
-	lda #$00
-	sta <zHScroll
-	sta <zHScrolllo
-.stop
-	clc
-	pla
+	txa
+	sbc aObjX
+	bcs .borrow_dx
 	eor #$FF
-	and #$03
-	adc <.d
+	adc #$01
+.borrow_dx
+	clc
+	adc #$01
+	sta <.dx
+	sec
+	lda aObjX
+	sbc <zHScroll
+	bit <zMoveVec
+	bvc .scroll_left
+;右スクロール
+	cmp #$60
+	bcc .skip_horizontal
+	lda <zHScroll
+	pha
+	adc <.dx
+	sta <zHScroll
+	bcc .carry_right
+	inc <zRoom
+.carry_right
+	pla ;ネームテーブル書き込み予約の判定
+	jmp .merge_h
+;左スクロール
+.scroll_left
+	cmp #$A0
+	bcs .skip_horizontal
+	sec
+	rol <.f
+	lda <zHScroll
+	pha
+	sbc <.dx
+	sta <zHScroll
+	bcs .borrow_left
+	dec <zRoom
+.borrow_left
+	pla ;ネームテーブル書き込み予約の判定
+	eor #$FF
+.merge_h
+	clc
+	and #$07
+	adc <.dx
 	lsr a
 	lsr a
-	sta <.bg
-	beq .skip
+	lsr a
+	sta <.nth ;横スクロールのための書き込み量
+.skip_horizontal
+;縦スクロール
 	sec
-	lda <zNTPrevlo
-	sta <zPtrlo
-	sbc <.bg
-	sta <zNTPrevlo
-	lda <zNTPrevhi
-	sta <zPtrhi
-	sbc #$00
-	sta <zNTPrevhi
+	tya
+	sbc aObjY
+	php
+	bcs .borrow_dy
+	eor #$FF
+	adc #$01
+.borrow_dy
+	clc
+	adc #$01
+	sta <.dy
 	sec
-	lda <zNTNextlo
-	sbc <.bg
-	sta <zNTNextlo
-	lda <zNTNexthi
-	sbc #$00
-	sta <zNTNexthi
-.loop
-	jsr WriteNameTableByScroll
-	dec <zNTPointer
-	lda <zNTPointer
-	and #$3F
-	sta <zNTPointer
+	lda aObjY
+	sbc <zVScroll
+	plp
+	bcs .scroll_up
+;下スクロール
+	cmp #$80
+	bcc .skip_vertical
+	lda <zVScroll
+	pha
+	adc <.dy
+	sta <zVScroll
+	cmp #$F0
+	bcc .cross_page_down
+	adc #$0F
+	sta <zVScroll
+	clc
+	lda <zRoom
+	adc #$10
+	sta <zRoom
+.cross_page_down
+	pla ;ネームテーブル書き込み予約の判定
+	jmp .merge_v
+;上スクロール
+.scroll_up
+	cmp #$60
+	bcs .skip_vertical
+	inc <.f
+	lda <zVScroll
+	pha
+	sbc <.dy
+	sta <zVScroll
+	cmp #$F0
+	bcc .cross_page_up
+	sbc #$10
+	sta <zVScroll
 	sec
-	lda <zPtrlo
-	sbc #$01
-	sta <zPtrlo
-	lda <zPtrhi
-	sbc #$00
-	sta <zPtrhi
-	dec <.bg
-	bne .loop
-.skip
+	lda <zRoom
+	sbc #$10
+	sta <zRoom
+.cross_page_up
+	pla ;ネームテーブル書き込み予約の判定
+	eor #$FF
+.merge_v
+	clc
+	and #$07
+	adc <.dx
+	lsr a
+	lsr a
+	lsr a
+	sta <.ntv
+.skip_vertical
+	
+;ネームテーブル書き込み予約
+;$00 書き込み量, X
+;$01 書き込み量, Y
+;$02 スクロール方向フラグ
+	lda <.nth
+	ora <.ntv
+	beq .noscroll
+	jmp WriteNameTableXYScroll
+.noscroll
 	rts

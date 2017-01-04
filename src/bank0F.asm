@@ -559,49 +559,56 @@ LoadStageGraphics:
 	lda <zStage
 	and #$07
 	jsr ChangeBank
-	mMOVW $BC00, <.ptrlo
+	mMOVW Stage_Graphics, <.ptrlo
 	lda <zStage
 	and #$08
 	beq .is8bosses
-	inc <.ptrhi
+	clc
+	lda <.ptrhi
+	adc #$08
+	sta <.ptrhi
 .is8bosses
 	ldy #$00
-	mMOV [.ptr],y, <$00
-	lda #$00
-	sta $2006
-	sta $2006
-	sta <zPtrlo
+	mSTZ $2006, $2006
+.loop_gr
+	mMOV [.ptr],y, $2007
 	iny
-	sty <$01
-.loop3
-	ldy <$01
-	mMOV [.ptr],y, <zPtrhi
-	iny
-	mMOV [.ptr],y, <$02
-	iny
-	lda [.ptr],y
-	iny
-	sty <$01
-	jsr ChangeBank
-.loop2
-	ldy #$00
-.loop
-	mMOV [zPtr],y, $2007
-	iny
-	bne .loop
-	inc <zPtrhi
-	dec <$02
-	bne .loop2
-	lda <zStage
-	and #$07
-	jsr ChangeBank
-	dec <$00
-	bne .loop3
+	bne .loop_gr
 	inc <.ptrhi
-	inc <.ptrhi
+	lda <.ptrhi
+	cmp #$B0
+	bne .loop_gr
+;	iny
+;	sty <$01
+;.loop3
+;	ldy <$01
+;	mMOV [.ptr],y, <zPtrhi
+;	iny
+;	mMOV [.ptr],y, <$02
+;	iny
+;	lda [.ptr],y
+;	iny
+;	sty <$01
+;	jsr ChangeBank
+;.loop2
+;	ldy #$00
+;.loop
+;	mMOV [zPtr],y, $2007
+;	iny
+;	bne .loop
+;	inc <zPtrhi
+;	dec <$02
+;	bne .loop2
+;	lda <zStage
+;	and #$07
+;	jsr ChangeBank
+;	dec <$00
+;	bne .loop3
+;	inc <.ptrhi
+;	inc <.ptrhi
 	ldy #$61
 .loop_palette
-	mMOV [.ptr],y, aPaletteAnim,y
+	mMOV Stage_Palette - 2,y, aPaletteAnim,y
 	dey
 	bpl .loop_palette
 	jsr WritePalette
@@ -1241,100 +1248,251 @@ SetPPUPos_Attr:
 Table_C918:
 	.db $03, $0C, $30, $C0
 
-;20 68 C9
-;ロックマンの進み具合に応じてマップをBGへ書き込み
-WriteNameTableByScroll:
+;マップをBGへ書き込み・新形式
+;$00 横書き込み量
+;$01 縦書き込み量
+;$02 スクロール方向フラグ: L... ...U
+;$03 32x32タイル位置
+;$04 16x16タイル位置
+;$05 8x8タイル位置
+;$06 
+;$08 横スクロール始点
+;$09 画面単位始点
+;$0A~$0B 画面定義へのポインタ
+;$0C~$0D 32x32タイル定義へのポインタ
+;$0E~$0F 16x16タイル定義へのポインタ
+WriteNameTableXYScroll:
+.xscroll = $00
+.yscroll = $01
+.f = $02
 	lda <zStage
 	and #$07
 	jsr ChangeBank
-	lda #$20
-	sta <$0B
+;横スクロール
+	lda <.xscroll
+	bne .do_h
+	jmp .skip_xscroll
+.do_h
+	ldx <zRoom
+	lda <.f
+	bmi .left
+	inx
+	bne .room_x
+.left
+	dex
+.room_x
+	stx <$09
+	ldx #$00
 	ldy #$00
-	lda [zPtr],y
-	tax
-	tay
-	lda $8400,y
-	pha
-	txa
+	sty <$06
+	lda <zHScroll
+	eor #$80
+	sta <$08
+	and #$08
+	beq .inx_8
+	ldy #$02
+.inx_8
+	sta <$08
+	and #$10
+	beq .inx_16
+	ldx #$02
+.inx_16
+	sta <$08
+	lsr a
+	lsr a
+	and #$38
+	sta <$03 ;$03: 00XX X000
+	lsr a
+	sta <$07 ;$07: 0～1F, PPU dx
+	lda <zVScroll
 	asl a
-	rol <$0B
+	rol a
+	rol a
+	rol a
+	bpl .iny_8
+	iny
+.iny_8
+	bcc .iny_16
+	inx
+.iny_16
+	and #$07
+	ora <$03
+	sta <$03 ;$03: 00XX XYYY
+	stx <$04 ;$04: 32x32 LT LB RT RB
+	sty <$05 ;$05: 16x16 LT LB RT RB
+;ネームテーブル書き込み位置指定
+	lda <$09
+	lsr a
+	lda #$20 >> 2
+	bcc .left_room_h
+	lda #$2C >> 2
+.left_room_h
+	sta aPPUHScrhi
+	lda <zVScroll
 	asl a
-	rol <$0B
-	sta <$0A
-	lda <zPPUSqr
+	rol aPPUHScrhi
 	asl a
-	asl a
-	asl a
-	asl a
-	tax
-	pha
-	ldy #$00
-.loop
-	clc
-	pla
-	pha
-	adc Table_C968,y
-	tax
+	rol aPPUHScrhi
+	adc <$07 ;$07: 0～1F, PPU dx
+	sta aPPUHScrlo
+;ネームテーブル書き込み
+.loop_nt_h
+	ldy <$09
+	mSTZ <$0A
+	lda Stage_DefMap16,y
+	lsr a
+	rol <$0A
+	lsr a
+	rol <$0A
+	adc #HIGH(Stage_DefRoom)
+	sta <$0B ;$0A~$0B: 32x32 ptr
+	
+	ldy <$03
+	mMOV #HIGH(Stage_Def32x32) >> 2, <$0D
 	lda [$0A],y
 	asl a
+	rol <$0D
 	asl a
-	clc
-	sta aPPUSqrData,x
-	adc #$01
-	sta aPPUSqrData + 4,x
-	adc #$01
-	sta aPPUSqrData + 1,x
-	adc #$01
-	sta aPPUSqrData + 5,x
-	iny
-	cpy #$04
-	bne .loop
-	pla
-	ldy #$20
-	lda <$08
-	and #$40
-	beq .jump
-	ldy #$24
-.jump
-	sty <$0D
-	lda <zNTPointer
-	sta <$0C
+	rol <$0D
+	sta <$0C ;$0C~$0D: 32x32 chip
+	
+	ldy <$04
+	mMOV #HIGH(Stage_Def16x16) >> 2, <$0F
+	lda [$0C],y
+	asl a
+	rol <$0F
+	asl a
+	rol <$0F
+	sta <$0E ;$0E~$0F: 16x16 chip
+	
+	ldy <$05 ;$05: 16x16 LT LB RT RB
+	ldx <$06
+	lda [$0E],y
+	sta aPPUHScrData,x
+	inc <$05
+	tya
 	lsr a
-	ror <$0C
-	lda <$0C
-	pha
-	and #$03
-	ora <$0D
-	sta <$0D
-	pla
-	and #$FC
-	ldx <zPPUSqr
-	sta aPPUSqrlo,x
-	lda <$0D
-	sta aPPUSqrhi,x
-	lda <$0D
-	ora #$03
-	sta aPPUSqrAttrhi,x
-	lda <zNTPointer
-	sta <$0C
+	bcc .merge_nt_h ;16x16定義を1つ下のものへ
+	dec <$05
+	inc <$04
+	lda <$04
 	lsr a
-	lsr a
-	lsr a
-	asl <$0C
-	asl <$0C
-	asl <$0C
-	ora #$C0
-	ora <$0C
-	sta aPPUSqrAttrlo,x
-	pla
-	sta aPPUSqrAttrData,x
-	inc <zPPUSqr
+	bcc .merge_nt_h ;32x32定義を1つ下のものへ
+	dec <$04
+	inc <$03
+	lda <$03
+	and #$07
+	bne .merge_nt_h ;画面定義を1つ下のものへ
+	sec
+	sbc #$08
+	sta <$03
+	inc <$09
+.merge_nt_h
+	inc <$06
+	lda <$06
+	cmp #$1F
+	bcc .loop_nt_h
+;属性データ書き込み
+.skip_xscroll
+;縦スクロール
+	lda <.yscroll
+	beq .skip_yscroll
+.skip_yscroll
 	mCHANGEBANK #$0E, 1
-	;rts
+
+;20 68 C9
+;ロックマンの進み具合に応じてマップをBGへ書き込み
+WriteNameTableByScroll:
+;	lda <zStage
+;	and #$07
+;	jsr ChangeBank
+;	mMOV #$20, <$0B
+;	ldy #$00
+;	lda [zPtr],y
+;	tax
+;	tay
+;	lda $8400,y
+;	pha
+;	txa
+;	asl a
+;	rol <$0B
+;	asl a
+;	rol <$0B
+;	sta <$0A
+;	lda <zPPUSqr
+;	asl a
+;	asl a
+;	asl a
+;	asl a
+;	tax
+;	pha
+;	ldy #$00
+;.loop
+;	clc
+;	pla
+;	pha
+;	adc Table_C968,y
+;	tax
+;	lda [$0A],y
+;	asl a
+;	asl a
+;	clc
+;	sta aPPUSqrData,x
+;	adc #$01
+;	sta aPPUSqrData + 4,x
+;	adc #$01
+;	sta aPPUSqrData + 1,x
+;	adc #$01
+;	sta aPPUSqrData + 5,x
+;	iny
+;	cpy #$04
+;	bne .loop
+;	pla
+;	ldy #$20
+;	lda <$08
+;	and #$40
+;	beq .jump
+;	ldy #$24
+;.jump
+;	sty <$0D
+;	lda <zNTPointer
+;	sta <$0C
+;	lsr a
+;	ror <$0C
+;	lda <$0C
+;	pha
+;	and #$03
+;	ora <$0D
+;	sta <$0D
+;	pla
+;	and #$FC
+;	ldx <zPPUSqr
+;	sta aPPUSqrlo,x
+;	lda <$0D
+;	sta aPPUSqrhi,x
+;	lda <$0D
+;	ora #$03
+;	sta aPPUSqrAttrhi,x
+;	lda <zNTPointer
+;	sta <$0C
+;	lsr a
+;	lsr a
+;	lsr a
+;	asl <$0C
+;	asl <$0C
+;	asl <$0C
+;	ora #$C0
+;	ora <$0C
+;	sta aPPUSqrAttrlo,x
+;	pla
+;	sta aPPUSqrAttrData,x
+;	inc <zPPUSqr
+;	mCHANGEBANK #$0E, 1
+	rts
 
 ;1ECA04
-Table_C968:
-	.db $00, $08, $02, $0A
+;Table_C968:
+;	.db $00, $08, $02, $0A
 
 ;20 08 CA
 WriteNameTableByScroll_AnyBank:
@@ -1342,8 +1500,7 @@ WriteNameTableByScroll_AnyBank:
 	pha
 	jsr WriteNameTableByScroll
 	pla
-	jsr ChangeBank
-	rts
+	mJSR_NORTS ChangeBank
 
 ;20 13 CA: 上下スクロール時のNameTableの描画に密接に関わる
 VerticalScroll_DrawNT:
@@ -1559,8 +1716,9 @@ CountBlockableObjects:
 	lda aObjFlags10,x
 	bpl .notexist
 	and #$10
-	beq $CB99
+	beq .skip_stx
 	stx <zBlockObjIndex,y
+.skip_stx
 	iny
 .notexist
 	dex
@@ -1572,7 +1730,6 @@ CountBlockableObjects:
 ;$08, $0A = (X, Y)
 ;$09: YYYYXXXX: screen
 ;$00 result(0～7)
-;$01 block flag(0 or not)
 PickupBlock:
 	ldy <zBlockObjNum
 .loop
@@ -1588,101 +1745,89 @@ PickupBlock:
 	cmp aObjBlockY10,x
 	bne .loop
 	lda aObjVar10,x
-	and #$07
-	sta <$01
-	lda aObjVar10,x
-	and #$08
 	sta <$00
 	rts
 
 ;20 C0 CB
 PickupMap:
 .result = $00
-.blk = $01
-.X = $08
-.R = $09
-.Xhi = $09 ;-----delete
-.Y = $0A
-.Yhi = $0B
+.X = $08 ;position X
+.R = $09 ;Room
+.Y = $0A ;position Y
 .ptr = $0C
 .ptrhi = $0D
 	lda <zStage
 	and #$07
 	jsr ChangeBank
-	mSTZ <.result, <.blk
 	
+	mSTZ <.ptr
 	ldx <.R
 	lda Stage_DefMap16,x
-	and #$40
-	bne .skip ;壁判定扱いにする
-	lda <.X
-	lsr a
-	lsr a
-	and #$38
-	sta <.result
+	bmi .skip ;壁判定扱いにする
+	ora #$C0 ;$B0 << 2 → $30 << 2
+	sta <.ptrhi
+	lsr <.ptrhi
+	ror <.ptr
+	sec ;$80 << 1
+	ror <.ptrhi
+	ror <.ptr ;.ptr = $B000 + Room << 6
+
+;y = X * $8 + Y
+	ldx #$00
 	lda <.Y
-;$00=00XX X000
 	asl a
 	rol a
 	rol a
 	rol a
 	and #$07
-	ora <.result
 	sta <.result
-;$00=00XX XYYY
-	lda #$00
-	sta <.ptr
-	lda <.Xhi
-	lsr a
-	ror <.ptr
-	lsr a
-	ror <.ptr
-	clc
-	adc #$85
-	sta <.ptrhi
-	ldy <.result
-	lda [.ptr],y
-	sta <.ptr
-	lda #$20
-	asl <.ptr
-	rol a
-	asl <.ptr
-	rol a
-	sta <.ptrhi
-	ldy #$00
+	bcc .y_jmp
+	inx
+.y_jmp
+;$00 = 0000 0YYY
 	lda <.X
-	and #$10
-	beq .yzero
-	iny
-	iny
-.yzero
-	lda <.Y
-	and #$10
-	beq .jump
-	iny
-.jump
-	lda [.ptr],y
-	sta <.result
-	asl <.result
-	rol a
-	asl <.result
-	rol a
-	and #$03
-	sta <.result
 	lsr a
-	beq .skip
-	dec <.result
-	dec <.result
-	lda <zStage
+	lsr a
+	and #$38
+	ora <.result
+	tay
+;x = 0, 1
+;y = 00XX XYYY
+	lda [.ptr],y ;a = 32x32 chip index
 	asl a
-	adc <.result
-	tax
-	lda Table_Terrain,x ;ステージ
+	tay
+	lda <.X
+	and #$10 >> 2
+	beq .x_jmp
+	iny
+.x_jmp
+	bcs .greater
+	lda Stage_Def32Attr,y
+	bcs .attr
+.greater
+	lda Stage_Def32Attr + $100,y
+.attr
+	dex
+	beq .y_shift
+	lsr a
+	lsr a
+	lsr a
+	lsr a
+.y_shift
+	and #$0F
+.offscreenblock
 	sta <.result
-.skip
+.block
 	mCHANGEBANK #$0E, 1
-	;rts
-
+.skip
+	lda #$08
+	bne .offscreenblock
+	
+Table_BlockAttrMask:
+	.db %00000011, %00110000, %00001100, %11000000
+Table_BlockAttrMask_ShiftLoops:
+	.db 0, 4, 2, 6
+	
 ;1ECC44
 Table_Terrain:
 	.db $02, $03 ;ヒートマン

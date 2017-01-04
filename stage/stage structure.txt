@@ -1,24 +1,67 @@
 0000-01FF 16x16 tile definition (80h tiles) (LT LB RT RB)
+	13 -> 11111111 22222222 33333333 44444444
+	24
 0200-05FF 32x32 graphics (100h mapchips)
 0600-06FF 32x32 palette
-0700-07FF 32x32 attribute
-0800-08FF 16x16 map
-0900-09FE enemies position(room)
-09FF-0AFD enemies position(X)
-0AFE-0BFC enemies position(Y)
-0BFD-0CFB enemies
-0CFC-0D1B item position(room)
-0D2C-0D5B item position(X)
-0D5C-0D8B item position(Y)
-0D8C-0DBB items
-0DBE the number of palette animation frames
-0DBF palette animation wait
-0DC0-0DEF palettes(default)
-0DF0-0E5F palette animation
-0E60- continue point setting
+0700-08FF 32x32 attribute
+	13 -> 11112222 33334444
+	24
+0900-09FF 16x16 map
+	+80 block
+	+40 scroll stops
+0A00-0AFE enemies position(room)
+0AFF-0BFD enemies position(X)
+0BFE-0CFC enemies position(Y)
+0CFD-0DFB enemies
+0DFC-0E2B item position(room)
+0E2C-0E5B item position(X)
+0E5C-0E8B item position(Y)
+0E8C-0EBB items
+0EBE the number of palette animation frames
+0EBF palette animation wait
+0EC0-0EEF palettes(default)
+0EF0-0F5F palette animation
+0F60- continue point setting
 
 
 1000-1FFF enemies graphics
 2000-2FFF stage graphics(compressed)
 
 3000-3FFF 8x8 room definition(40h rooms)
+
+300 horizontal scroll ppu addr hi
+301 horizontal scroll ppu addr lo
+302-320 horizontal scroll data
+321 horizontal scroll ppu attr hi
+322 horizontal scroll ppu attr lo
+323 horizontal scroll ppu attr data
+... x8
+339 vertical scroll ppu addr hi 1
+33A vertical scroll ppu addr hi 2
+33B vertical scroll ppu addr lo
+33C-35B vertical scroll ppu data 1
+35C-37B vertical scroll ppu data 2
+37C vertical scroll attr hi 1
+37D vertical scroll attr hi 2
+37E vertical scroll attr lo
+37F-386 vertical scroll attr data 1
+387-38E vertical scroll attr data 2
+
+地形判定0～F
+0 背景
+1 水
+2 はしご
+3 
+4 
+5 
+6 
+7 
+
+8 壁
+9 トゲ
+A コンベア左
+B コンベア右
+C 氷
+D 
+E 
+F シャッター

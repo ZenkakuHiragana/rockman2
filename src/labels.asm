@@ -280,6 +280,21 @@ aPPULaserData = $3C2    ;PPU書き込みデータ
 aPPUShutterAttrhi = $3C2;PPUシャッター書き込み時の属性テーブル位置上位
 aPPUShutterAttrlo = $3C8;PPUシャッター書き込み時の属性テーブル位置下位
 
+;--------------------------------------------------------------
+aPPUHScrhi = $300     ;横スクロールNT書き込み上位
+aPPUHScrlo = $301     ;横スクロールNT書き込み下位
+aPPUHScrData = $302   ;横スクロールNT書き込みデータ
+aPPUHScrAttrhi = $321 ;横スクロール属性書き込み上位
+aPPUHScrAttrlo = $322 ;横スクロール属性書き込み下位
+aPPUHScrAttr = $323   ;横スクロール属性書き込みデータ
+                      ;8つ分の属性書き込み領域
+aPPUVScrhi = $339     ;縦スクロールNT書き込み上位
+aPPUVScrlo = $33B     ;縦スクロールNT書き込み下位
+aPPUVScrData = $33C   ;縦スクロールNT書き込みデータ
+aPPUVScrAttrhi = $37C ;縦スクロール属性書き込み上位
+aPPUVScrAttrlo = $37E ;縦スクロール属性書き込み下位
+aPPUVScrAttr = $37F   ;縦スクロール属性書き込みデータ
+;--------------------------------------------------------------
 
 aObjAnim = $400         ;オブジェクトのアニメーション番号
 aObjAnim10 = $410       ;+10する場合のラベル
@@ -503,24 +518,27 @@ aPaletteBackup = $700   ;サブメニューを開いた時のBGパレットバ�
 Stage_Def16x16 = $8000
 Stage_Def32x32 = $8200
 Stage_Def32Pal = $8600
+;地形判定定義
+
 Stage_Def32Attr = $8700
 ;マップ定義(00～3F)
-;Scroll stop -> +80
-;Block flag -> +40
-Stage_DefMap16 = $8800
-Stage_DefEnemiesRoom = $8900
-Stage_DefEnemiesX = $8A00 - 1
-Stage_DefEnemiesY = $8B00 - 2
-Stage_DefEnemies = $8C00 - 3
-Stage_DefItemsRoom = $8D00 - 4
-Stage_DefItemsX = $8D30 - 4
-Stage_DefItemsY = $8D60 - 4
-Stage_DefItems = $8D90 - 4
-Stage_PaletteAnimNum = $8DC0 - 2
-Stage_PaletteAnimWait = $8DC0 - 1
-Stage_Palette = $8DC0
-Stage_PaletteAnim = $8DF0
+;Scroll stop -> +40
+;Block flag -> +80
+Stage_DefMap16 = $8900
+Stage_DefEnemiesRoom = $8A00
+Stage_DefEnemiesX = $8B00 - 1
+Stage_DefEnemiesY = $8C00 - 2
+Stage_DefEnemies = $8D00 - 3
+Stage_DefItemsRoom = $8E00 - 4
+Stage_DefItemsX = $8E30 - 4
+Stage_DefItemsY = $8E60 - 4
+Stage_DefItems = $8E90 - 4
+Stage_PaletteAnimNum = $8EC0 - 2
+Stage_PaletteAnimWait = $8EC0 - 1
+Stage_Palette = $8EC0
+Stage_PaletteAnim = $8EF0
 Stage_DefRoom = $B000
+Stage_Graphics = $A000
 
 
 Table_AnimationPointer_Low = $F900

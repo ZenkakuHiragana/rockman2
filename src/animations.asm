@@ -1,6 +1,6 @@
 
 ;F900
-	mBEGINRAW #$1E, Table_AnimationPointer_Low
+	.org Table_AnimationPointer_Low
 	.db LOW(anim00), LOW(anim01), LOW(anim02), LOW(anim03)
 	.db LOW(anim04), LOW(anim05), LOW(anim06), LOW(anim07)
 	.db LOW(anim08), LOW(anim09), LOW(anim0A), LOW(anim0B)

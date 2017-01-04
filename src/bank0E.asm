@@ -109,25 +109,18 @@ StartStage_NoEnergyRegen:
 ;80AB
 ;死亡時のコンティニュー位置
 StartStage_Continue:
-	lda #$00
-	sta <zConveyorLVec
-	lda #$40
-	sta <zConveyorRVec
-	lda #$10
-	sta <z2000
-	sta $2000
-	lda #$06
-	sta <z2001
-	sta $2001
+	mMOV #$40, <zConveyorRVec
+	mMOV #%00010000, <z2000, $2000
+	mMOV #%00000110, <z2001, $2001
 	jsr LoadStageGraphics
-	lda #$1C
-	sta aObjLife
-	lda #$00
-	sta <zStopFlag
-	sta <zEquipment
+	mMOV #$1C, aObjLife
 	jsr ChangeBodyColor
 	jsr SetContinuePoint
 	lda #$00
+	sta <zConveyorLVec
+	sta <zStopFlag
+	sta <zEquipment
+	sta <zGravityhi
 	sta <zHScroll
 	sta <zHScrolllo
 	sta <zVScroll
@@ -148,33 +141,26 @@ StartStage_Continue:
 	lda <zRoom
 	adc #$01
 	jsr DrawRoom
-	lda #$20
-	sta <zNTPointer
+	mMOV #$20, <zNTPointer
 	jsr ClearSprites
 	lda <z2001
-	ora #$1E
+	ora #%00011110
 	sta <z2001
 	sta $2001
 	lda <z2000
-	ora #$80
+	ora #%10000000
 	sta <z2000
 	sta $2000
 	sta <zIsLag
-	lda #$40
-	sta <zGravity
-	lda #$00
-	sta <zGravityhi
+	mMOV #$40, <zGravity
 	ldx <zStage
-	lda Table_StageMusic,x
-	jsr PlayTrack
+	mPLAYTRACK Table_StageMusic,x
 	ldx #$13
 .spriteloop
-	lda Table_SpriteREADY,x
-	sta aSprite,x
+	mMOV Table_SpriteREADY,x, aSprite,x
 	dex
 	bpl .spriteloop
-	lda #$C0
-	sta <zWait2
+	mMOV #$C0, <zWait2
 .readyloop
 	ldy #$60
 	ldx #$10
@@ -194,10 +180,8 @@ StartStage_Continue:
 	dec <zWait2
 	bne .readyloop
 	jsr ClearSprites
-	lda #$DF
-	sta <zJumpPowerlo
-	lda #$04
-	sta <zJumpPowerhi
+	mMOV #$DF, <zJumpPowerlo
+	mMOV #$04, <zJumpPowerhi
 	jsr EraseEnemiesByScroll
 	jsr Rockman_Warp_to_Land
 	lda <zStage
@@ -233,8 +217,7 @@ MainLoop:
 	bcs .nolag
 .lag
 	jsr FrameAdvanceWater
-	lda #$00
-	sta <zWaterWait
+	mSTZ <zWaterWait
 .nolag
 	jsr FrameAdvance1C
 	jmp MainLoop
@@ -919,7 +902,7 @@ DrawRoom:
 	lsr a
 	ror <$08
 	clc
-	adc #$85
+	adc #$B0
 	sta <$09
 	lda <zNTPointer
 	pha
