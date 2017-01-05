@@ -428,12 +428,14 @@ BeginTitleScreenSkipped:
 	dec <$FD
 	bne .loop_wait_reset
 	jsr DisableScreen1A
+	
 ;A286
 ;ゲームメニューへ
 	lda #$00
 	sta <zScreenMod
 	lda #$0E
-	jsr Write_Reg0_A
+	jmp Write_Reg0_A
+;---------------------------------------CUT
 	lda <zRestartTitle
 	beq .notreset
 	rts

@@ -1,7 +1,6 @@
 #[1]   hack2.asm
-  916  1C:10AE                    mNULL
-#[2]   src/bank0E.asm
-#[3]   src/obj/behaviour_normal.asm
+ 1408  1C:11FE                    mNULL
+ 1424  1C:1200                    mNULL
 #[2]   src/bank0E.asm
 #[1]   hack2.asm
 #[2]   src/bank0F.asm

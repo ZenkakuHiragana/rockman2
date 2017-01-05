@@ -2,7 +2,6 @@
 ;CFED NMI Interrupt
 ;NMI_Start:
 	pha
-	php
 	txa
 	pha
 	tya
@@ -12,11 +11,11 @@
 	jmp .lag
 .notlag
 	lda <z2000
-	and #$7C
+	and #%01111100
 	sta <z2000
 	sta $2000 ;PPU Reg0
 	lda <z2001
-	and #$E7
+	and #%11100111
 	sta <z2001
 	sta $2001 ;PPU Reg1
 	lda $2002 ;PPU Stats
@@ -24,6 +23,14 @@
 	sta $2003 ;Sprite Address
 	lda #$02
 	sta $4014 ;Sprite DMA
+	lda <zPPUHScr
+	beq .hscr
+	jsr WritePPUHScroll
+.hscr
+	lda <zPPUVScr
+	beq .vscr
+	jsr WritePPUVScroll
+.vscr
 	lda <zPPUSqr
 	beq .sqr
 	jsr WritePPUSquare
@@ -39,9 +46,7 @@
 .laser
 .s = $00
 .r = $01
-	lda $2002 ;PPU Stats
-	lda #$00
-	sta <$01
+	mSTZ <$01
 	lda <zHScroll
 	sta <.s
 	lda <zHScrollApparenthi
@@ -69,11 +74,11 @@
 	lda <.s
 	sta $2005 ;PPU Scroll Register
 	lda <z2001
-	ora #$1E
+	ora #%00011110
 	sta <z2001
 	sta $2001
 	lda <z2000
-	ora #$80
+	ora #%10000000
 	sta <z2000
 	lda <zRoom
 	eor <.r
@@ -124,7 +129,6 @@
 	tay
 	pla
 	tax
-	plp
 	pla
 	rti
 
@@ -168,6 +172,52 @@ WritePalette:
 	sta $2006
 	sta $2006
 	sta <z3A ;---------------------------?
+	rts
+
+WritePPUHScroll:
+	lda <z2000
+	ora #%00000100
+	sta $2000
+	mMOV aPPUHScrhi, $2006
+	mMOV aPPUHScrlo, $2006
+	ldx #$00
+	stx <zPPUHScr
+.loop_nt
+	mMOV aPPUHScrData,x, $2007
+	inx
+	cpx #$1E
+	bne .loop_nt
+	ldx #$00
+.loop_attr
+	mMOV aPPUHScrAttrhi, $2006
+	mMOV aPPUHScrAttrlo,x, $2006
+	mMOV aPPUHScrAttr,x, $2007
+	inx
+	inx
+	cpx #$10
+	bne .loop_attr
+	mMOV <z2000, $2000
+	rts
+
+WritePPUVScroll:
+	mMOV aPPUVScrhi, $2006
+	mMOV aPPUVScrlo, $2006
+	ldx #$00
+	stx <zPPUVScr
+.loop_nt
+	mMOV aPPUVScrData,x, $2007
+	inx
+	cpx #$20
+	bne .loop_nt
+	lda aPPUVScrhi
+	adc #$03
+	sta $2006
+	mMOV aPPUVScrlo, $2006
+.loop_nt2
+	mMOV aPPUVScrData,x, $2007
+	inx
+	cpx #$40
+	bne .loop_nt2
 	rts
 
 ;20 18 D1

@@ -1305,7 +1305,7 @@ EN19:
 	ldy #$02
 	lda aObjLife,x
 	bne .dead
-	jmp EN19_Die
+	jmp .die
 .dead
 	cmp .life_prev,x
 	beq .nohit
@@ -1322,7 +1322,7 @@ EN19:
 	bne .looplife
 	ldx <zObjIndex
 	lda aObjVXlo,x
-	bne EN19_skip
+	bne .skip
 	lda #$01
 	sta aObjFrame,x
 	
@@ -1331,7 +1331,7 @@ EN19:
 ;	mBEGINRAW #$1D, #$A000 ;*******************************
 ;	.db $00
 
-EN19_BEGIN_A000:
+;EN19_BEGIN_A000:
 	sta aObjWait,x
 	lda aObjVar,x
 	bne .1
@@ -1346,29 +1346,29 @@ EN19_BEGIN_A000:
 	lda #$02
 	sta aObjVar,x
 	dec aObjVX,x
-	bne EN19_done
+	bne .done
 	inc aObjVXlo,x
-	bne EN19_done
+	bne .done
 .1
 	dec aObjVar,x
-EN19_skip:
+.skip
 	lda aObjFrame,x
-	bne EN19_done
+	bne .done
 	lda #$00
 	sta aObjVXlo,x
 	lda #$03
 	sta aObjVX,x
 	lda <zRand
 	and #$03
-	beq EN19_done
+	beq .done
 	asl aObjVX,x
 	and #$01
-	bne EN19_done
+	bne .done
 	clc
 	lda aObjVX,x
 	adc #$03
 	sta aObjVX,x
-EN19_done:
+.done
 	jsr CheckOffscreenEnemy
 	bcc .rts
 	lda #%10000000
@@ -1383,14 +1383,14 @@ EN19_done:
 	rts
 
 ;A06B
-EN19_Die:
+.die:
 	lda #$00
 	sta aObjFrame,x
 	sta aObjWait,x
 	lda aObjVXlo,x
-	beq .1
-	jmp .skip2
-.1
+	beq .2
+	jmp .skip3
+.2
 	lda aObjVar,x
 	and #$03
 	sta <$00
@@ -1404,7 +1404,7 @@ EN19_Die:
 .loop
 	lda #$06
 	jsr CreateEnemyHere
-	bcs .overflow
+	bcs .overflow2
 	ldx <$01
 	clc
 	lda aObjX10,y
@@ -1417,12 +1417,12 @@ EN19_Die:
 	inc <$01
 	dec <$02
 	bne .loop
-.overflow
+.overflow2
 	ldx <zObjIndex
 	inc aObjVar,x
 	lda aObjVar,x
 	cmp #$08
-	bne .skip
+	bne .skip2
 	lda #$1A
 	jsr FindObject
 	bcs .notfound
@@ -1452,10 +1452,10 @@ EN19_Die:
 .notfound2
 	sta aEnemyOrder,x
 	asl aObjFlags,x
-.skip
+.skip2
 	lda #$08
 	sta aObjVXlo,x
-.skip2
+.skip3
 	dec aObjVXlo,x
 	rts
 ;A108

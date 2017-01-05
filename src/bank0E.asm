@@ -115,7 +115,7 @@ StartStage_Continue:
 	jsr LoadStageGraphics
 	mMOV #$1C, aObjLife
 	jsr ChangeBodyColor
-	jsr SetContinuePoint
+	;jsr SetContinuePoint
 	lda #$00
 	sta <zConveyorLVec
 	sta <zStopFlag
@@ -895,49 +895,48 @@ Table_BossRoom:
 ;907D
 ;次の画面を描画
 DrawRoom:
-	ldx #$00
-	stx <$08
-	lsr a
-	ror <$08
-	lsr a
-	ror <$08
-	clc
-	adc #$B0
-	sta <$09
-	lda <zNTPointer
+	tay
+	dey
+	dey
+	lda <zRoom
 	pha
-	lda #$00
-	sta <zNTPointer
+	lda <zHScroll
+	pha
+	sty <zRoom
+	mMOV #$80, <zHScroll
+	mSTZ <$01, <$02, <zVScroll
+	mMOV #$01, <$00
+	lda #$20
 .loop
-	jsr WriteNameTableByScroll
-	inc <$08
-	inc <zNTPointer
-	jsr WriteNameTableByScroll
-	lda <$08
 	pha
-	lda <$09
-	pha
+	jsr WriteNameTableByScroll
+.waitdebug
+	lda $2002
+	bpl .waitdebug
 	lda <z2000
-	and #$80
+	and #%10000000
 	beq .nowait
 	jsr FrameAdvance1C
 	jmp .wait
 .nowait
 	lda <zPPUSqr
-	jsr WritePPUSquare
+	jsr WritePPUHScroll
 .wait
 	clc
+	lda <zHScroll
+	adc #$08
+	sta <zHScroll
+	bcc .carry
+	inc <zRoom
+.carry
 	pla
-	sta <$09
-	pla
-	sta <$08
-	inc <$08
-	inc <zNTPointer
-	lda <$08
-	and #$3F
+	sec
+	sbc #$01
 	bne .loop
 	pla
-	sta <zNTPointer
+	sta <zHScroll
+	pla
+	sta <zRoom
 	rts
 
 ;90C9

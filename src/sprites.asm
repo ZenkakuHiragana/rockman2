@@ -195,7 +195,9 @@ DontAnimateObjects:
 	jmp DrawObjectSprites
 .deleteobject
 	lsr aObjFlags,x
-;	clc ;------added clc
+	.ifdef ___BUGFIX
+	clc ;------added clc
+	.endif
 	rts
 
 ;20 BC CD
@@ -221,7 +223,9 @@ DontAnimateEnemies:
 	jmp DrawEnemySprites
 .deleteobject
 	lsr aObjFlags,x
-;	clc ;------added clc
+	.ifdef ___BUGFIX
+	clc ;------added clc
+	.endif
 	rts
 
 ;20 E4 CD
@@ -262,7 +266,9 @@ AnimateObjects:
 	lda [zPtr],y
 	bne DrawObjectSprites
 	lsr aObjFlags,x
-;	clc ;------added clc
+	.ifdef ___BUGFIX
+	clc ;------added clc
+	.endif
 	rts
 
 ;4C 2C CE
@@ -327,9 +333,12 @@ DrawSprites:
 	lda aObjX,x
 	sbc <zHScroll
 	sta <.x
-	lda aObjRoom,x
-	sbc <zRoom
+	sec
 	lda aObjY,x
+	sbc <zVScroll
+	bcs .boundary_y
+	sbc #$0F
+.boundary_y
 	sta <.y
 	lda aObjFlags,x
 	and #%01000000

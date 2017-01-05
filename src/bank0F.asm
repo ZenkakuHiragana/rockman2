@@ -559,7 +559,7 @@ LoadStageGraphics:
 	lda <zStage
 	and #$07
 	jsr ChangeBank
-	mMOVW Stage_Graphics, <.ptrlo
+	mMOVW Stage_Graphics - $1000, <.ptrlo
 	lda <zStage
 	and #$08
 	beq .is8bosses
@@ -997,6 +997,7 @@ Rockman_Warp_to_Land:
 	sta aObjY
 	ldx <zContinuePoint
 	cmp $BB00,x ;----------------------
+	cmp #$84
 	beq .onland
 	jsr SpriteSetup
 	jsr FrameAdvance1C
@@ -1255,55 +1256,55 @@ Table_C918:
 ;$03 32x32タイル位置
 ;$04 16x16タイル位置
 ;$05 8x8タイル位置
-;$06 
+;$06 PPUデータ書き込みポインタ
+;$07 PPUデータ書き込みポインタ始点
 ;$08 横スクロール始点
 ;$09 画面単位始点
 ;$0A~$0B 画面定義へのポインタ
 ;$0C~$0D 32x32タイル定義へのポインタ
 ;$0E~$0F 16x16タイル定義へのポインタ
-WriteNameTableXYScroll:
+WriteNameTableByScroll:
 .xscroll = $00
 .yscroll = $01
 .f = $02
 	lda <zStage
 	and #$07
 	jsr ChangeBank
-;横スクロール
-	lda <.xscroll
-	bne .do_h
-	jmp .skip_xscroll
-.do_h
+;書き込み開始位置の設定
 	ldx <zRoom
-	lda <.f
-	bmi .left
+	lda <zHScroll
+	ldy <$02
+	bpl .left_nt
+	clc
+	adc #$08
+	bcc .left_nt
 	inx
-	bne .room_x
-.left
-	dex
-.room_x
+.left_nt
+	eor #$80
+	bmi .inx_room_h
+	inx
+.inx_room_h
+	sta <$08
 	stx <$09
 	ldx #$00
 	ldy #$00
-	sty <$06
-	lda <zHScroll
-	eor #$80
-	sta <$08
 	and #$08
 	beq .inx_8
 	ldy #$02
 .inx_8
-	sta <$08
+	lda <$08
 	and #$10
 	beq .inx_16
 	ldx #$02
 .inx_16
-	sta <$08
+	lda <$08
 	lsr a
 	lsr a
+	lsr a
+	sta aPPUHScrlo ;0～1F, PPU dx
+	rol a
 	and #$38
 	sta <$03 ;$03: 00XX X000
-	lsr a
-	sta <$07 ;$07: 0～1F, PPU dx
 	lda <zVScroll
 	asl a
 	rol a
@@ -1323,176 +1324,276 @@ WriteNameTableXYScroll:
 ;ネームテーブル書き込み位置指定
 	lda <$09
 	lsr a
-	lda #$20 >> 2
+	lda #$20
 	bcc .left_room_h
-	lda #$2C >> 2
+	lda #$2C
 .left_room_h
 	sta aPPUHScrhi
+;横スクロール
+	lda <.xscroll
+	sta <zPPUHScr
+	bne .do_h
+	jmp .skip_xscroll
+.do_h
+	lda <.f
+	bmi .left
+	inc <$09
+	bvc .merge_room
+.left
+	dec <$09
+.merge_room
+;画面切り分け位置の指定
 	lda <zVScroll
+	lsr a
+	lsr a
+	lsr a
+	sta <$06 ;$06: ppu write data index
+	sta <$07 ;$07: ppu write data index
+;属性データ書き込み位置指定
+	clc
+	lda aPPUHScrhi
+	adc #$03
+	sta aPPUHScrAttrhi
+	lda <$08
 	asl a
-	rol aPPUHScrhi
-	asl a
-	rol aPPUHScrhi
-	adc <$07 ;$07: 0～1F, PPU dx
-	sta aPPUHScrlo
+	rol a
+	rol a
+	rol a
+	and #$07
+	clc
+	adc #$C0
+	ldx #$00
+.loop_attr
+	pha
+	mSTZ aPPUHScrAttr,x
+	pla
+	sta aPPUHScrAttrlo,x
+	adc #$08
+	inx
+	inx
+	cpx #$10
+	bne .loop_attr
+	
 ;ネームテーブル書き込み
 .loop_nt_h
+	jsr WriteNameTable_GetMapPtr
+.loop_nt_h_32
+	jsr WriteNameTable_GetChip32
+;属性データ書き込み
+	ldx <$06
+	cpx <$07
+	bne .notfirstattr_h
+	lda <$04
+	lsr a
+	lda #%11110000
+	bcc .notlastattr_h
+	bcs .write_attr_h
+.notfirstattr_h
+	dex
+	cpx <$07
+	bne .notlastattr_h
+	lda <$04
+	lsr a
+	lda #%00001111
+	bcc .write_attr_h
+.notlastattr_h
+	lda #%11111111
+.write_attr_h
+	pha
+	lda <$06
+	lsr a
+	and #$FE
+	tax
+	pla
+	and Stage_Def32Pal,y
+	ora aPPUHScrAttr,x
+	sta aPPUHScrAttr,x
+.loop_nt_h_16
+	jsr WriteNameTable_GetTile16
+.loop_nt_h_8
+	ldy <$05 ;$05: 16x16 LT LB RT RB
+	ldx <$06
+	lda [$0E],y
+	sta aPPUHScrData,x
+	
+	inc <$06
+	lda <$06
+	cmp <$07
+	beq .skip_xscroll
+	cmp #$1E
+	bcs .end_ptr_h
+	tya
+	lsr a
+	bcs .go_down16 ;16x16定義を1つ下のものへ
+	inc <$05
+	bne .loop_nt_h_8
+.go_down16
+	dec <$05
+	lda <$04
+	lsr a
+	bcs .go_down32 ;32x32定義を1つ下のものへ
+	inc <$04
+	bne .loop_nt_h_16
+.go_down32
+	dec <$04
+	inc <$03
+	bne .loop_nt_h_32
+.end_ptr_h
+	lda <$07
+	beq .skip_xscroll
+	sec
+	lda <$03
+	sbc #$07
+	sta <$03
+	clc
+	lda <$09
+	adc #$10
+	sta <$09
+	lda <$05
+	and #$FE
+	sta <$05
+	lda <$04
+	and #$FE
+	sta <$04
+	mSTZ <$06
+	jmp .loop_nt_h
+.skip_xscroll
+;縦スクロール
+	lda <.yscroll
+	sta <zPPUVScr
+	bne .do_yscroll
+	jmp .skip_yscroll
+.do_yscroll
+	mMOV #$20 >> 2, aPPUVScrhi
+	mSTZ aPPUVScrlo
+	lda <zVScroll
+	asl a
+	rol aPPUVScrhi
+	asl a
+	rol aPPUVScrhi
+	adc aPPUVScrlo
+	sta aPPUVScrlo
+	and #$1F
+	pha
+	lda <$09
+	lsr a
+	pla
+	bcc .boundary_left
+	adc #$1F
+.boundary_left
+	sta <$06 ;$06: ppu write data index
+	sta <$07 ;$07: ppu write data index
+	
+;ネームテーブル書き込み
+.loop_nt_v
+	jsr WriteNameTable_GetMapPtr
+	sty <$73
+.loop_nt_v_32
+	jsr WriteNameTable_GetChip32
+.loop_nt_v_16
+	jsr WriteNameTable_GetTile16
+.loop_nt_v_8
+	ldy <$05 ;$05: 16x16 LT LB RT RB
+	ldx <$06
+	lda [$0E],y
+	sta aPPUVScrData,x
+	
+	inc <$06
+	lda <$06
+	cmp <$07
+	beq .skip_yscroll
+	cmp #$40
+	bcs .end_ptr_v
+	cmp #$20
+	beq .end_ptr_v
+	tya
+	and #$02
+	bne .go_right16 ;16x16定義を1つ下のものへ
+	iny
+	iny
+	sty <$05
+	bne .loop_nt_v_8
+.go_right16
+	dey
+	dey
+	sty <$05
+	lda <$04
+	and #$02
+	bne .go_right32
+	clc
+	lda <$04
+	adc #$02
+	sta <$04
+	bne .loop_nt_v_16
+.go_right32
+	sec
+	lda <$04
+	sbc #$02
+	sta <$04
+	lda <$03
+	adc #$07
+	sta <$03
+	bne .loop_nt_v_32
+.end_ptr_v
+	cmp #$40
+	bcc .noreset
+	mSTZ <$06
+	lda <$07
+	beq .skip_yscroll
+.noreset
+	inc <$09
+	sec
+	lda <$03
+	sbc #$40 - 8
+	sta <$03
+	lda <$05
+	and #$FD
+	sta <$05
+	lda <$04
+	and #$FD
+	sta <$04
+	jmp .loop_nt_v
+.skip_yscroll
+	mCHANGEBANK #$0E, 1
+
+WriteNameTable_GetMapPtr:
 	ldy <$09
 	mSTZ <$0A
 	lda Stage_DefMap16,y
 	lsr a
-	rol <$0A
+	ror <$0A
 	lsr a
-	rol <$0A
+	ror <$0A
 	adc #HIGH(Stage_DefRoom)
-	sta <$0B ;$0A~$0B: 32x32 ptr
-	
+	sta <$0B ;$0A~$0B: room ptr
+	rts
+WriteNameTable_GetChip32:
 	ldy <$03
-	mMOV #HIGH(Stage_Def32x32) >> 2, <$0D
+	clc
 	lda [$0A],y
-	asl a
-	rol <$0D
-	asl a
-	rol <$0D
-	sta <$0C ;$0C~$0D: 32x32 chip
-	
+	tay
+	adc #LOW(Stage_Def32x32 >> 2)
+	sta <$0C
+	lda #HIGH(Stage_Def32x32 >> 2)
+	adc #$00
+	sta <$0D
+	asl <$0C
+	rol a
+	asl <$0C
+	rol a
+	sta <$0D ;$0C~$0D: 32x32 chip
+	rts
+WriteNameTable_GetTile16:
 	ldy <$04
-	mMOV #HIGH(Stage_Def16x16) >> 2, <$0F
+	mMOV #HIGH(Stage_Def16x16 >> 2), <$0F
 	lda [$0C],y
+	and #$7F
 	asl a
 	rol <$0F
 	asl a
 	rol <$0F
 	sta <$0E ;$0E~$0F: 16x16 chip
-	
-	ldy <$05 ;$05: 16x16 LT LB RT RB
-	ldx <$06
-	lda [$0E],y
-	sta aPPUHScrData,x
-	inc <$05
-	tya
-	lsr a
-	bcc .merge_nt_h ;16x16定義を1つ下のものへ
-	dec <$05
-	inc <$04
-	lda <$04
-	lsr a
-	bcc .merge_nt_h ;32x32定義を1つ下のものへ
-	dec <$04
-	inc <$03
-	lda <$03
-	and #$07
-	bne .merge_nt_h ;画面定義を1つ下のものへ
-	sec
-	sbc #$08
-	sta <$03
-	inc <$09
-.merge_nt_h
-	inc <$06
-	lda <$06
-	cmp #$1F
-	bcc .loop_nt_h
-;属性データ書き込み
-.skip_xscroll
-;縦スクロール
-	lda <.yscroll
-	beq .skip_yscroll
-.skip_yscroll
-	mCHANGEBANK #$0E, 1
-
-;20 68 C9
-;ロックマンの進み具合に応じてマップをBGへ書き込み
-WriteNameTableByScroll:
-;	lda <zStage
-;	and #$07
-;	jsr ChangeBank
-;	mMOV #$20, <$0B
-;	ldy #$00
-;	lda [zPtr],y
-;	tax
-;	tay
-;	lda $8400,y
-;	pha
-;	txa
-;	asl a
-;	rol <$0B
-;	asl a
-;	rol <$0B
-;	sta <$0A
-;	lda <zPPUSqr
-;	asl a
-;	asl a
-;	asl a
-;	asl a
-;	tax
-;	pha
-;	ldy #$00
-;.loop
-;	clc
-;	pla
-;	pha
-;	adc Table_C968,y
-;	tax
-;	lda [$0A],y
-;	asl a
-;	asl a
-;	clc
-;	sta aPPUSqrData,x
-;	adc #$01
-;	sta aPPUSqrData + 4,x
-;	adc #$01
-;	sta aPPUSqrData + 1,x
-;	adc #$01
-;	sta aPPUSqrData + 5,x
-;	iny
-;	cpy #$04
-;	bne .loop
-;	pla
-;	ldy #$20
-;	lda <$08
-;	and #$40
-;	beq .jump
-;	ldy #$24
-;.jump
-;	sty <$0D
-;	lda <zNTPointer
-;	sta <$0C
-;	lsr a
-;	ror <$0C
-;	lda <$0C
-;	pha
-;	and #$03
-;	ora <$0D
-;	sta <$0D
-;	pla
-;	and #$FC
-;	ldx <zPPUSqr
-;	sta aPPUSqrlo,x
-;	lda <$0D
-;	sta aPPUSqrhi,x
-;	lda <$0D
-;	ora #$03
-;	sta aPPUSqrAttrhi,x
-;	lda <zNTPointer
-;	sta <$0C
-;	lsr a
-;	lsr a
-;	lsr a
-;	asl <$0C
-;	asl <$0C
-;	asl <$0C
-;	ora #$C0
-;	ora <$0C
-;	sta aPPUSqrAttrlo,x
-;	pla
-;	sta aPPUSqrAttrData,x
-;	inc <zPPUSqr
-;	mCHANGEBANK #$0E, 1
 	rts
-
-;1ECA04
-;Table_C968:
-;	.db $00, $08, $02, $0A
 
 ;20 08 CA
 WriteNameTableByScroll_AnyBank:
@@ -1816,6 +1917,7 @@ PickupMap:
 .y_shift
 	and #$0F
 .offscreenblock
+	lda #$00
 	sta <.result
 .block
 	mCHANGEBANK #$0E, 1
