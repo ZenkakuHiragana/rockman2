@@ -1351,6 +1351,14 @@ WriteNameTableByScroll:
 	bne .do_h
 	jmp .skip_xscroll
 .do_h
+	lda <$03
+	pha
+	lda <$04
+	pha
+	lda <$05
+	pha
+	lda <$09
+	pha
 	bcs .left
 	inc <$09
 	jmp .merge_room
@@ -1443,7 +1451,7 @@ WriteNameTableByScroll:
 	inc <$06
 	lda <$06
 	cmp <$07
-	beq .skip_xscroll
+	beq .skip_xscroll_pla
 	cmp #$1E
 	bcs .end_ptr_h
 	tya
@@ -1464,7 +1472,7 @@ WriteNameTableByScroll:
 	bne .loop_nt_h_32
 .end_ptr_h
 	lda <$07
-	beq .skip_xscroll
+	beq .skip_xscroll_pla
 	sec
 	lda <$03
 	sbc #$07
@@ -1481,6 +1489,15 @@ WriteNameTableByScroll:
 	sta <$04
 	mSTZ <$06
 	jmp .loop_nt_h
+.skip_xscroll_pla
+	pla
+	sta <$09
+	pla
+	sta <$05
+	pla
+	sta <$04
+	pla
+	sta <$03
 .skip_xscroll
 ;縦スクロール
 	lda <.yscroll
