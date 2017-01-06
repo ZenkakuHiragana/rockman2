@@ -54,9 +54,9 @@ Reset_Continue;
 	lda #$00
 	sta <zETanks
 .restart
-	jsr BeginTitleScreen
-	lda <zRestartTitle ;タイトル画面をもう一度やるなら1
-	bne .restart
+;	jsr BeginTitleScreen
+;	lda <zRestartTitle ;タイトル画面をもう一度やるなら1
+;	bne .restart
 	lda <zClearFlags
 	cmp #$FF
 	bne StartStageSelect
@@ -115,7 +115,7 @@ StartStage_Continue:
 	jsr LoadStageGraphics
 	mMOV #$1C, aObjLife
 	jsr ChangeBodyColor
-	;jsr SetContinuePoint
+	jsr SetContinuePoint
 	lda #$00
 	sta <zConveyorLVec
 	sta <zStopFlag
@@ -137,11 +137,6 @@ StartStage_Continue:
 	sta <zBossBehaviour
 	lda <zRoom
 	jsr DrawRoom
-	clc
-	lda <zRoom
-	adc #$01
-	jsr DrawRoom
-	mMOV #$20, <zNTPointer
 	jsr ClearSprites
 	lda <z2001
 	ora #%00011110
@@ -894,21 +889,40 @@ Table_BossRoom:
 
 ;907D
 ;次の画面を描画
+DrawRoom_ByVertical
 DrawRoom:
+	sec
+	.ifdef DrawRoom_ByVertical
+	sbc #$10
+	.else
+	sbc #$02
+	.endif
 	tay
-	dey
-	dey
 	lda <zRoom
 	pha
 	lda <zHScroll
 	pha
+	lda <zVScroll
+	pha
 	sty <zRoom
-	mMOV #$80, <zHScroll
-	mSTZ <$01, <$02, <zVScroll
-	mMOV #$01, <$00
-	lda #$20
+	.ifdef DrawRoom_ByVertical
+	mMOV #$00, <zHScroll
+	mSTZ <zVScroll
+	lda #$1F
+	.else
+	mMOV #$00, <zHScroll
+	mSTZ <zVScroll
+	lda #$40
+	.endif
 .loop
 	pha
+	.ifdef DrawRoom_ByVertical
+	mSTZ <$00, <$02
+	mMOV #$01, <$01
+	.else
+	mSTZ <$01, <$02
+	mMOV #$01, <$00
+	.endif
 	jsr WriteNameTableByScroll
 .waitdebug
 	lda $2002
@@ -919,20 +933,41 @@ DrawRoom:
 	jsr FrameAdvance1C
 	jmp .wait
 .nowait
-	lda <zPPUSqr
-	jsr WritePPUHScroll
+	jsr WritePPUScroll
 .wait
 	clc
+	.ifdef DrawRoom_ByVertical
+	lda <zVScroll
+	.else
 	lda <zHScroll
+	.endif
 	adc #$08
-	sta <zHScroll
-	bcc .carry
+	.ifdef DrawRoom_ByVertical
+	cmp #$F0
+	.endif
+	bcc .carry_nt
+	.ifdef DrawRoom_ByVertical
+	adc #$0F
+	tay
+	lda <zRoom
+	adc #$0F
+	sta <zRoom
+	tya
+	.else
 	inc <zRoom
-.carry
+	.endif
+.carry_nt
+	.ifdef DrawRoom_ByVertical
+	sta <zVScroll
+	.else
+	sta <zHScroll
+	.endif
 	pla
 	sec
 	sbc #$01
 	bne .loop
+	pla
+	sta <zVScroll
 	pla
 	sta <zHScroll
 	pla

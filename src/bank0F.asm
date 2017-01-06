@@ -622,68 +622,69 @@ SetContinuePoint:
 	jsr ChangeBank
 	ldy <zContinuePoint
 	lda $BB06,y ;-----------------------
+	lda #$10
 	sta <zRoom
 	sta aObjRoom
-	lda $BB0C,y ;-----------------------
-	sta <zEnemyIndexPrev
-	sta <zEnemyIndexNext
-	lda $BB12,y ;-----------------------
-	sta <zItemIndexPrev
-	sta <zItemIndexNext
-	lda $BB18,y ;-----------------------
-	sta <zNTPrevhi
-	lda $BB1E,y ;-----------------------
-	sta <zNTPrevlo
-	lda $BB24,y ;-----------------------
-	sta <zNTNexthi
-	lda $BB2A,y ;-----------------------
-	sta <zNTNextlo
-	lda $BB30,y ;-----------------------
-	sta <zScrollNumber
-	lda $BB36,y ;-----------------------
-	sta <zScrollLeft
-	lda $BB3C,y ;-----------------------
-	sta <zScrollRight
-	ldx <zScrollNumber
-	jsr Unknown_CB61
-	tya
-	clc
-	adc #$0B
-	tay
-	ldx #$0C
-.loop_pha
-	lda $B460,y ;-----------------------
-	pha
-	dey
-	dex
-	bne .loop_pha
-	lda #$0A
-	sta $2006
-	lda #$00
-	sta $2006
-	sta <zPtrlo
-	lda #$06
-	sta <$00
-.loop_enemygraphics
-	pla
-	sta <zPtrhi
-	pla
-	jsr ChangeBank
-	ldy #$00
-.loop
-	lda [zPtr],y
-	sta $2007
-	iny
-	bne .loop
-	dec <$00
-	bne .loop_enemygraphics
-	mCHANGEBANK #$0E
-	lda <zContinuePoint
-	cmp #$02
-	bne .isnot_02
-	jsr $9115 ;-------------------------
-.isnot_02
-	rts
+;	lda $BB0C,y ;-----------------------
+;	sta <zEnemyIndexPrev
+;	sta <zEnemyIndexNext
+;	lda $BB12,y ;-----------------------
+;	sta <zItemIndexPrev
+;	sta <zItemIndexNext
+;	lda $BB18,y ;-----------------------
+;	sta <zNTPrevhi
+;	lda $BB1E,y ;-----------------------
+;	sta <zNTPrevlo
+;	lda $BB24,y ;-----------------------
+;	sta <zNTNexthi
+;	lda $BB2A,y ;-----------------------
+;	sta <zNTNextlo
+;	lda $BB30,y ;-----------------------
+;	sta <zScrollNumber
+;	lda $BB36,y ;-----------------------
+;	sta <zScrollLeft
+;	lda $BB3C,y ;-----------------------
+;	sta <zScrollRight
+;	ldx <zScrollNumber
+;	jsr Unknown_CB61
+;	tya
+;	clc
+;	adc #$0B
+;	tay
+;	ldx #$0C
+;.loop_pha
+;	lda $B460,y ;-----------------------
+;	pha
+;	dey
+;	dex
+;	bne .loop_pha
+;	lda #$0A
+;	sta $2006
+;	lda #$00
+;	sta $2006
+;	sta <zPtrlo
+;	lda #$06
+;	sta <$00
+;.loop_enemygraphics
+;	pla
+;	sta <zPtrhi
+;	pla
+;	jsr ChangeBank
+;	ldy #$00
+;.loop
+;	lda [zPtr],y
+;	sta $2007
+;	iny
+;	bne .loop
+;	dec <$00
+;	bne .loop_enemygraphics
+;	mCHANGEBANK #$0E
+;	lda <zContinuePoint
+;	cmp #$02
+;	bne .isnot_02
+;	jsr $9115 ;-------------------------
+;.isnot_02
+	mCHANGEBANK #$0E, 1
 
 ;20 57 C5
 BeginTitleScreen:
@@ -1272,11 +1273,11 @@ WriteNameTableByScroll:
 	jsr ChangeBank
 ;書き込み開始位置の設定
 	ldx <zRoom
+	lda <.f
+	asl a
 	lda <zHScroll
-	ldy <$02
-	bpl .left_nt
-	clc
-	adc #$08
+	bcc .left_nt
+	adc #$07
 	bcc .left_nt
 	inx
 .left_nt
@@ -1285,9 +1286,31 @@ WriteNameTableByScroll:
 	inx
 .inx_room_h
 	sta <$08
+	ldy <zVScroll
+	asl <.f
+	php
+	lda <$01
+	beq .scroll_up
+	lda <.f
+	bne .scroll_up
+	sec
+	tya
+	sbc #$08
+	tay
+	bcs .scroll_down
+	sbc #$0F
+	tay
+	bne .scroll_up
+.scroll_down
+	txa
+	adc #$0F
+	tax
+.scroll_up
+	sty <$10
 	stx <$09
 	ldx #$00
 	ldy #$00
+	lda <$08
 	and #$08
 	beq .inx_8
 	ldy #$02
@@ -1305,7 +1328,7 @@ WriteNameTableByScroll:
 	rol a
 	and #$38
 	sta <$03 ;$03: 00XX X000
-	lda <zVScroll
+	lda <$10
 	asl a
 	rol a
 	rol a
@@ -1321,38 +1344,38 @@ WriteNameTableByScroll:
 	sta <$03 ;$03: 00XX XYYY
 	stx <$04 ;$04: 32x32 LT LB RT RB
 	sty <$05 ;$05: 16x16 LT LB RT RB
+;横スクロール
+	plp
+	lda <.xscroll
+	sta <zPPUHScr
+	bne .do_h
+	jmp .skip_xscroll
+.do_h
+	bcs .left
+	inc <$09
+	jmp .merge_room
+.left
+	dec <$09
+.merge_room
 ;ネームテーブル書き込み位置指定
 	lda <$09
+	sta <$72
 	lsr a
 	lda #$20
 	bcc .left_room_h
 	lda #$2C
 .left_room_h
 	sta aPPUHScrhi
-;横スクロール
-	lda <.xscroll
-	sta <zPPUHScr
-	bne .do_h
-	jmp .skip_xscroll
-.do_h
-	lda <.f
-	bmi .left
-	inc <$09
-	bvc .merge_room
-.left
-	dec <$09
-.merge_room
 ;画面切り分け位置の指定
-	lda <zVScroll
+	lda <$10
 	lsr a
 	lsr a
 	lsr a
 	sta <$06 ;$06: ppu write data index
 	sta <$07 ;$07: ppu write data index
 ;属性データ書き込み位置指定
-	clc
 	lda aPPUHScrhi
-	adc #$03
+	ora #$03
 	sta aPPUHScrAttrhi
 	lda <$08
 	asl a
@@ -1364,9 +1387,9 @@ WriteNameTableByScroll:
 	adc #$C0
 	ldx #$00
 .loop_attr
-	pha
+	tay
 	mSTZ aPPUHScrAttr,x
-	pla
+	tya
 	sta aPPUHScrAttrlo,x
 	adc #$08
 	inx
@@ -1408,6 +1431,7 @@ WriteNameTableByScroll:
 	and Stage_Def32Pal,y
 	ora aPPUHScrAttr,x
 	sta aPPUHScrAttr,x
+	
 .loop_nt_h_16
 	jsr WriteNameTable_GetTile16
 .loop_nt_h_8
@@ -1462,34 +1486,71 @@ WriteNameTableByScroll:
 	lda <.yscroll
 	sta <zPPUVScr
 	bne .do_yscroll
-	jmp .skip_yscroll
+	jmp .end_scroll
 .do_yscroll
-	mMOV #$20 >> 2, aPPUVScrhi
-	mSTZ aPPUVScrlo
-	lda <zVScroll
-	asl a
-	rol aPPUVScrhi
-	asl a
-	rol aPPUVScrhi
-	adc aPPUVScrlo
-	sta aPPUVScrlo
-	and #$1F
-	pha
+	dec <$09
+	lda <$08
+	lsr a
+	lsr a
+	lsr a
+	tay
 	lda <$09
 	lsr a
-	pla
+	tya
 	bcc .boundary_left
-	adc #$1F
+	ora #$20
 .boundary_left
 	sta <$06 ;$06: ppu write data index
 	sta <$07 ;$07: ppu write data index
+	mMOV #$20 >> 2, aPPUVScrhi
+	mSTZ aPPUVScrlo
+	lda <$10
+	asl a
+	rol aPPUVScrhi
+	asl a
+	rol aPPUVScrhi
+	and #$E0
+	sta aPPUVScrlo
 	
+	and #$10 << 2
+	bne .attr
+	lda #%11110000
+	.db $2C
+.attr
+	lda #%00001111
+	cmp #%11110000
+	ldy <.f
+	beq .skip
+	ror a ;上スクロール時、逆条件
+	eor #%10000000
+	rol a
+.skip
+	bcs .write_all
+	lda #%00000000 ;属性テーブルの上側を書く時、マスクなし
+.write_all
+	sta aPPUVScrAttrMask
+;属性データ書き込み位置指定
+	lda <$10
+	lsr a
+	lsr a
+	and #$38
+	ora #$C0
+	sta aPPUVScrAttr
 ;ネームテーブル書き込み
 .loop_nt_v
 	jsr WriteNameTable_GetMapPtr
-	sty <$73
 .loop_nt_v_32
 	jsr WriteNameTable_GetChip32
+;属性データ書き込み
+	lda <$06
+	lsr a
+	lsr a
+	tax
+	lda aPPUVScrAttrMask
+	eor #%11111111
+	and Stage_Def32Pal,y
+	sta aPPUVScrAttrData,x
+	
 .loop_nt_v_16
 	jsr WriteNameTable_GetTile16
 .loop_nt_v_8
@@ -1554,12 +1615,56 @@ WriteNameTableByScroll:
 	sta <$04
 	jmp .loop_nt_v
 .skip_yscroll
+;属性テーブルをora
+	
+	ldx <zRoom
+	dex
+	txa
+	ldx <.f
+	beq .skip3
+	clc
+	adc #$10
+.skip3
+	sta <$09
+	lsr <$07
+	lsr <$07
+	ldx <$07
+.loop_attr_y
+	jsr WriteNameTable_GetMapPtr
+.loop_attr_y_32
+	jsr WriteNameTable_GetChip32
+	lda aPPUVScrAttrMask
+	and Stage_Def32Pal,y
+	ora aPPUVScrAttrData,x
+	sta aPPUVScrAttrData,x
+	
+	inx
+	cpx <$07
+	beq .end_scroll
+	cpx #$10
+	bcs .end_ptr
+	cpx #$08
+	beq .end_ptr
+	clc
+	lda <$03
+	adc #$08
+	sta <$03
+	bne .loop_attr_y_32
+.end_ptr
+	inc <$09
+	sec
+	lda <$03
+	sbc #$40 - 8
+	sta <$03
+	bpl .loop_attr_y
+.end_scroll
 	mCHANGEBANK #$0E, 1
 
 WriteNameTable_GetMapPtr:
 	ldy <$09
 	mSTZ <$0A
 	lda Stage_DefMap16,y
+	and #$3F
 	lsr a
 	ror <$0A
 	lsr a

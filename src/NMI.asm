@@ -19,18 +19,11 @@
 	sta <z2001
 	sta $2001 ;PPU Reg1
 	lda $2002 ;PPU Stats
+	jsr WritePPUScroll
 	lda #$00
 	sta $2003 ;Sprite Address
 	lda #$02
 	sta $4014 ;Sprite DMA
-	lda <zPPUHScr
-	beq .hscr
-	jsr WritePPUHScroll
-.hscr
-	lda <zPPUVScr
-	beq .vscr
-	jsr WritePPUVScroll
-.vscr
 	lda <zPPUSqr
 	beq .sqr
 	jsr WritePPUSquare
@@ -173,52 +166,184 @@ WritePalette:
 	sta $2006
 	sta <z3A ;---------------------------?
 	rts
+	.beginregion "PPU_4way_scroll"
+WritePPUScroll:
+	lda <zPPUVScr
+	bne .do_v
+	jmp .skip_v
+.do_v
+	ldx aPPUVScrhi
+	stx $2006
+	ldy aPPUVScrlo
+	sty $2006
+	
+	mMOV aPPUVScrData, $2007
+	mMOV aPPUVScrData + $01, $2007
+	mMOV aPPUVScrData + $02, $2007
+	mMOV aPPUVScrData + $03, $2007
+	mMOV aPPUVScrData + $04, $2007
+	mMOV aPPUVScrData + $05, $2007
+	mMOV aPPUVScrData + $06, $2007
+	mMOV aPPUVScrData + $07, $2007
+	mMOV aPPUVScrData + $08, $2007
+	mMOV aPPUVScrData + $09, $2007
+	mMOV aPPUVScrData + $0A, $2007
+	mMOV aPPUVScrData + $0B, $2007
+	mMOV aPPUVScrData + $0C, $2007
+	mMOV aPPUVScrData + $0D, $2007
+	mMOV aPPUVScrData + $0E, $2007
+	mMOV aPPUVScrData + $0F, $2007
+	mMOV aPPUVScrData + $10, $2007
+	mMOV aPPUVScrData + $11, $2007
+	mMOV aPPUVScrData + $12, $2007
+	mMOV aPPUVScrData + $13, $2007
+	mMOV aPPUVScrData + $14, $2007
+	mMOV aPPUVScrData + $15, $2007
+	mMOV aPPUVScrData + $16, $2007
+	mMOV aPPUVScrData + $17, $2007
+	mMOV aPPUVScrData + $18, $2007
+	mMOV aPPUVScrData + $19, $2007
+	mMOV aPPUVScrData + $1A, $2007
+	mMOV aPPUVScrData + $1B, $2007
+	mMOV aPPUVScrData + $1C, $2007
+	mMOV aPPUVScrData + $1D, $2007
+	mMOV aPPUVScrData + $1E, $2007
+	mMOV aPPUVScrData + $1F, $2007
+	
+	txa
+	clc
+	adc #$04
+	sta $2006
+	sty $2006
+	
+	mMOV aPPUVScrData + $20, $2007
+	mMOV aPPUVScrData + $21, $2007
+	mMOV aPPUVScrData + $22, $2007
+	mMOV aPPUVScrData + $23, $2007
+	mMOV aPPUVScrData + $24, $2007
+	mMOV aPPUVScrData + $25, $2007
+	mMOV aPPUVScrData + $26, $2007
+	mMOV aPPUVScrData + $27, $2007
+	mMOV aPPUVScrData + $28, $2007
+	mMOV aPPUVScrData + $29, $2007
+	mMOV aPPUVScrData + $2A, $2007
+	mMOV aPPUVScrData + $2B, $2007
+	mMOV aPPUVScrData + $2C, $2007
+	mMOV aPPUVScrData + $2D, $2007
+	mMOV aPPUVScrData + $2E, $2007
+	mMOV aPPUVScrData + $2F, $2007
+	mMOV aPPUVScrData + $30, $2007
+	mMOV aPPUVScrData + $31, $2007
+	mMOV aPPUVScrData + $32, $2007
+	mMOV aPPUVScrData + $33, $2007
+	mMOV aPPUVScrData + $34, $2007
+	mMOV aPPUVScrData + $35, $2007
+	mMOV aPPUVScrData + $36, $2007
+	mMOV aPPUVScrData + $37, $2007
+	mMOV aPPUVScrData + $38, $2007
+	mMOV aPPUVScrData + $39, $2007
+	mMOV aPPUVScrData + $3A, $2007
+	mMOV aPPUVScrData + $3B, $2007
+	mMOV aPPUVScrData + $3C, $2007
+	mMOV aPPUVScrData + $3D, $2007
+	mMOV aPPUVScrData + $3E, $2007
+	mMOV aPPUVScrData + $3F, $2007
+	
+	mMOV #$23, $2006
+	ldy aPPUVScrAttr
+	sty $2006
+	
+	mMOV aPPUVScrAttrData, $2007
+	mMOV aPPUVScrAttrData + 1, $2007
+	mMOV aPPUVScrAttrData + 2, $2007
+	mMOV aPPUVScrAttrData + 3, $2007
+	mMOV aPPUVScrAttrData + 4, $2007
+	mMOV aPPUVScrAttrData + 5, $2007
+	mMOV aPPUVScrAttrData + 6, $2007
+	mMOV aPPUVScrAttrData + 7, $2007
+	
+	mMOV #$2F, $2006
+	sty $2006
+	
+	mMOV aPPUVScrAttrData + 8, $2007
+	mMOV aPPUVScrAttrData + 9, $2007
+	mMOV aPPUVScrAttrData + $A, $2007
+	mMOV aPPUVScrAttrData + $B, $2007
+	mMOV aPPUVScrAttrData + $C, $2007
+	mMOV aPPUVScrAttrData + $D, $2007
+	mMOV aPPUVScrAttrData + $E, $2007
+	mMOV aPPUVScrAttrData + $F, $2007
+.skip_v
 
-WritePPUHScroll:
-	lda <z2000
-	ora #%00000100
-	sta $2000
+	lda <zPPUHScr
+	bne .do_h
+	jmp .skip_h
+.do_h
+	
+	mMOV #%00010100, $2000
 	mMOV aPPUHScrhi, $2006
 	mMOV aPPUHScrlo, $2006
-	ldx #$00
-	stx <zPPUHScr
-.loop_nt
-	mMOV aPPUHScrData,x, $2007
-	inx
-	cpx #$1E
-	bne .loop_nt
-	ldx #$00
-.loop_attr
-	mMOV aPPUHScrAttrhi, $2006
-	mMOV aPPUHScrAttrlo,x, $2006
-	mMOV aPPUHScrAttr,x, $2007
-	inx
-	inx
-	cpx #$10
-	bne .loop_attr
+	mMOV aPPUHScrData, $2007
+	mMOV aPPUHScrData + $01, $2007
+	mMOV aPPUHScrData + $02, $2007
+	mMOV aPPUHScrData + $03, $2007
+	mMOV aPPUHScrData + $04, $2007
+	mMOV aPPUHScrData + $05, $2007
+	mMOV aPPUHScrData + $06, $2007
+	mMOV aPPUHScrData + $07, $2007
+	mMOV aPPUHScrData + $08, $2007
+	mMOV aPPUHScrData + $09, $2007
+	mMOV aPPUHScrData + $0A, $2007
+	mMOV aPPUHScrData + $0B, $2007
+	mMOV aPPUHScrData + $0C, $2007
+	mMOV aPPUHScrData + $0D, $2007
+	mMOV aPPUHScrData + $0E, $2007
+	mMOV aPPUHScrData + $0F, $2007
+	mMOV aPPUHScrData + $10, $2007
+	mMOV aPPUHScrData + $11, $2007
+	mMOV aPPUHScrData + $12, $2007
+	mMOV aPPUHScrData + $13, $2007
+	mMOV aPPUHScrData + $14, $2007
+	mMOV aPPUHScrData + $15, $2007
+	mMOV aPPUHScrData + $16, $2007
+	mMOV aPPUHScrData + $17, $2007
+	mMOV aPPUHScrData + $18, $2007
+	mMOV aPPUHScrData + $19, $2007
+	mMOV aPPUHScrData + $1A, $2007
+	mMOV aPPUHScrData + $1B, $2007
+	mMOV aPPUHScrData + $1C, $2007
+	mMOV aPPUHScrData + $1D, $2007
+	
+	ldy aPPUHScrAttrhi
+	sty $2006
+	mMOV aPPUHScrAttrlo, $2006
+	mMOV aPPUHScrAttr, $2007
+	sty $2006
+	mMOV aPPUHScrAttrlo + 2, $2006
+	mMOV aPPUHScrAttr + 2, $2007
+	sty $2006
+	mMOV aPPUHScrAttrlo + 4, $2006
+	mMOV aPPUHScrAttr + 4, $2007
+	sty $2006
+	mMOV aPPUHScrAttrlo + 6, $2006
+	mMOV aPPUHScrAttr + 6, $2007
+	sty $2006
+	mMOV aPPUHScrAttrlo + 8, $2006
+	mMOV aPPUHScrAttr + 8, $2007
+	sty $2006
+	mMOV aPPUHScrAttrlo + $A, $2006
+	mMOV aPPUHScrAttr + $A, $2007
+	sty $2006
+	mMOV aPPUHScrAttrlo + $C, $2006
+	mMOV aPPUHScrAttr + $C, $2007
+	sty $2006
+	mMOV aPPUHScrAttrlo + $E, $2006
+	mMOV aPPUHScrAttr + $E, $2007
 	mMOV <z2000, $2000
+	mSTZ <zPPUHScr, <zPPUVScr
+.skip_h
 	rts
-
-WritePPUVScroll:
-	mMOV aPPUVScrhi, $2006
-	mMOV aPPUVScrlo, $2006
-	ldx #$00
-	stx <zPPUVScr
-.loop_nt
-	mMOV aPPUVScrData,x, $2007
-	inx
-	cpx #$20
-	bne .loop_nt
-	lda aPPUVScrhi
-	adc #$03
-	sta $2006
-	mMOV aPPUVScrlo, $2006
-.loop_nt2
-	mMOV aPPUVScrData,x, $2007
-	inx
-	cpx #$40
-	bne .loop_nt2
-	rts
+	.endregion "PPU_4way_scroll"
 
 ;20 18 D1
 WritePPUSquare:

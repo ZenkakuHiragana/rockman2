@@ -1299,8 +1299,8 @@ DoRockman_DoScroll:
 	sbc <zHScroll
 	sec
 	bit <zMoveVec
-;	bvc .scroll_left
-	jmp .skip_horizontal
+	bvc .scroll_left
+;	jmp .skip_horizontal
 ;右スクロール
 	sbc #$60
 	bcc .skip_horizontal
@@ -1387,6 +1387,7 @@ DoRockman_DoScroll:
 	bcs .changedy_d
 	sta <.dy
 .changedy_d
+	clc
 	lda <zVScroll
 	pha
 	adc <.dy
@@ -1395,9 +1396,8 @@ DoRockman_DoScroll:
 	bcc .cross_page_down
 	adc #$0F
 	sta <zVScroll
-	clc
 	lda <zRoom
-	adc #$10
+	adc #$0F
 	sta <zRoom
 .cross_page_down
 	pla ;ネームテーブル書き込み予約の判定
@@ -1432,7 +1432,7 @@ DoRockman_DoScroll:
 .merge_v
 	clc
 	and #$07
-	adc <.dx
+	adc <.dy
 	lsr a
 	lsr a
 	lsr a

@@ -289,19 +289,19 @@ aPPUShutterAttrhi = $3C2;PPUシャッター書き込み時の属性テーブル�
 aPPUShutterAttrlo = $3C8;PPUシャッター書き込み時の属性テーブル位置下位
 
 ;--------------------------------------------------------------
-aPPUHScrhi = $300     ;横スクロールNT書き込み上位
-aPPUHScrlo = $301     ;横スクロールNT書き込み下位
-aPPUHScrData = $302   ;横スクロールNT書き込みデータ
-aPPUHScrAttrhi = $320 ;横スクロール属性書き込み上位
-aPPUHScrAttrlo = $321 ;横スクロール属性書き込み下位
-aPPUHScrAttr = $322   ;横スクロール属性書き込みデータ
-                      ;8つ分の属性書き込み領域
-aPPUVScrhi = $331     ;縦スクロールNT書き込み上位
-aPPUVScrlo = $332     ;縦スクロールNT書き込み下位
-aPPUVScrData = $333   ;縦スクロールNT書き込みデータ
-aPPUVScrAttrhi = $373 ;縦スクロール属性書き込み上位
-aPPUVScrAttrlo = $375 ;縦スクロール属性書き込み下位
-aPPUVScrAttr = $376   ;縦スクロール属性書き込みデータ
+aPPUHScrhi = $300       ;横スクロールNT書き込み上位
+aPPUHScrlo = $301       ;横スクロールNT書き込み下位
+aPPUHScrData = $302     ;横スクロールNT書き込みデータ
+aPPUHScrAttrhi = $320   ;横スクロール属性書き込み上位
+aPPUHScrAttrlo = $321   ;横スクロール属性書き込み下位
+aPPUHScrAttr = $322     ;横スクロール属性書き込みデータ
+                        ;8つ分の属性書き込み領域
+aPPUVScrhi = $331       ;縦スクロールNT書き込み上位
+aPPUVScrlo = $332       ;縦スクロールNT書き込み下位
+aPPUVScrData = $333     ;縦スクロールNT書き込みデータ
+aPPUVScrAttr = $373     ;縦スクロール属性書き込み下位
+aPPUVScrAttrMask = $374 ;縦スクロール属性マスク
+aPPUVScrAttrData = $375 ;縦スクロール属性書き込みデータ
 ;--------------------------------------------------------------
 
 aObjAnim = $400         ;オブジェクトのアニメーション番号
