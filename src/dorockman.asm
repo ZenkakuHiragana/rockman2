@@ -166,17 +166,17 @@ DoRockman05_Walking_Skip:
 ;ロックマン状態#6空中
 DoRockman06_Jumping:
 	jsr DoRockman_ShootWeapon
-	mSTZ aObjVXlo, aObjVX, aObjVYlo, aObjVY
-	lda <zKeyDown
-	and #$30
-	beq .move_v
-	and #$20
-	beq .up
-	mMOVW $FE80, aObjVYlo, aObjVY
-	bne .move_v
-.up
-	mMOVW $0180, aObjVYlo, aObjVY
-.move_v
+	mSTZ aObjVXlo, aObjVX;, aObjVYlo, aObjVY
+;	lda <zKeyDown
+;	and #$30
+;	beq .move_v
+;	and #$20
+;	beq .up
+;	mMOVW $FE80, aObjVYlo, aObjVY
+;	bne .move_v
+;.up
+;	mMOVW $0180, aObjVYlo, aObjVY
+;.move_v
 ;滑り速度の減速
 	sec
 	lda <zSliplo
@@ -251,8 +251,7 @@ DoRockman0A_LadderTop:
 	beq .notshoot
 	jmp .shoot
 .notshoot
-	lda #$00
-	sta <zAutoFireTimer
+	mSTZ <zAutoFireTimer
 .aftershoot
 	lda <zKeyDown
 	and #$31
@@ -273,9 +272,11 @@ DoRockman0A_LadderTop:
 	sec
 	sbc #$0C
 	sta aObjY
-	lda <zOffscreen
-	sbc #$00
-	sta <zOffscreen
+	bcs .borrow_up
+	lda aObjRoom
+	sbc #$0F
+	sta aObjRoom
+.borrow_up
 	ldx #$03
 	jmp .done
 .middle
@@ -292,9 +293,10 @@ DoRockman0A_LadderTop:
 	clc
 	adc #$0C
 	sta aObjY
-	lda <zOffscreen
-	adc #$00
-	sta <zOffscreen
+	bcc .skip2
+	lda aObjRoom
+	adc #$0F
+	sta aObjRoom
 .skip2
 	ldy #$FF
 	ldx #$40
@@ -389,7 +391,6 @@ Table_DoRockmanhi:
 ;879B
 ;ロックマンの武器のショット処理
 DoRockman_ShootWeapon:
-.x = $2E
 	lda <zKeyDown
 	and #$02
 	bne .shoot
@@ -416,6 +417,10 @@ DoRockman_ShootWeapon:
 ;	lda aObjFlags
 ;	eor #%01000000
 ;	sta aObjFlags
+	lda aObjX
+	and #$F0
+	ora #$08
+	sta aObjX
 	jsr SetRockmanAnimation
 	pla
 	pla
@@ -674,7 +679,8 @@ DoRockman_BodyMoveX:
 DoRockman_WallCheckX:
 .n = $02
 .blk = $10
-	sta <$09
+	and #$0F
+	sta <$03
 	lda #$02
 	sta <.n
 .loop
@@ -682,8 +688,19 @@ DoRockman_WallCheckX:
 	clc
 	lda aObjY
 	adc Table_WallCheckX_dy,x
+	ldy Table_WallCheckX_dy,x
+	bmi .sbc
+	cmp #$F0
+	bcc .borrow
+	adc #$0F
+	bpl .borrow
+.sbc
+	bcs .borrow
+	sbc #$0F
+	clc
+.borrow
 	sta <$0A
-	lda <$09
+	lda aObjRoom
 	and #$F0
 	php
 	lsr a
@@ -696,7 +713,7 @@ DoRockman_WallCheckX:
 	asl a
 	asl a
 	asl a
-	ora <$09
+	ora <$03
 	sta <$09
 	jsr PickupBlock
 	ldx <.n
@@ -753,16 +770,28 @@ Table_WallCheckX_dr:
 ;はしごや水中判定のための地形判定
 DoRockman_CheckAttr_Center:
 	mMOV aObjX, <$08
-	lda aObjRoom
-	sta <$09
 	mMOV #$02, <$01
 .loop
 	ldx <$01
 	clc
 	lda aObjY
 	adc Table_WallCheckX_dy,x
+	ldy Table_WallCheckX_dy,x
+	bmi .sbc
+	cmp #$F0
+	bcc .borrow
+	adc #$0F
+	bpl .borrow
+.sbc
+	bcs .borrow
+	sbc #$0F
+	clc
+.borrow
 	sta <$0A
-	lda <$09
+	lda aObjRoom
+	and #$0F
+	sta <$09
+	lda aObjRoom
 	php
 	lsr a
 	lsr a
@@ -849,6 +878,16 @@ DoRockman_CheckAttr_Center:
 	dex
 	bpl .loopladder
 	
+	lda aObjRoom
+	and #$F0
+	lsr a
+	lsr a
+	lsr a
+	lsr a
+	sta <$00
+	lda aObjRoom
+	and #$0F
+	sta <$09
 	sec
 	lda aObjYlo
 	sbc aObjVYlo
@@ -859,28 +898,22 @@ DoRockman_CheckAttr_Center:
 	sec
 	sbc #$0C
 	sta <$0A
-	lda <$09
-	and #$F0
-	php
-	lsr a
-	lsr a
-	lsr a
-	lsr a
-	plp
+	bcs .borrow_add
+	sbc #$0F
+	clc
+.borrow_add
+	lda <$00
 	sbc #$00
 	jmp .jump
 .fall
 	clc
 	adc #$0C
+	cmp #$F0
+	bcc .carry_add
+	adc #$0F
+.carry_add
 	sta <$0A
-	lda <$09
-	and #$F0
-	php
-	lsr a
-	lsr a
-	lsr a
-	lsr a
-	plp
+	lda <$00
 	adc #$00
 .jump
 	asl a
@@ -985,22 +1018,20 @@ DoRockman_BodyMoveY_NoHit:
 	sec
 	lda aObjVYlo
 	sbc <zGravity
-;	sta aObjVYlo
+	sta aObjVYlo
 	lda aObjVY
 	sbc <zGravityhi
-;	sta aObjVY
-	bpl .done_up
-	cmp #$F4
-	bcs .done_up
+	sta aObjVY
+	bpl DoRockman_BodyMoveY_NoHit_Done
+	cmp #$F8
+	bcs DoRockman_BodyMoveY_NoHit_Done
 	mSTZ aObjVYlo
-	mMOV #$F4, aObjVY
+	mMOV #$F8, aObjVY
+DoRockman_BodyMoveY_NoHit_Done:
+.r = $01
 	lda aObjRoom
 	and #$0F
 	sta aObjRoom
-	bcc .boundary_y
-	adc #$0F
-	sec
-.boundary_y
 	lda <.r
 	asl a
 	asl a
@@ -1008,27 +1039,30 @@ DoRockman_BodyMoveY_NoHit:
 	asl a
 	ora aObjRoom
 	sta aObjRoom
-.done_up
 	rts
 ;8C28
 ;壁判定・下方向
-DoRockman_BodyMoveY_CheckWallDown
+DoRockman_BodyMoveY_CheckWallDown:
 .r = $01
 	clc
 	lda aObjY
 	adc #$0C
-	sta <$0A
 	cmp #$F0
 	bcc .boundary_y
 	adc #$0F
 	sec
 .boundary_y
+	sta <$0A
 	lda <.r
 	adc #$00
 	jsr DoRockman_WallCheckY
 	jsr DoRockman_CheckLift
 	lda <$00
-	beq DoRockman_BodyMoveY_NoHit
+	bne .hit_land
+	bcc DoRockman_BodyMoveY_NoHit
+	inc <$00
+	bcs DoRockman_BodyMoveY_NoHit_Done
+.hit_land
 	mSTZ aObjYlo
 	lda aObjY
 	pha
@@ -1050,32 +1084,33 @@ DoRockman_BodyMoveY_CheckWallDown
 ;Y方向の壁判定
 DoRockman_WallCheckY:
 ;a = 0000 YYYY, Y = room Y
+.n = $02
 .x = $08
 .r = $09
+.ry = $03
 .y = $0A
 	asl a
 	asl a
 	asl a
 	asl a
-	sta <.r
-	mMOV #$01, <$01
+	sta <.ry
+	mMOV #$01, <.n
 .loop
-	ldx <$01
+	ldx <.n
 	clc
 	lda aObjX
 	adc Table_WallCheckY_dx,x
 	sta <.x
 	lda aObjRoom
-	and #$0F
-	ora <.r
 	adc Table_WallCheckY_dr,x
+	and #$0F
+	ora <.ry
 	sta <.r
-	sta <$70,x
 	jsr PickupBlock
-	ldx <$01
+	ldx <.n
 	lda <$00
 	sta <zBGAttr,x
-	dec <$01
+	dec <.n
 	bpl .loop
 	
 	mSTZ <zWindFlag
@@ -1116,7 +1151,8 @@ DoRockman_WallCheckY:
 .done
 	sta <$00
 	lda <zBGLadder
-	beq .ladder
+	cmp #$01
+	bne .ladder
 	sta <$00
 .ladder
 	rts
@@ -1284,6 +1320,7 @@ DoRockman_DoScroll:
 .dx = $03 ;移動差X
 .dy = $04 ;移動差Y
 	mSTZ <.nth, <.ntv, <.f
+	sty <.dy
 	sec
 	txa
 	sbc aObjX
@@ -1300,15 +1337,23 @@ DoRockman_DoScroll:
 	sec
 	bit <zMoveVec
 	bvc .scroll_left
-;	jmp .skip_horizontal
 ;右スクロール
-	sbc #$60
+	sbc #$5F
 	bcc .skip_horizontal
-	beq .skip_horizontal
 	cmp <.dx
 	bcs .changedx_r
 	sta <.dx
 .changedx_r
+	ldx <zRoom
+	inx
+	ldy #$00
+	jsr ChangeBank_GetScrollable
+	tya
+	bpl .scroll_right_do
+	lda <zHScroll
+	sta <.dx
+	jmp .changedx_lscr
+.scroll_right_do
 	clc
 	lda <zHScroll
 	pha
@@ -1329,6 +1374,17 @@ DoRockman_DoScroll:
 	bcs .changedx_l
 	sta <.dx
 .changedx_l
+	ldx <zRoom
+	dex
+	ldy #$00
+	jsr ChangeBank_GetScrollable
+	tya
+	bpl .changedx_lscr
+	lda <zHScroll
+	cmp <.dx
+	bcs .changedx_lscr
+	sta <.dx
+.changedx_lscr
 	sec
 	ror <.f
 	sec
@@ -1350,23 +1406,19 @@ DoRockman_DoScroll:
 	lsr a
 	sta <.nth ;横スクロールのための書き込み量
 .skip_horizontal
+	ldy <.dy
 ;縦スクロール
 	sec
 	tya
 	sbc aObjY
 	bne .usevy
-	lda aObjVY
-	eor #$80
-	asl a
-	lda #$01
-	php
-	bne .usevy2
+	clc
 .usevy
 	php
-	bcs .borrow_dy
+	bcs .inv_dy
 	eor #$FF
 	adc #$01
-.borrow_dy
+.inv_dy
 	clc
 	adc #$01
 .usevy2
@@ -1381,12 +1433,26 @@ DoRockman_DoScroll:
 	bcs .scroll_up
 ;下スクロール
 	sbc #$7F
-	bcc .skip_vertical
-	beq .skip_vertical
+	bcs .go_down
+	adc #$80
+	jmp .scroll_up
+.go_down
 	cmp <.dy
 	bcs .changedy_d
 	sta <.dy
 .changedy_d
+	lda <zRoom
+	clc
+	adc #$10
+	tax
+	ldy #$01
+	jsr ChangeBank_GetScrollable
+	tya
+	bpl .scroll_down_do
+	lda <zVScroll
+	sta <.dy
+	jmp .changedy_uscr
+.scroll_down_do
 	clc
 	lda <zVScroll
 	pha
@@ -1412,6 +1478,19 @@ DoRockman_DoScroll:
 	bcs .changedy_u
 	sta <.dy
 .changedy_u
+	lda <zRoom
+	sec
+	sbc #$10
+	tax
+	ldy #$01
+	jsr ChangeBank_GetScrollable
+	tya
+	bpl .changedy_uscr
+	lda <zVScroll
+	cmp <.dy
+	bcs .changedy_uscr
+	sta <.dy
+.changedy_uscr
 	sec
 	inc <.f
 	lda <zVScroll

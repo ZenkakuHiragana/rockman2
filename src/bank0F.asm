@@ -1367,7 +1367,6 @@ WriteNameTableByScroll:
 .merge_room
 ;ネームテーブル書き込み位置指定
 	lda <$09
-	sta <$72
 	lsr a
 	lda #$20
 	bcc .left_room_h
@@ -1725,6 +1724,37 @@ WriteNameTableByScroll_AnyBank:
 	pla
 	mJSR_NORTS ChangeBank
 
+;その画面位置にスクロール可能かを調べる
+;X 画面位置
+;Y = 1 → 縦スクロールで侵入可能か
+ChangeBank_GetScrollable:
+	lda <zStage
+	and #$07
+	jsr ChangeBank
+	lda Stage_DefMap16,x
+	dey
+	bpl .vertical
+;横スクロールで侵入可能か
+	ldy <zVScroll
+	beq .merge
+	tay
+	txa
+	clc
+	adc #$10
+	tax
+	tya
+	jmp .merge
+;縦スクロールで侵入可能か
+.vertical
+	ldy <zHScroll
+	beq .merge
+	inx
+.merge
+	ora Stage_DefMap16,x
+	asl a
+	tay
+	mCHANGEBANK #$0E, 1
+
 ;20 13 CA: 上下スクロール時のNameTableの描画に密接に関わる
 VerticalScroll_DrawNT:
 .VertScrollCounter = $39
@@ -1984,16 +2014,14 @@ PickupMap:
 	jsr ChangeBank
 	
 	mSTZ <.ptr
-	ldx <.R
-	lda Stage_DefMap16,x
+	ldx <.Y
+	ldy <.R
+	lda Stage_DefMap16,y
 	bmi .skip ;壁判定扱いにする
-	ora #$C0 ;$B0 << 2 → $30 << 2
-	sta <.ptrhi
-	lsr <.ptrhi
-	ror <.ptr
-	sec ;$80 << 1
-	ror <.ptrhi
-	ror <.ptr ;.ptr = $B000 + Room << 6
+	jsr WriteNameTable_GetMapPtr
+	mMOV <$0A, <.ptr
+	mMOV <$0B, <.ptrhi
+	stx <.Y
 
 ;y = X * $8 + Y
 	ldx #$00
@@ -2020,13 +2048,13 @@ PickupMap:
 	asl a
 	tay
 	lda <.X
-	and #$10 >> 2
+	and #$10
 	beq .x_jmp
 	iny
 .x_jmp
 	bcs .greater
 	lda Stage_Def32Attr,y
-	bcs .attr
+	bcc .attr
 .greater
 	lda Stage_Def32Attr + $100,y
 .attr
@@ -2039,18 +2067,12 @@ PickupMap:
 .y_shift
 	and #$0F
 .offscreenblock
-	lda #$00
 	sta <.result
 .block
 	mCHANGEBANK #$0E, 1
 .skip
 	lda #$08
 	bne .offscreenblock
-	
-Table_BlockAttrMask:
-	.db %00000011, %00110000, %00001100, %11000000
-Table_BlockAttrMask_ShiftLoops:
-	.db 0, 4, 2, 6
 	
 ;1ECC44
 Table_Terrain:
