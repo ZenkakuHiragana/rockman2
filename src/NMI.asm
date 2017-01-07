@@ -166,8 +166,51 @@ WritePalette:
 	sta $2006
 	sta <z3A ;---------------------------?
 	rts
+	
 	.beginregion "PPU_4way_scroll"
 WritePPUScroll:
+	lda <zPPUHScr
+	bne .do_h
+	jmp .skip_h
+.do_h
+	
+	mMOV #%00010100, $2000
+	mMOV aPPUHScrhi, $2006
+	mMOV aPPUHScrlo, $2006
+	mMOV aPPUHScrData, $2007
+	mMOV aPPUHScrData + $01, $2007
+	mMOV aPPUHScrData + $02, $2007
+	mMOV aPPUHScrData + $03, $2007
+	mMOV aPPUHScrData + $04, $2007
+	mMOV aPPUHScrData + $05, $2007
+	mMOV aPPUHScrData + $06, $2007
+	mMOV aPPUHScrData + $07, $2007
+	mMOV aPPUHScrData + $08, $2007
+	mMOV aPPUHScrData + $09, $2007
+	mMOV aPPUHScrData + $0A, $2007
+	mMOV aPPUHScrData + $0B, $2007
+	mMOV aPPUHScrData + $0C, $2007
+	mMOV aPPUHScrData + $0D, $2007
+	mMOV aPPUHScrData + $0E, $2007
+	mMOV aPPUHScrData + $0F, $2007
+	mMOV aPPUHScrData + $10, $2007
+	mMOV aPPUHScrData + $11, $2007
+	mMOV aPPUHScrData + $12, $2007
+	mMOV aPPUHScrData + $13, $2007
+	mMOV aPPUHScrData + $14, $2007
+	mMOV aPPUHScrData + $15, $2007
+	mMOV aPPUHScrData + $16, $2007
+	mMOV aPPUHScrData + $17, $2007
+	mMOV aPPUHScrData + $18, $2007
+	mMOV aPPUHScrData + $19, $2007
+	mMOV aPPUHScrData + $1A, $2007
+	mMOV aPPUHScrData + $1B, $2007
+	mMOV aPPUHScrData + $1C, $2007
+	mMOV aPPUHScrData + $1D, $2007
+	
+	mMOV <z2000, $2000
+.skip_h
+
 	lda <zPPUVScr
 	bne .do_v
 	jmp .skip_v
@@ -276,43 +319,7 @@ WritePPUScroll:
 .skip_v
 
 	lda <zPPUHScr
-	bne .do_h
-	jmp .skip_h
-.do_h
-	
-	mMOV #%00010100, $2000
-	mMOV aPPUHScrhi, $2006
-	mMOV aPPUHScrlo, $2006
-	mMOV aPPUHScrData, $2007
-	mMOV aPPUHScrData + $01, $2007
-	mMOV aPPUHScrData + $02, $2007
-	mMOV aPPUHScrData + $03, $2007
-	mMOV aPPUHScrData + $04, $2007
-	mMOV aPPUHScrData + $05, $2007
-	mMOV aPPUHScrData + $06, $2007
-	mMOV aPPUHScrData + $07, $2007
-	mMOV aPPUHScrData + $08, $2007
-	mMOV aPPUHScrData + $09, $2007
-	mMOV aPPUHScrData + $0A, $2007
-	mMOV aPPUHScrData + $0B, $2007
-	mMOV aPPUHScrData + $0C, $2007
-	mMOV aPPUHScrData + $0D, $2007
-	mMOV aPPUHScrData + $0E, $2007
-	mMOV aPPUHScrData + $0F, $2007
-	mMOV aPPUHScrData + $10, $2007
-	mMOV aPPUHScrData + $11, $2007
-	mMOV aPPUHScrData + $12, $2007
-	mMOV aPPUHScrData + $13, $2007
-	mMOV aPPUHScrData + $14, $2007
-	mMOV aPPUHScrData + $15, $2007
-	mMOV aPPUHScrData + $16, $2007
-	mMOV aPPUHScrData + $17, $2007
-	mMOV aPPUHScrData + $18, $2007
-	mMOV aPPUHScrData + $19, $2007
-	mMOV aPPUHScrData + $1A, $2007
-	mMOV aPPUHScrData + $1B, $2007
-	mMOV aPPUHScrData + $1C, $2007
-	mMOV aPPUHScrData + $1D, $2007
+	beq .skip_h_attr
 	
 	ldy aPPUHScrAttrhi
 	sty $2006
@@ -339,9 +346,9 @@ WritePPUScroll:
 	sty $2006
 	mMOV aPPUHScrAttrlo + $E, $2006
 	mMOV aPPUHScrAttr + $E, $2007
-	mMOV <z2000, $2000
+.skip_h_attr
+	
 	mSTZ <zPPUHScr, <zPPUVScr
-.skip_h
 	rts
 	.endregion "PPU_4way_scroll"
 

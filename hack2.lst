@@ -1,16 +1,5 @@
 #[1]   hack2.asm
- 1408  1C:11FE                    mNULL
- 1424  1C:1200                    mNULL
-#[2]   src/bank0E.asm
-#[1]   hack2.asm
-#[2]   src/bank0F.asm
-#[3]   src/sprites.asm
-#[2]   src/bank0F.asm
-#[3]   src/NMI.asm
-#[2]   src/bank0F.asm
-#[3]   src/spawnenemy.asm
-#[2]   src/bank0F.asm
-#[3]   src/weapons.asm
+  171  1E:DFFE  F0 1F             beq .invalid
 #[2]   src/bank0F.asm
 #[3]   src/damageinfo.asm
 #[2]   src/bank0F.asm

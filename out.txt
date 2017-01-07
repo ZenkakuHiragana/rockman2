@@ -1,5 +1,5 @@
 pass 1
 ==================== Region Info ====================
-Region PPU_4way_scroll:      867 bytes (0x000363 bytes)
+Region PPU_4way_scroll:      871 bytes (0x000367 bytes)
 =====================================================
 pass 2

@@ -140,8 +140,7 @@ FireBubbleLead
 	lda <zWeaponEnergy
 	cmp #$02
 	bne .noconsume
-	lda #$00
-	sta <zWeaponEnergy
+	mSTZ <zWeaponEnergy
 	dec <zEnergyBubble
 .noconsume
 	jmp FireRockBuster_SetShootPose

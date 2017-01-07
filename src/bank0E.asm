@@ -111,7 +111,7 @@ StartStage_NoEnergyRegen:
 StartStage_Continue:
 	mMOV #$40, <zConveyorRVec
 	mMOV #%00010000, <z2000, $2000
-	mMOV #%00000110, <z2001, $2001
+	mMOV #%00000110, <z2001
 	jsr LoadStageGraphics
 	mMOV #$1C, aObjLife
 	jsr ChangeBodyColor
@@ -141,7 +141,6 @@ StartStage_Continue:
 	lda <z2001
 	ora #%00011110
 	sta <z2001
-	sta $2001
 	lda <z2000
 	ora #%10000000
 	sta <z2000
@@ -911,7 +910,7 @@ DrawRoom:
 	lda #$1F
 	.else
 	mMOV #$00, <zHScroll
-	mSTZ <zVScroll
+	mMOV #$08, <zVScroll
 	lda #$41
 	.endif
 .loop

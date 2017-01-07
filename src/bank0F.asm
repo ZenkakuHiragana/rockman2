@@ -46,11 +46,11 @@ ChangeBank:
 	bne .loop_postsound
 .end_postsound
 	mMOV #$00, <zPostProcessSound
-	lda <zBankCopy
 	.ifdef ___BUGFIX
 	pla
 	tay
 	.endif
+	lda <zBankCopy
 	jmp ChangeBank
 
 ;20 51 C0
@@ -1272,99 +1272,22 @@ WriteNameTableByScroll:
 	and #$07
 	jsr ChangeBank
 ;書き込み開始位置の設定
-	ldx <zRoom
-	lda <.f
-	asl a
-	lda <zHScroll
-	bcc .left_nt
-	adc #$07
-	bcc .left_nt
-	inx
-.left_nt
-	eor #$80
-	bmi .inx_room_h
-	inx
-.inx_room_h
-	sta <$08
-	ldy <zVScroll
-	asl <.f
-	php
-	lda <$01
-	beq .scroll_up
-	lda <.f
-	bne .scroll_up
-	sec
-	tya
-	sbc #$08
-	tay
-	bcs .scroll_down
-	sbc #$0F
-	tay
-	bne .scroll_up
-.scroll_down
-	txa
-	adc #$0F
-	tax
-.scroll_up
-	sty <$10
-	stx <$09
-	ldx #$00
-	ldy #$00
-	lda <$08
-	and #$08
-	beq .inx_8
-	ldy #$02
-.inx_8
-	lda <$08
-	and #$10
-	beq .inx_16
-	ldx #$02
-.inx_16
-	lda <$08
-	lsr a
-	lsr a
-	lsr a
-	sta aPPUHScrlo ;0～1F, PPU dx
-	rol a
-	and #$38
-	sta <$03 ;$03: 00XX X000
-	lda <$10
-	asl a
-	rol a
-	rol a
-	rol a
-	bpl .iny_8
-	iny
-.iny_8
-	bcc .iny_16
-	inx
-.iny_16
-	and #$07
-	ora <$03
-	sta <$03 ;$03: 00XX XYYY
-	stx <$04 ;$04: 32x32 LT LB RT RB
-	sty <$05 ;$05: 16x16 LT LB RT RB
 ;横スクロール
-	plp
 	lda <.xscroll
 	sta <zPPUHScr
 	bne .do_h
 	jmp .skip_xscroll
 .do_h
-	lda <$03
-	pha
-	lda <$04
-	pha
-	lda <$05
-	pha
-	lda <$09
-	pha
-	bcs .left
+	jsr WriteNameTable_GetOrigin
+	
+	ldy <$02
+	bmi .left_nt
 	inc <$09
-	jmp .merge_room
-.left
+	jmp .done_h
+.left_nt
 	dec <$09
-.merge_room
+.done_h
+	
 ;ネームテーブル書き込み位置指定
 	lda <$09
 	lsr a
@@ -1419,7 +1342,7 @@ WriteNameTableByScroll:
 	bcc .notlastattr_h
 	bcs .write_attr_h
 .notfirstattr_h
-	dex
+	inx
 	cpx <$07
 	bne .notlastattr_h
 	lda <$04
@@ -1448,10 +1371,10 @@ WriteNameTableByScroll:
 	sta aPPUHScrData,x
 	
 	inc <$06
-	lda <$06
-	cmp <$07
-	beq .skip_xscroll_pla
-	cmp #$1E
+	inx
+	cpx <$07
+	beq .skip_xscroll
+	cpx #$1E
 	bcs .end_ptr_h
 	tya
 	lsr a
@@ -1471,32 +1394,22 @@ WriteNameTableByScroll:
 	bne .loop_nt_h_32
 .end_ptr_h
 	lda <$07
-	beq .skip_xscroll_pla
-	sec
+	beq .skip_xscroll
 	lda <$03
-	sbc #$07
+	and #$38
 	sta <$03
 	clc
 	lda <$09
 	adc #$10
 	sta <$09
 	lda <$05
-	and #$FE
+	and #$02
 	sta <$05
 	lda <$04
-	and #$FE
+	and #$02
 	sta <$04
 	mSTZ <$06
 	jmp .loop_nt_h
-.skip_xscroll_pla
-	pla
-	sta <$09
-	pla
-	sta <$05
-	pla
-	sta <$04
-	pla
-	sta <$03
 .skip_xscroll
 ;縦スクロール
 	lda <.yscroll
@@ -1504,7 +1417,18 @@ WriteNameTableByScroll:
 	bne .do_yscroll
 	jmp .end_scroll
 .do_yscroll
-	dec <$09
+	jsr WriteNameTable_GetOrigin
+	ldy <$09
+	dey
+	tya
+	asl <.f
+	bne .up_nt
+	clc
+	adc #$10
+.up_nt
+	sta <$09
+	sta <$11
+	
 	lda <$08
 	lsr a
 	lsr a
@@ -1516,6 +1440,7 @@ WriteNameTableByScroll:
 	bcc .boundary_left
 	ora #$20
 .boundary_left
+	and #$3F
 	sta <$06 ;$06: ppu write data index
 	sta <$07 ;$07: ppu write data index
 	mMOV #$20 >> 2, aPPUVScrhi
@@ -1576,12 +1501,12 @@ WriteNameTableByScroll:
 	sta aPPUVScrData,x
 	
 	inc <$06
-	lda <$06
-	cmp <$07
+	inx
+	cpx <$07
 	beq .skip_yscroll
-	cmp #$40
+	cpx #$40
 	bcs .end_ptr_v
-	cmp #$20
+	cpx #$20
 	beq .end_ptr_v
 	tya
 	and #$02
@@ -1612,7 +1537,7 @@ WriteNameTableByScroll:
 	sta <$03
 	bne .loop_nt_v_32
 .end_ptr_v
-	cmp #$40
+	cpx #$40
 	bcc .noreset
 	mSTZ <$06
 	lda <$07
@@ -1621,7 +1546,7 @@ WriteNameTableByScroll:
 	inc <$09
 	sec
 	lda <$03
-	sbc #$40 - 8
+	and #$07
 	sta <$03
 	lda <$05
 	and #$FD
@@ -1633,18 +1558,21 @@ WriteNameTableByScroll:
 .skip_yscroll
 ;属性テーブルをora
 	
-	ldx <zRoom
-	dex
-	txa
+	lda <$11
 	ldx <.f
-	beq .skip3
-	clc
-	adc #$10
+	sec
+	bne .skip3
+	sbc #$20
+	sec
 .skip3
+	sbc #$F0
 	sta <$09
-	lsr <$07
-	lsr <$07
-	ldx <$07
+	sta <$70
+	lda <$07
+	lsr a
+	lsr a
+	sta <$07
+	tax
 .loop_attr_y
 	jsr WriteNameTable_GetMapPtr
 .loop_attr_y_32
@@ -1660,22 +1588,121 @@ WriteNameTableByScroll:
 	cpx #$10
 	bcs .end_ptr
 	cpx #$08
-	beq .end_ptr
+	beq .end_ptr_noreset
 	clc
 	lda <$03
 	adc #$08
 	sta <$03
 	bne .loop_attr_y_32
 .end_ptr
+	ldx <$07
+	beq .end_scroll
+	ldx #$00
+.end_ptr_noreset
 	inc <$09
-	sec
 	lda <$03
-	sbc #$40 - 8
+	and #$07
 	sta <$03
 	bpl .loop_attr_y
 .end_scroll
 	mCHANGEBANK #$0E, 1
 
+;スクロール位置の補正
+WriteNameTable_GetOrigin:
+	lda <zRoom
+	lsr a
+	lsr a
+	lsr a
+	lsr a
+	sta <$09
+	lda <zRoom
+	and #$0F
+	tax
+	lda <zHScroll
+	ldy <$02
+	clc
+	bpl .right_nt
+	adc #$04
+	bcc .done_h
+	inx
+	jmp .done_h
+.right_nt
+	sbc #$03
+	bcs .done_h
+	dex
+.done_h
+	eor #$80
+	bmi .inv_h
+	inx
+.inv_h
+	sta <$08
+	
+	ldy <zVScroll
+	lda <$02
+	lsr a
+	tya
+	bcs .up_nt
+	sbc #$03
+	bcs .done_v
+	sbc #$0F
+	dec <$09
+	jmp .done_v
+.up_nt
+	adc #$03
+	cmp #$F0
+	bcc .done_v
+	adc #$0F
+	inc <$09
+.done_v
+	sta <$10
+	lda <$09
+	asl a
+	asl a
+	asl a
+	asl a
+	sta <$09
+	txa
+	ora <$09
+	sta <$09
+;書き込み開始位置の指定
+	ldx #$00
+	ldy #$00
+	lda <$08
+	and #$08
+	beq .inx_8
+	ldy #$02
+.inx_8
+	lda <$08
+	and #$10
+	beq .inx_16
+	ldx #$02
+.inx_16
+	lda <$08
+	lsr a
+	lsr a
+	lsr a
+	sta aPPUHScrlo ;0～1F, PPU dx
+	rol a
+	and #$38
+	sta <$03 ;$03: 00XX X000
+	lda <$10
+	asl a
+	rol a
+	rol a
+	rol a
+	bpl .iny_8
+	iny
+.iny_8
+	bcc .iny_16
+	inx
+.iny_16
+	and #$07
+	ora <$03
+	sta <$03 ;$03: 00XX XYYY
+	stx <$04 ;$04: 32x32 LT LB RT RB
+	sty <$05 ;$05: 16x16 LT LB RT RB
+	rts
+	
 WriteNameTable_GetMapPtr:
 	ldy <$09
 	mSTZ <$0A

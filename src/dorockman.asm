@@ -166,17 +166,18 @@ DoRockman05_Walking_Skip:
 ;ロックマン状態#6空中
 DoRockman06_Jumping:
 	jsr DoRockman_ShootWeapon
-	mSTZ aObjVXlo, aObjVX;, aObjVYlo, aObjVY
-;	lda <zKeyDown
-;	and #$30
-;	beq .move_v
-;	and #$20
-;	beq .up
-;	mMOVW $FE80, aObjVYlo, aObjVY
-;	bne .move_v
-;.up
-;	mMOVW $0180, aObjVYlo, aObjVY
-;.move_v
+	mSTZ aObjVXlo, aObjVX
+	mSTZ aObjVYlo, aObjVY
+	lda <zKeyDown
+	and #$30
+	beq .move_v
+	and #$20
+	beq .up
+	mMOVW -$0300, aObjVYlo, aObjVY
+	bne .move_v
+.up
+	mMOVW $0300, aObjVYlo, aObjVY
+.move_v
 ;滑り速度の減速
 	sec
 	lda <zSliplo
@@ -580,12 +581,12 @@ Table_SlipDeceleration:
 ;890C
 ;ロックマンの状態毎のVxhi
 Table_RockmanVXhi:
-	.db $00, $00, $00, $00, $00, $01, $01, $00, $00, $00, $00
+	.db $00, $00, $00, $00, $00, $01, $03, $00, $00, $00, $00
 
 ;8917
 ;ロックマンの状態毎のVxlo
 Table_RockmanVXlo:
-	.db $00, $00, $90, $00, $20, $60, $50, $80, $00, $00, $00
+	.db $00, $00, $90, $00, $20, $60, $00, $80, $00, $00, $00
 	
 ;8922
 ;ロックマン横移動
@@ -1338,7 +1339,7 @@ DoRockman_DoScroll:
 	bit <zMoveVec
 	bvc .scroll_left
 ;右スクロール
-	sbc #$5F
+	sbc #$60
 	bcc .skip_horizontal
 	cmp <.dx
 	bcs .changedx_r
@@ -1354,6 +1355,11 @@ DoRockman_DoScroll:
 	sta <.dx
 	jmp .changedx_lscr
 .scroll_right_do
+	lda #$08
+	cmp <.dx
+	bcs .finalizedx_r
+	sta <.dx
+.finalizedx_r
 	clc
 	lda <zHScroll
 	pha
@@ -1385,6 +1391,11 @@ DoRockman_DoScroll:
 	bcs .changedx_lscr
 	sta <.dx
 .changedx_lscr
+	lda #$08
+	cmp <.dx
+	bcs .finalizedx_l
+	sta <.dx
+.finalizedx_l
 	sec
 	ror <.f
 	sec
@@ -1453,6 +1464,11 @@ DoRockman_DoScroll:
 	sta <.dy
 	jmp .changedy_uscr
 .scroll_down_do
+	lda #$08
+	cmp <.dy
+	bcs .finalizedy_d
+	sta <.dy
+.finalizedy_d
 	clc
 	lda <zVScroll
 	pha
@@ -1491,6 +1507,11 @@ DoRockman_DoScroll:
 	bcs .changedy_uscr
 	sta <.dy
 .changedy_uscr
+	lda #$08
+	cmp <.dy
+	bcs .finalizedy_u
+	sta <.dy
+.finalizedy_u
 	sec
 	inc <.f
 	lda <zVScroll
