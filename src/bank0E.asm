@@ -68,7 +68,7 @@ Reset_Continue;
 StartStageSelect:
 	lda #$03
 	sta <zLives
-	jsr ChangeBank_DoStageSelect
+;	jsr ChangeBank_DoStageSelect
 ;8079
 ;ステージセレクト処理の後から
 StartStage_All:
@@ -228,7 +228,7 @@ Table_SpriteREADY:
 
 ;81D0
 Table_StageMusic:
-	.db $03, $04, $01, $07, $06, $00, $05, $02
+	.db $00, $04, $01, $07, $06, $00, $05, $02
 	.db $08, $08, $09, $09, $09, $FF
 
 ;81DE
@@ -889,7 +889,7 @@ Table_BossRoom:
 
 ;907D
 ;次の画面を描画
-DrawRoom_ByVertical
+;DrawRoom_ByVertical
 DrawRoom:
 	sec
 	.ifdef DrawRoom_ByVertical
@@ -912,7 +912,7 @@ DrawRoom:
 	.else
 	mMOV #$00, <zHScroll
 	mSTZ <zVScroll
-	lda #$40
+	lda #$41
 	.endif
 .loop
 	pha
