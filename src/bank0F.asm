@@ -46,11 +46,11 @@ ChangeBank:
 	bne .loop_postsound
 .end_postsound
 	mMOV #$00, <zPostProcessSound
-	lda <zBankCopy
 	.ifdef ___BUGFIX
 	pla
 	tay
 	.endif
+	lda <zBankCopy
 	jmp ChangeBank
 
 ;20 51 C0
