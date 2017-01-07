@@ -162,22 +162,27 @@ DoRockman05_Walking_Skip:
 	sta <zStatus
 	bne DoRockman_CheckJump
 
+Debug_RockmanNoclipVX = $0700
 ;85FB
 ;ロックマン状態#6空中
 DoRockman06_Jumping:
 	jsr DoRockman_ShootWeapon
 	mSTZ aObjVXlo, aObjVX
+	
+	.ifdef Debug_RockmanNoclipVX
 	mSTZ aObjVYlo, aObjVY
 	lda <zKeyDown
 	and #$30
 	beq .move_v
 	and #$20
 	beq .up
-	mMOVW -$0300, aObjVYlo, aObjVY
+	mMOVW -Debug_RockmanNoclipVX, aObjVYlo, aObjVY
 	bne .move_v
 .up
-	mMOVW $0300, aObjVYlo, aObjVY
+	mMOVW Debug_RockmanNoclipVX, aObjVYlo, aObjVY
 .move_v
+	.endif
+	
 ;滑り速度の減速
 	sec
 	lda <zSliplo
@@ -260,7 +265,9 @@ DoRockman0A_LadderTop:
 	jmp .jump
 .move
 	and #$30
-	beq .skip3
+	bne .move2
+	jmp .skip3
+.move2
 	and #$10
 	beq .down
 	ldy #$00
@@ -274,12 +281,14 @@ DoRockman0A_LadderTop:
 	sbc #$0C
 	sta aObjY
 	bcs .borrow_up
-	lda aObjRoom
 	sbc #$0F
+	sta aObjY
+	lda aObjRoom
+	sbc #$10
 	sta aObjRoom
 .borrow_up
 	ldx #$03
-	jmp .done
+	bne .done
 .middle
 	and #$08
 	bne .skip
@@ -290,11 +299,14 @@ DoRockman0A_LadderTop:
 	lda <zBGLadder
 	cmp #$01
 	bne .skip2
-	lda aObjY
 	clc
+	lda aObjY
 	adc #$0C
 	sta aObjY
+	cmp #$F0
 	bcc .skip2
+	adc #$0F
+	sta aObjY
 	lda aObjRoom
 	adc #$0F
 	sta aObjRoom
@@ -581,12 +593,12 @@ Table_SlipDeceleration:
 ;890C
 ;ロックマンの状態毎のVxhi
 Table_RockmanVXhi:
-	.db $00, $00, $00, $00, $00, $01, $03, $00, $00, $00, $00
+	.db $00, $00, $00, $00, $00, $01, HIGH(Debug_RockmanNoclipVX), $00, $00, $00, $00
 
 ;8917
 ;ロックマンの状態毎のVxlo
 Table_RockmanVXlo:
-	.db $00, $00, $90, $00, $20, $60, $00, $80, $00, $00, $00
+	.db $00, $00, $90, $00, $20, $60, LOW(Debug_RockmanNoclipVX), $80, $00, $00, $00
 	
 ;8922
 ;ロックマン横移動
@@ -1320,6 +1332,7 @@ DoRockman_DoScroll:
 .f = $02 ;スクロール方向フラグ: L... ...U(U: 上, L: 左)
 .dx = $03 ;移動差X
 .dy = $04 ;移動差Y
+.scroll_max = $06
 	mSTZ <.nth, <.ntv, <.f
 	sty <.dy
 	sec
@@ -1355,7 +1368,7 @@ DoRockman_DoScroll:
 	sta <.dx
 	jmp .changedx_lscr
 .scroll_right_do
-	lda #$08
+	lda #.scroll_max
 	cmp <.dx
 	bcs .finalizedx_r
 	sta <.dx
@@ -1391,7 +1404,7 @@ DoRockman_DoScroll:
 	bcs .changedx_lscr
 	sta <.dx
 .changedx_lscr
-	lda #$08
+	lda #.scroll_max
 	cmp <.dx
 	bcs .finalizedx_l
 	sta <.dx
@@ -1464,7 +1477,7 @@ DoRockman_DoScroll:
 	sta <.dy
 	jmp .changedy_uscr
 .scroll_down_do
-	lda #$08
+	lda #.scroll_max
 	cmp <.dy
 	bcs .finalizedy_d
 	sta <.dy
@@ -1507,7 +1520,7 @@ DoRockman_DoScroll:
 	bcs .changedy_uscr
 	sta <.dy
 .changedy_uscr
-	lda #$08
+	lda #.scroll_max
 	cmp <.dy
 	bcs .finalizedy_u
 	sta <.dy

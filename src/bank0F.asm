@@ -1264,6 +1264,8 @@ Table_C918:
 ;$0A~$0B 画面定義へのポインタ
 ;$0C~$0D 32x32タイル定義へのポインタ
 ;$0E~$0F 16x16タイル定義へのポインタ
+;$10 縦スクロール始点
+;$11 縦スクロール時、$09をバックアップ
 WriteNameTableByScroll:
 .xscroll = $00
 .yscroll = $01
@@ -1278,6 +1280,7 @@ WriteNameTableByScroll:
 	bne .do_h
 	jmp .skip_xscroll
 .do_h
+	mMOV #$01, <$12
 	jsr WriteNameTable_GetOrigin
 	
 	ldy <$02
@@ -1417,6 +1420,7 @@ WriteNameTableByScroll:
 	bne .do_yscroll
 	jmp .end_scroll
 .do_yscroll
+	mSTZ <$12
 	jsr WriteNameTable_GetOrigin
 	ldy <$09
 	dey
@@ -1567,7 +1571,6 @@ WriteNameTableByScroll:
 .skip3
 	sbc #$F0
 	sta <$09
-	sta <$70
 	lda <$07
 	lsr a
 	lsr a
@@ -1620,39 +1623,53 @@ WriteNameTable_GetOrigin:
 	tax
 	lda <zHScroll
 	ldy <$02
-	clc
 	bpl .right_nt
-	adc #$04
-	bcc .done_h
+	clc
+	adc #$08
+	bcc .right_nt
 	inx
-	jmp .done_h
+;	jmp .right_nt
 .right_nt
-	sbc #$03
-	bcs .done_h
-	dex
-.done_h
 	eor #$80
 	bmi .inv_h
 	inx
 .inv_h
+;	ldy <$12
+;	bne .horizontal ;縦スクロールの設定の時
+;	ldy <$02
+;	bmi .horizontal
+;	clc
+;	adc #$08 ;横スクロール値を+8
+;	bcc .horizontal
+;	inx
+;.horizontal
 	sta <$08
 	
 	ldy <zVScroll
 	lda <$02
 	lsr a
+	lda <$12
+	beq .vertical ;横スクロールの設定の時
+	tya
+	bcs .vertical ;下スクロールの時
+	adc #$08 ;縦スクロール値を+8
+	cmp #$F0
+	bcc .merge_vertical
+	inc <$09
+	adc #$0F
+.merge_vertical
+	tay
+.vertical
+	lda <$02
+	lsr a
 	tya
 	bcs .up_nt
-	sbc #$03
+	sbc #$07
 	bcs .done_v
 	sbc #$0F
 	dec <$09
-	jmp .done_v
+;	jmp .done_v
 .up_nt
-	adc #$03
-	cmp #$F0
-	bcc .done_v
-	adc #$0F
-	inc <$09
 .done_v
 	sta <$10
 	lda <$09
@@ -3015,6 +3032,9 @@ IndirectJSR:
 	.org Reset_Start
 	sei
 	inc $FFE1
+	lda #%00000111
+	sta $4001
+	sta $4005
 	jmp Reset_JMP
 	
 	.org NMI_VECTOR
