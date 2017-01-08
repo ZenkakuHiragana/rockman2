@@ -207,11 +207,27 @@ DieRockman:
 	adc .tiwnround_x,x
 	sta aObjX + $0E,y
 	lda aObjRoom
+	and #$0F
 	adc .tiwnround_xh,x
 	sta aObjRoom + $0E,y
 	lda aObjY
 	adc .tiwnround_y,x
 	sta aObjY + $0E,y
+	lda aObjRoom
+	php
+	lsr a
+	lsr a
+	lsr a
+	lsr a
+	plp
+	adc .tiwnround_yh,x
+	asl a
+	asl a
+	asl a
+	asl a
+	adc aObjRoom + $0E,y
+	sta aObjRoom + $0E,y
+	
 	lda #$01
 	sta aObjFrame + $0E,y
 	lda #$00
@@ -279,6 +295,8 @@ DieRockman:
 
 .tiwnround_y
 	.db $F8, $08, $FB, $05, $00, $00, $05, $FB
+.tiwnround_yh
+	.db $FF, $00, $FF, $00, $00, $00, $00, $FF
 .tiwnround_x
 	.db $00, $00, $FB, $05, $FB, $08, $FB, $05
 .tiwnround_xh
@@ -2017,9 +2035,8 @@ CountBlockableObjects:
 	lda aObjFlags10,x
 	bpl .notexist
 	and #$10
-	beq .skip_stx
+	beq .notexist
 	stx <zBlockObjIndex,y
-.skip_stx
 	iny
 .notexist
 	dex
@@ -2452,6 +2469,7 @@ MoveEnemy_Start:
 	sta <zObjItemFlag
 ;20 CD EE
 MoveObjectForWeapon:
+;縦移動
 	sec
 	lda aObjYlo,x
 	sbc aObjVYlo,x
@@ -2459,28 +2477,25 @@ MoveObjectForWeapon:
 	lda aObjY,x
 	sbc aObjVY,x
 	ldy aObjVY,x
+	sta aObjY,x
 	bmi .godown_movey
-	cmp #$F0
-	bcc .movey
-	adc #$0F
-	pha
+	bcs .continue_y
+	sbc #$0F
+	sta aObjY,x
 	lda aObjRoom,x
-	adc #$0F
+	sbc #$10
 	jmp .movey
 .godown_movey
-	bcs .movey
-	sbc #$0F
-	pha
+	cmp #$F0
+	bcc .continue_y
+	adc #$0F
+	sta aObjY,x
 	lda aObjRoom,x
-	sbc #$F0
+	adc #$0F
 .movey
 	sta aObjRoom,x
-	pla
-	sta aObjY,x
-;	bcc .continue
-;縦画面外判定
-;	jmp SafeRemoveEnemy
-;.continue
+.continue_y
+;重力加速度の適用
 	lda aObjFlags,x
 	and #%00000100
 	beq .gravity
@@ -2492,6 +2507,7 @@ MoveObjectForWeapon:
 	sbc <zGravityhi
 	sta aObjVY,x
 .gravity
+;横移動
 	lda aObjFlags,x
 	asl a
 	bmi .right
@@ -2518,27 +2534,6 @@ MoveObjectForWeapon:
 	inc aObjRoom,x
 .done
 	jmp CheckOffscreenEnemy_Moving
-SafeRemoveEnemy:
-	lsr aObjFlags,x
-PostSafeRemoveEnemy:
-	cpx #$10
-	bcc .weapons
-	lda <zObjItemFlag
-	bne .isitem
-	lda #$FF
-	sta aEnemyOrder,x
-.weapons
-	sec
-	rts
-.isitem
-	lda #$FF
-	sta aItemOrder,x
-	lda aItemLifeOffset,x
-	tay
-	lda aObjLife,x
-	sta aItemLife,y
-	sec
-	rts
 
 ;20 8D EF
 CheckOffscreenItem:
@@ -2553,7 +2548,7 @@ CheckOffscreenEnemy_Moving:
 	lda aObjFlags,x
 	and #%00000011
 	beq CheckOffscreenEnemy_CheckOffscreen
-	lsr
+	lsr a
 	php
 	bcc .checkdmg
 	jsr RockmanTakeDamage
@@ -2565,19 +2560,127 @@ CheckOffscreenEnemy_Moving:
 ;撃破時
 CheckOffscreenEnemy_Break:
 	jsr CreateItemFromEnemy
-	lda #$06
-	sta aObjAnim,x
-	lda #$80
-	sta aObjFlags,x
-	lda #$00
-	sta aObjWait,x
-	sta aObjFrame,x
+	mMOV #$06, aObjAnim,x
+	mMOV #%10000000, aObjFlags,x
+	mSTZ aObjWait,x, aObjFrame,x
 	jmp PostSafeRemoveEnemy
-;画面外判定をする
 CheckOffscreenEnemy_CheckOffscreen:
-	lda <zEScreenRoom
-	bne SafeRemoveEnemy
+	mMOV aObjX,x, <$08
+	mMOV aObjRoom,x, <$09
+	mMOV aObjY,x, <$0A
+	lda aObjFlags,x
+	asl a
+	sta <$0B
+	lda aObjVY,x
+	asl a
+	ror <$0B
+	jsr CheckOffscreen
+	bcc CheckOffscreen_End
+	jmp SafeRemoveEnemy
+;画面外判定をする
+;$00 相対画面位置X
+;$01 相対画面位置Y
+;$08 横位置
+;$09 画面位置
+;$0A 縦位置
+;$0B VR.. ...., V Y速度の方向, R 右向きフラグ
+CheckOffscreen:
+.rx = $00
+.ry = $02
+.x = $08
+.r = $09
+.y = $0A
+.f = $0B
+	sec
+	lda <.r
+	sbc <zRoom
+	sta <.rx
+	and #$EE
+	bne CheckOffscreen_Out
+CheckOffscreen_SpawnEnemy:
+.rx = $00
+.ry = $02
+.x = $08
+.r = $09
+.y = $0A
+.f = $0B
+	lda <.rx
+	and #$11
+	sta <.rx
+	lsr a
+	lsr a
+	lsr a
+	lsr a
+	sta <.ry
+	lda <.rx
+	and #$01
+	tay
+;横の画面外判定
+	sec
+	lda <.x
+	sbc <zHScroll
+	dey
+	bcs .borrow_x
+	bmi CheckOffscreen_Out
+	bpl .continue_x
+.borrow_x
+	bpl CheckOffscreen_Out
+.continue_x
+	tay
+	bit <.f
+	bvs .right
+	cpy #$08
+	bcc CheckOffscreen_Out
+	bcs .continue
+.right
+	cpy #$F8
+	bcs CheckOffscreen_Out
+.continue
+;縦の画面外判定
+	sec
+	lda <.y
+	sbc <zVScroll
+	dec <$02
+	bcs .borrow_y
+	bmi CheckOffscreen_Out
+	bpl .continue_y
+.borrow_y
+	bpl CheckOffscreen_Out
+.continue_y
+	tay
+	lda <.f
+	bpl .up
+	cpy #$F0
+	bcs CheckOffscreen_Out
+	bcc .safe
+.up
+	cpy #$08
+	bcc CheckOffscreen_Out
+.safe
 	clc
+	rts
+CheckOffscreen_Out
+	sec
+CheckOffscreen_End:
+	rts
+;画面外に出たオブジェクトを消去する
+SafeRemoveEnemy:
+	lsr aObjFlags,x
+PostSafeRemoveEnemy:
+	cpx #$10
+	bcc .weapons
+	lda <zObjItemFlag
+	bne .isitem
+	sta aEnemyOrder,x
+.weapons
+	sec
+	rts
+.isitem
+	lda #$00
+	sta aItemOrder,x
+	ldy aItemLifeOffset,x
+	mMOV aObjLife,x, aItemLife,y
+	sec
 	rts
 
 ;20 CC EF

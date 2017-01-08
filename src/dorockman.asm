@@ -162,7 +162,7 @@ DoRockman05_Walking_Skip:
 	sta <zStatus
 	bne DoRockman_CheckJump
 
-Debug_RockmanNoclipVX = $0700
+;Debug_RockmanNoclipVX = $0700
 ;85FB
 ;ロックマン状態#6空中
 DoRockman06_Jumping:
@@ -593,12 +593,24 @@ Table_SlipDeceleration:
 ;890C
 ;ロックマンの状態毎のVxhi
 Table_RockmanVXhi:
-	.db $00, $00, $00, $00, $00, $01, HIGH(Debug_RockmanNoclipVX), $00, $00, $00, $00
+	.db $00, $00, $00, $00, $00, $01
+	.ifdef Debug_RockmanNoclipVX
+	.db HIGH(Debug_RockmanNoclipVX)
+	.else
+	.db $01
+	.endif
+	.db $00, $00, $00, $00
 
 ;8917
 ;ロックマンの状態毎のVxlo
 Table_RockmanVXlo:
-	.db $00, $00, $90, $00, $20, $60, LOW(Debug_RockmanNoclipVX), $80, $00, $00, $00
+	.db $00, $00, $90, $00, $20, $60
+	.ifdef Debug_RockmanNoclipVX
+	.db LOW(Debug_RockmanNoclipVX)
+	.else
+	.db $50
+	.endif
+	.db $80, $00, $00, $00
 	
 ;8922
 ;ロックマン横移動

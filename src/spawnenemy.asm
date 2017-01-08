@@ -1,6 +1,7 @@
 
 ;20 55 D6
 ;SpawnEnemyByScroll
+.seek = $01 ;01～FFまで
 .l = $0A
 .lhi = $0B
 .r = $08
@@ -8,196 +9,72 @@
 	lda <zStage
 	and #$07
 	jsr ChangeBank
-	clc
-	lda <zHScroll
-	sta <.l
-	adc #$FF
-	sta <.r
-	lda <zRoom
-	sta <.lhi
-	adc #$00
-	sta <.rhi
-	lda <zMoveVec
-	and #$40
-	bne .right
-;左スクロールのオブジェクト出現処理
-.loopleft
-	ldy <zEnemyIndexPrev
-	beq .skipleft
-	lda $B5FF,y ;------------------enemy page
-	cmp <.lhi
-	bcc .skipleft
-	bne .spawnleft
-	lda $B6FF,y ;------------------enemy x
-	cmp <.l
-	bcc .skipleft
-.spawnleft
-	dey
+	ldy #$01
+.loop_seek
+	sty <.seek
+	
+	lda Stage_DefEnemies - 1,y
+	bmi .skip_seek
+	sec
+	mMOV Stage_DefEnemiesRoom - 1,y, <$09
+	sbc <zRoom
+	sta <$00
+	and #$EE
+	bne .skip_seek
+	mMOV Stage_DefEnemiesX - 1,y, <$08
+	mMOV Stage_DefEnemiesY - 1,y, <$0A
+	mMOV #%10000000, <$0B
+	jsr CheckOffscreen_SpawnEnemy
+	bcs .skip_seek
+;敵が出現する
+	ldy <.seek
 	jsr CreateEnemy
-	dec <zEnemyIndexPrev
-	bne .loopleft
-.skipleft
-	ldy <zEnemyIndexNext
-	beq .skipleftseek
-.loopleftseek
-	lda $B5FF,y ;------------------enemy page
-	cmp <.rhi
-	bcc .skipleftseek
-	bne .spawnleftseek
-	lda $B6FF,y ;------------------enemy x
-	cmp <.r
-	bcc .skipleftseek
-.spawnleftseek
-	dey
-	bne .loopleftseek
-.skipleftseek
-	sty <zEnemyIndexNext
-
-.loopitemleft
-	ldy <zItemIndexPrev
-	beq .skipitemleft
-	lda $B9FF,y ;------------------item page
-	cmp <.lhi
-	bcc .skipitemleft
-	bne .spawnitemleft
-	lda $BA3F,y ;------------------item x
-	cmp <.l
-	bcc .skipitemleft
-.spawnitemleft
-	lda aItemLife - 1,y
-	beq .noitemhpleft
-	dey
-	jsr CreateItem
-.noitemhpleft
-	dec <zItemIndexPrev
-	bne .loopitemleft
-.skipitemleft
-	ldy <zItemIndexNext
-	beq .skipitemleftseek
-.loopitemleftseek
-	lda $B9FF,y ;------------------item page
-	cmp <.rhi
-	bcc .skipitemleftseek
-	bne .spawnitemleftseek
-	lda $BA3F,y ;------------------item x
-	cmp <.r
-	bcc .skipitemleftseek
-.spawnitemleftseek
-	dey
-	bne .loopitemleftseek
-.skipitemleftseek
-	sty <zItemIndexNext
-	jmp .done
-;右スクロールのオブジェクト出現処理右端における敵の配置
-.right
-	ldy <zEnemyIndexNext
-	lda <.rhi
-	cmp $B600,y ;------------------enemy page
-	bcc .skipright
-	bne .spawnright
-	lda <.r
-	cmp $B700,y ;------------------enemy x
-	bcc .skipright
-.spawnright
-	jsr CreateEnemy
-	inc <zEnemyIndexNext
-	bne .right
-.skipright
-	ldy <zEnemyIndexPrev
-.looprightseek
-	lda <.lhi
-	cmp $B600,y ;------------------enemy page
-	bcc .skiprightseek
-	bne .spawnrightseek
-	lda <.l
-	cmp $B700,y ;------------------enemy x
-	bcc .skiprightseek
-.spawnrightseek
+.skip_seek
+	ldy <.seek
 	iny
-	bne .looprightseek
-.skiprightseek
-	sty <zEnemyIndexPrev
-
-.loopitemright
-	ldy <zItemIndexNext
-	lda <.rhi
-	cmp $BA00,y ;------------------item page
-	bcc .skipitemright
-	bne .spawnitemright
-	lda <.r
-	cmp $BA40,y ;------------------item x
-	bcc .skipitemright
-.spawnitemright
-	lda aItemLife,y
-	beq .noitemhpright
-	jsr CreateItem
-.noitemhpright
-	inc <zItemIndexNext
-	bne .loopitemright
-.skipitemright
-	ldy <zItemIndexPrev
-.loopitemrightseek
-	lda <.lhi
-	cmp $BA00,y ;------------------item page
-	bcc .skipitemrightseek
-	bne .spawnitemrightseek
-	lda <.l
-	cmp $BA40,y ;------------------item x
-	bcc .skipitemrightseek
-.spawnitemrightseek
-	iny
-	bne .loopitemrightseek
-.skipitemrightseek
-	sty <zItemIndexPrev
-
+	bne .loop_seek
 .done
 	mCHANGEBANK #$0E, 1
 	;rts
 
 ;20 50 D7
+;敵順序番号Yを生成
 CreateEnemy:
-	tya
 	ldx #$0F
+	tya
 .loopseek
 	cmp aEnemyOrder10,x
 	beq InvalidCreateObject
 	dex
 	bpl .loopseek
+	
 	jsr GetEnemyPointer
 	bcs InvalidCreateObject
 	tya
 	sta aEnemyOrder10,x
-	lda $B600,y ;------------enemy page
-	sta aObjRoom10,x
-	lda $B700,y ;------------enemy x
-	sta aObjX10,x
-	lda $B800,y ;------------enemy y
-	sta aObjY10,x
-	lda $B900,y ;------------enemy number
+	mMOV Stage_DefEnemiesRoom - 1,y, aObjRoom10,x
+	sta <$70
+	mMOV Stage_DefEnemiesX - 1,y, aObjX10,x
+	mMOV Stage_DefEnemiesY - 1,y, aObjY10,x
+	lda Stage_DefEnemies - 1,y
+	sta <$71
 CreateObjectHere:
 	sta aObjAnim10,x
 	tay
 	pha
-	lda Table_ObjectInitialFlags,y
-	sta aObjFlags10,x
-	lda Table_ObjectInitalCollisionSize,y
-	sta aObjCollision10,x
-	lda #$14
-	sta aObjLife10,x
+	mMOV Table_ObjectInitialFlags,y, aObjFlags10,x
+	mMOV Table_ObjectInitalCollisionSize,y, aObjCollision10,x
+	mMOV #$14, aObjLife10,x
 	lda Table_ObjectInitialVX,y
 	tay
-	lda Table_InitialVX,y
-	sta aObjVX10,x
-	lda Table_InitialVX + 1,y
-	sta aObjVXlo10,x
+	mMOV Table_InitialVX,y, aObjVX10,x
+	mMOV Table_InitialVX + 1,y, aObjVXlo10,x
 	pla
 	tay
 	lda Table_ObjectInitialVY,y
 	tay
-	lda Table_InitialVY,y
-	sta aObjVY10,x
-	lda Table_InitialVY + 1,y
-	sta aObjVYlo10,x
+	mMOV Table_InitialVY,y, aObjVY10,x
+	mMOV Table_InitialVY + 1,y, aObjVYlo10,x
 	lda #$00
 	sta aObjFrame10,x
 	sta aObjWait10,x
