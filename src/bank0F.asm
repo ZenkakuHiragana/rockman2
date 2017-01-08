@@ -998,7 +998,7 @@ Rockman_Warp_to_Land:
 	sta aObjY
 	ldx <zContinuePoint
 	cmp $BB00,x ;----------------------
-	cmp #$84
+	cmp #$A4
 	beq .onland
 	jsr SpriteSetup
 	jsr FrameAdvance1C
@@ -1011,6 +1011,7 @@ Rockman_Warp_to_Land:
 	sta <zSliphi
 	lda #$40
 	sta <zMoveVec
+	dec aObjVY
 	mCHANGEBANK #$0E, 1
 	;rts
 
@@ -1634,15 +1635,15 @@ WriteNameTable_GetOrigin:
 	bmi .inv_h
 	inx
 .inv_h
-;	ldy <$12
-;	bne .horizontal ;縦スクロールの設定の時
-;	ldy <$02
-;	bmi .horizontal
-;	clc
-;	adc #$08 ;横スクロール値を+8
-;	bcc .horizontal
-;	inx
-;.horizontal
+	ldy <$12
+	bne .horizontal ;縦スクロールの設定の時
+	ldy <$02
+	bmi .horizontal
+	clc
+	adc #$08 ;横スクロール値を+8
+	bcc .horizontal
+	inx
+.horizontal
 	sta <$08
 	
 	ldy <zVScroll
@@ -1664,7 +1665,7 @@ WriteNameTable_GetOrigin:
 	lsr a
 	tya
 	bcs .up_nt
-	sbc #$07
+	sbc #$07 
 	bcs .done_v
 	sbc #$0F
 	dec <$09
@@ -1679,7 +1680,7 @@ WriteNameTable_GetOrigin:
 	asl a
 	sta <$09
 	txa
-	ora <$09
+	adc <$09
 	sta <$09
 ;書き込み開始位置の指定
 	ldx #$00
@@ -1698,7 +1699,10 @@ WriteNameTable_GetOrigin:
 	lsr a
 	lsr a
 	lsr a
+	lsr <$12
+	bcc .ppu_h
 	sta aPPUHScrlo ;0～1F, PPU dx
+.ppu_h
 	rol a
 	and #$38
 	sta <$03 ;$03: 00XX X000

@@ -603,15 +603,6 @@ Table_RockmanVXlo:
 ;8922
 ;ロックマン横移動
 DoRockman_BodyMoveX:
-;.r = $2D   ;移動前画面数
-;.x = $2E   ;移動前X上位
-;.xlo = $2F ;移動前X下位
-;	ldx aObjRoom
-;	stx <.r
-;	ldy aObjX
-;	sty <.x
-;	lda aObjXlo
-;	sta <.xlo
 	mSTZ <$00
 	bit <zMoveVec
 	bvc .left
@@ -632,6 +623,7 @@ DoRockman_BodyMoveX:
 	adc #$08
 	sta <$08
 	lda aObjRoom
+	and #$0F
 	adc #$00
 	jsr DoRockman_WallCheckX
 	lda <$00
@@ -666,6 +658,7 @@ DoRockman_BodyMoveX:
 	sbc #$08
 	sta <$08
 	lda aObjRoom
+	and #$0F
 	sbc #$00
 	jsr DoRockman_WallCheckX
 	lda <$00
@@ -692,7 +685,6 @@ DoRockman_BodyMoveX:
 DoRockman_WallCheckX:
 .n = $02
 .blk = $10
-	and #$0F
 	sta <$03
 	lda #$02
 	sta <.n
@@ -726,7 +718,7 @@ DoRockman_WallCheckX:
 	asl a
 	asl a
 	asl a
-	ora <$03
+	adc <$03
 	sta <$09
 	jsr PickupBlock
 	ldx <.n
@@ -1115,9 +1107,10 @@ DoRockman_WallCheckY:
 	adc Table_WallCheckY_dx,x
 	sta <.x
 	lda aObjRoom
-	adc Table_WallCheckY_dr,x
 	and #$0F
-	ora <.ry
+	adc Table_WallCheckY_dr,x
+	clc
+	adc <.ry
 	sta <.r
 	jsr PickupBlock
 	ldx <.n
@@ -1332,7 +1325,7 @@ DoRockman_DoScroll:
 .f = $02 ;スクロール方向フラグ: L... ...U(U: 上, L: 左)
 .dx = $03 ;移動差X
 .dy = $04 ;移動差Y
-.scroll_max = $06
+.scroll_max = $08
 	mSTZ <.nth, <.ntv, <.f
 	sty <.dy
 	sec

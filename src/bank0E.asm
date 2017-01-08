@@ -68,7 +68,7 @@ Reset_Continue;
 StartStageSelect:
 	lda #$03
 	sta <zLives
-;	jsr ChangeBank_DoStageSelect
+	jsr ChangeBank_DoStageSelect
 ;8079
 ;ステージセレクト処理の後から
 StartStage_All:
@@ -227,7 +227,7 @@ Table_SpriteREADY:
 
 ;81D0
 Table_StageMusic:
-	.db $00, $04, $01, $07, $06, $00, $05, $02
+	.db $03, $04, $01, $07, $06, $00, $05, $02
 	.db $08, $08, $09, $09, $09, $FF
 
 ;81DE
@@ -909,8 +909,7 @@ DrawRoom:
 	mSTZ <zVScroll
 	lda #$1F
 	.else
-	mMOV #$00, <zHScroll
-	mMOV #$08, <zVScroll
+	mMOV #$00, <zHScroll, <zVScroll
 	lda #$41
 	.endif
 .loop
@@ -923,9 +922,9 @@ DrawRoom:
 	mMOV #$01, <$00
 	.endif
 	jsr WriteNameTableByScroll
-.waitdebug
-	lda $2002
-	bpl .waitdebug
+;.waitdebug
+;	lda $2002
+;	bpl .waitdebug
 	lda <z2000
 	and #%10000000
 	beq .nowait
@@ -961,6 +960,7 @@ DrawRoom:
 	.else
 	sta <zHScroll
 	.endif
+	
 	pla
 	sec
 	sbc #$01
