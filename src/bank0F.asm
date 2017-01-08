@@ -2450,31 +2450,6 @@ MoveEnemy:
 	lda #$00
 MoveEnemy_Start:
 	sta <zObjItemFlag
-	lda aObjFlags,x
-	and #%00000011
-	beq MoveObjectForWeapon
-	pha
-	and #%00000001
-	beq .checkdmg
-	jsr RockmanTakeDamage
-.checkdmg
-	pla
-	and #%00000010
-	beq MoveObjectForWeapon
-	jsr EnemyTakeDamage
-	bcc MoveObjectForWeapon
-;撃破時
-	jsr CreateItemFromEnemy
-;20 B8 EE
-MoveEnemy_Break:
-	lda #$06
-	sta aObjAnim,x
-	lda #$80
-	sta aObjFlags,x
-	lda #$00
-	sta aObjWait,x
-	sta aObjFrame,x
-	jmp PostSafeRemoveEnemy
 ;20 CD EE
 MoveObjectForWeapon:
 	sec
@@ -2483,12 +2458,29 @@ MoveObjectForWeapon:
 	sta aObjYlo,x
 	lda aObjY,x
 	sbc aObjVY,x
-	sta aObjY,x
+	ldy aObjVY,x
+	bmi .godown_movey
 	cmp #$F0
-	bcc .continue
+	bcc .movey
+	adc #$0F
+	pha
+	lda aObjRoom,x
+	adc #$0F
+	jmp .movey
+.godown_movey
+	bcs .movey
+	sbc #$0F
+	pha
+	lda aObjRoom,x
+	sbc #$F0
+.movey
+	sta aObjRoom,x
+	pla
+	sta aObjY,x
+;	bcc .continue
 ;縦画面外判定
-	jmp SafeRemoveEnemy
-.continue
+;	jmp SafeRemoveEnemy
+;.continue
 	lda aObjFlags,x
 	and #%00000100
 	beq .gravity
@@ -2501,8 +2493,8 @@ MoveObjectForWeapon:
 	sta aObjVY,x
 .gravity
 	lda aObjFlags,x
-	and #%01000000
-	bne .right
+	asl a
+	bmi .right
 	sec
 	lda aObjXlo,x
 	sbc aObjVXlo,x
@@ -2510,20 +2502,10 @@ MoveObjectForWeapon:
 	lda aObjX,x
 	sbc aObjVX,x
 	sta aObjX,x
-	lda aObjRoom,x
-	sbc #$00
-	sta aObjRoom,x
-	sec
-	lda aObjX,x
-	sbc <zHScroll
-	sta <$08
-	lda aObjRoom,x
-	sbc <zRoom
-	bne SafeRemoveEnemy
-	lda <$08
-	cmp #$08
-	bcc SafeRemoveEnemy
-	bcs .done
+	bcs .borrow_x
+	dec aObjRoom,x
+.borrow_x
+	jmp .done
 .right
 	clc
 	lda aObjXlo,x
@@ -2532,22 +2514,10 @@ MoveObjectForWeapon:
 	lda aObjX,x
 	adc aObjVX,x
 	sta aObjX,x
-	lda aObjRoom,x
-	adc #$00
-	sta aObjRoom,x
-	sec
-	lda aObjX,x
-	sbc <zHScroll
-	sta <$08
-	lda aObjRoom,x
-	sbc <zRoom
-	bne SafeRemoveEnemy
-	lda <$08
-	cmp #$F8
-	bcs SafeRemoveEnemy
+	bcc .done
+	inc aObjRoom,x
 .done
-	clc
-	rts
+	jmp CheckOffscreenEnemy_Moving
 SafeRemoveEnemy:
 	lsr aObjFlags,x
 PostSafeRemoveEnemy:
@@ -2579,20 +2549,21 @@ CheckOffscreenEnemy:
 	lda #$00
 CheckOffscreenEnemy_Start:
 	sta <zObjItemFlag
+CheckOffscreenEnemy_Moving:
 	lda aObjFlags,x
 	and #%00000011
-	beq .check
-	pha
-	and #%00000001
-	beq .checkdmg
+	beq CheckOffscreenEnemy_CheckOffscreen
+	lsr
+	php
+	bcc .checkdmg
 	jsr RockmanTakeDamage
 .checkdmg
-	pla
-	and #%00000010
-	beq .check
+	plp
+	beq CheckOffscreenEnemy_CheckOffscreen
 	jsr EnemyTakeDamage
-	bcc .check
+	bcc CheckOffscreenEnemy_CheckOffscreen
 ;撃破時
+CheckOffscreenEnemy_Break:
 	jsr CreateItemFromEnemy
 	lda #$06
 	sta aObjAnim,x
@@ -2602,7 +2573,8 @@ CheckOffscreenEnemy_Start:
 	sta aObjWait,x
 	sta aObjFrame,x
 	jmp PostSafeRemoveEnemy
-.check
+;画面外判定をする
+CheckOffscreenEnemy_CheckOffscreen:
 	lda <zEScreenRoom
 	bne SafeRemoveEnemy
 	clc

@@ -2544,7 +2544,7 @@ EN33:
 	beq .do
 	lda #$00
 	sta <zObjItemFlag
-	jmp MoveEnemy_Break
+	jmp CheckOffscreenEnemy_Break
 .do
 	lda #$00
 	sta aObjVXlo,x
