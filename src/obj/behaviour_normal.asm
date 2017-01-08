@@ -4002,7 +4002,7 @@ EN53_55_Begin:
 	lda #$00
 	sta aObjWait,x
 .loopanim
-	lda #$01
+	lda #$08
 	sta aObjVar,x
 	lda aObjX,x
 	and aObjBlockW,x

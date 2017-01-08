@@ -1,41 +1,85 @@
 
 ;20 55 D6
 ;SpawnEnemyByScroll
-.seek = $01 ;01～FFまで
-.l = $0A
-.lhi = $0B
-.r = $08
-.rhi = $09
+.seek = $00
+.seek_r = $01
+.room = $02
+.num = $03
 	lda <zStage
 	and #$07
 	jsr ChangeBank
-	ldy #$01
+	
+	mSTZ <.seek_r
+.loop_room
+	lda <$20
+	ldy <.seek_r
+	beq .skip_1st
+	clc
+	adc .room_list,y
+.skip_1st
+	sta <.room
+	tax
+	
+	lda Stage_DefMap16,x
+	tax
+	asl a
+	bmi .skip_room
+	lda Stage_DefEnemiesAmount,x
+	beq .skip_room
+	sta <.num
+	
+	tya
+	and #$01
+	sta <$05
+	tya
+	and #$02
+	sta <$04
+	
+	ldy Stage_DefEnemiesPtr,x
 .loop_seek
 	sty <.seek
 	
-	lda Stage_DefEnemies - 1,y
-	bmi .skip_seek
+;横の画面外判定
 	sec
-	mMOV Stage_DefEnemiesRoom - 1,y, <$09
-	sbc <zRoom
-	sta <$00
-	and #$EE
-	bne .skip_seek
-	mMOV Stage_DefEnemiesX - 1,y, <$08
-	mMOV Stage_DefEnemiesY - 1,y, <$0A
-	mMOV #%10000000, <$0B
-	jsr CheckOffscreen_SpawnEnemy
+	lda Stage_DefEnemiesX - 1,y
+	sbc <zHScroll
+	ldx <$05
+	beq .inv_x
+	clc
+	eor #$FF
+	adc #$01
+.inv_x
+	cmp #$08
+	bcc .spawn
+;縦の画面外判定
+	sec
+	lda Stage_DefEnemiesY - 1,y
+	sbc <zVScroll
+	ldx <$04
+	beq .inv_y
+	clc
+	eor #$FF
+	adc #$01
+.inv_y
+	cmp #$08
 	bcs .skip_seek
 ;敵が出現する
-	ldy <.seek
+.spawn
 	jsr CreateEnemy
 .skip_seek
 	ldy <.seek
 	iny
+	dec <.num
 	bne .loop_seek
-.done
+.skip_room
+	inc <.seek_r
+	ldy <.seek_r
+	cpy #$04
+	bne .loop_room
 	mCHANGEBANK #$0E, 1
-	;rts
+
+.room_list
+	.db $00, $01, $10, $11
 
 ;20 50 D7
 ;敵順序番号Yを生成

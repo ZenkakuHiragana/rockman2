@@ -574,56 +574,69 @@ LoadStageGraphics:
 .ptr = $0A
 .ptrlo = $0A
 .ptrhi = $0B
+	mCHANGEBANK #$00
+	lda #$90
+	sta <.ptrhi
+	ldy #$00
+	sty <.ptr
+	sty $2006
+	sty $2006
+.loop_rockman
+	mMOV [.ptr],y, $2007
+	iny
+	bne .loop_rockman
+	inc <.ptrhi
+	lda <.ptrhi
+	cmp #$9A
+	bcc .loop_rockman
+
 	lda <zStage
 	and #$07
 	jsr ChangeBank
-	mMOVW Stage_Graphics - $1000, <.ptrlo
+	ldx #$00
+	stx <.ptr
 	lda <zStage
 	and #$08
 	beq .is8bosses
-	clc
-	lda <.ptrhi
-	adc #$08
-	sta <.ptrhi
+	ldx #$10
 .is8bosses
+	lda Stage_DefGraphics,x
+	sta <$00
 	ldy #$00
-	mSTZ $2006, $2006
+.loop_graphics
+	inx
+	lda Stage_DefGraphics,x
+	sta <$01
+	inx
+	lda Stage_DefGraphics,x
+	sta <.ptrhi
+	inx
+	lda Stage_DefGraphics,x
+	jsr ChangeBank
 .loop_gr
 	mMOV [.ptr],y, $2007
 	iny
 	bne .loop_gr
 	inc <.ptrhi
+	dec <$01
+	bne .loop_gr
+	lda <zStage
+	and #$07
+	jsr ChangeBank
+	dec <$00
+	bne .loop_graphics
+	
+;背景画像読み込み
+	mMOV #$A0, <.ptrhi
+.loop_bg
+	mMOV [.ptr],y, $2007
+	iny
+	bne .loop_bg
+	inc <.ptrhi
 	lda <.ptrhi
 	cmp #$B0
-	bne .loop_gr
-;	iny
-;	sty <$01
-;.loop3
-;	ldy <$01
-;	mMOV [.ptr],y, <zPtrhi
-;	iny
-;	mMOV [.ptr],y, <$02
-;	iny
-;	lda [.ptr],y
-;	iny
-;	sty <$01
-;	jsr ChangeBank
-;.loop2
-;	ldy #$00
-;.loop
-;	mMOV [zPtr],y, $2007
-;	iny
-;	bne .loop
-;	inc <zPtrhi
-;	dec <$02
-;	bne .loop2
-;	lda <zStage
-;	and #$07
-;	jsr ChangeBank
-;	dec <$00
-;	bne .loop3
-;	inc <.ptrhi
-;	inc <.ptrhi
+	bcc .loop_bg
+	
 	ldy #$61
 .loop_palette
 	mMOV Stage_Palette - 2,y, aPaletteAnim,y
@@ -2533,7 +2546,11 @@ MoveObjectForWeapon:
 	bcc .done
 	inc aObjRoom,x
 .done
+	cpx #$10
+	bcc .weapon
 	jmp CheckOffscreenEnemy_Moving
+.weapon
+	jmp CheckOffscreenEnemy_CheckOffscreen
 
 ;20 8D EF
 CheckOffscreenItem:
@@ -2597,13 +2614,6 @@ CheckOffscreen:
 	sta <.rx
 	and #$EE
 	bne CheckOffscreen_Out
-CheckOffscreen_SpawnEnemy:
-.rx = $00
-.ry = $02
-.x = $08
-.r = $09
-.y = $0A
-.f = $0B
 	lda <.rx
 	and #$11
 	sta <.rx
@@ -2659,7 +2669,7 @@ CheckOffscreen_SpawnEnemy:
 .safe
 	clc
 	rts
-CheckOffscreen_Out
+CheckOffscreen_Out:
 	sec
 CheckOffscreen_End:
 	rts

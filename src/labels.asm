@@ -522,9 +522,13 @@ aObjCollision10 = $6F0
 aPaletteBackup = $700   ;サブメニューを開いた時のBGパレットバックアップ
 
 
-
+;16x16タイル定義
+;13 → 1, 2, 3, 4
+;24
 Stage_Def16x16 = $8000
+;32x32タイル定義
 Stage_Def32x32 = $8200
+;32x32属性定義
 Stage_Def32Pal = $8600
 ;地形判定定義
 ;13 → 11112222 33334444
@@ -534,20 +538,57 @@ Stage_Def32Attr = $8700
 ;Scroll stop -> +40
 ;Block flag -> +80
 Stage_DefMap16 = $8900
+;敵画面位置定義
 Stage_DefEnemiesRoom = $8A00
-Stage_DefEnemiesX = $8B00 - 1
-Stage_DefEnemiesY = $8C00 - 2
-Stage_DefEnemies = $8D00 - 3
-Stage_DefItemsRoom = $8E00 - 4
-Stage_DefItemsX = $8E30 - 4
-Stage_DefItemsY = $8E60 - 4
-Stage_DefItems = $8E90 - 4
-Stage_PaletteAnimNum = $8EC0 - 2
-Stage_PaletteAnimWait = $8EC0 - 1
-Stage_Palette = $8EC0
-Stage_PaletteAnim = $8EF0
+;敵X位置定義
+Stage_DefEnemiesX = $8AC0
+;敵Y位置定義
+Stage_DefEnemiesY = $8B80
+;敵種類定義
+Stage_DefEnemies = $8C40
+;画面ごとの敵配置ポインタ
+Stage_DefEnemiesPtr = $8D00
+;画面ごとの敵配置量
+Stage_DefEnemiesAmount = $8D40
+;アイテム画面位置定義
+Stage_DefItemsRoom = $8D80
+;アイテムX位置定義
+Stage_DefItemsX = $8DA0
+;アイテムY位置定義
+Stage_DefItemsY = $8DC0
+;アイテム種類定義
+Stage_DefItems = $8DE0
+;画面ごとのアイテム配置ポインタ
+Stage_DefItemsPtr = $8E00
+;画面ごとのアイテム配置量
+Stage_DefItemsAmount = $8E40
+;パレットアニメーション枚数
+Stage_PaletteAnimNum = $8E80
+;パレットアニメーション待ち時間
+Stage_PaletteAnimWait = $8E80 + 1
+;パレット定義
+Stage_Palette = $8E80 + 2
+;パレットアニメーション定義
+Stage_PaletteAnim = $8EA0 + 2
+
+Stage_PaletteAnimNumWily = $8F20 + 2
+Stage_PaletteAnimWaitWily = $8F20 + 3
+Stage_PaletteWily = $8F20 + 4
+Stage_PaletteAnimWily = $8F40 + 4
+
+;画像セット定義
+Stage_DefGraphics = $8FE0
+Stage_DefGraphicsWily = $8FF0
+
+;8x8画面定義
 Stage_DefRoom = $B000
+;画像格納位置
 Stage_Graphics = $A000
+
+;ステージ開始位置定義
+Stage_BeginPoint = $8E90 - 4
+;ワイリーステージ開始位置定義
+Stage_BeginPointWily = $8E90 - 3
 
 
 Table_AnimationPointer_Low = $F900

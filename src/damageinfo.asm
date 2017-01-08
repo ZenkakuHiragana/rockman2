@@ -22,8 +22,14 @@
 	bcs .nodmg
 
 	sec
+	lda aObjY,x
+	sbc <zVScroll
+	sta <$00
+	sec
 	lda aObjY
-	sbc aObjY,x
+	sbc <zVScroll
+	sec
+	sbc <$00
 	bcs .inv_y
 	eor #$FF
 	adc #$01
