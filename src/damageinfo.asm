@@ -85,7 +85,9 @@
 ;20 E9 E5
 ;Obj[x]とロックマンの武器とのヒット処理
 EnemyTakeDamage:
+	sec
 	lda aObjY,x
+	sbc <zVScroll
 	sta <$00
 	lda aObjCollision,x
 	sta <$08
@@ -118,8 +120,10 @@ EnemyTakeDamage:
 	cmp Table_CollisionSizeX,y
 	bcs .skip
 	sec
-	lda <$00
-	sbc aObjY,x
+	lda aObjY,x
+	sbc <zVScroll
+	sec
+	sbc <$00
 	bcs .inv_y
 	eor #$FF
 	adc #$01
