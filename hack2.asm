@@ -19,7 +19,7 @@
 	.ineschr $00 ;キャラクタバンク数
 	.inesmir 1   ;
 	.inesmap 1
-
+	
 	.incbin "rockman2.prg"
 	.include "src/labels.asm"
 	.include "src/lib.asm"
