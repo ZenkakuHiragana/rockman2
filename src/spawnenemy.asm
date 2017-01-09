@@ -9,14 +9,103 @@
 	lda <zStage
 	and #$07
 	jsr ChangeBank
+
+;アイテム出現処理
+	ldy #$00
+.loop_room_item
+	sty <.seek_r
+	lda <$20
+	beq .skip_1st_item
+	clc
+	adc .room_list - 1,y
+.skip_1st_item
+	sta <.room
+	tax
 	
+	lda Stage_DefMap16,x
+	tax
+	asl a
+	bmi .skip_room_item
+	lda Stage_DefItemsAmount,x
+	beq .skip_room_item
+	sta <.num
+	
+	tya
+	and #$01
+	sta <$05
+	tya
+	and #$02
+	sta <$04
+	
+	ldy Stage_DefItemsPtr,x
+.loop_seek_item
+	sty <.seek
+	lda aItemLife,y
+	beq .skip_seek_item
+	mSTZ <.spawnflag
+	
+;横の画面外判定
+	sec
+	lda Stage_DefEnemiesX - 1,y
+	sbc <zHScroll
+	ldx <$05
+	dex
+	bcc .borrow_x_item
+	bpl .skip_seek_item
+	bmi .cont_x_item
+.borrow_x_item
+	bmi .skip_seek_item
+	eor #$FF
+.cont_x_item
+	
+	cmp #$08
+	bcc .skip_seek_item
+	cmp #$10
+	bcs .spawnflag_set_item
+	inc <.spawnflag
+.spawnflag_set_item
+;縦の画面外判定
+	sec
+	lda Stage_DefEnemiesY - 1,y
+	sbc <zVScroll
+	ldx <$04
+	dex
+	bcc .borrow_y_item
+	bpl .skip_seek_item
+	bmi .cont_y_item
+.borrow_y_item
+	bmi .skip_seek_item
+	eor #$FF
+.cont_y_item
+	
+	cmp #$08
+	bcc .skip_seek_item
+	ldx <.spawnflag
+	bne .spawn_item
+	cmp #$10
+	bcs .skip_seek_item
+;アイテムが出現する
+.spawn_item
+	jsr CreateItem
+.skip_seek_item
+	ldy <.seek
+	iny
+	dec <.num
+	bne .loop_seek_item
+.skip_room_item
+	ldy <.seek_r
+	iny
+	cpy #$04
+	bne .loop_room_item
+
+;敵出現処理
 	ldy #$00
 .loop_room
 	sty <.seek_r
 	lda <$20
 	beq .skip_1st
 	clc
-	adc .room_list,y
+	adc .room_list - 1,y
 .skip_1st
 	sta <.room
 	tax
@@ -83,6 +172,8 @@
 	bcs .skip_seek
 ;敵が出現する
 .spawn
+	lda Stage_DefEnemies - 1,y
+	bmi .sendchr
 	jsr CreateEnemy
 .skip_seek
 	ldy <.seek
@@ -94,98 +185,13 @@
 	iny
 	cpy #$04
 	bne .loop_room
-	
-;アイテム出現処理
-	ldy #$00
-.loop_room_item
-	sty <.seek_r
-	lda <$20
-	beq .skip_1st_item
-	clc
-	adc .room_list,y
-.skip_1st_item
-	sta <.room
-	tax
-	
-	lda Stage_DefMap16,x
-	tax
-	asl a
-	bmi .skip_room_item
-	lda Stage_DefItemsAmount,x
-	beq .skip_room_item
-	sta <.num
-	
-	tya
-	and #$01
-	sta <$05
-	tya
-	and #$02
-	sta <$04
-	
-	ldy Stage_DefItemsPtr,x
-.loop_seek_item
-	sty <.seek
-	lda aItemLife,y
-	beq .skip_seek_item
-	mSTZ <.spawnflag
-	
-;横の画面外判定
-	sec
-	lda Stage_DefEnemiesX - 1,y
-	sbc <zHScroll
-	ldx <$05
-	dex
-	bcc .borrow_x_item
-	bpl .skip_seek_item
-	bmi .cont_x_item
-.borrow_x_item
-	bmi .skip_seek_item
-	eor #$FF
-.cont_x_item
-	
-	cmp #$08
-	bcc .skip_seek_item
-	cmp #$10
-	bcs .spawnflag_set_item
-	inc <.spawnflag
-.spawnflag_set_item
-;縦の画面外判定
-	sec
-	lda Stage_DefEnemiesY - 1,y
-	sbc <zVScroll
-	ldx <$04
-	dex
-	bcc .borrow_y_item
-	bpl .skip_seek
-	bmi .cont_y_item
-.borrow_y_item
-	bmi .skip_seek_item
-	eor #$FF
-.cont_y_item
-	
-	cmp #$08
-	bcc .skip_seek_item
-	ldx <.spawnflag
-	bne .spawn_item
-	cmp #$10
-	bcs .skip_seek_item
-;アイテムが出現する
-.spawn_item
-	jsr CreateItem
-.skip_seek_item
-	ldy <.seek
-	iny
-	dec <.num
-	bne .loop_seek_item
-.skip_room_item
-	ldy <.seek_r
-	iny
-	cpy #$04
-	bne .loop_room_item
 	mCHANGEBANK #$0E, 1
+.sendchr
+	
+	bmi .skip_seek
 
 .room_list
-	.db $00, $01, $10, $11
+	.db $01, $10, $11
 
 ;20 50 D7
 ;敵順序番号Yを生成
