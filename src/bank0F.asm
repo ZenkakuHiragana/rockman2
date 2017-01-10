@@ -1027,10 +1027,14 @@ Rockman_Warp_to_Land:
 	lda aObjY
 	adc #$10
 	sta aObjY
-	ldx <zContinuePoint
-	cmp $BB00,x ;----------------------
-	cmp #$A4
-	beq .onland
+	adc #$10
+	sta <$0A
+	mMOV aObjX, <$08
+	mMOV aObjRoom, <$09
+	jsr PickupBlock
+	lda <$00
+	and #$08
+	bne .onland
 	jsr SpriteSetup
 	jsr FrameAdvance1C
 	jmp .loop
@@ -1042,7 +1046,7 @@ Rockman_Warp_to_Land:
 	sta <zSliphi
 	lda #$40
 	sta <zMoveVec
-	dec aObjVY
+	mMOV #$FF, aObjVY
 	mCHANGEBANK #$0E, 1
 	;rts
 
@@ -1306,14 +1310,106 @@ WriteNameTableByScroll:
 	and #$07
 	jsr ChangeBank
 ;書き込み開始位置の設定
+	lda <zRoom
+	and #$F0
+	sta <$09
+	lda <zRoom
+	and #$0F
+	tax
+	clc
+	lda <zHScroll
+	adc #$88
+	bcc .carry_x_init
+	inx
+.carry_x_init
+	sta <$08
+	lsr a
+	lsr a
+	and #$38
+	sta <$03 ;$03: 00XX X000
+	
+	lda <zVScroll
+	sta <$10
+	clc
+	txa
+	adc <$09
+	sta <$09
+	
+	ldx #$00
+	ldy #$00
+	lda <$08
+	and #$08
+	beq .inx_8
+	ldy #$02
+.inx_8
+	lda <$08
+	and #$10
+	beq .inx_16
+	ldx #$02
+.inx_16
+	lda <$10
+	asl a
+	rol a
+	rol a
+	rol a
+	bpl .iny_8
+	iny
+.iny_8
+	bcc .iny_16
+	inx
+.iny_16
+	and #$07
+	ora <$03
+	sta <$03 ;$03: 00XX XYYY
+	stx <$04 ;$04: 32x32 LT LB RT RB
+	sty <$05 ;$05: 16x16 LT LB RT RB
+	
 ;横スクロール
 	lda <.xscroll
 	sta <zPPUHScr
 	bne .do_h
 	jmp .skip_xscroll
 .do_h
-	mMOV #$01, <$12
-	jsr WriteNameTable_GetOrigin
+	lda <$03
+	pha
+	txa
+	pha
+	tya
+	pha
+	lda <$08
+	pha
+	lda <$09
+	pha
+	lda <$10
+	pha
+	
+	lda <$02
+	bmi .horizontal_v ;右スクロール時
+	sec
+	lda <$08
+	sbc #$08
+	sta <$08
+	bcs .carry_h_v
+	dec <$09
+.carry_h_v
+	tya ;横の書き込み開始位置を-8[dot]
+	eor #$02
+	tay
+	and #$02
+	beq .horizontal_v
+	txa
+	eor #$02
+	tax
+	and #$02
+	beq .horizontal_v
+	sec
+	lda <$03
+	sbc #$08
+	and #$3F
+	sta <$03
+.horizontal_v
+	stx <$04
+	sty <$05
 	
 	ldy <$02
 	bmi .left_nt
@@ -1331,23 +1427,14 @@ WriteNameTableByScroll:
 	lda #$2C
 .left_room_h
 	sta aPPUHScrhi
-;画面切り分け位置の指定
-	lda <$10
-	lsr a
-	lsr a
-	lsr a
-	sta <$06 ;$06: ppu write data index
-	sta <$07 ;$07: ppu write data index
-;属性データ書き込み位置指定
-	lda aPPUHScrhi
-	ora #$03
-	sta aPPUHScrAttrhi
 	lda <$08
-	asl a
-	rol a
-	rol a
-	rol a
-	and #$07
+	lsr a
+	lsr a
+	lsr a
+	sta aPPUHScrlo ;0～1F, PPU dx
+;属性データ書き込み位置指定
+	lsr a
+	lsr a
 	clc
 	adc #$C0
 	ldx #$00
@@ -1361,6 +1448,16 @@ WriteNameTableByScroll:
 	inx
 	cpx #$10
 	bne .loop_attr
+	lda aPPUHScrhi
+	ora #$03
+	sta aPPUHScrAttrhi
+;画面切り分け位置の指定
+	lda <$10
+	lsr a
+	lsr a
+	lsr a
+	sta <$06 ;$06: ppu write data index
+	sta <$07 ;$07: ppu write data index
 	
 ;ネームテーブル書き込み
 .loop_nt_h
@@ -1408,7 +1505,7 @@ WriteNameTableByScroll:
 	inc <$06
 	inx
 	cpx <$07
-	beq .skip_xscroll
+	beq .skip_xscroll_pla
 	cpx #$1E
 	bcs .end_ptr_h
 	tya
@@ -1429,7 +1526,7 @@ WriteNameTableByScroll:
 	bne .loop_nt_h_32
 .end_ptr_h
 	lda <$07
-	beq .skip_xscroll
+	beq .skip_xscroll_pla
 	lda <$03
 	and #$38
 	sta <$03
@@ -1445,6 +1542,19 @@ WriteNameTableByScroll:
 	sta <$04
 	mSTZ <$06
 	jmp .loop_nt_h
+.skip_xscroll_pla
+	pla
+	sta <$10
+	pla
+	sta <$09
+	pla
+	sta <$08
+	pla
+	sta <$05
+	pla
+	sta <$04
+	pla
+	sta <$03
 .skip_xscroll
 ;縦スクロール
 	lda <.yscroll
@@ -1452,8 +1562,42 @@ WriteNameTableByScroll:
 	bne .do_yscroll
 	jmp .end_scroll
 .do_yscroll
-	mSTZ <$12
-	jsr WriteNameTable_GetOrigin
+	
+	ldx <$04
+	ldy <$05
+	lda <$02
+	lsr a
+	bcs .up_dy ;下スクロールの時
+	lda <$10 ;縦の書き込み開始位置-8[dot]
+	sbc #$07
+	sta <$10
+	bcs .borrow_nt
+	sbc #$0F
+	sta <$10
+	lda <$09
+	sbc #$10
+	sta <$09
+.borrow_nt
+	dey
+	tya
+	lsr a
+	bcc .up_dy
+	iny
+	iny
+	dex
+	txa
+	lsr a
+	bcc .up_dy
+	inx
+	inx
+	lda <$03
+	sbc #$01
+	and #$3F
+	sta <$03
+.up_dy
+	stx <$04
+	sty <$05
+
 	ldy <$09
 	dey
 	tya
@@ -1644,116 +1788,6 @@ WriteNameTableByScroll:
 
 ;スクロール位置の補正
 WriteNameTable_GetOrigin:
-	lda <zRoom
-	lsr a
-	lsr a
-	lsr a
-	lsr a
-	sta <$09
-	lda <zRoom
-	and #$0F
-	tax
-	lda <zHScroll
-	ldy <$02
-	bpl .right_nt
-	clc
-	adc #$08
-	bcc .right_nt
-	inx
-;	jmp .right_nt
-.right_nt
-	eor #$80
-	bmi .inv_h
-	inx
-.inv_h
-	ldy <$12
-	bne .horizontal ;縦スクロールの設定の時
-	ldy <$02
-	bmi .horizontal
-	clc
-	adc #$08 ;横スクロール値を+8
-	bcc .horizontal
-	inx
-.horizontal
-	sta <$08
-	
-	ldy <zVScroll
-	lda <$02
-	lsr a
-	lda <$12
-	beq .vertical ;横スクロールの設定の時
-	tya
-	bcs .vertical ;下スクロールの時
-	adc #$08 ;縦スクロール値を+8
-	cmp #$F0
-	bcc .merge_vertical
-	inc <$09
-	adc #$0F
-.merge_vertical
-	tay
-.vertical
-	lda <$02
-	lsr a
-	tya
-	bcs .up_nt
-	sbc #$07 
-	bcs .done_v
-	sbc #$0F
-	dec <$09
-;	jmp .done_v
-.up_nt
-.done_v
-	sta <$10
-	lda <$09
-	asl a
-	asl a
-	asl a
-	asl a
-	sta <$09
-	txa
-	adc <$09
-	sta <$09
-;書き込み開始位置の指定
-	ldx #$00
-	ldy #$00
-	lda <$08
-	and #$08
-	beq .inx_8
-	ldy #$02
-.inx_8
-	lda <$08
-	and #$10
-	beq .inx_16
-	ldx #$02
-.inx_16
-	lda <$08
-	lsr a
-	lsr a
-	lsr a
-	lsr <$12
-	bcc .ppu_h
-	sta aPPUHScrlo ;0～1F, PPU dx
-.ppu_h
-	rol a
-	and #$38
-	sta <$03 ;$03: 00XX X000
-	lda <$10
-	asl a
-	rol a
-	rol a
-	rol a
-	bpl .iny_8
-	iny
-.iny_8
-	bcc .iny_16
-	inx
-.iny_16
-	and #$07
-	ora <$03
-	sta <$03 ;$03: 00XX XYYY
-	stx <$04 ;$04: 32x32 LT LB RT RB
-	sty <$05 ;$05: 16x16 LT LB RT RB
-	rts
 	
 WriteNameTable_GetMapPtr:
 	ldy <$09
@@ -2582,96 +2616,69 @@ CheckOffscreenEnemy_Break:
 	mSTZ aObjWait,x, aObjFrame,x
 	jmp PostSafeRemoveEnemy
 CheckOffscreenEnemy_CheckOffscreen:
-	mMOV aObjX,x, <$08
-	mMOV aObjRoom,x, <$09
-	mMOV aObjY,x, <$0A
 	lda aObjFlags,x
 	asl a
-	sta <$0B
+	sta <$02
 	lda aObjVY,x
 	asl a
-	ror <$0B
-	jsr CheckOffscreen
-	bcc CheckOffscreen_End
-	jmp SafeRemoveEnemy
-;画面外判定をする
-;$00 相対画面位置X
-;$01 相対画面位置Y
-;$08 横位置
-;$09 画面位置
-;$0A 縦位置
-;$0B VR.. ...., V Y速度の方向, R 右向きフラグ
-CheckOffscreen:
-.rx = $00
-.ry = $02
-.x = $08
-.r = $09
-.y = $0A
-.f = $0B
+	ror <$02
 	sec
-	lda <.r
+	lda aObjRoom,x
 	sbc <zRoom
-	sta <.rx
+	sta <$00
 	and #$EE
-	bne CheckOffscreen_Out
-	lda <.rx
+	bne SafeRemoveEnemy
+	lda <$00
 	and #$11
-	sta <.rx
+	sta <$00
+	tay
 	lsr a
 	lsr a
 	lsr a
 	lsr a
-	sta <.ry
-	lda <.rx
+	sta <$00
+	tya
 	and #$01
 	tay
 ;横の画面外判定
 	sec
-	lda <.x
+	lda aObjX,x
 	sbc <zHScroll
 	dey
 	bcs .borrow_x
-	bmi CheckOffscreen_Out
-	bpl .continue_x
+	bmi SafeRemoveEnemy
+	bpl .cont_x
 .borrow_x
-	bpl CheckOffscreen_Out
-.continue_x
-	tay
-	bit <.f
-	bvs .right
-	cpy #$08
-	bcc CheckOffscreen_Out
-	bcs .continue
-.right
-	cpy #$F8
-	bcs CheckOffscreen_Out
-.continue
+	bpl SafeRemoveEnemy
+.cont_x
+	bit <$02
+	bvc .inv_x
+	clc
+	eor #$FF
+	adc #$01
+.inv_x
+	cmp #$08
+	bcc SafeRemoveEnemy
 ;縦の画面外判定
 	sec
-	lda <.y
+	lda aObjY,x
 	sbc <zVScroll
-	dec <$02
+	dec <$00
 	bcs .borrow_y
-	bmi CheckOffscreen_Out
-	bpl .continue_y
+	bmi SafeRemoveEnemy
+	bpl .cont_y
 .borrow_y
-	bpl CheckOffscreen_Out
-.continue_y
-	tay
-	lda <.f
-	bpl .up
-	cpy #$F0
-	bcs CheckOffscreen_Out
-	bcc .safe
-.up
-	cpy #$08
-	bcc CheckOffscreen_Out
-.safe
+	bpl SafeRemoveEnemy
+.cont_y
+	ldy <$02
+	bpl .inv_y
 	clc
-	rts
-CheckOffscreen_Out:
-	sec
-CheckOffscreen_End:
+	eor #$FF
+	adc #$01
+.inv_y
+	cmp #$08
+	bcc SafeRemoveEnemy
+	clc
 	rts
 ;画面外に出たオブジェクトを消去する
 SafeRemoveEnemy:
