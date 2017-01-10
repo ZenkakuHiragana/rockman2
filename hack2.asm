@@ -23,6 +23,8 @@
 	.incbin "rockman2.prg"
 	.include "src/labels.asm"
 	.include "src/lib.asm"
+	mBEGIN $00, $8000
+	.incbin "stage/test.bin"
 ;	.include "src/bank0C.asm"
 	.include "src/bank0D.asm"
 	.include "src/bank0E.asm"
