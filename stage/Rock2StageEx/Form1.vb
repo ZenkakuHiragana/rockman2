@@ -137,11 +137,10 @@ Public Class Form1
     Dim BinFilePath As String
     ''' <summary>ファイルの最終書き込み日時です。</summary>
     Dim TimeStamp As Date
-    Dim zoom As UInteger = 1
+    'Dim zoom As UInteger = 1
 
     Dim _Pi As Byte                                 'アニメーションさせる際、今何枚目のパレットか、を記録
     Dim frameCounter As Integer = 0                 'タイマーが呼び出される度にインクリメント。
-    Dim _Color As Byte = Nothing                    '色のコピペ用。
     Dim TimerStats As Threading.Timer               '別スレッドでタイマーを使うため、スレッド破棄用。
 
     Delegate Sub SetBackColorDelegate(ByVal c As Color)         '別スレッドでコントロールを扱うときはデリゲート宣言しないといけない
@@ -504,7 +503,7 @@ Public Class Form1
         g.DrawLine(chain, New Point(center.X, 0), New Point(center.X, sender.ClientSize.Height))
     End Sub
 
-    Private Sub Draw8Graph(ByRef g As Graphics, ByRef cur As Point, ByVal a As UInteger, ByVal at As UInteger, ByVal mag As UInteger)
+    Private Sub Draw8Graph(ByRef g As Graphics, ByRef cur As Point, ByVal a As UInteger, ByVal at As UInteger) ', ByVal mag As UInteger)
         Dim c, seek As UInteger
         Dim bitmask() As Byte = {&H80, &H40, &H20, &H10, &H8, &H4, &H2, &H1}
 
@@ -521,33 +520,33 @@ Public Class Form1
                     c = c Or 2
                 End If
 
-                g.FillRectangle(PaletteBrushes(palette(4 * at + c)), New Rectangle((cur.X + x) * mag, (cur.Y + y) * mag, mag, mag))
+                g.FillRectangle(PaletteBrushes(palette(4 * at + c)), New Rectangle(cur.X + x, cur.Y + y, 1, 1))
             Next
         Next
     End Sub
 
-    Private Sub Draw16Tile(ByRef g As Graphics, ByRef cur As Point, ByVal a As UInteger, ByVal at As UInteger, ByVal mag As UInteger)
+    Private Sub Draw16Tile(ByRef g As Graphics, ByRef cur As Point, ByVal a As UInteger, ByVal at As UInteger) ', ByVal mag As UInteger)
         Dim graphnum As UInteger
 
         For x8 As UInteger = 0 To 1
             For y8 As UInteger = 0 To 1
                 graphnum = tile(a * 4 + x8 * 2 + y8)
 
-                Draw8Graph(g, cur, graphnum, at, mag)
+                Draw8Graph(g, cur, graphnum, at)
                 cur += New Point(0, 8)
             Next
             cur += New Point(8, -16)
         Next
     End Sub
 
+    ' <param name="mag">倍率。</param>
     ''' <summary>
     ''' 32x32を描画します。
     ''' </summary>
     ''' <param name="g">描画先のグラフィックスオブジェクト。</param>
     ''' <param name="cur">描画する左上の位置。</param>
     ''' <param name="a">タイル番号。</param>
-    ''' <param name="mag">倍率。</param>
-    Private Sub Draw32Chip(ByRef g As Graphics, ByRef cur As Point, ByVal a As UInteger, ByVal mag As UInteger)
+    Private Sub Draw32Chip(ByRef g As Graphics, ByRef cur As Point, ByVal a As UInteger) ', ByVal mag As UInteger)
         Dim tilenum, at As UInteger '属性、ドットの色、8x8グラのデータ読み取り位置
         'Dim bitmask_inv() As Byte = {1, 2, 4, 8, &H10, &H20, &H40, &H80}
         Dim attrmask() As Byte = {&H3, &H30, &HC, &HC0}
@@ -557,7 +556,7 @@ Public Class Form1
             For y16 As UInteger = 0 To 1
                 tilenum = chip(a * 4 + x16 * 2 + y16) And &H7F
                 at = ((attr(a) And attrmask(x16 * 2 + y16)) >> attrshiftmask(x16 * 2 + y16)) And 3
-                Draw16Tile(g, cur, tilenum, at, mag)
+                Draw16Tile(g, cur, tilenum, at)
                 cur += New Point(-16, 16)
             Next
             cur += New Point(16, -32)
@@ -633,7 +632,7 @@ Public Class Form1
                         For x32 As UInteger = 0 To 7 '32x32 chip loop
                             For y32 As UInteger = 0 To 7
                                 chipnum = room(roomnum * &H40 + x32 * 8 + y32)
-                                Draw32Chip(g, cur, chipnum, zoom)
+                                Draw32Chip(g, cur, chipnum)
                                 cur += New Point(-32, 32)
                             Next
                             cur += New Point(32, -256)
@@ -652,8 +651,6 @@ Public Class Form1
                                 type = en.type
                                 p = en.org
                                 p += New Point(Xm * 256, Ym * 256)
-                                p.X *= zoom
-                                p.Y *= zoom
                                 If type < 16 Then
                                     s = "0"
                                 Else
@@ -679,8 +676,6 @@ Public Class Form1
                                 type = it.type
                                 p = it.org
                                 p += New Point(Xm * 256, Ym * 256)
-                                p.X *= zoom
-                                p.Y *= zoom
                                 If type < 16 Then
                                     s = "0"
                                 Else
@@ -696,7 +691,7 @@ Public Class Form1
                             Next
                         End If
                     Else
-                        g.FillRectangle(Brushes.Black, cur.X * zoom, cur.Y * zoom, (cur.X + 256) * zoom, (cur.Y + 256) * zoom)
+                        g.FillRectangle(Brushes.Black, cur.X, cur.Y, cur.X + 256, cur.Y + 256)
                         cur += New Point(256, 0)
                     End If
                     cur += New Point(-256, 256)
@@ -718,7 +713,7 @@ Public Class Form1
             For y32 As UInteger = 0 To 15 '32x32 chip loop
                 For x32 As UInteger = 0 To 15
                     chipnum = y32 * 16 + x32
-                    Draw32Chip(g, cur, chipnum, zoom)
+                    Draw32Chip(g, cur, chipnum)
                 Next
                 cur += New Point(-512, 32)
             Next
@@ -737,7 +732,7 @@ Public Class Form1
             For y16 As UInteger = 0 To 7 '16x16 tile loop
                 For x16 As UInteger = 0 To 15
                     tilenum = y16 * 16 + x16
-                    Draw16Tile(g, cur, tilenum, tile_attr, zoom * 2)
+                    Draw16Tile(g, cur, tilenum, tile_attr) '2x
                 Next
                 cur += New Point(-256, 16)
             Next
@@ -770,7 +765,7 @@ Public Class Form1
     Private Sub p32focus_Paint(sender As Object, e As PaintEventArgs) Handles p32focus.Paint, pmapSelect.Paint
         Dim g As Graphics = p32selectedBuf.Graphics
         SyncLock palette
-            Draw32Chip(g, New Point(0, 0), focus32, zoom * 4)
+            Draw32Chip(g, New Point(0, 0), focus32) '4x
         End SyncLock
 
         Dim center As New Point(sender.ClientSize.Width / 2, sender.ClientSize.Height / 2)
@@ -821,7 +816,7 @@ Public Class Form1
     Private Sub p16focus_Paint(sender As Object, e As PaintEventArgs) Handles p16focus.Paint, p3216focus.Paint
         Dim g As Graphics = p16selectedBuf.Graphics
         SyncLock palette
-            Draw16Tile(g, New Point(0, 0), focus16, tile_attr, zoom * sender.Size.Width / 16)
+            Draw16Tile(g, New Point(0, 0), focus16, tile_attr) ', zoom * sender.Size.Width / 16)
         End SyncLock
 
         Dim center As New Point(sender.ClientSize.Width / 2, sender.ClientSize.Height / 2)
@@ -849,7 +844,7 @@ Public Class Form1
     Private Sub p8focus_Paint(sender As Object, e As PaintEventArgs) Handles p8focus.Paint
         Dim g As Graphics = p8selectedBuf.Graphics
         SyncLock palette
-            Draw8Graph(g, New Point(0, 0), focus8, tile_attr, zoom * sender.Size.Width / 8)
+            Draw8Graph(g, New Point(0, 0), focus8, tile_attr) ', zoom * sender.Size.Width / 8)
         End SyncLock
 
         Dim center As New Point(sender.ClientSize.Width / 2, sender.ClientSize.Height / 2)
@@ -874,7 +869,7 @@ Public Class Form1
         SyncLock palette
             For y As UInteger = 0 To 15
                 For x As UInteger = 0 To 15
-                    Draw8Graph(g, cur, y * 16 + x, tile_attr, zoom * 2)
+                    Draw8Graph(g, cur, y * 16 + x, tile_attr) '2x
                     cur += New Point(8, 0)
                 Next
                 cur += New Point(-128, 8)
@@ -938,8 +933,6 @@ Public Class Form1
                             org = en.org
                             org += New Point(quad.X * 256, quad.Y * 256)
                             org -= New Point(16, 16)
-                            org.X *= zoom
-                            org.Y *= zoom
                             If e.X > org.X And e.Y > org.Y And e.X < org.X + 32 And e.Y < org.Y + 32 Then
                                 SetObjectSelection(numroom, EnemiesArray(numroom).IndexOf(en), en.type, en.org)
                                 RefreshAll()
@@ -951,8 +944,6 @@ Public Class Form1
                             org = it.org
                             org += New Point(quad.X * 256, quad.Y * 256)
                             org -= New Point(16, 16)
-                            org.X *= zoom
-                            org.Y *= zoom
                             If e.X > org.X And e.Y > org.Y And e.X < org.X + 32 And e.Y < org.Y + 32 Then
                                 SetObjectSelection(numroom, ItemsArray(numroom).IndexOf(it), it.type, it.org)
                                 RefreshAll()
