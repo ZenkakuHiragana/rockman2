@@ -135,7 +135,11 @@ StartStage_Continue:
 	sta <zPaletteIndex
 	sta <zPaletteTimer
 	sta <zBossBehaviour
+	sec
 	lda <zRoom
+	sbc #$02
+	ldx #$00
+	ldy #$41
 	jsr DrawRoom
 	jsr ClearSprites
 	lda <z2001
@@ -313,60 +317,54 @@ Table_BossRushCapsuleY:
 Table_BossRushCapsuleX:
 	.db $20, $20, $20, $70, $90, $E0, $E0, $E0
 
+;20 B2 C7: 棒状になって降りてきて着地まで
+Rockman_Warp_to_Land:
+	mMOV #%11000000, aObjFlags
+	mMOV #$80, aObjX
+	mMOV #$14, aObjY
+	mMOV #$1A, aObjAnim
+.loop
+	mSTZ aObjWait, aObjFrame
+	clc
+	lda aObjY
+	adc #$10
+	sta aObjY
+	adc #$10
+	cmp #$50
+	bcc .skip
+	sta <$0A
+	mMOV aObjX, <$08
+	mMOV aObjRoom, <$09
+	jsr PickupBlock
+	lda <$00
+	and #$08
+	bne .onland
+.skip
+	jsr SpriteSetup
+	jsr FrameAdvance1C
+	jmp .loop
+.onland
+	mPLAYTRACK #$30
+	mSTZ <zStatus, <zSliplo, <zSliphi
+	mMOV #$40, <zMoveVec
+	mMOV #$FF, aObjVY
+	rts
+	
 ;8278
+;スクロール方向$37 - 1 = 0, 1, 2, 3 → 左右上下
+;スクロール先画面番号$38
 DoScroll:
-	ldx <zHScroll
-	bne .fall
-	ldx <zRoom
-	beq .forward
-	cpx <zScrollLeft
-	bne .forward
-	ldy <zScrollNumber
-	dey
-	jsr GetScrollInfo
-	tya
-	ldy <zScrollFlag
-	and Table_AndScrollFlag_Prev - 1,y
-	beq .forward
-	jsr Scroll_GoBack
-	jmp .done
-;8298
-.forward
-	cpx <zScrollRight
-	bne .fall
-	ldy <zScrollNumber
-	jsr GetScrollInfo
-	tya
-	ldy <zScrollFlag
-	and Table_AndScrollFlag_Next - 1,y
-	beq .fall
+	;bmi .done
 	jsr Scroll_GoForward
+	
 	ldx <zStage
 	lda <zRoom
 	cmp Table_BossRoom,x
 	bne .notspawnboss
 	jsr SpawnBoss
 .notspawnboss
-	jmp .done
-;82BB
-.fall
-	lda <zScrollFlag
-	cmp #$03
-	bne .done
-	lda #$01
-	sta <zStatus
-	jmp DieRockman
-;82C8
-.done
-	lda #$00
-	sta <zScrollFlag
-	rts
-;82CD
-Table_AndScrollFlag_Prev:
-	.db $40, $00, $80, $20
-;82D1
-Table_AndScrollFlag_Next:
-	.db $80, $20, $40, $00
+	mSTZ <zScrollFlag
+	jmp SpawnEnemiesAll
 
 ;82D5
 ItemInterrupt:
@@ -678,78 +676,25 @@ Table_ItemInterrupthi:
 DoRockman:
 	.include "src/dorockman.asm"
 
-;8EDD
-;「戻る」スクロールの処理
-Scroll_GoBack:
-	jsr EraseEnemiesByScroll
-	ldx <zScrollLeft
-	dex
-	stx <zScrollRight
-	dec <zScrollNumber
-	ldy <zScrollNumber
-	jsr GetScrollInfo
-	tya
-	and #$1F
-	sta <zScrollLeft
-	txa
-	sec
-	sbc <zScrollLeft
-	sta <zScrollLeft
-	lda <zScrollRight
-	jsr DrawRoom
-	dec aObjRoom
-	lda <zScrollNumber
-	sta <$FE
-	jsr DoScroll_Loop
-	dec <zRoom
-	sec
-	lda <zNTPrevlo
-	sbc #$40
-	sta <zNTPrevlo
-	lda <zNTPrevhi
-	sbc #$00
-	sta <zNTPrevhi
-	sec
-	lda <zNTNextlo
-	sbc #$40
-	sta <zNTNextlo
-	lda <zNTNexthi
-	sbc #$00
-	sta <zNTNexthi
-	jsr FrameAdvance1C
-	sec
-	lda <zScrollRight
-	sbc #$01
-	jsr DrawRoom
-	lda #$00
-	sta <zOffscreen
-	lda #$00
-	sta <zMoveVec
-	mJSR_NORTS SpawnEnemyByScroll
-
 ;8F39
 ;「進む」スクロールの処理
 Scroll_GoForward:
 	jsr EraseEnemiesByScroll
-	ldx <zScrollRight
-	inx
+	lda <zScrollNumber
+	jsr GetScrollTo
 	txa
-	pha
+	sta <zScrollNumber
+	sec
+	sbc #$02
+	ldx #$80
+	ldy #$20
 	jsr DrawRoom
-	inc aObjRoom
-	lda <zScrollFlag
-	and #$01
-	bne .vertical
-	lda #$18
-	sta <$FD
-	lda #$00
-	sta <$FE
+	mMOV #$19, <$FD
 ;シャッターの処理
 .loop_open
 	ldx <zStage
-	lda <zRoom
-	cmp Table_ShutterStart,x
-	bcc .vertical
+	lda <zScrollFlag
+	bpl .vertical
 	lda <$FD
 	and #$07
 	bne .skip_open
@@ -773,56 +718,35 @@ Scroll_GoForward:
 	bpl .loop_open
 	mPLAYTRACK #$FE
 .vertical
-	lda <zScrollNumber
-	sta <$FE
-	inc <$FE
 	jsr DoScroll_Loop
 	inc <zRoom
 	jsr FrameAdvance1C
-	clc
-	lda <zScrollRight
-	adc #$02
-	jsr DrawRoom
-	inc <zScrollNumber
-	ldy <zScrollNumber
-	jsr GetScrollInfo
-	tya
-	and #$1F
-	sta <zScrollLeft
-	pla
-	tax
-	clc
-	adc <zScrollLeft
-	sta <zScrollRight
-	stx <zScrollLeft
-	clc
-	lda <zNTNextlo
-	adc #$40
-	sta <zNTNextlo
-	lda <zNTNexthi
-	adc #$00
-	sta <zNTNexthi
-	clc
-	lda <zNTPrevlo
-	adc #$40
-	sta <zNTPrevlo
-	lda <zNTPrevhi
-	adc #$00
-	sta <zNTPrevhi
-	lda #$00
-	sta <zOffscreen
 	lda <zScrollFlag
 	and #$01
 	bne .done
+	sec
+	lda <zScrollNumber
+	sta <zRoom
+	sta aObjRoom
+	sbc #$02
+	ldx #$00
+	ldy #$10
+	jsr DrawRoom
+	sec
+	lda <zScrollNumber
+	sbc #$01
+	ldx #$80
+	ldy #$10
+	jsr DrawRoom
 ;シャッター閉じる処理
 	lda #$00
 	sta <$FD
 	sta <$FE
 .loop_close
+	lda <zScrollFlag
+	bpl .done
 	ldx <zStage
 	lda <zRoom
-	cmp Table_ShutterStart,x
-	bcc .done
 	cmp Table_BossRoom,x
 	bne .notboss
 	mPLAYTRACK #$0B
@@ -883,90 +807,61 @@ Table_ShutterStart:
 ;906F
 ;ボスの居る画面数
 Table_BossRoom:
-	.db $17, $15, $17, $15, $17, $13, $15, $13
+	.db $63, $15, $17, $15, $17, $13, $15, $13
 	.db $00, $27, $27, $26, $00, $1F
 
 ;907D
 ;次の画面を描画
 ;DrawRoom_ByVertical
 DrawRoom:
-	sec
-	.ifdef DrawRoom_ByVertical
-	sbc #$10
-	.else
-	sbc #$02
-	.endif
-	tay
+	sta <$FF
 	lda <zRoom
 	pha
 	lda <zHScroll
 	pha
-	lda <zVScroll
-	pha
-	sty <zRoom
-	.ifdef DrawRoom_ByVertical
-	mMOV #$00, <zHScroll
-	mSTZ <zVScroll
-	lda #$1F
-	.else
-	mMOV #$00, <zHScroll, <zVScroll
-	lda #$41
-	.endif
+	lda <$FF
+	sta <zRoom
+	stx <zHScroll
+	;y = num of loops
+	sty <$FD
 .loop
-	pha
-	.ifdef DrawRoom_ByVertical
-	mSTZ <$00, <$02
-	mMOV #$01, <$01
-	.else
 	mSTZ <$01, <$02
 	mMOV #$01, <$00
-	.endif
 	jsr WriteNameTableByScroll
-;.waitdebug
-;	lda $2002
-;	bpl .waitdebug
 	lda <z2000
 	and #%10000000
 	beq .nowait
+	lda <zHScroll
+	sta <$FE
+	lda <zRoom
+	sta <$FF
+	pla
+	sta <zHScroll
+	pla
+	sta <zRoom
 	jsr FrameAdvance1C
+	lda <zRoom
+	pha
+	lda <zHScroll
+	pha
+	lda <$FF
+	sta <zRoom
+	lda <$FE
+	sta <zHScroll
 	jmp .wait
 .nowait
 	jsr WritePPUScroll
 .wait
 	clc
-	.ifdef DrawRoom_ByVertical
-	lda <zVScroll
-	.else
 	lda <zHScroll
-	.endif
 	adc #$08
-	.ifdef DrawRoom_ByVertical
-	cmp #$F0
-	.endif
 	bcc .carry_nt
-	.ifdef DrawRoom_ByVertical
-	adc #$0F
-	tay
-	lda <zRoom
-	adc #$0F
-	sta <zRoom
-	tya
-	.else
 	inc <zRoom
-	.endif
 .carry_nt
-	.ifdef DrawRoom_ByVertical
-	sta <zVScroll
-	.else
 	sta <zHScroll
-	.endif
 	
-	pla
-	sec
-	sbc #$01
+	dec <$FD
 	bne .loop
-	pla
-	sta <zVScroll
 	pla
 	sta <zHScroll
 	pla
@@ -976,21 +871,17 @@ DrawRoom:
 ;90C9
 ;実際にループしてスクロールさせる処理を呼ぶ
 DoScroll_Loop:
-	lda <zScrollFlag
-	and #$01
-	beq .right
-	jmp DoVerticalScroll_Loop
-.right
-	jsr PaletteChange_RightScroll
-	lda #$00
-	sta <zSliplo
-	sta <zSliphi
-	sta <$FD
+;	lda <zScrollFlag
+;	and #$01
+;	beq .right
+;	jmp DoVerticalScroll_Loop
+;.right
+	;jsr PaletteChange_RightScroll
+	mSTZ <zSliplo, <zSliphi, <$FD
 	ldy #$3F
 .loop_right
 	tya
 	pha
-	lda #$01
 	clc
 	lda <zHScroll
 	adc #$04
@@ -1008,7 +899,7 @@ DoScroll_Loop:
 	jsr FixAtomicFireObject
 .skipatomic
 	jsr SpriteSetup
-	jsr Unknown_CB09
+	;jsr Unknown_CB09
 	jsr FrameAdvance1C
 	pla
 	tay
@@ -1071,67 +962,67 @@ PaletteChange_RightScroll:
 
 ;9185
 ;上下スクロールの実行処理
-DoVerticalScroll_Loop:
-.counter = $39
-	lda <zScrollFlag
-	lsr a
-	bne .down
-;上スクロール
-	ldx #$09
-	stx <zStatus
-	pha
-	jsr SetRockmanAnimation
-	pla
-.down
-	tax
-	lda Table_VScrollCounter_Init,x
-	sta <.counter
-	lda Table_VScroll_Init,x
-	sta <zVScroll
-	lda #$00
-	sta <$FD
-.loop
-	txa
-	pha
-	jsr SpriteSetup
-	jsr VerticalScroll_DrawNT
-	jsr Unknown_CB09
-	jsr FrameAdvance1C
-	pla
-	tax
-	lda <zEquipment
-	cmp #$01
-	bne .skipatomic
-	jsr FixAtomicFireObject
-.skipatomic
-	clc
-	lda aObjYlo
-	adc Table_VScroll_dylo,x
-	sta aObjYlo
-	lda aObjY
-	adc Table_VScroll_dy,x
-	sta aObjY
-	lda <zOffscreen
-	adc Table_VScroll_dOffscreen,x
-	sta <zOffscreen
-	clc
-	lda <zVScroll
-	adc Table_VScroll_dyhi,x
-	sta <zVScroll
-	clc
-	lda <.counter
-	adc Table_VScrollCounter_Delta,x
-	sta <.counter
-	bmi .done
-	cmp #$3C
-	beq .done
-	bne .loop
-.done
-	lda #$00
-	sta <zVScrolllo
-	sta <zVScroll
-	sta aObjYlo
-	mJSR_NORTS SpriteSetup
+;DoVerticalScroll_Loop:
+;.counter = $39
+;	lda <zScrollFlag
+;	lsr a
+;	bne .down
+;;上スクロール
+;	ldx #$09
+;	stx <zStatus
+;	pha
+;	jsr SetRockmanAnimation
+;	pla
+;.down
+;	tax
+;	lda Table_VScrollCounter_Init,x
+;	sta <.counter
+;	lda Table_VScroll_Init,x
+;	sta <zVScroll
+;	lda #$00
+;	sta <$FD
+;.loop
+;	txa
+;	pha
+;	jsr SpriteSetup
+;	jsr VerticalScroll_DrawNT
+;	jsr Unknown_CB09
+;	jsr FrameAdvance1C
+;	pla
+;	tax
+;	lda <zEquipment
+;	cmp #$01
+;	bne .skipatomic
+;	jsr FixAtomicFireObject
+;.skipatomic
+;	clc
+;	lda aObjYlo
+;	adc Table_VScroll_dylo,x
+;	sta aObjYlo
+;	lda aObjY
+;	adc Table_VScroll_dy,x
+;	sta aObjY
+;	lda <zOffscreen
+;	adc Table_VScroll_dOffscreen,x
+;	sta <zOffscreen
+;	clc
+;	lda <zVScroll
+;	adc Table_VScroll_dyhi,x
+;	sta <zVScroll
+;	clc
+;	lda <.counter
+;	adc Table_VScrollCounter_Delta,x
+;	sta <.counter
+;	bmi .done
+;	cmp #$3C
+;	beq .done
+;	bne .loop
+;.done
+;	lda #$00
+;	sta <zVScrolllo
+;	sta <zVScroll
+;	sta aObjYlo
+;	mJSR_NORTS SpriteSetup
 
 ;91FA
 ;アトミックファイヤーオブジェクトの位置修正

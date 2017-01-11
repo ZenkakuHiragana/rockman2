@@ -2267,7 +2267,7 @@ EN2F:
 EN2D:
 EN2E:
 EN57:
-	lda #$01
+	lda #$08
 Obj_BreakableWall:
 	sta aObjVar,x
 	lda aObjX,x

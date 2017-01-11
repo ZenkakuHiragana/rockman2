@@ -743,7 +743,7 @@ DoRockman_WallCheckX:
 	lda <zBGAttr,x
 	cmp #$0F
 	bne .notshutter
-	ldy #$02
+	ldy #$82
 	sty <zScrollFlag
 	bne .continue
 .notshutter

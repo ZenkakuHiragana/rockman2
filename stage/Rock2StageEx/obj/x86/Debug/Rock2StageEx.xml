@@ -6,7 +6,14 @@ Rock2StageEx
 </name>
 </assembly>
 <members>
-<member name="T:Rock2StageEx.Form1.EnemiesStructure">
+<member name="M:Rock2StageEx.Form1.Draw32Chip(System.Drawing.Graphics@,System.Drawing.Point@,System.UInt32,System.UInt32)">
+	<summary>
+ 32x32を描画します。
+ </summary>
+	<param name="g">描画先のグラフィックスオブジェクト。</param>
+	<param name="cur">描画する左上の位置。</param>
+	<param name="a">タイル番号。</param>
+</member><member name="T:Rock2StageEx.Form1.EnemiesStructure">
 	<summary>画面内に定義された敵1体の情報を表します。</summary>
 </member><member name="F:Rock2StageEx.Form1.ViewOrigin">
 	<summary>マップ表示画面で表示する左上の画面位置を表します。</summary>
@@ -62,13 +69,6 @@ Rock2StageEx
 	<summary>ファイルのパスです。</summary>
 </member><member name="F:Rock2StageEx.Form1.TimeStamp">
 	<summary>ファイルの最終書き込み日時です。</summary>
-</member><member name="M:Rock2StageEx.Form1.Draw32Chip(System.Drawing.Graphics@,System.Drawing.Point@,System.UInt32)">
-	<summary>
- 32x32を描画します。
- </summary>
-	<param name="g">描画先のグラフィックスオブジェクト。</param>
-	<param name="cur">描画する左上の位置。</param>
-	<param name="a">タイル番号。</param>
 </member><member name="M:Rock2StageEx.Form1.SetObjectSelection(System.UInt32,System.UInt32,System.UInt32,System.Drawing.Point)">
 	<summary>
  選択したオブジェクトの情報をセットします。

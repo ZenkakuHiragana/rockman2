@@ -60,16 +60,6 @@ Public Class Form1
     Const AddrBG As UInteger = &H2000       'BG画像位置
     Const AddrRoom As UInteger = &H3000     '画面定義
 
-    Dim BufContext As BufferedGraphicsContext
-    Dim scrBuf As BufferedGraphics
-    Dim p32Buf As BufferedGraphics
-    Dim p16Buf As BufferedGraphics
-    Dim p8Buf As BufferedGraphics
-    Dim p32selectedBuf As BufferedGraphics
-    Dim p16selectedBuf As BufferedGraphics
-    Dim p8selectedBuf As BufferedGraphics
-    Dim paletteBuf As BufferedGraphics
-
     ''' <summary>マップ表示画面で表示する左上の画面位置を表します。</summary>
     Dim ViewOrigin As New Point(0, 0)
     ''' <summary>ステージ情報の全データを格納する配列です。</summary>
@@ -137,45 +127,6 @@ Public Class Form1
     Dim BinFilePath As String
     ''' <summary>ファイルの最終書き込み日時です。</summary>
     Dim TimeStamp As Date
-    'Dim zoom As UInteger = 1
-
-    Dim _Pi As Byte                                 'アニメーションさせる際、今何枚目のパレットか、を記録
-    Dim frameCounter As Integer = 0                 'タイマーが呼び出される度にインクリメント。
-    Dim TimerStats As Threading.Timer               '別スレッドでタイマーを使うため、スレッド破棄用。
-
-    Delegate Sub SetBackColorDelegate(ByVal c As Color)         '別スレッドでコントロールを扱うときはデリゲート宣言しないといけない
-    Delegate Sub AnimationTimerDelegate(ByVal o As Object)      'タイマーが呼び出されると、このメソッドに行く
-    Dim AnimTDelegate As New AnimationTimerDelegate(AddressOf AnimationTimer)       'デリゲート宣言を型とする変数が要るようである
-    Dim LblBkColorDelegate As New SetBackColorDelegate(AddressOf SetBackColor)      '上がタイマー用、下がパレット変更用。
-
-    'アニメーション用、タイマースレ
-    Private Sub AnimationTimer(ByVal o As Object)
-        If numpalanim = 0 Or palwait = 0 Then Exit Sub
-        'みょ～に例外が出やすいので、出たら中断
-        Try
-            _Pi += CByte(1) '枚数 + 1
-            If _Pi >= numpalanim Then _Pi = 0 'ループ
-            '現在のパレットを変える
-            SyncLock palette
-                For i As UInteger = 0 To 15
-                    palette(i) = palanim(_Pi * 16 + i)
-                Next
-            End SyncLock
-
-            Me.Invoke(LblBkColorDelegate, New Object() {Nothing})
-        Catch ex As Exception
-            Exit Sub
-        End Try
-    End Sub
-
-    '別スレだとプロパティを変更するのもなんだか面倒らしい
-    Private Sub SetBackColor(ByVal c As Color)
-        RefreshAll()
-    End Sub
-
-    Private Sub Form1_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
-        If TimerStats IsNot Nothing Then TimerStats.Dispose()
-    End Sub
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         For i As UInteger = 0 To &H4000 - 1
@@ -252,6 +203,7 @@ Public Class Form1
         p8Buf = BufContext.Allocate(pgraphs.CreateGraphics(), pgraphs.DisplayRectangle())
         p32selectedBuf = BufContext.Allocate(p32focus.CreateGraphics(), p32focus.DisplayRectangle())
         p16selectedBuf = BufContext.Allocate(p16focus.CreateGraphics(), p16focus.DisplayRectangle())
+        p3216selectedBuf = BufContext.Allocate(p3216focus.CreateGraphics(), p3216focus.DisplayRectangle())
         p8selectedBuf = BufContext.Allocate(p8focus.CreateGraphics(), p8focus.DisplayRectangle())
         paletteBuf = BufContext.Allocate(ppalette.CreateGraphics(), ppalette.DisplayRectangle())
     End Sub
@@ -373,7 +325,7 @@ Public Class Form1
 
         If palwait > 0 Then
             Dim wait As Integer = palwait * 16
-            If wait < 200 Then wait = 200
+            If wait < 350 Then wait = 350
             'Timerのインスタンスを作成
             Dim timerDelegate As New TimerCallback(AddressOf AnimationTimer)
             Dim timer As New Threading.Timer(timerDelegate, Nothing, 100, wait)
@@ -444,7 +396,7 @@ Public Class Form1
             items_ptr(i) = 0
             For Each a As EnemiesStructure In ItemsArray(i)
                 ptr += 1
-                If a = ItemsArray(i).First() Then items_ptr(i) = ptr - ItemsArray(i).Count + 1
+                If a = ItemsArray(i).First() Then items_ptr(i) = ptr
 
                 items(ptr - 1) = a.type
                 itemsx(ptr - 1) = a.org.X
@@ -473,114 +425,6 @@ Public Class Form1
         f.Write(testfile, 0, &H4000)
         f.Close()
         TimeStamp = File.GetLastWriteTime(BinFilePath)
-    End Sub
-
-    Private Function GetPalette(ByVal c As Byte)
-        c = c And &H3F
-        Dim cr = Color.FromArgb(255, My.Resources.nes(c * 3), _
-                               My.Resources.nes(c * 3 + 1), _
-                               My.Resources.nes(c * 3 + 2))
-        Return New SolidBrush(cr)
-    End Function
-
-    Private Sub DrawCenterLine(ByVal sender As Object, ByRef g As Graphics)
-
-        Dim center As New Point(sender.ClientSize.Width / 2, sender.ClientSize.Height / 2)
-        Dim chain As New Pen(Brushes.Gray, 1)
-        chain.DashStyle = Drawing2D.DashStyle.Custom
-        chain.DashPattern = New Single() {16, 2, 4, 2}
-
-        '32x32 line
-        For i As UInteger = 1 To 15
-            g.DrawLine(chain, New Point(0, sender.ClientSize.Height / 16 * i), New Point(sender.ClientSize.Width, sender.ClientSize.Height / 16 * i))
-            g.DrawLine(chain, New Point(sender.ClientSize.Width / 16 * i, 0), New Point(sender.ClientSize.Width / 16 * i, sender.ClientSize.Height))
-        Next
-
-        chain.Brush = Brushes.White
-        'horizontal center line
-        g.DrawLine(chain, New Point(0, center.Y), New Point(sender.ClientSize.Width, center.Y))
-        'vertical center line
-        g.DrawLine(chain, New Point(center.X, 0), New Point(center.X, sender.ClientSize.Height))
-    End Sub
-
-    Private Sub Draw8Graph(ByRef g As Graphics, ByRef cur As Point, ByVal a As UInteger, ByVal at As UInteger) ', ByVal mag As UInteger)
-        Dim c, seek As UInteger
-        Dim bitmask() As Byte = {&H80, &H40, &H20, &H10, &H8, &H4, &H2, &H1}
-
-        For x As UInteger = 0 To 7
-            For y As UInteger = 0 To 7
-                seek = a * 16 + y
-                c = bg(seek) And bitmask(x)
-                If c <> 0 Then
-                    c = 1
-                End If
-
-                seek += 8
-                If bg(seek) And bitmask(x) Then
-                    c = c Or 2
-                End If
-
-                g.FillRectangle(PaletteBrushes(palette(4 * at + c)), New Rectangle(cur.X + x, cur.Y + y, 1, 1))
-            Next
-        Next
-    End Sub
-
-    Private Sub Draw16Tile(ByRef g As Graphics, ByRef cur As Point, ByVal a As UInteger, ByVal at As UInteger) ', ByVal mag As UInteger)
-        Dim graphnum As UInteger
-
-        For x8 As UInteger = 0 To 1
-            For y8 As UInteger = 0 To 1
-                graphnum = tile(a * 4 + x8 * 2 + y8)
-
-                Draw8Graph(g, cur, graphnum, at)
-                cur += New Point(0, 8)
-            Next
-            cur += New Point(8, -16)
-        Next
-    End Sub
-
-    ' <param name="mag">倍率。</param>
-    ''' <summary>
-    ''' 32x32を描画します。
-    ''' </summary>
-    ''' <param name="g">描画先のグラフィックスオブジェクト。</param>
-    ''' <param name="cur">描画する左上の位置。</param>
-    ''' <param name="a">タイル番号。</param>
-    Private Sub Draw32Chip(ByRef g As Graphics, ByRef cur As Point, ByVal a As UInteger) ', ByVal mag As UInteger)
-        Dim tilenum, at As UInteger '属性、ドットの色、8x8グラのデータ読み取り位置
-        'Dim bitmask_inv() As Byte = {1, 2, 4, 8, &H10, &H20, &H40, &H80}
-        Dim attrmask() As Byte = {&H3, &H30, &HC, &HC0}
-        Dim attrshiftmask() As Byte = {0, 4, 2, 6}
-
-        For x16 As UInteger = 0 To 1 '16x16 tile loop
-            For y16 As UInteger = 0 To 1
-                tilenum = chip(a * 4 + x16 * 2 + y16) And &H7F
-                at = ((attr(a) And attrmask(x16 * 2 + y16)) >> attrshiftmask(x16 * 2 + y16)) And 3
-                Draw16Tile(g, cur, tilenum, at)
-                cur += New Point(-16, 16)
-            Next
-            cur += New Point(16, -32)
-        Next
-    End Sub
-
-    Public Function GetAllControls(ByVal top As Control) As Control()
-        Dim buf As ArrayList = New ArrayList
-        For Each c As Control In top.Controls
-            buf.Add(c)
-            buf.AddRange(GetAllControls(c))
-        Next
-        Return CType(buf.ToArray(GetType(Control)), Control())
-    End Function
-
-    Private Sub RefreshAll()
-        Me.SuspendLayout()
-        For Each o As Control In GetAllControls(Me)
-            If TypeOf o Is PictureBox Then
-                o.Refresh()
-            End If
-        Next
-        Application.DoEvents()
-        Me.ResumeLayout()
     End Sub
 
     ''' <summary>
@@ -612,186 +456,64 @@ Public Class Form1
     'マップ編集画面の描画
     '敵配置もここで描く
     Private Sub scr_Paint(sender As Object, e As PaintEventArgs) Handles scr.Paint
-        Dim g As Graphics = scrBuf.Graphics
-
-        '地形描画用
-        Dim mapimage As New Bitmap(256, 256)
-        Dim cur As New Point(0, 0)
-        Dim roomnum, chipnum As UInteger
-
-        '敵位置描画用
-        Dim p As Point
-        Dim type As UInteger
-        Dim s As String
-        Dim pen As Pen, brush As Brush
-        SyncLock palette
-            For Xm As UInteger = 0 To 1
-                For Ym As UInteger = 0 To 1
-                    roomnum = map(((ViewOrigin.Y + Ym) * 16) + ViewOrigin.X + Xm)
-                    If roomnum < &H40 Then
-                        For x32 As UInteger = 0 To 7 '32x32 chip loop
-                            For y32 As UInteger = 0 To 7
-                                chipnum = room(roomnum * &H40 + x32 * 8 + y32)
-                                Draw32Chip(g, cur, chipnum)
-                                cur += New Point(-32, 32)
-                            Next
-                            cur += New Point(32, -256)
-                        Next
-
-                        '敵配置編集モード有効の時、敵の位置情報を描く
-                        If Radio_EditEnemies.Checked Then
-                            If obj_isenemy Then
-                                pen = Pens.White
-                                brush = Brushes.White
-                            Else
-                                pen = Pens.Violet
-                                brush = Brushes.Violet
-                            End If
-                            For Each en As EnemiesStructure In EnemiesArray(roomnum)
-                                type = en.type
-                                p = en.org
-                                p += New Point(Xm * 256, Ym * 256)
-                                If type < 16 Then
-                                    s = "0"
-                                Else
-                                    s = ""
-                                End If
-                                s += Hex(type)
-                                g.DrawRectangle(pen, p.X - 15, p.Y - 15, 30, 30)
-                                If obj_isenemy And objroom_selected = roomnum And objindex_selected - 1 = EnemiesArray(roomnum).IndexOf(en) Then
-                                    g.DrawRectangle(pen, p.X - 13, p.Y - 13, 26, 26)
-                                End If
-                                g.DrawString(s, New Font("MS UI Gothic", 12), brush, _
-                                             New Rectangle(p - New Point(10, 10), New Size(32, 32)))
-                            Next
-
-                            If Not obj_isenemy Then
-                                pen = Pens.White
-                                brush = Brushes.White
-                            Else
-                                pen = Pens.Violet
-                                brush = Brushes.Violet
-                            End If
-                            For Each it As EnemiesStructure In ItemsArray(roomnum)
-                                type = it.type
-                                p = it.org
-                                p += New Point(Xm * 256, Ym * 256)
-                                If type < 16 Then
-                                    s = "0"
-                                Else
-                                    s = ""
-                                End If
-                                s += Hex(type)
-                                g.DrawRectangle(pen, p.X - 15, p.Y - 15, 30, 30)
-                                If (Not obj_isenemy) And objroom_selected = roomnum And objindex_selected - 1 = ItemsArray(roomnum).IndexOf(it) Then
-                                    g.DrawRectangle(pen, p.X - 13, p.Y - 13, 26, 26)
-                                End If
-                                g.DrawString(s, New Font("MS UI Gothic", 12), brush, _
-                                             New Rectangle(p - New Point(10, 10), New Size(32, 32)))
-                            Next
-                        End If
-                    Else
-                        g.FillRectangle(Brushes.Black, cur.X, cur.Y, cur.X + 256, cur.Y + 256)
-                        cur += New Point(256, 0)
-                    End If
-                    cur += New Point(-256, 256)
-                Next
-                cur += New Point(256, -512)
-            Next
+        'DrawScr(sender)
+        SyncLock scrBuf
+            scrBuf.Render(e.Graphics)
         End SyncLock
-        DrawCenterLine(sender, g)
-
-        scrBuf.Render(e.Graphics)
     End Sub
 
     Private Sub p32_Paint(sender As Object, e As PaintEventArgs) Handles p32.Paint
-        Dim g As Graphics = p32Buf.Graphics
-        Dim cur As New Point(0, 0)
-        Dim chipnum As UInteger
-
-        SyncLock palette
-            For y32 As UInteger = 0 To 15 '32x32 chip loop
-                For x32 As UInteger = 0 To 15
-                    chipnum = y32 * 16 + x32
-                    Draw32Chip(g, cur, chipnum)
-                Next
-                cur += New Point(-512, 32)
-            Next
+        'DrawP32(sender)
+        SyncLock p32Buf
+            p32Buf.Render(e.Graphics)
         End SyncLock
-
-        DrawCenterLine(sender, g)
-        p32Buf.Render(e.Graphics)
     End Sub
 
     Private Sub ptile_Paint(sender As Object, e As PaintEventArgs) Handles ptile.Paint
-        Dim g As Graphics = p16Buf.Graphics
-        Dim cur As New Point(0, 0)
-        Dim tilenum As UInteger
-
-        SyncLock palette
-            For y16 As UInteger = 0 To 7 '16x16 tile loop
-                For x16 As UInteger = 0 To 15
-                    tilenum = y16 * 16 + x16
-                    Draw16Tile(g, cur, tilenum, tile_attr) '2x
-                Next
-                cur += New Point(-256, 16)
-            Next
+        'DrawP16(sender)
+        SyncLock p16Buf
+            p16Buf.Render(e.Graphics)
         End SyncLock
-
-        Dim center As New Point(sender.ClientSize.Width / 2, sender.ClientSize.Height / 2)
-        Dim chain As New Pen(Brushes.Gray, 1)
-        chain.DashStyle = Drawing2D.DashStyle.Custom
-        chain.DashPattern = New Single() {16, 2, 4, 2}
-
-        '32x32 line
-        For i As UInteger = 1 To 7
-            g.DrawLine(chain, New Point(0, sender.ClientSize.Height / 16 * 2 * i), New Point(sender.ClientSize.Width, sender.ClientSize.Height / 16 * 2 * i))
-        Next
-
-        For i As UInteger = 1 To 15
-            g.DrawLine(chain, New Point(sender.ClientSize.Width / 16 * i, 0), New Point(sender.ClientSize.Width / 16 * i, sender.ClientSize.Height))
-        Next
-
-        chain.Brush = Brushes.White
-        'horizontal center line
-        g.DrawLine(chain, New Point(0, center.Y), New Point(sender.ClientSize.Width, center.Y))
-        'vertical center line
-        g.DrawLine(chain, New Point(center.X, 0), New Point(center.X, sender.ClientSize.Height))
-
-        p16Buf.Render(e.Graphics)
     End Sub
 
     '選択されたやつを表示する
-    Private Sub p32focus_Paint(sender As Object, e As PaintEventArgs) Handles p32focus.Paint, pmapSelect.Paint
-        Dim g As Graphics = p32selectedBuf.Graphics
-        SyncLock palette
-            Draw32Chip(g, New Point(0, 0), focus32) '4x
+    Private Sub pmapSelect_Paint(sender As Object, e As PaintEventArgs) Handles pmapSelect.Paint
+        'DrawP32Focus(sender)
+        Dim ss As String = "No.: "
+        If focus32 < 16 Then
+            ss += "0"
+        End If
+        ss += Hex(focus32)
+        If ss <> Label_32Chip1.Text Then
+            Label_32Chip1.Text = ss
+        End If
+        SyncLock p32selectedBuf
+            p32selectedBuf.Render(e.Graphics)
         End SyncLock
+    End Sub
 
-        Dim center As New Point(sender.ClientSize.Width / 2, sender.ClientSize.Height / 2)
-        Dim chain As New Pen(Brushes.White, 1)
-        'horizontal center line
-        g.DrawLine(chain, New Point(0, center.Y), New Point(sender.ClientSize.Width, center.Y))
-        'vertical center line
-        g.DrawLine(chain, New Point(center.X, 0), New Point(center.X, sender.ClientSize.Height))
+    Private Sub p32focus_Paint(sender As Object, e As PaintEventArgs) Handles p32focus.Paint
+        'DrawP32Focus(sender)
 
-        Label_32Chip1.Text = "No: "
+        Dim ss As String = "No.: "
         If focus32 < 16 Then
-            Label_32Chip1.Text += "0"
+            ss += "0"
         End If
-        Label_32Chip1.Text += Hex(focus32)
-
-        Label_32Chip2.Text = "No: "
-        If focus32 < 16 Then
-            Label_32Chip2.Text += "0"
+        ss += Hex(focus32)
+        If ss <> Label_32Chip2.Text Then
+            Label_32Chip2.Text = ss
         End If
-        Label_32Chip2.Text += Hex(focus32)
-        p32selectedBuf.Render(e.Graphics)
+        SyncLock p32selectedBuf
+            p32selectedBuf.Render(e.Graphics)
+        End SyncLock
     End Sub
 
     '32x32タイル選択枠、属性表示の方
     Private Sub p32focus_attr_Paint(sender As Object, e As PaintEventArgs) Handles p32focus_attr.Paint
-        p32focus_Paint(sender, e)
+        'DrawP32Focus(sender)
+        SyncLock p32selectedBuf
+            p32selectedBuf.Render(e.Graphics)
+        End SyncLock
 
         Dim s As String
         Dim a As UInteger
@@ -813,82 +535,67 @@ Public Class Form1
     End Sub
 
     '16x16タイルの選択枠
-    Private Sub p16focus_Paint(sender As Object, e As PaintEventArgs) Handles p16focus.Paint, p3216focus.Paint
-        Dim g As Graphics = p16selectedBuf.Graphics
-        SyncLock palette
-            Draw16Tile(g, New Point(0, 0), focus16, tile_attr) ', zoom * sender.Size.Width / 16)
+    Private Sub p16focus_Paint(sender As Object, e As PaintEventArgs) Handles p16focus.Paint
+        'DrawP16Focus(sender)
+
+        Dim ss As String = "No.: "
+        If focus16 < 16 Then
+            ss += "0"
+        End If
+        ss += Hex(focus16)
+        If ss <> Label_16Chip1.Text Then
+            Label_16Chip1.Text = ss
+        End If
+        SyncLock p16selectedBuf
+            p16selectedBuf.Render(e.Graphics)
         End SyncLock
+    End Sub
 
-        Dim center As New Point(sender.ClientSize.Width / 2, sender.ClientSize.Height / 2)
-        Dim chain As New Pen(Brushes.White, 1)
-        'horizontal center line
-        g.DrawLine(chain, New Point(0, center.Y), New Point(sender.ClientSize.Width, center.Y))
-        'vertical center line
-        g.DrawLine(chain, New Point(center.X, 0), New Point(center.X, sender.ClientSize.Height))
+    Private Sub p3216focus_Paint(sender As Object, e As PaintEventArgs) Handles p3216focus.Paint
+        'DrawP16Focus(sender)
 
-        Label_16Chip1.Text = "No: "
+        Dim ss As String = "No.: "
         If focus16 < 16 Then
-            Label_16Chip1.Text += "0"
+            ss += "0"
         End If
-        Label_16Chip1.Text += Hex(focus16)
-
-        Label_16Chip2.Text = "No: "
-        If focus16 < 16 Then
-            Label_16Chip2.Text += "0"
+        ss += Hex(focus16)
+        If ss <> Label_16Chip2.Text Then
+            Label_16Chip2.Text = ss
         End If
-        Label_16Chip2.Text += Hex(focus16)
-        p16selectedBuf.Render(e.Graphics)
+        SyncLock p3216selectedBuf
+            p3216selectedBuf.Render(e.Graphics)
+        End SyncLock
     End Sub
 
     '8x8タイルの選択枠
     Private Sub p8focus_Paint(sender As Object, e As PaintEventArgs) Handles p8focus.Paint
-        Dim g As Graphics = p8selectedBuf.Graphics
-        SyncLock palette
-            Draw8Graph(g, New Point(0, 0), focus8, tile_attr) ', zoom * sender.Size.Width / 8)
-        End SyncLock
+        'DrawP8Focus(sender)
 
-        Dim center As New Point(sender.ClientSize.Width / 2, sender.ClientSize.Height / 2)
-        Dim chain As New Pen(Brushes.White, 1)
-        'horizontal center line
-        g.DrawLine(chain, New Point(0, center.Y), New Point(sender.ClientSize.Width, center.Y))
-        'vertical center line
-        g.DrawLine(chain, New Point(center.X, 0), New Point(center.X, sender.ClientSize.Height))
-
-        Label_8Graph.Text = "No: "
+        Dim ss As String = "No.: "
         If focus8 < 16 Then
-            Label_8Graph.Text += "0"
+            ss += "0"
         End If
-        Label_8Graph.Text += Hex(focus8)
-        p8selectedBuf.Render(e.Graphics)
+        ss += Hex(focus8)
+        If ss <> Label_8Graph.Text Then
+            Label_8Graph.Text = ss
+        End If
+        SyncLock p8selectedBuf
+            p8selectedBuf.Render(e.Graphics)
+        End SyncLock
     End Sub
 
     '8x8タイルのパレット
     Private Sub pgraphs_Paint(sender As Object, e As PaintEventArgs) Handles pgraphs.Paint
-        Dim g As Graphics = p8Buf.Graphics
-        Dim cur As New Point(0, 0)
-        SyncLock palette
-            For y As UInteger = 0 To 15
-                For x As UInteger = 0 To 15
-                    Draw8Graph(g, cur, y * 16 + x, tile_attr) '2x
-                    cur += New Point(8, 0)
-                Next
-                cur += New Point(-128, 8)
-            Next
+        'DrawP8(sender)
+        SyncLock p8Buf
+            p8Buf.Render(e.Graphics)
         End SyncLock
-        DrawCenterLine(sender, g)
-        p8Buf.Render(e.Graphics)
     End Sub
 
     'パレットバーの表示
     Private Sub ppalette_Paint(sender As Object, e As PaintEventArgs) Handles ppalette.Paint, ppalette32.Paint
-        SyncLock palette
-            Dim g As Graphics = paletteBuf.Graphics
-            For i As UInteger = 0 To 15
-                g.FillRectangle(GetPalette(palette(i)), New Rectangle(sender.Size.Height * i, 0, sender.Size.Height, sender.Size.Height))
-                If i > 0 And i Mod 4 = 0 Then
-                    g.DrawLine(Pens.White, sender.Size.Height * i, 0, sender.Size.Height * i, sender.Size.Height)
-                End If
-            Next
+        'DrawPaletteBar(sender)
+        SyncLock paletteBuf
             paletteBuf.Render(e.Graphics)
         End SyncLock
     End Sub
@@ -919,10 +626,13 @@ Public Class Form1
                 '地形編集モード| 右クリック: 選択, 左クリック: 書き込み
                 If e.Button = Windows.Forms.MouseButtons.Right Then
                     focus32 = room(numroom * &H40 + selected)
+                    DrawP32Focus(p32focus)
+                    RefreshP32Focus()
                 ElseIf e.Button = MouseButtons.Left Then
                     room(numroom * &H40 + selected) = focus32
+                    DrawScr(scr)
+                    scr.Refresh()
                 End If
-                RefreshAll()
             Else
                 If e.Button = MouseButtons.Left Then
                     '敵編集モード| 左クリック: オブジェクト選択
@@ -935,7 +645,8 @@ Public Class Form1
                             org -= New Point(16, 16)
                             If e.X > org.X And e.Y > org.Y And e.X < org.X + 32 And e.Y < org.Y + 32 Then
                                 SetObjectSelection(numroom, EnemiesArray(numroom).IndexOf(en), en.type, en.org)
-                                RefreshAll()
+                                DrawScr(scr)
+                                scr.Refresh()
                                 Exit For
                             End If
                         Next
@@ -946,7 +657,8 @@ Public Class Form1
                             org -= New Point(16, 16)
                             If e.X > org.X And e.Y > org.Y And e.X < org.X + 32 And e.Y < org.Y + 32 Then
                                 SetObjectSelection(numroom, ItemsArray(numroom).IndexOf(it), it.type, it.org)
-                                RefreshAll()
+                                DrawScr(scr)
+                                scr.Refresh()
                                 Exit For
                             End If
                         Next
@@ -980,7 +692,8 @@ Public Class Form1
             If numroom < &H40 Then
                 If e.Button = MouseButtons.Left Then
                     room(numroom * &H40 + selected) = focus32
-                    RefreshAll()
+                    DrawScr(scr)
+                    scr.Refresh()
                 End If
             End If
         End If
@@ -992,9 +705,26 @@ Public Class Form1
         Dim p As Point 'どのマスをクリックしたか
         p.X = Math.Floor(e.X / (sender.Size.Width / 16)) 'p = 0～15
         p.Y = Math.Floor(e.Y / (sender.Size.Width / 16))
+        If e.Button = MouseButtons.Left Then
 
-        focus32 = p.Y * 16 + p.X
-        RefreshAll()
+            focus32 = p.Y * 16 + p.X
+            DrawP32Focus(p32)
+            RefreshP32Focus()
+        Else
+            Dim bitmask() As UInteger = {3, &H30, &HC, &HC0}
+            Dim shift() As UInteger = {0, 4, 2, 6}
+            Dim selectedattr As UInteger
+            Dim selected32 As UInteger = p.Y * 16 + p.X
+            p.X = Math.Floor(e.X / (sender.Size.Width / 32)) 'p = 0～31
+            p.Y = Math.Floor(e.Y / (sender.Size.Width / 32))
+            p.X = p.X Mod 2
+            p.Y = p.Y Mod 2
+
+            focus16 = chip(selected32 * 4 + p.X * 2 + p.Y)
+            selectedattr = (attr(selected32) And bitmask(p.X * 2 + p.Y)) >> shift(p.X * 2 + p.Y)
+
+            ReDraw16Focus()
+        End If
     End Sub
 
     '32x32選択枠のクリック
@@ -1008,14 +738,22 @@ Public Class Form1
         If e.Button = MouseButtons.Right Then '読み
             focus16 = chip(focus32 * 4 + p.X * 2 + p.Y) And &H7F
             tile_attr = (attr(focus32) And bitmask(p.X * 2 + p.Y)) >> shift(p.X * 2 + p.Y)
+
+            ReDraw16Focus()
         ElseIf e.Button = MouseButtons.Left Then '書き
             Dim attr_write As UInteger = tile_attr << shift(p.X * 2 + p.Y)
             Dim attr_tmp As UInteger = attr(focus32)
             attr_tmp = attr_tmp And (Not bitmask(p.X * 2 + p.Y))
             attr(focus32) = attr_tmp Or attr_write
             chip(focus32 * 4 + p.X * 2 + p.Y) = focus16
+
+            DrawP32Focus(p32focus)
+            RefreshP32Focus()
+            DrawP32(p32)
+            p32.Refresh()
+            DrawScr(scr)
+            scr.Refresh()
         End If
-        RefreshAll()
     End Sub
 
     '16x16タイル定義パレットのクリック
@@ -1024,8 +762,25 @@ Public Class Form1
         p.X = Math.Floor(e.X / (sender.Size.Width / 16)) 'p = 0～15
         p.Y = Math.Floor(e.Y / (sender.Size.Width / 16))
 
-        focus16 = p.Y * 16 + p.X
-        RefreshAll()
+        If e.Button = MouseButtons.Left Then
+            focus16 = p.Y * 16 + p.X
+            RefreshAll()
+
+            DrawP16Focus(p16focus)
+            p16focus.Refresh()
+            DrawP16Focus(p3216focus)
+            p3216focus.Refresh()
+        Else
+            Dim selected16 As UInteger = p.Y * 16 + p.X
+            p.X = Math.Floor(e.X / (sender.Size.Width / 32)) 'p = 0～31
+            p.Y = Math.Floor(e.Y / (sender.Size.Width / 32))
+            p.X = p.X Mod 2
+            p.Y = p.Y Mod 2
+
+            focus8 = tile(selected16 * 4 + p.X * 2 + p.Y)
+            DrawP8Focus(p8focus)
+            p8focus.Refresh()
+        End If
     End Sub
 
     '16x16選択枠のクリック
@@ -1036,10 +791,23 @@ Public Class Form1
 
         If e.Button = MouseButtons.Right Then '読み
             focus8 = tile(focus16 * 4 + p.X * 2 + p.Y)
+            DrawP8Focus(p8focus)
+            p8focus.Refresh()
         ElseIf e.Button = MouseButtons.Left Then '書き
             tile(focus16 * 4 + p.X * 2 + p.Y) = focus8
+            DrawP16(ptile)
+            ptile.Refresh()
+            DrawP16Focus(p16focus)
+            p16focus.Refresh()
+            DrawP16Focus(p3216focus)
+            p3216focus.Refresh()
+            DrawP32(p32)
+            DrawP32Focus(p32focus)
+            p32.Refresh()
+            RefreshP32Focus()
+            DrawScr(scr)
+            scr.Refresh()
         End If
-        RefreshAll()
     End Sub
 
     '8x8タイルパレットのクリック
@@ -1049,13 +817,23 @@ Public Class Form1
         p.Y = Math.Floor(e.Y / (sender.Size.Width / 16))
 
         focus8 = p.X + p.Y * 16
-        RefreshAll()
+        DrawP8Focus(p8focus)
+        p8focus.Refresh()
     End Sub
 
     'パレットバーのクリック
     Private Sub ppalette_MouseClick(sender As Object, e As MouseEventArgs) Handles ppalette.MouseClick, ppalette32.MouseClick
         tile_attr = Math.Floor(e.X / (sender.Size.Width / 4))
-        RefreshAll()
+        DrawP8(pgraphs)
+        DrawP8Focus(p8focus)
+        DrawP16(ptile)
+        DrawP16Focus(p16focus)
+        pgraphs.Refresh()
+        ptile.Refresh()
+        p8focus.Refresh()
+        p16focus.Refresh()
+        DrawP16Focus(p3216focus)
+        p3216focus.Refresh()
     End Sub
 
     '地形判定の設定選択時
@@ -1087,7 +865,7 @@ Public Class Form1
                 a = a And &HF0
             End If
             flag(focus32 * 2 + p.X) = a Or write
-            RefreshAll()
+            p32focus_attr.Refresh()
         End If
     End Sub
 
@@ -1097,7 +875,7 @@ Public Class Form1
             If objindex_selected = 0 Then Exit Sub
 
             Dim t As UInteger = Convert.ToUInt32(TextBoxObjType.Text, 16)
-            If t >= &H80 Then
+            If t >= &H100 Then
                 e.Cancel = True
                 Exit Sub
             End If
@@ -1116,7 +894,8 @@ Public Class Form1
             Else
                 ItemsArray(objroom_selected).Item(objindex_selected - 1) = obj
             End If
-            RefreshAll()
+            DrawScr(scr)
+            scr.Refresh()
         Catch ex As Exception
             e.Cancel = True
         End Try
@@ -1145,7 +924,8 @@ Public Class Form1
             Else
                 ItemsArray(objroom_selected).Item(objindex_selected - 1) = obj
             End If
-            RefreshAll()
+            DrawScr(scr)
+            scr.Refresh()
         Catch ex As Exception
             e.Cancel = True
         End Try
@@ -1174,7 +954,8 @@ Public Class Form1
             Else
                 ItemsArray(objroom_selected).Item(objindex_selected - 1) = obj
             End If
-            RefreshAll()
+            DrawScr(scr)
+            scr.Refresh()
         Catch ex As Exception
             e.Cancel = True
         End Try
@@ -1198,28 +979,32 @@ Public Class Form1
     Private Sub ButtonMapUp_Click(sender As Object, e As EventArgs) Handles ButtonMapUp.Click
         If ViewOrigin.Y > 0 Then
             ViewOrigin.Y -= 1
-            RefreshAll()
+            DrawScr(scr)
+            scr.Refresh()
         End If
     End Sub
 
     Private Sub ButtonMapDown_Click(sender As Object, e As EventArgs) Handles ButtonMapDown.Click
         If ViewOrigin.Y < 15 Then
             ViewOrigin.Y += 1
-            RefreshAll()
+            DrawScr(scr)
+            scr.Refresh()
         End If
     End Sub
 
     Private Sub ButtonMapLeft_Click(sender As Object, e As EventArgs) Handles ButtonMapLeft.Click
         If ViewOrigin.X > 0 Then
             ViewOrigin.X -= 1
-            RefreshAll()
+            DrawScr(scr)
+            scr.Refresh()
         End If
     End Sub
 
     Private Sub ButtonMapRight_Click(sender As Object, e As EventArgs) Handles ButtonMapRight.Click
         If ViewOrigin.X < 15 Then
             ViewOrigin.X += 1
-            RefreshAll()
+            DrawScr(scr)
+            scr.Refresh()
         End If
     End Sub
 
@@ -1251,7 +1036,8 @@ Public Class Form1
                 objindex_selected = ItemsArray(ContextRoom).Count
             End If
             SetObjectSelection(ContextRoom, objindex_selected - 1, type, ContextOrigin)
-            RefreshAll()
+            DrawScr(scr)
+            scr.Refresh()
         End If
     End Sub
 
@@ -1264,7 +1050,8 @@ Public Class Form1
             ItemsArray(objroom_selected).RemoveAt(objindex_selected - 1)
         End If
         ClearObjectSelection()
-        RefreshAll()
+        DrawScr(scr)
+        scr.Refresh()
     End Sub
 
     Private Sub 画面番号の変更ToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles 画面番号の変更ToolStripMenuItem.Click
@@ -1286,7 +1073,8 @@ Public Class Form1
 
         TextBoxScreenNum.Visible = False
         Label_ScreenNum.Visible = False
-        RefreshAll()
+        DrawScr(scr)
+        scr.Refresh()
     End Sub
 
     '32x32タイル情報の表示
@@ -1418,6 +1206,8 @@ Public Class Form1
             TabControl1.TabPages.RemoveByKey("ttile")
 
             ppalette32.Visible = False
+            'DrawAll()
+            'RefreshAll()
         End If
     End Sub
 
@@ -1440,6 +1230,10 @@ Public Class Form1
             Next
 
             ppalette32.Visible = True
+            DrawScr(scr)
+            scr.Refresh()
+            DrawP32Focus(pmapSelect)
+            pmapSelect.Refresh()
         End If
     End Sub
 
@@ -1451,14 +1245,16 @@ Public Class Form1
             scr.ContextMenuStrip = ContextMenuStripObj
         End If
         ClearObjectSelection()
-        RefreshAll()
+        DrawScr(scr)
+        scr.Refresh()
     End Sub
 
     '敵/アイテム切り替えのラジオボタン
     Private Sub Radio_IsEnemy_CheckedChanged(sender As Object, e As EventArgs) Handles Radio_IsEnemy.CheckedChanged, Radio_IsItem.CheckedChanged
         obj_isenemy = Radio_IsEnemy.Checked
         ClearObjectSelection()
-        RefreshAll()
+        DrawScr(scr)
+        scr.Refresh()
     End Sub
 
     Private Sub Form1_Activated(sender As Object, e As EventArgs) Handles MyBase.Activated
@@ -1475,6 +1271,8 @@ Public Class Form1
                     OpenStageData(BinFilePath)
                 End If
             End If
+            'DrawAll()
+            'RefreshAll()
         End If
     End Sub
 End Class

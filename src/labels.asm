@@ -30,6 +30,11 @@ zNTNextlo = $18         ;マップ書き込みアドレス・進む方下位
 zNTNexthi = $19         ;マップ書き込みアドレス・進む方上位
 zNTPointer = $1A        ;マップ読み込み位置
 
+zPPUObjhi = $14         ;敵画像書き込み位置上位
+zPPUObjlo = $15         ;敵画像書き込み位置下位
+zPPUObjPtr = $16        ;敵画像読み込みセット番号
+zPPUObjPtrEnd = $17     ;敵画像読み込み完了位置
+zPPUObjProg = $18       ;敵画像読み込み位置
 zPPUHScr = $19          ;横スクロール書き込みフラグ
 zPPUVScr = $1A          ;縦スクロール書き込みフラグ
 
@@ -76,8 +81,8 @@ zBGLadder = $35         ;ロックマンのはしご周りの状態
 
 zShootPoseTimer = $36   ;撃つ姿勢の保持時間
 
-zScrollFlag = $37       ;スクロールフラグ
-zScrollNumber = $38     ;スクロール番号
+zScrollFlag = $37       ;スクロールフラグ +80: シャッター
+zScrollNumber = $38     ;スクロール番号 → スクロール移動先画面数
 
 zBubbleCounter = $39    ;水中の泡が出てくるまでのカウンタ
 
@@ -115,6 +120,8 @@ zInvincible = $4B       ;無敵時間
 
 zItemIndexPrev = $4C    ;アイテム番号・戻る方
 zItemIndexNext = $4D    ;アイテム番号・進む方
+
+zShutterHeight = $4D    ;シャッター高さ
 
 zObjItemFlag = $4E      ;移動処理時に使用する、アイテムフラグ
 
@@ -576,7 +583,19 @@ Stage_PaletteAnimWaitWily = $8E40 + 3
 Stage_PaletteWily = $8E40 + 4
 Stage_PaletteAnimWily = $8E60 + 4
 
-;8EE0 + 4: 空き
+;敵画像読み込みセット読み込み開始位置
+Stage_LoadGraphicsOrg = $8F20 + 4
+;敵画像読み込みセット書き込み回数
+Stage_LoadGraphicsNum = $8F20 + 4 + $0C
+;敵画像読み込みセット書き込み位置
+Stage_LoadGraphicsPtr = $8F20 + 4 + $18
+;敵画像読み込みセット
+Stage_LoadGraphics = $8F48
+
+;ステージ開始位置定義
+Stage_BeginPoint = $8FE0 - 2
+;ワイリーステージ開始位置定義
+Stage_BeginPointWily = $8FE0 - 1
 
 ;画像セット定義
 Stage_DefGraphics = $8FE0
@@ -586,11 +605,6 @@ Stage_DefGraphicsWily = $8FF0
 Stage_DefRoom = $B000
 ;画像格納位置
 Stage_Graphics = $A000
-
-;ステージ開始位置定義
-Stage_BeginPoint = $8E90 - 4
-;ワイリーステージ開始位置定義
-Stage_BeginPointWily = $8E90 - 3
 
 
 Table_AnimationPointer_Low = $F900

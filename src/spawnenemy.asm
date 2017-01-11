@@ -15,10 +15,8 @@
 .loop_room_item
 	sty <.seek_r
 	lda <$20
-	beq .skip_1st_item
 	clc
-	adc .room_list - 1,y
-.skip_1st_item
+	adc SpawnEnemy_RoomList,y
 	sta <.room
 	tax
 	
@@ -40,49 +38,50 @@
 	ldy Stage_DefItemsPtr,x
 .loop_seek_item
 	sty <.seek
-	lda aItemLife,y
+	lda aItemLife - 1,y
 	beq .skip_seek_item
 	mSTZ <.spawnflag
 	
 ;横の画面外判定
 	sec
-	lda Stage_DefEnemiesX - 1,y
+	lda Stage_DefItemsX - 1,y
 	sbc <zHScroll
-	ldx <$05
-	dex
-	bcc .borrow_x_item
-	bpl .skip_seek_item
-	bmi .cont_x_item
-.borrow_x_item
-	bmi .skip_seek_item
+	bpl .inv_x_item
 	eor #$FF
+.inv_x_item
+	ldx <$05
+	bcc .borrow_x_item
+	bne .skip_seek_item
+	beq .cont_x_item
+.borrow_x_item
+	beq .skip_seek_item
 .cont_x_item
-	
-	cmp #$08
+	cmp #$06
 	bcc .skip_seek_item
-	cmp #$10
+	cmp #$0C
 	bcs .spawnflag_set_item
 	inc <.spawnflag
 .spawnflag_set_item
+
 ;縦の画面外判定
 	sec
-	lda Stage_DefEnemiesY - 1,y
+	lda Stage_DefItemsY - 1,y
 	sbc <zVScroll
-	ldx <$04
-	dex
-	bcc .borrow_y_item
-	bpl .skip_seek_item
-	bmi .cont_y_item
-.borrow_y_item
-	bmi .skip_seek_item
+	bpl .inv_y_item
 	eor #$FF
+.inv_y_item
+	ldx <$04
+	bcc .borrow_y_item
+	bne .skip_seek_item
+	beq .cont_y_item
+.borrow_y_item
+	beq .skip_seek_item
 .cont_y_item
-	
-	cmp #$08
+	cmp #$06
 	bcc .skip_seek_item
 	ldx <.spawnflag
 	bne .spawn_item
-	cmp #$10
+	cmp #$0C
 	bcs .skip_seek_item
 ;アイテムが出現する
 .spawn_item
@@ -96,17 +95,17 @@
 	ldy <.seek_r
 	iny
 	cpy #$04
-	bne .loop_room_item
+	beq .end_room_item
+	jmp .loop_room_item
+.end_room_item
 
 ;敵出現処理
 	ldy #$00
 .loop_room
 	sty <.seek_r
 	lda <$20
-	beq .skip_1st
 	clc
-	adc .room_list - 1,y
-.skip_1st
+	adc SpawnEnemy_RoomList,y
 	sta <.room
 	tax
 	
@@ -134,46 +133,50 @@
 	sec
 	lda Stage_DefEnemiesX - 1,y
 	sbc <zHScroll
-	ldx <$05
-	dex
-	bcc .borrow_x
-	bpl .skip_seek
-	bmi .cont_x
-.borrow_x
-	bmi .skip_seek
+	bpl .inv_x
 	eor #$FF
+.inv_x
+	ldx <$05
+	bcc .borrow_x
+	bne .skip_seek
+	beq .cont_x
+.borrow_x
+	beq .skip_seek
 .cont_x
-	
-	cmp #$08
+	cmp #$06
 	bcc .skip_seek
-	cmp #$10
+	cmp #$0C
 	bcs .spawnflag_set
 	inc <.spawnflag
 .spawnflag_set
+
 ;縦の画面外判定
 	sec
 	lda Stage_DefEnemiesY - 1,y
 	sbc <zVScroll
-	ldx <$04
-	dex
-	bcc .borrow_y
-	bpl .skip_seek
-	bmi .cont_y
-.borrow_y
-	bmi .skip_seek
+	bpl .inv_y
 	eor #$FF
+.inv_y
+	ldx <$04
+	bcc .borrow_y
+	bne .skip_seek
+	beq .cont_y
+.borrow_y
+	beq .skip_seek
 .cont_y
-	
-	cmp #$08
+	cmp #$06
 	bcc .skip_seek
 	ldx <.spawnflag
 	bne .spawn
-	cmp #$10
+	cmp #$0C
 	bcs .skip_seek
 ;敵が出現する
 .spawn
 	lda Stage_DefEnemies - 1,y
-	bmi .sendchr
+	bpl .sendchr
+	jsr SpawnEnemy_SendCommand
+	jmp .skip_seek
+.sendchr
 	jsr CreateEnemy
 .skip_seek
 	ldy <.seek
@@ -184,14 +187,150 @@
 	ldy <.seek_r
 	iny
 	cpy #$04
-	bne .loop_room
+	beq .end
+	jmp .loop_room
+.end
+	lda <zPPUObjPtrEnd
+	bne .writeobj
+.rts
 	mCHANGEBANK #$0E, 1
-.sendchr
+.writeobj
+	lda <zPPUHScr
+	ora <zPPUVScr
+	bne .rts
+	ldx <zPPUObjPtr
+	lda Stage_LoadGraphics,x
+	sta <zPtrhi
+	lda <zPPUObjlo
+	sta <zPtrlo
+	inx
+	mCHANGEBANK Stage_LoadGraphics,x
+	inx
+	ldy #$40
+	sty <zPPULinear
+	dey
+.loop
+	lda [zPtr],y
+	sta aPPULinearData,y
+	dey
+	bpl .loop
 	
-	bmi .skip_seek
+	clc
+	lda <zPPUObjlo
+	sta aPPULinearlo
+	adc #$40
+	sta <zPPUObjlo
+	lda <zPPUObjhi
+	sta aPPULinearhi
+	bcc .rts
+	inc <zPPUObjhi
+	stx <zPPUObjPtr
+	dec <zPPUObjPtrEnd
+	bne .rts
+	lda <zStage
+	and #$07
+	jsr ChangeBank
+.skip_palette
+	iny
+.loop_palette
+	cpy #$03
+	beq .skip_palette
+	
+	lda Stage_LoadGraphics,x
+	bmi .rtsj
+	sta aPaletteSpr + 9,y
+	inx
+	iny
+	cpy #$07
+	bne .loop_palette
+.rtsj
+	jmp .rts
+;敵画像読み込みセットの設定
+SpawnEnemy_SendCommand:
+.room = $02
+	and #$7F
+	cmp #$40
+	bcc .1
+	and #$3F ;敵番号C0～FF: スクロール移動先の設定
+	sta <zScrollNumber
+	bpl .rts
+.1
+	cmp #$30 ;敵番号B0～BF: シャッター高さの設定
+	bcc .2
+	sbc #$30
+	asl a
+	asl a
+	asl a
+	asl a
+	sta <zShutterHeight
+	bcc .rts
+.2
+	cmp #$0F ;敵番号8F: 中間ポイントの設定
+	bne .3
+	ldy <.room
+	sty <zContinuePoint
+	rts
+.3
+	tay ;敵番号80～8B: パターンテーブル転送の適用
+	mSTZ <zPPUObjlo
+	lda Stage_LoadGraphicsPtr,y
+	sta <zPPUObjhi
+	lda Stage_LoadGraphicsOrg,y
+	sta <zPPUObjPtr
+	lda Stage_LoadGraphicsNum,y
+	sta <zPPUObjPtrEnd
+.rts
+	rts
 
-.room_list
-	.db $01, $10, $11
+SpawnEnemy_RoomList:
+	.db $00, $01, $10, $11
+
+;指定した画面内の敵を強制的に出現
+SpawnEnemiesAll:
+.ptr = $02
+.num = $03
+	lda <zStage
+	and #$07
+	jsr ChangeBank
+	
+	ldx <zRoom
+	ldy Stage_DefMap16,x
+	lda Stage_DefItemsAmount,y
+	beq .skip_item
+	sta <.num
+	ldx Stage_DefItemsPtr,y
+.loop_item
+	stx <.ptr
+	lda Stage_DefItems - 1,y
+	jsr CreateEnemy
+	ldx <.ptr
+	inx
+	dec <.num
+	dec <.num
+	bne .loop_item
+;敵の出現
+.skip_item
+	ldx <zRoom
+	ldy Stage_DefMap16,x
+	lda Stage_DefEnemiesAmount,y
+	beq .skip
+	sta <.num
+	ldx Stage_DefEnemiesPtr,y
+.loop
+	stx <.ptr
+	lda Stage_DefEnemies - 1,y
+	bpl .sendchr
+	jsr SpawnEnemy_SendCommand
+	jmp .1
+.sendchr
+	jsr CreateEnemy
+.1
+	ldx <.ptr
+	inx
+	dec <.num
+	bne .loop
+.skip
+	mCHANGEBANK #$0E, 1
 
 ;20 50 D7
 ;敵順序番号Yを生成
@@ -241,6 +380,7 @@ InvalidCreateObject:
 	rts
 
 ;20 C9 D7
+;アイテム順序番号Yを生成
 CreateItem:
 	tya
 	ldx #$0F
@@ -257,9 +397,9 @@ CreateItem:
 	sta aItemOrder10,x
 	mMOV aItemLife,y, aObjLife10,x
 	mMOV <$02, aObjRoom10,x
-	mMOV Stage_DefItemsX,y, aObjX10,x
-	mMOV Stage_DefItemsY,y, aObjY10,x
-	lda Stage_DefItems,y ;-------------item number
+	mMOV Stage_DefItemsX - 1,y, aObjX10,x
+	mMOV Stage_DefItemsY - 1,y, aObjY10,x
+	lda Stage_DefItems - 1,y ;-------------item number
 	mJSR_NORTS CreateObjectHere
 
 ;D802

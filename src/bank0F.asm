@@ -262,22 +262,8 @@ DieRockman:
 
 	mMOV #$10, $2000
 	mMOV #$06, $2001
-	lda <zStage
-	and #$07
-	jsr ChangeBank
-	ldx #$00
-	lda aObjRoom
-.loop_checkpoint
-	cmp $BB07,x ;-----------------
-	bcc .checkpoint
-	inx
-	cpx #$05
-	bne .loop_checkpoint
-.checkpoint
-	stx <zContinuePoint
 	ldx #$FF
 	txs
-	mCHANGEBANK #$0E
 	dec <zLives
 	bne .notgameover
 	mSTZ <zETanks
@@ -557,14 +543,30 @@ DoPaletteAnimation:
 	asl a
 	asl a
 	tax
+	lda <zBank
+	pha
+	lda <zStage
+	and #$07
+	jsr ChangeBank
 	ldy #$00
 .loop
-	mMOV aPaletteAnimBuf,x, aPalette,y
+	lda <zStage
+	and #$08
+	bne .wily
+	lda Stage_PaletteAnim,x
+	bpl .skip
+.wily
+	lda Stage_PaletteAnimWily,x
+.skip
+	sta aPalette,y
 	inx
 	iny
 	cpy #$10
 	bne .loop
-	inc <$3A
+	
+	inc <z3A ;------------------------
+	pla
+	jmp ChangeBank
 .isnoanim
 	rts
 
@@ -651,70 +653,28 @@ SetContinuePoint:
 	lda <zStage
 	and #$07
 	jsr ChangeBank
-	ldy <zContinuePoint
-	lda $BB06,y ;-----------------------
-	lda #$10
+	lda <zContinuePoint
+	beq .first
+	ldx #$00
+.loop
+	cmp Stage_DefMap16,x
+	beq .get
+	inx
+	bne .loop
+.get
+	beq .do
+.first
+	ldx #$00
+	lda <zStage
+	and #$08
+	beq .8boss
+	inx
+.8boss
+	stx <$70
+	lda Stage_BeginPoint,x
+.do
 	sta <zRoom
 	sta aObjRoom
-;	lda $BB0C,y ;-----------------------
-;	sta <zEnemyIndexPrev
-;	sta <zEnemyIndexNext
-;	lda $BB12,y ;-----------------------
-;	sta <zItemIndexPrev
-;	sta <zItemIndexNext
-;	lda $BB18,y ;-----------------------
-;	sta <zNTPrevhi
-;	lda $BB1E,y ;-----------------------
-;	sta <zNTPrevlo
-;	lda $BB24,y ;-----------------------
-;	sta <zNTNexthi
-;	lda $BB2A,y ;-----------------------
-;	sta <zNTNextlo
-;	lda $BB30,y ;-----------------------
-;	sta <zScrollNumber
-;	lda $BB36,y ;-----------------------
-;	sta <zScrollLeft
-;	lda $BB3C,y ;-----------------------
-;	sta <zScrollRight
-;	ldx <zScrollNumber
-;	jsr Unknown_CB61
-;	tya
-;	clc
-;	adc #$0B
-;	tay
-;	ldx #$0C
-;.loop_pha
-;	lda $B460,y ;-----------------------
-;	pha
-;	dey
-;	dex
-;	bne .loop_pha
-;	lda #$0A
-;	sta $2006
-;	lda #$00
-;	sta $2006
-;	sta <zPtrlo
-;	lda #$06
-;	sta <$00
-;.loop_enemygraphics
-;	pla
-;	sta <zPtrhi
-;	pla
-;	jsr ChangeBank
-;	ldy #$00
-;.loop
-;	lda [zPtr],y
-;	sta $2007
-;	iny
-;	bne .loop
-;	dec <$00
-;	bne .loop_enemygraphics
-;	mCHANGEBANK #$0E
-;	lda <zContinuePoint
-;	cmp #$02
-;	bne .isnot_02
-;	jsr $9115 ;-------------------------
-;.isnot_02
 	mCHANGEBANK #$0E, 1
 
 ;20 57 C5
@@ -995,61 +955,6 @@ Unknown_C75D:
 	sta <zPPULinear
 	mCHANGEBANK #$0D, 1
 	;rts
-
-;20 A1 C7
-GetScrollInfo:
-	lda <zStage
-	and #$07
-	jsr ChangeBank
-	lda $B400,y ;----------------------
-	tay
-	mCHANGEBANK #$0E, 1
-	;rts
-
-;20 B2 C7: 棒状になって降りてきて着地まで
-Rockman_Warp_to_Land:
-	lda #%11000000
-	sta aObjFlags
-	lda #$80
-	sta aObjX
-	lda #$14
-	sta aObjY
-	lda #$1A
-	sta aObjAnim
-.loop
-	lda <zStage
-	and #$07
-	jsr ChangeBank
-	lda #$00
-	sta aObjWait
-	sta aObjFrame
-	clc
-	lda aObjY
-	adc #$10
-	sta aObjY
-	adc #$10
-	sta <$0A
-	mMOV aObjX, <$08
-	mMOV aObjRoom, <$09
-	jsr PickupBlock
-	lda <$00
-	and #$08
-	bne .onland
-	jsr SpriteSetup
-	jsr FrameAdvance1C
-	jmp .loop
-.onland
-	mPLAYTRACK #$30
-	lda #$00
-	sta <zStatus
-	sta <zSliplo
-	sta <zSliphi
-	lda #$40
-	sta <zMoveVec
-	mMOV #$FF, aObjVY
-	mCHANGEBANK #$0E, 1
-	;rts
-
 
 ;20 05 C8
 SpawnBoss:
@@ -1868,140 +1773,21 @@ ChangeBank_GetScrollable:
 	tay
 	mCHANGEBANK #$0E, 1
 
-;20 13 CA: 上下スクロール時のNameTableの描画に密接に関わる
-VerticalScroll_DrawNT:
-.VertScrollCounter = $39
+;画面数Aがどの画面位置に存在するかを返す
+GetScrollTo:
+	pha
 	lda <zStage
 	and #$07
 	jsr ChangeBank
-	lda <.VertScrollCounter
-	lsr a
-	lsr a
-	lsr a
-	lsr a
-	sta aPPUSqrhi
-	lda <.VertScrollCounter
-	asl a
-	asl a
-	asl a
-	pha
-	and #$18
-	sta aPPUSqrhi + 1
 	pla
-	asl a
-	and #$C0
-	ora aPPUSqrhi + 1
-	sta aPPUSqrhi + 1
-	lda <.VertScrollCounter
-	and #$F8
-	ora #$C0
-	sta aPPUSqrData + 3
-	lda <.VertScrollCounter
-	and #$03
-	asl a
-	ora aPPUSqrData + 3
-	sta aPPUSqrData + 3
-	ldx #$20
-	lda <zRoom
-	and #$01
-	beq .left
-	ldx #$24
-.left
-	txa
-	ora aPPUSqrhi
-	sta aPPUSqrhi
-	txa
-	ora #$03
-	sta aPPUSqrData + 2
-	lda #$00
-	sta <$00
-	lda <.VertScrollCounter
-	and #$3B
-	lsr a
-	ror <$00
-	lsr a
-	ror <$00
-	lsr a
-	ror <$00
-	lsr <$00
-	ora <$00
-	sta <$00
-	lda aObjRoom
 	ldx #$00
-	stx <zPtrlo
-	lsr a
-	ror <zPtrlo
-	lsr a
-	ror <zPtrlo
-	clc
-	adc #$85
-	sta <zPtrhi
-	stx <$01
-.loop2
-	ldy <$00
-	lda [zPtr],y
-	sta <$03
-	sta <$0A
-	lda #$20
-	asl <$0A
-	rol a
-	asl <$0A
-	rol a
-	sta <$0B
-	ldy #$00
-	lda <.VertScrollCounter
-	and #$04
-	beq .jump
-	iny
-.jump
-	lda #$02
-	sta <$02
 .loop
-	lda [$0A],y
-	asl a
-	asl a
-	clc
-	sta aPPUSqrhi + 2,x
-	adc #$01
-	sta aPPUSqrAttrhi + 2,x
-	adc #$01
-	sta aPPUSqrhi + 3,x
-	adc #$01
-	sta aPPUSqrAttrhi + 3,x
+	cmp Stage_DefMap16,x
+	beq .end
 	inx
-	inx
-	iny
-	iny
-	dec <$02
 	bne .loop
-	lda <.VertScrollCounter
-	ldy #$0F
-	and #$04
-	beq .jump2
-	ldy #$F0
-.jump2
-	sty aPPUSqrData + 4
-	ldy <$03
-	lda $8400,y
-	and aPPUSqrData + 4
-	ldy <$01
-	sta aPPUSqrData + 5,y
-	lda <$00
-	ora #$08
-	sta <$00
-	inc <$01
-	lda <$01
-	cmp #$02
-	beq .jump3
-	jmp .loop2
-.jump3
-	lda #$80
-	sta <zPPUSqr
-	lda #$FF
-	eor aPPUSqrData + 4
-	sta aPPUSqrData + 4
+.end
 	mCHANGEBANK #$0E, 1
-	;rts
 
 ;20 09 CB
 ;上下スクロール時のパターンテーブル描画に密接に関わる
@@ -2205,7 +1991,7 @@ Table_Terrain:
 	.db $00, $00 ;ワイリーステージ6
 
 ;20 60 CC
-Unknown_CC60:
+PickupMap_BossBank:
 	jsr PickupBlock
 	mCHANGEBANK #$0B, 1
 	;rts
@@ -2657,7 +2443,7 @@ CheckOffscreenEnemy_CheckOffscreen:
 	eor #$FF
 	adc #$01
 .inv_x
-	cmp #$08
+	cmp #$06
 	bcc SafeRemoveEnemy
 ;縦の画面外判定
 	sec
@@ -2676,7 +2462,7 @@ CheckOffscreenEnemy_CheckOffscreen:
 	eor #$FF
 	adc #$01
 .inv_y
-	cmp #$08
+	cmp #$06
 	bcc SafeRemoveEnemy
 	clc
 	rts
