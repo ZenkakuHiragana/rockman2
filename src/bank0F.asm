@@ -1970,8 +1970,8 @@ PickupMap:
 .block
 	mCHANGEBANK #$0E, 1
 .skip
-	lda #$08
-	bne .offscreenblock
+	and #$3F
+	bpl .offscreenblock
 	
 ;1ECC44
 Table_Terrain:
@@ -2444,7 +2444,7 @@ CheckOffscreenEnemy_CheckOffscreen:
 	eor #$FF
 	adc #$01
 .inv_x
-	cmp #$06
+	cmp #SpawnEnemyBoundary
 	bcc SafeRemoveEnemy
 ;縦の画面外判定
 	sec
@@ -2463,7 +2463,7 @@ CheckOffscreenEnemy_CheckOffscreen:
 	eor #$FF
 	adc #$01
 .inv_y
-	cmp #$06
+	cmp #SpawnEnemyBoundary
 	bcc SafeRemoveEnemy
 	clc
 	rts

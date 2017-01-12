@@ -22,6 +22,15 @@
 	mMOV Table_DoRockmanlo,x, <zPtrlo
 	mMOV Table_DoRockmanhi,x, <zPtrhi
 	jsr IndirectJSR
+	ldx #$00
+	lda aObjFlags
+	pha
+	jsr CheckOffscreenEnemy_CheckOffscreen
+	pla
+	sta aObjFlags
+	lda #$00
+	rol a
+	sta <zOffscreen
 	pla
 	tay
 	pla
@@ -837,6 +846,11 @@ DoRockman_CheckAttr_Center:
 	beq .water
 .notboss
 	lda <zBGAttr2
+	cmp #$10
+	bcc .fall_to_die
+	mMOV #$01, <zStatus
+	jmp DieRockman
+.fall_to_die
 	cmp #$01
 	bne .air
 	lda <zWaterLevel
@@ -1354,7 +1368,7 @@ DoRockman_DoScroll:
 	sec
 	sbc <zHScroll
 	sec
-	bit <zMoveVec
+	bit aObjFlags
 	bvc .scroll_left
 ;右スクロール
 	sbc #$78
