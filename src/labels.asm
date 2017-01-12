@@ -176,9 +176,8 @@ zWindVec = $AF          ;風の方向
 zContinuePoint = $B0    ;中間地点番号を一時的に保存する
 zBossBehaviour = $B1    ;ボスの行動の種類
 zBossVar = $B2          ;ボス用変数
-zBossKind = $B3         ;ボスの種類
-
-zB4 = $B4
+zBossType = $B3         ;ボスの種類
+zBossVar2 = $B4
 
 zVScrollApparentlo = $B5;見かけの横スクロール下位
 zVScrollApparenthi = $B6;見かけの横スクロール上位

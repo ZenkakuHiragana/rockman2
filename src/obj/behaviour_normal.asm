@@ -2260,7 +2260,7 @@ EN2C:
 ;A7D3
 ;シャッター壁
 EN2F:
-	lda #$08
+	lda #$0F
 	bne Obj_BreakableWall
 ;A7D7
 ;破壊可能壁、フレンダー壁
@@ -4383,7 +4383,7 @@ EN64:
 	lda #$07
 	sta aObjLife,x
 	lda #$08
-	sta <zBossKind
+	sta <zBossType
 	lda #$01
 	sta <zBossBehaviour
 	lda #$17
@@ -4500,7 +4500,7 @@ EN65_GutsHand:
 	lda aBossVar1
 	sta aObjFlags,x
 	jsr MoveEnemy
-	lda <zBossKind
+	lda <zBossType
 	cmp #$08
 	beq .wilyobj
 	lda aObjAnim,x

@@ -499,7 +499,7 @@ DrawBar:
 	lda aObjLife + 1
 	sta <.amount
 	lda #$03
-	ldy <zBossKind
+	ldy <zBossType
 	cpy #$08
 	beq .exception
 	cpy #$0D

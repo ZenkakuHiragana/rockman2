@@ -204,14 +204,14 @@ DieRockman:
 	mMOV #%10000000, aObjFlags + $0E,y
 	clc
 	lda aObjX
-	adc .tiwnround_x,x
+	adc Table_TiwnBalldx,x
 	sta aObjX + $0E,y
 	lda aObjRoom
 	and #$0F
-	adc .tiwnround_xh,x
+	adc Table_TiwnBalldr,x
 	sta aObjRoom + $0E,y
 	lda aObjY
-	adc .tiwnround_y,x
+	adc Table_TiwnBalldy,x
 	sta aObjY + $0E,y
 	lda aObjRoom
 	php
@@ -220,7 +220,7 @@ DieRockman:
 	lsr a
 	lsr a
 	plp
-	adc .tiwnround_yh,x
+	adc Table_TiwnBalldyh,x
 	asl a
 	asl a
 	asl a
@@ -279,13 +279,13 @@ DieRockman:
 	jmp StartStage_Continue ;残機がまだある
 
 
-.tiwnround_y
+Table_TiwnBalldy:
 	.db $F8, $08, $FB, $05, $00, $00, $05, $FB
-.tiwnround_yh
+Table_TiwnBalldyh:
 	.db $FF, $00, $FF, $00, $00, $00, $00, $FF
-.tiwnround_x
+Table_TiwnBalldx:
 	.db $00, $00, $FB, $05, $FB, $08, $FB, $05
-.tiwnround_xh
+Table_TiwnBalldr:
 	.db $00, $00, $FF, $00, $FF, $00, $FF, $00
 
 
@@ -485,6 +485,7 @@ SpawnTiwnRound:
 	mMOV aObjY, <$0A
 	mMOV #$25, <$0B
 	ldx #$0D
+SpawnTiwnRound_Specified:
 	ldy #$0B
 .loop
 	lda #%10000000
@@ -959,7 +960,7 @@ Unknown_C75D:
 ;20 05 C8
 SpawnBoss:
 	lda <zStage
-	sta <zBossKind
+	sta <zBossType
 SpawnBoss_BossRushBegin:
 	mCHANGEBANK #$0B
 	jsr $8000
