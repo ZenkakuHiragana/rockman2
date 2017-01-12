@@ -867,16 +867,384 @@ BossBehaviour_BossTakeDamage:
 	mMOV Table_BossTakeDamagelo,y, <zPtrlo
 	mMOV Table_BossTakeDamagehi,y, <zPtrhi
 	jmp [zPtr]
+
+;A601
+;ボスのロックバスターのダメージ処理
+BossBehaviour_TakeRockBuster:
+	lda aObjFlags + 1
+	and #%00001000
+	bne .skip
+	ldy <zBossType
+	mMOV Table_BossTakeDamageRockBuster,y, <$00
+	beq .skip
+	php
+	lsr aObjFlags,x
+	plp
+	bpl .dmg
+	jmp BossBehaviour_MaxBossLife
+.dmg
+	mPLAYTRACK #$2B
+	mMOV #$01, <$02
+	inc <zBossVar2
+	sec
+	lda aObjLife + 1
+	sbc <$00
+	sta aObjLife + 1
+	beq .dead
+	bcs .alive
+.dead
+	mSTZ aObjLife + 1
+	sec
+	rts
+.skip
+	lda aObjFlags,x
+	eor #%01000000
+	and #%11111110
+	sta aObjFlags,x
+	mMOV #$05, aObjVY,x, aObjVX,x
+	mPLAYTRACK #$2D
+	mMOV #$02, <$02
+.alive
+	clc
+	rts
+
+;A657
+;ボスのアトミックファイヤーのダメージ処理
+BossBehaviour_TakeAtomicFire:
+	lda <zBossType
+	cmp #$00
+	bne .do
+	jmp BossBehaviour_MaxBossLife
+.do
+	lda aObjFlags + 1
+	and #%00001000
+	bne .skip
+	ldy <zBossType
+	lda Table_BossTakeDamageAtomicFire,y
+	beq .skip
+	lda aObjVar,x
+	cmp #$02
+	bcc .buster
+	beq .atomic
+	lda Table_BossTakeDamageAtomicFire,y
+	bne .write_dmg
+.atomic
+	clc
+	lda Table_BossTakeDamageRockBuster,y
+	asl a
+	adc Table_BossTakeDamageRockBuster,y
+	jmp .write_dmg
+.buster
+	lda Table_BossTakeDamageRockBuster,y
+.write_dmg
+	sta <$00
+	beq .skip
+	bpl .dmg
+	jmp BossBehaviour_MaxBossLife
+.dmg
+	mPLAYTRACK #$2B
+	mMOV #$01, <$02
+	inc <zBossVar2
+	sec
+	lda aObjLife + 1
+	sbc <$00
+	sta aObjLife + 1
+	beq .dead
+	bcs BossBehaviour_TakeAtomicFireEnd
+.dead
+	mSTZ aObjLife + 1
+	sec
+	rts
+.skip
+	mPLAYTRACK #$2D
+	mMOV #$02, <$02
+	lsr aObjFlags,x
+	jmp BossBehaviour_TakeAtomicFireRTS
+BossBehaviour_TakeAtomicFireEnd:
+	mSTZ aObjFlags,x
+BossBehaviour_TakeAtomicFireRTS:
+	clc
+	rts
+
+;A6C8
+;ボスのエアーシューターのダメージ処理
+BossBehaviour_TakeAirShooter:
+	lda aObjFlags + 1
+	and #%00001000
+	bne .skip
+	ldy <zBossType
+	lda Table_BossTakeDamageAirShooter,y
+	sta <$00
+	beq .skip
+	bpl .dmg
+	jmp BossBehaviour_MaxBossLife
+.dmg
+	mPLAYTRACK #$2B
+	mMOV #$01, <$02
+	inc <zBossVar2
+	sec
+	lda aObjLife + 1
+	sbc <$00
+	sta aObjLife + 1
+	beq .dead
+	bcs BossBehaviour_TakeAtomicFireEnd
+.dead
+	mSTZ aObjLife + 1
+	sec
+	rts
+.skip
+	mPLAYTRACK #$2D
+	mMOV #$02, <$02
+	lda aObjFlags,x
+	and #%11111110
+	sta aObjFlags,x
+	mMOV #$3D, aObjAnim,x
+	mSTZ aObjFrame,x, aObjWait,x
+	clc
+	rts
+
+;A71C
+;ボスのリーフシールドのダメージ処理
+BossBehaviour_TakeLeafShield:
+	lda aObjFlags + 1
+	and #%00001000
+	bne .skip
+	ldy <zBossType
+	lda Table_BossTakeDamageLeafShield,y
+	sta <$00
+	beq .skip
+	bpl .dmg
+	jmp BossBehaviour_MaxBossLife
+.dmg
+	mPLAYTRACK #$2B
+	mMOV #$01, <$02
+	inc <zBossVar2
+	sec
+	lda aObjLife + 1
+	sbc <$00
+	sta aObjLife + 1
+	beq .dead
+	bcs BossBehaviour_TakeLeafShieldEnd
+.dead
+	mSTZ aObjLife + 1
+	sec
+	rts
+.skip
+	mPLAYTRACK #$2D
+	mMOV #$02, <$02
+	lda aObjFlags,x
+	and #%11110010
+	sta aObjFlags,x
+	mMOV #$3B, aObjAnim,x
+	mSTZ aObjFrame,x, aObjWait,x, aObjVar,x, aObjLife,x
+BossBehaviour_TakeLeafShieldRTS:
+	clc
+	rts
+BossBehaviour_TakeLeafShieldEnd:
+	mSTZ aObjFlags,x
+	beq BossBehaviour_TakeLeafShieldRTS
+
+;A77D
+;ボスのバブルリードのダメージ処理
+BossBehaviour_TakeBubbleLead:
+	lda aObjFlags + 1
+	and #%00001000
+	bne .skip
+	ldy <zBossType
+	lda Table_BossTakeDamageBubbleLead,y
+	sta <$00
+	beq .skip
+	bpl .dmg
+	jmp BossBehaviour_MaxBossLife
+.dmg
+	mPLAYTRACK #$2B
+	mMOV #$01, <$02
+	inc <zBossVar2
+	sec
+	lda aObjLife + 1
+	sbc <$00
+	sta aObjLife + 1
+	beq .dead
+	bcs BossBehaviour_TakeLeafShieldEnd
+.dead
+	mSTZ aObjLife + 1
+	sec
+	rts
+.skip
+	mSTZ aObjVX,x, aObjVXlo,x, aObjVYlo,x
+	mMOV #$04, aObjVY,x
+	mMOV #%10000000, aObjFlags,x
+	mPLAYTRACK #$2D
+	mMOV #$02, <$02
+	clc
+	rts
+
+;A7D1
+;ボスのクイックブーメランのダメージ処理
+BossBehaviour_TakeQuickBoomerang:
+	lda aObjFlags + 1
+	and #%00001000
+	bne .skip
+	ldy <zBossType
+	lda Table_BossTakeDamageQuickBoomerang,y
+	sta <$00
+	beq .skip
+	bpl .dmg
+	jmp BossBehaviour_MaxBossLife
+.dmg
+	mPLAYTRACK #$2B
+	mMOV #$01, <$02
+	inc <zBossVar2
+	sec
+	lda aObjLife + 1
+	sbc <$00
+	sta aObjLife + 1
+	beq .dead
+	bcs BossBehaviour_TakeQuickBoomerangEnd
+.dead
+	mSTZ aObjLife + 1
+	sec
+	rts
+.skip
+	mMOV #$3C, aObjAnim,x
+	lda aObjFlags,x
+	and #%11000000
+	eor #%01000000
+	ora #%00000100
+	sta aObjFlags,x
+	mSTZ aObjFrame,x, aObjWait,x, aObjVX,x, aObjVYlo,x
+	mMOV #$C0, aObjVXlo,x
+	mMOV #$04, aObjVY,x
+	mPLAYTRACK #$2D
+	mMOV #$02, <$02
+BossBehaviour_TakeQuickBoomerangRTS:
+	ldx <zObjIndex
+	clc
+	rts
+BossBehaviour_TakeQuickBoomerangEnd:
+	mSTZ aObjFlags,x
+	beq BossBehaviour_TakeQuickBoomerangRTS
+
+;A842
+;ボスのクラッシュボムのダメージ処理
+BossBehaviour_TakeCrashBomb:
+	lda aObjFlags + 1
+	and #%00001000
+	bne .skip
+	ldy <zBossType
+	lda Table_BossTakeDamageCrashBomb,y
+	sta <$00
+	beq .skip
+	bpl .dmg
+	jmp BossBehaviour_MaxBossLife
+.dmg
+	mPLAYTRACK #$2B
+	mMOV #$01, <$02
+	inc <zBossVar2
+	sec
+	lda aObjLife + 1
+	sbc <$00
+	sta aObjLife + 1
+	beq .dead
+	bcs BossBehaviour_TakeQuickBoomerangEnd
+.dead
+	mSTZ aObjLife + 1
+	sec
+	rts
+.skip
+	lda aObjAnim,x
+	cmp #$2F
+	beq .end
+	lda aObjVar,x
+	cmp #$02
+	beq .end
+	mMOV #$05, aObjFrame,x
+	mSTZ aObjWait,x
+	mMOV #$38, aObjLife,x
+	inc aObjVar,x
+	mPLAYTRACK #$2D
+	mMOV #$01, <$02
+.end
+	clc
+	rts
+
+;A8A1
+;ボスのメタルブレードのダメージ処理
+BossBehaviour_TakeMetalBlade:
+	lda aObjFlags + 1
+	and #%00001000
+	bne .skip
+	ldy <zBossType
+	lda Table_BossTakeDamageMetalBlade,y
+	sta <$00
+	beq .skip
+	bpl .dmg
+	jmp BossBehaviour_MaxBossLife
+.dmg
+	mPLAYTRACK #$2B
+	mMOV #$01, <$02
+	inc <zBossVar2
+	sec
+	lda aObjLife + 1
+	sbc <$00
+	sta aObjLife + 1
+	beq .dead
+	bcs .alive
+.dead
+	mSTZ aObjLife + 1
+	sec
+	rts
+.skip
+	mMOV #$03, aObjVY,x
+	mMOV #$B2, aObjVYlo,x
+	mMOV #$01, aObjVX,x
+	mMOV #$87, aObjVXlo,x
+	lda aObjFlags,x
+	and #%11110000
+	sta aObjFlags,x
+	mPLAYTRACK #$2D
+	mMOV #$02, <$02
+.end
+	clc
+	rts
+.alive
+	mSTZ aObjFlags,x
+	beq .end
+
+;A903
+;ボス回復/ボスのタイムストッパーのダメージ処理(来ない)
+BossBehaviour_TakeTimeStopper:
+BossBehaviour_MaxBossLife:
+	mMOV #$1C, aObjLife + 1
+	mSTZ <$02
+	lsr aObjFlags,x
+	clc
+	rts
 	
-	.org $A911
 ;A911
 ;武器毎のボスに当てた時のルーチン下位
 Table_BossTakeDamagelo:
-	.db $01, $57, $C8, $1C, $7D, $D1, $03, $A1, $42
+	.db LOW(BossBehaviour_TakeRockBuster)
+	.db LOW(BossBehaviour_TakeAtomicFire)
+	.db LOW(BossBehaviour_TakeAirShooter)
+	.db LOW(BossBehaviour_TakeLeafShield)
+	.db LOW(BossBehaviour_TakeBubbleLead)
+	.db LOW(BossBehaviour_TakeQuickBoomerang)
+	.db LOW(BossBehaviour_TakeTimeStopper)
+	.db LOW(BossBehaviour_TakeMetalBlade)
+	.db LOW(BossBehaviour_TakeCrashBomb)
 ;A91A
 ;武器毎のボスに当てた時のルーチン上位
 Table_BossTakeDamagehi:
-	.db $A6, $A6, $A6, $A7, $A7, $A7, $A9, $A8, $A8
+	.db HIGH(BossBehaviour_TakeRockBuster)
+	.db HIGH(BossBehaviour_TakeAtomicFire)
+	.db HIGH(BossBehaviour_TakeAirShooter)
+	.db HIGH(BossBehaviour_TakeLeafShield)
+	.db HIGH(BossBehaviour_TakeBubbleLead)
+	.db HIGH(BossBehaviour_TakeQuickBoomerang)
+	.db HIGH(BossBehaviour_TakeTimeStopper)
+	.db HIGH(BossBehaviour_TakeMetalBlade)
+	.db HIGH(BossBehaviour_TakeCrashBomb)
 ;A923
 ;ボス毎のロックバスターダメージ
 Table_BossTakeDamageRockBuster:

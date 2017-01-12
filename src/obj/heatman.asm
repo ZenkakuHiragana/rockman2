@@ -16,12 +16,12 @@ BossBehaviour_Spawn:
 	ldy <zBossType
 	mMOV Table_SpawnBossTerraindx,y, <.dx
 	mMOV Table_SpawnBossTerraindy,y, <.dy
-	jsr $A249
+	jsr BossBehaviour_WallCollisionY
 	lda <$00
 	bne .land
 	mSTZ aObjFrame + 1, aObjWait + 1
 .move
-	mJSR_NORTS $A14F
+	mJSR_NORTS BossBehaviour_Move
 .land
 	mSTZ aObjVY + 1, aObjVYlo + 1
 	inc aObjVar + 1
@@ -40,7 +40,7 @@ BossBehaviour_MaxLife:
 	mSTZ <zBossVar, aObjVar + 1
 	ldy <zBossType
 	lda Table_SpawnBossAnimationInit,y
-	mJSR_NORTS $A10C
+	mJSR_NORTS SetBossAnimation
 BossBehaviour_ChargeLife:
 	lda <zFrameCounter
 	and #$03
@@ -72,7 +72,7 @@ Table_SpawnBossAnimationInit:
 ;2, ヒートマンが火の玉を投擲する
 Heatman2:
 	lda #$58
-	jsr $A22D ;-------------check existence
+	jsr BossBehaviour_CheckExistence
 	bcs .exist
 	lda aObjFrame + 1
 	bne Heatman_Move
@@ -84,7 +84,7 @@ Heatman2:
 	lda aObjFrame + 1
 	cmp #$02
 	bne Heatman_Move
-	jsr $A209 ;------------facetowards
+	jsr BossBehaviour_FaceTowards
 	mMOV <$00, <$03
 	clc
 	adc #$20
@@ -105,7 +105,7 @@ Heatman2:
 	jsr Divide
 	ldx #$01
 	lda #$58
-	jsr $A352 ;-----------spawn obj
+	jsr BossBehaviour_SpawnEnemy
 	ldx <$01
 	mMOV HeatmanBallVYlo,x, aObjVYlo10,y
 	mMOV HeatmanBallVYhi,x, aObjVY10,y
@@ -119,7 +119,7 @@ Heatman2:
 ;81D3
 Heatman_Move:
 	ldx #$01
-	jsr $A146 ;------------------
+	jsr BossBehaviour_MoveAndCollide
 	lda <$02
 	cmp #$01
 	bne .rts
@@ -129,7 +129,7 @@ Heatman_Move:
 	mMOV #$04, <zBossBehaviour
 	mMOV #$12, aBossInvincible
 	lda #$53
-	mJSRJMP $A10C
+	mJSRJMP SetBossAnimation
 .rts
 	rts
 ;81EF
@@ -165,7 +165,7 @@ Heatman3:
 	mMOV #$03, aObjFrame + 1
 	mSTZ aObjWait + 1
 	mMOV #$11, aObjCollision + 1
-	jsr $A209
+	jsr BossBehaviour_FaceTowards
 	lda <$00
 	lsr a
 	lsr a
@@ -206,9 +206,9 @@ Heatman3:
 	cmp #$0D
 	bne .done
 	lda #$50
-	jsr $A10C
+	jsr SetBossAnimation
 	mMOV #%10000011, aObjFlags + 1
-	jsr $A209
+	jsr BossBehaviour_FaceTowards
 	inc aObjFrame,x
 	mMOV #$05, <zBossBehaviour
 .done
@@ -239,10 +239,10 @@ Heatman4:
 	ldx <$04
 	mMOV Table_HeatmanChargeWait,x, <zBossVar
 	lda #$52
-	jsr $A10C
+	jsr SetBossAnimation
 	mPLAYTRACK #$38
 .end
-	mJSR_NORTS $A14F
+	mJSR_NORTS BossBehaviour_Move
 
 ;82CC
 ;5, 体当たりから戻る
