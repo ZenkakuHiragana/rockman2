@@ -1,5 +1,12 @@
 #[1]   hack2.asm
-  171  1E:DFFE  F0 1F             beq .invalid
+ 1905  1E:CCC4            PickupMap:
+#[3]   src/sprites.asm
+#[2]   src/bank0F.asm
+#[3]   src/NMI.asm
+#[2]   src/bank0F.asm
+#[3]   src/spawnenemy.asm
+#[2]   src/bank0F.asm
+#[3]   src/weapons.asm
 #[2]   src/bank0F.asm
 #[3]   src/damageinfo.asm
 #[2]   src/bank0F.asm

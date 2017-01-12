@@ -27,6 +27,7 @@ Partial Class Form1
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip()
         Me.Menu_File = New System.Windows.Forms.ToolStripMenuItem()
         Me.Menu_Open = New System.Windows.Forms.ToolStripMenuItem()
+        Me.保存SToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.Menu_Exit = New System.Windows.Forms.ToolStripMenuItem()
         Me.Menu_ShowAll = New System.Windows.Forms.ToolStripMenuItem()
         Me.Menu_ShowPartial = New System.Windows.Forms.ToolStripMenuItem()
@@ -63,6 +64,7 @@ Partial Class Form1
         Me.p32focus = New System.Windows.Forms.PictureBox()
         Me.p32 = New System.Windows.Forms.PictureBox()
         Me.ttile = New System.Windows.Forms.TabPage()
+        Me.ButtonTileInfo = New System.Windows.Forms.Button()
         Me.Label_8Graph = New System.Windows.Forms.Label()
         Me.Label_16Chip1 = New System.Windows.Forms.Label()
         Me.ppalette = New System.Windows.Forms.PictureBox()
@@ -81,8 +83,7 @@ Partial Class Form1
         Me.画面番号の変更ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.bg_chipinfo = New System.ComponentModel.BackgroundWorker()
         Me.bg_tileinfo = New System.ComponentModel.BackgroundWorker()
-        Me.ButtonTileInfo = New System.Windows.Forms.Button()
-        Me.保存SToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.LabelViewOrigin = New System.Windows.Forms.Label()
         CType(Me.scr, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.MenuStrip1.SuspendLayout()
         Me.TabControl1.SuspendLayout()
@@ -135,6 +136,12 @@ Partial Class Form1
         Me.Menu_Open.Size = New System.Drawing.Size(119, 22)
         Me.Menu_Open.Text = "開く(&O)"
         '
+        '保存SToolStripMenuItem
+        '
+        Me.保存SToolStripMenuItem.Name = "保存SToolStripMenuItem"
+        Me.保存SToolStripMenuItem.Size = New System.Drawing.Size(119, 22)
+        Me.保存SToolStripMenuItem.Text = "保存(&S)"
+        '
         'Menu_Exit
         '
         Me.Menu_Exit.Name = "Menu_Exit"
@@ -180,6 +187,7 @@ Partial Class Form1
         Me.tmap.Controls.Add(Me.ButtonMapRight)
         Me.tmap.Controls.Add(Me.ButtonMapUp)
         Me.tmap.Controls.Add(Me.ButtonMapLeft)
+        Me.tmap.Controls.Add(Me.LabelViewOrigin)
         Me.tmap.Controls.Add(Me.Label_ScreenNum)
         Me.tmap.Controls.Add(Me.Label_ObjY)
         Me.tmap.Controls.Add(Me.Label_ObjX)
@@ -231,7 +239,7 @@ Partial Class Form1
         'TextBoxScreenNum
         '
         Me.TextBoxScreenNum.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
-        Me.TextBoxScreenNum.Location = New System.Drawing.Point(241, 527)
+        Me.TextBoxScreenNum.Location = New System.Drawing.Point(241, 556)
         Me.TextBoxScreenNum.MaxLength = 2
         Me.TextBoxScreenNum.Name = "TextBoxScreenNum"
         Me.TextBoxScreenNum.ShortcutsEnabled = False
@@ -333,7 +341,7 @@ Partial Class Form1
         '
         Me.Label_ScreenNum.AutoSize = True
         Me.Label_ScreenNum.Font = New System.Drawing.Font("MS UI Gothic", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
-        Me.Label_ScreenNum.Location = New System.Drawing.Point(140, 527)
+        Me.Label_ScreenNum.Location = New System.Drawing.Point(140, 556)
         Me.Label_ScreenNum.Name = "Label_ScreenNum"
         Me.Label_ScreenNum.Size = New System.Drawing.Size(95, 19)
         Me.Label_ScreenNum.TabIndex = 7
@@ -524,6 +532,17 @@ Partial Class Form1
         Me.ttile.Text = "16x16"
         Me.ttile.UseVisualStyleBackColor = True
         '
+        'ButtonTileInfo
+        '
+        Me.ButtonTileInfo.AutoSize = True
+        Me.ButtonTileInfo.Font = New System.Drawing.Font("MS UI Gothic", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
+        Me.ButtonTileInfo.Location = New System.Drawing.Point(406, 530)
+        Me.ButtonTileInfo.Name = "ButtonTileInfo"
+        Me.ButtonTileInfo.Size = New System.Drawing.Size(112, 29)
+        Me.ButtonTileInfo.TabIndex = 17
+        Me.ButtonTileInfo.Text = "タイル情報..."
+        Me.ButtonTileInfo.UseVisualStyleBackColor = True
+        '
         'Label_8Graph
         '
         Me.Label_8Graph.AutoSize = True
@@ -655,22 +674,15 @@ Partial Class Form1
         'bg_tileinfo
         '
         '
-        'ButtonTileInfo
+        'LabelViewOrigin
         '
-        Me.ButtonTileInfo.AutoSize = True
-        Me.ButtonTileInfo.Font = New System.Drawing.Font("MS UI Gothic", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
-        Me.ButtonTileInfo.Location = New System.Drawing.Point(406, 530)
-        Me.ButtonTileInfo.Name = "ButtonTileInfo"
-        Me.ButtonTileInfo.Size = New System.Drawing.Size(112, 29)
-        Me.ButtonTileInfo.TabIndex = 17
-        Me.ButtonTileInfo.Text = "タイル情報..."
-        Me.ButtonTileInfo.UseVisualStyleBackColor = True
-        '
-        '保存SToolStripMenuItem
-        '
-        Me.保存SToolStripMenuItem.Name = "保存SToolStripMenuItem"
-        Me.保存SToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
-        Me.保存SToolStripMenuItem.Text = "保存(&S)"
+        Me.LabelViewOrigin.AutoSize = True
+        Me.LabelViewOrigin.Font = New System.Drawing.Font("MS UI Gothic", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
+        Me.LabelViewOrigin.Location = New System.Drawing.Point(140, 527)
+        Me.LabelViewOrigin.Name = "LabelViewOrigin"
+        Me.LabelViewOrigin.Size = New System.Drawing.Size(95, 19)
+        Me.LabelViewOrigin.TabIndex = 7
+        Me.LabelViewOrigin.Text = "画面位置: "
         '
         'Form1
         '
@@ -772,5 +784,6 @@ Partial Class Form1
     Friend WithEvents bg_tileinfo As System.ComponentModel.BackgroundWorker
     Friend WithEvents ButtonTileInfo As System.Windows.Forms.Button
     Friend WithEvents 保存SToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents LabelViewOrigin As System.Windows.Forms.Label
 
 End Class

@@ -330,7 +330,7 @@ Rockman_Warp_to_Land:
 	adc #$10
 	sta aObjY
 	adc #$10
-	cmp #$50
+	cmp #$80
 	bcc .skip
 	sta <$0A
 	mMOV aObjX, <$08
@@ -680,6 +680,37 @@ DoRockman:
 ;「進む」スクロールの処理
 Scroll_GoForward:
 	jsr EraseEnemiesByScroll
+.loop
+	ldx #$00
+	lda <zVScroll
+	beq .skip
+	bmi .1
+	inx
+.1
+	and #$07
+	bne .skip_nt
+	ldy #$01
+	sty <$01
+	dey
+	sty <$00
+	stx <$02
+	jsr WriteNameTableByScroll
+.skip_nt
+	ldy <zVScroll
+	bmi .godown
+	dey
+	bpl .write
+.godown
+	iny
+	cpy #$F0
+	bne .write
+	ldy #$00
+.write
+	sty <zVScroll
+	jsr SpriteSetup
+	jsr FrameAdvance1C
+	jmp .loop
+.skip
 	lda <zScrollNumber
 	jsr GetScrollTo
 	txa
@@ -807,7 +838,7 @@ Table_ShutterStart:
 ;906F
 ;ボスの居る画面数
 Table_BossRoom:
-	.db $63, $15, $17, $15, $17, $13, $15, $13
+	.db $63, $43, $5F, $15, $17, $13, $15, $13
 	.db $00, $27, $27, $26, $00, $1F
 
 ;907D

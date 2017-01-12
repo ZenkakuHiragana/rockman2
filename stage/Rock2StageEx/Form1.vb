@@ -332,6 +332,9 @@ Public Class Form1
             'インスタンスをコピー
             TimerStats = timer
         End If
+
+        DrawAll()
+        RefreshAll()
     End Sub
 
     Private Sub 保存SToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles 保存SToolStripMenuItem.Click
@@ -460,6 +463,10 @@ Public Class Form1
         SyncLock scrBuf
             scrBuf.Render(e.Graphics)
         End SyncLock
+        Dim s As String = "画面位置: (" & Hex(ViewOrigin.X) & ", " & Hex(ViewOrigin.Y) & ")"
+        If LabelViewOrigin.Text <> s Then
+            LabelViewOrigin.Text = s
+        End If
     End Sub
 
     Private Sub p32_Paint(sender As Object, e As PaintEventArgs) Handles p32.Paint
@@ -1271,8 +1278,6 @@ Public Class Form1
                     OpenStageData(BinFilePath)
                 End If
             End If
-            'DrawAll()
-            'RefreshAll()
         End If
     End Sub
 End Class

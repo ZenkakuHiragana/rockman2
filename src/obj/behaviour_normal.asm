@@ -1507,7 +1507,7 @@ EN1B:
 EN1C:
 	sec
 	lda aObjRoom,x
-	sbc #$06
+	sbc #$34
 	tay
 	lda .table_land,y
 	cmp aObjY,x
@@ -1523,6 +1523,10 @@ EN1C:
 	lda #$00
 	sta aObjVY,x
 	jsr CheckOffscreenEnemy
+	lda <zPPUHScr
+	ora <zPPUVScr
+	ora <zPPULinear
+	bne .skip_scroll
 	lda aObjFrame,x
 	pha
 	tay
@@ -1584,6 +1588,7 @@ EN1C:
 	dec <$00
 	bne .loop
 	inc <zPPUSqr
+.skip_scroll
 	ldx <zObjIndex
 	lda aObjFrame,x
 	cmp #$03

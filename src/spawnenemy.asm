@@ -56,9 +56,9 @@
 .borrow_x_item
 	beq .skip_seek_item
 .cont_x_item
-	cmp #$06
+	cmp #SpawnEnemyBoundary
 	bcc .skip_seek_item
-	cmp #$0C
+	cmp #SpawnEnemyBoundary * 2
 	bcs .spawnflag_set_item
 	inc <.spawnflag
 .spawnflag_set_item
@@ -77,11 +77,11 @@
 .borrow_y_item
 	beq .skip_seek_item
 .cont_y_item
-	cmp #$06
+	cmp #SpawnEnemyBoundary
 	bcc .skip_seek_item
 	ldx <.spawnflag
 	bne .spawn_item
-	cmp #$0C
+	cmp #SpawnEnemyBoundary * 2
 	bcs .skip_seek_item
 ;アイテムが出現する
 .spawn_item
@@ -143,9 +143,9 @@
 .borrow_x
 	beq .skip_seek
 .cont_x
-	cmp #$06
+	cmp #SpawnEnemyBoundary
 	bcc .skip_seek
-	cmp #$0C
+	cmp #SpawnEnemyBoundary * 2
 	bcs .spawnflag_set
 	inc <.spawnflag
 .spawnflag_set
@@ -164,11 +164,11 @@
 .borrow_y
 	beq .skip_seek
 .cont_y
-	cmp #$06
+	cmp #SpawnEnemyBoundary
 	bcc .skip_seek
 	ldx <.spawnflag
 	bne .spawn
-	cmp #$0C
+	cmp #SpawnEnemyBoundary * 2
 	bcs .skip_seek
 ;敵が出現する
 .spawn
