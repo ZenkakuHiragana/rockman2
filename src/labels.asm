@@ -166,9 +166,9 @@ zWindVec = $AF          ;風の方向
 zContinuePoint = $B0    ;中間地点番号を一時的に保存する
 zBossBehaviour = $B1    ;ボスの行動の種類
 zBossVar = $B2          ;ボス用変数
-zBossKind = $B3         ;ボスの種類
+zBossType = $B3         ;ボスの種類
 
-zB4 = $B4
+zBossVar2 = $B4
 
 zVScrollApparentlo = $B5;見かけの横スクロール下位
 zVScrollApparenthi = $B6;見かけの横スクロール上位
@@ -450,7 +450,7 @@ aWeaponCollision = $590 ;武器の当たり判定
 aWeaponPlatformW = $5A0 ;武器の足場判定広さ
 aWeaponPlatformY = $5A3 ;武器の足場判定Y位置
 
-aTimeStopper = $5A6     ;なんですかこれは
+aTimeStopper = $5A6     ;タイムストッパーのダメージを与える間隔カウンタ
 
 aBossTiwnWait = $5A7    ;ボスが弾け飛ぶまでのフレーム。らしい。
 aBossVar1 = $5A7

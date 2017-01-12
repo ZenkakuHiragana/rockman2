@@ -1,4 +1,4 @@
 del "hack2.nes"
-NesAsmSharp "hack2.asm" >out.txt
+NesAsmSharp -watch "hack2.asm"
 type out.txt
 pause

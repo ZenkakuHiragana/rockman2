@@ -534,8 +534,8 @@ Item_TeleporterIn:
 	jsr Item_OutofCapsule
 	mPLAYTRACK #$0B
 	lda <zBossRushStage
-	sta <zBossKind
-	dec <zBossKind
+	sta <zBossType
+	dec <zBossType
 	mJSR_NORTS SpawnBoss_BossRushBegin
 ;83D7
 ;ボスラッシュのカプセルに入った時、パターンテーブルの書き換えを指定
@@ -586,7 +586,7 @@ Item_DrawEnemyPattern:
 ;8423
 Item_TeleporterOut:
 	jsr Item_IntoCapsule
-	ldx <zBossKind
+	ldx <zBossType
 	lda <zBossRushProg
 	ora StageBitTable,x
 	sta <zBossRushProg
@@ -616,7 +616,7 @@ Item_TeleporterOut:
 	jsr Item_SetBossRushBG
 	lda #$00
 	sta <zBossBehaviour
-	ldx <zBossKind
+	ldx <zBossType
 	clc
 	lda Table_BossRushCapsuleY,x
 	adc #$07

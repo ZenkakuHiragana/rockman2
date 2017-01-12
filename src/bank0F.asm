@@ -204,13 +204,13 @@ DieRockman:
 	mMOV #%10000000, aObjFlags + $0E,y
 	clc
 	lda aObjX
-	adc .tiwnround_x,x
+	adc Table_TiwnBalldx,x
 	sta aObjX + $0E,y
 	lda aObjRoom
-	adc .tiwnround_xh,x
+	adc Table_TiwnBalldr,x
 	sta aObjRoom + $0E,y
 	lda aObjY
-	adc .tiwnround_y,x
+	adc Table_TiwnBalldy,x
 	sta aObjY + $0E,y
 	lda #$01
 	sta aObjFrame + $0E,y
@@ -277,11 +277,11 @@ DieRockman:
 	jmp StartStage_Continue ;残機がまだある
 
 
-.tiwnround_y
+Table_TiwnBalldy:
 	.db $F8, $08, $FB, $05, $00, $00, $05, $FB
-.tiwnround_x
+Table_TiwnBalldx:
 	.db $00, $00, $FB, $05, $FB, $08, $FB, $05
-.tiwnround_xh
+Table_TiwnBalldr:
 	.db $00, $00, $FF, $00, $FF, $00, $FF, $00
 
 
@@ -481,6 +481,8 @@ SpawnTiwnRound:
 	mMOV aObjY, <$0A
 	mMOV #$25, <$0B
 	ldx #$0D
+;C3A8
+SpawnTiwnRound_Specified:
 	ldy #$0B
 .loop
 	lda #%10000000
@@ -1009,7 +1011,7 @@ Rockman_Warp_to_Land:
 ;20 05 C8
 SpawnBoss:
 	lda <zStage
-	sta <zBossKind
+	sta <zBossType
 SpawnBoss_BossRushBegin:
 	mCHANGEBANK #$0B
 	jsr $8000
@@ -1698,7 +1700,7 @@ Table_Terrain:
 	.db $00, $00 ;ワイリーステージ6
 
 ;20 60 CC
-Unknown_CC60:
+PickupMap_BossBank:
 	jsr PickupBlock
 	mCHANGEBANK #$0B, 1
 	;rts
@@ -1987,6 +1989,20 @@ Unknown_D64A:
 ;20 55 D6
 SpawnEnemyByScroll:
 	.include "src/spawnenemy.asm"
+
+;20 40 DA
+GetEnemyPointer:
+	ldx #$0F
+.loop
+	lda aObjFlags10,x
+	bpl .ok
+	dex
+	bpl .loop
+	sec
+	rts
+.ok
+	clc
+	rts
 
 ;20 4E DA
 ;武器の発射処理/武器オブジェクトの挙動

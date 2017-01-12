@@ -44,18 +44,21 @@ mSEC .macro
 	.endm
 
 mCHANGEBANK .macro
-	.if \?2
 	lda \1
+	.if \?2
 	mJSR_NORTS ChangeBank
 	.else
-	lda \1
 	jsr ChangeBank
 	.endif
 	.endm
 
 mPLAYTRACK .macro
 	lda \1
+	.if \?2
+	mJSR_NORTS PlayTrack
+	.else
 	jsr PlayTrack
+	.endif
 	.endm
 
 mMOV .macro
