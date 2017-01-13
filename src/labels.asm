@@ -617,5 +617,6 @@ RESET_VECTOR = $FFFC
 BREAK_VECTOR = $FFFE
 
 ;敵出現の境界線
-SpawnEnemyBoundary = $08
+SpawnEnemyBoundaryX = $04
+SpawnEnemyBoundaryY = $08
 

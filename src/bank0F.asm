@@ -2444,7 +2444,7 @@ CheckOffscreenEnemy_CheckOffscreen:
 	eor #$FF
 	adc #$01
 .inv_x
-	cmp #SpawnEnemyBoundary
+	cmp #SpawnEnemyBoundaryX
 	bcc SafeRemoveEnemy
 ;縦の画面外判定
 	sec
@@ -2463,7 +2463,7 @@ CheckOffscreenEnemy_CheckOffscreen:
 	eor #$FF
 	adc #$01
 .inv_y
-	cmp #SpawnEnemyBoundary
+	cmp #SpawnEnemyBoundaryY
 	bcc SafeRemoveEnemy
 	clc
 	rts
