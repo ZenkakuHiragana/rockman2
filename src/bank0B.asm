@@ -35,12 +35,20 @@ Table_TimeStopperBossDamageAmount:
 ;8047
 ;ボスの挙動アドレス下位
 Table_BossBehaviourlo:
-	.db LOW(Heatman), $E3, $FB, $56, $9E, $56, $20, $C3
+	.db LOW(Heatman)
+	.db LOW(Airman)
+	.db LOW(Woodman)
+	.db LOW(Bubbleman)
+	.db $9E, $56, $20, $C3
 	.db $10, $13, $9B, $6E, $C0, $2A
 ;8045
 ;ボスの挙動アドレス上位
 Table_BossBehaviourhi:
-	.db HIGH(Heatman), $82, $84, $86, $87, $89, $8B, $8C
+	.db HIGH(Heatman)
+	.db HIGH(Airman)
+	.db HIGH(Woodman)
+	.db HIGH(Bubbleman)
+	.db $87, $89, $8B, $8C
 	.db $8E, $92, $93, $96, $96, $9B
 ;8063
 ;時間停止中のボスの処理
@@ -101,6 +109,20 @@ DoBossBehaviour_Stopping:
 ;Airman:
 	.include "src/obj/airman.asm"
 
+;84FB
+;ウッドマン
+;Woodman:
+	.include "src/obj/woodman.asm"
+
+;8655
+;バブルマン
+;Bubbleman:
+	.include "src/obj/bubbleman.asm"
+
+;879E
+;クイックマン
+;Quickman:
+;	.include "src/obj/quickman.asm"
 
 	.org $9FD3
 BossBehaviour_Dying:
@@ -401,7 +423,7 @@ BossBehaviour_FaceTowards:
 BossBehaviour_CheckExistence:
 	sta <$00
 	ldy #$0F
-.loop2
+BossBehaviour_CheckExistenceSpecified:
 	lda <$00
 .loop
 	cmp aObjAnim10,y
@@ -414,7 +436,7 @@ BossBehaviour_CheckExistence:
 	lda aObjFlags10,y
 	bmi .found
 	dey
-	bpl .loop2
+	bpl BossBehaviour_CheckExistenceSpecified
 	sec
 	rts
 .found
@@ -452,8 +474,8 @@ BossBehaviour_WallCollisionY:
 	adc #$00
 	sta <.r
 	jsr PickupMap_BossBank
-	ldy <.res
-	lda Table_BossTerrainBlockFlag,y
+	lda <.res
+	and #$08
 	sta <.dy
 	sec
 	lda aObjX + 1
@@ -463,8 +485,8 @@ BossBehaviour_WallCollisionY:
 	sbc #$00
 	sta <.r
 	jsr PickupMap_BossBank
-	ldy <.res
-	lda Table_BossTerrainBlockFlag,y
+	lda <.res
+	and #$08
 	ora <.dy
 	sta <.res
 	beq .nohit_y
@@ -533,8 +555,8 @@ BossBehaviour_WallCollisionXY:
 .write_dx
 	sta <.r
 	jsr PickupMap_BossBank
-	ldy <.res
-	lda Table_BossTerrainBlockFlag,y
+	lda <.res
+	and #$08
 	sta <$03
 	beq .nohit_x
 	plp
@@ -567,8 +589,8 @@ BossBehaviour_WallCollisionXY:
 
 ;A349
 ;壁フラグ
-Table_BossTerrainBlockFlag:
-	.db $00, $01, $00, $01, $00, $01, $01, $01, $01
+;Table_BossTerrainBlockFlag:
+;	.db $00, $01, $00, $01, $00, $01, $01, $01, $01
 
 ;A352
 ;敵番号Aを生成
