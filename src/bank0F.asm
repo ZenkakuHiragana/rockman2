@@ -453,13 +453,12 @@ ___MainRoutine_WhileDeath:
 	jsr SpriteSetup
 	lda <zWaterLevel
 	beq .isntwater
-	inc <zWaterWait
-	cmp <zWaterWait
-	beq .lag
-	bcs .isntwater
+	dec <zWaterWait
+	bmi .lag
+	bpl .isntwater
 .lag
 	jsr FrameAdvanceWater
-	mSTZ <zWaterWait
+	mMOV #WaterLagInterval, <zWaterWait
 .isntwater
 	.ifndef ___NORTS
 	jsr FrameAdvance1C
@@ -551,6 +550,8 @@ DoPaletteAnimation:
 	jsr ChangeBank
 	ldy #$00
 .loop
+	lda aPaletteOverride,y
+	bpl .skip
 	lda <zStage
 	and #$08
 	bne .wily
@@ -978,14 +979,12 @@ SpawnBoss_Loop_Begin:
 	jsr SpriteSetup
 	lda <zWaterLevel
 	beq .nolag
-	inc <zWaterWait
-	cmp <zWaterWait
-	beq .lag
-	bcs .nolag
+	dec <zWaterWait
+	bmi .lag
+	bpl .nolag
 .lag
 	jsr FrameAdvanceWater
-	lda #$00
-	sta <zWaterWait
+	mMOV #WaterLagInterval, <zWaterWait
 .nolag
 	jsr FrameAdvance1C
 	lda <zBossBehaviour
@@ -2480,9 +2479,9 @@ PostSafeRemoveEnemy:
 	sec
 	rts
 .isitem
+	ldy aItemOrder,x
 	lda #$00
 	sta aItemOrder,x
-	ldy aItemLifeOffset,x
 	mMOV aObjLife,x, aItemLife,y
 	sec
 	rts
@@ -2571,8 +2570,8 @@ WallCollisionY:
 .isenemy_right
 	jsr PickupMap
 .result_right
-	ldy <.result
-	lda WallCollision_Terrain,y
+	lda <.result
+	and #$08
 	sta <$02
 	ldx <zObjIndex
 	sec
@@ -2590,8 +2589,8 @@ WallCollisionY:
 	jsr PickupMap
 .result_left
 	ldx <zObjIndex
-	ldy <.result
-	lda WallCollision_Terrain,y
+	lda <.result
+	and #$08
 	ora <$02
 	sta <.result
 	beq .inair
@@ -2673,8 +2672,8 @@ WallCollisionXY:
 	jsr PickupMap
 .result_h
 	ldx <zObjIndex
-	ldy <.result
-	lda WallCollision_Terrain,y
+	lda <.result
+	and #$08
 	sta <.res_h
 	beq .nohitwall
 	plp
@@ -2704,8 +2703,8 @@ WallCollisionXY:
 .nohitwall
 	plp
 	jmp WallCollisionY
-WallCollision_Terrain:
-	.db $00, $01, $00, $01, $00, $01, $01, $01, $01
+;WallCollision_Terrain:
+;	.db $00, $01, $00, $01, $00, $01, $01, $01, $01
 
 ;20 37 F1
 CreateEnemyHere:

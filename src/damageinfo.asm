@@ -73,10 +73,9 @@
 	inc <$01
 	lda aObjVar,x
 	bne .skip
+	ldy aItemOrder,x
 	lda #$FF
 	sta aItemOrder,x
-	lda aItemLifeOffset,x
-	tay
 	lda #$00
 	sta aItemLife,y
 .skip

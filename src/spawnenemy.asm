@@ -46,7 +46,8 @@
 	sec
 	lda Stage_DefItemsX - 1,y
 	sbc <zHScroll
-	bpl .inv_x_item
+	bit <zMoveVec
+	bvc .inv_x_item
 	eor #$FF
 .inv_x_item
 	ldx <$05
@@ -67,6 +68,7 @@
 	sec
 	lda Stage_DefItemsY - 1,y
 	sbc <zVScroll
+;	ldx aObjVY
 	bpl .inv_y_item
 	eor #$FF
 .inv_y_item
@@ -155,6 +157,7 @@
 	sec
 	lda Stage_DefEnemiesY - 1,y
 	sbc <zVScroll
+;	ldx aObjVY
 	bpl .inv_y
 	eor #$FF
 .inv_y
@@ -195,6 +198,7 @@
 	bne .writeobj
 .rts
 	mCHANGEBANK #$0E, 1
+;画像書き換え
 .writeobj
 	lda <zPPUHScr
 	ora <zPPUVScr
@@ -288,37 +292,40 @@ SpawnEnemy_RoomList:
 
 ;指定した画面内の敵を強制的に出現
 SpawnEnemiesAll:
-.ptr = $02
+.seek = $00
+.ptr = $01
+.room = $02
 .num = $03
 	lda <zStage
 	and #$07
 	jsr ChangeBank
-	
-	ldx <zRoom
-	ldy Stage_DefMap16,x
-	lda Stage_DefItemsAmount,y
+;アイテムの出現
+	ldy <zRoom
+	sty <.room
+	ldx Stage_DefMap16,y
+	lda Stage_DefItemsAmount,x
 	beq .skip_item
 	sta <.num
-	ldx Stage_DefItemsPtr,y
+	ldy Stage_DefItemsPtr,x
 .loop_item
-	stx <.ptr
-	lda Stage_DefItems - 1,y
-	jsr CreateEnemy
-	ldx <.ptr
-	inx
-	dec <.num
+	sty <.ptr
+	jsr CreateItem
+	ldy <.ptr
+	iny
 	dec <.num
 	bne .loop_item
 ;敵の出現
 .skip_item
-	ldx <zRoom
-	ldy Stage_DefMap16,x
-	lda Stage_DefEnemiesAmount,y
+	sta <$70
+	ldy <zRoom
+	sty <.room
+	ldx Stage_DefMap16,y
+	lda Stage_DefEnemiesAmount,x
 	beq .skip
 	sta <.num
-	ldx Stage_DefEnemiesPtr,y
+	ldy Stage_DefEnemiesPtr,x
 .loop
-	stx <.ptr
+	sty <.ptr
 	lda Stage_DefEnemies - 1,y
 	bpl .sendchr
 	jsr SpawnEnemy_SendCommand
@@ -326,8 +333,8 @@ SpawnEnemiesAll:
 .sendchr
 	jsr CreateEnemy
 .1
-	ldx <.ptr
-	inx
+	ldy <.ptr
+	iny
 	dec <.num
 	bne .loop
 .skip
@@ -394,7 +401,6 @@ CreateItem:
 	jsr GetEnemyPointer
 	bcs InvalidCreateObject
 	tya
-	sta aItemLifeOffset10,x
 	sta aItemOrder10,x
 	mMOV aItemLife,y, aObjLife10,x
 	mMOV <$02, aObjRoom10,x

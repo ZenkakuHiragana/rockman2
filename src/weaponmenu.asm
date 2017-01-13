@@ -70,9 +70,9 @@
 	ldx #$02
 .loop_blackout_gutstank
 	sta aPalette + $05,x
-	sta aPaletteAnimBuf + $05,x
-	sta aPaletteAnimBuf + $15,x
-	sta aPaletteAnimBuf + $25,x
+;	sta aPaletteAnimBuf + $05,x
+;	sta aPaletteAnimBuf + $15,x
+;	sta aPaletteAnimBuf + $25,x
 	dex
 	bpl .loop_blackout_gutstank
 .not_gutstank
@@ -357,9 +357,9 @@
 .loop_gutstank_palette
 	lda .table_gutstank_palette,x
 	sta aPalette + $05,x
-	sta aPaletteAnimBuf + $05,x
-	sta aPaletteAnimBuf + $15,x
-	sta aPaletteAnimBuf + $25,x
+;	sta aPaletteAnimBuf + $05,x
+;	sta aPaletteAnimBuf + $15,x
+;	sta aPaletteAnimBuf + $25,x
 	dex
 	bpl .loop_gutstank_palette
 .not_gutstank_endmenu

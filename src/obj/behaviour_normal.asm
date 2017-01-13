@@ -471,7 +471,7 @@ EN0A:
 	jsr PickupMap
 	ldx <zObjIndex
 	lda <$00
-	and #$01
+	and #$08
 	bne .hit
 	clc
 	lda <$0A
@@ -480,7 +480,7 @@ EN0A:
 	jsr PickupMap
 	ldx <zObjIndex
 	lda <$00
-	and #$01
+	and #$08
 	bne .done
 .hit
 	lda aObjFlags,x
@@ -969,7 +969,7 @@ EN13:
 ;9C90
 ;レーザー出現
 EN14:
-	sec
+	rts
 	lda aObjRoom,x
 	sbc #$03
 	tay
@@ -1442,9 +1442,11 @@ EN19:
 	bcs .notfound2
 	lda #%00000000
 	sta aObjFlags10,y
+	lda aItemOrder10,y
+	pha
 	lda #$FF
 	sta aItemOrder10,y
-	lda aItemLifeOffset10,y
+	pla
 	tay
 	lda #$00
 	sta aItemLife,y
@@ -3190,10 +3192,11 @@ Goblin_ChangePalette:
 .loop_changepalette
 	lda .palette,y
 	sta aPalette,x
-	sta aPaletteAnimBuf,x
-	sta aPaletteAnimBuf + $10,x
-	sta aPaletteAnimBuf + $20,x
-	sta aPaletteAnimBuf + $30,x
+	sta aPaletteOverride,x
+;	sta aPaletteAnimBuf,x
+;	sta aPaletteAnimBuf + $10,x
+;	sta aPaletteAnimBuf + $20,x
+;	sta aPaletteAnimBuf + $30,x
 	iny
 	inx
 	dec <$02
@@ -3218,9 +3221,9 @@ Goblin_dr:
 EN42:
 EN43:
 	lsr aObjFlags,x
+	ldy aItemOrder,x
 	lda #$FF
 	sta aItemOrder,x
-	ldy aItemLifeOffset,x
 	lda #$00
 	sta aItemLife,y
 	sec

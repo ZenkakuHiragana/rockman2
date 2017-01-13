@@ -460,17 +460,17 @@ WritePPUSquare:
 
 ;20 DC D1
 WritePPULinear:
-	lda aPPULinearhi
-	sta $2006
-	lda aPPULinearlo
-	sta $2006
+	mMOV aPPULinearhi, $2006
+	mMOV aPPULinearlo, $2006
 	ldx #$00
+	ldy <zPPULinear
 .loop
 	lda aPPULinearData,x
 	sta $2007
 	inx
-	dec <zPPULinear
+	dey
 	bne .loop
+	sty <zPPULinear
 	rts
 
 ;20 F6 D1

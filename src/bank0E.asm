@@ -135,6 +135,12 @@ StartStage_Continue:
 	sta <zPaletteIndex
 	sta <zPaletteTimer
 	sta <zBossBehaviour
+	ldx #$0F
+.loop_override
+	lda #$FF
+	sta aPaletteOverride,x
+	dex
+	bpl .loop_override
 	sec
 	lda <zRoom
 	sbc #$02
@@ -209,13 +215,12 @@ MainLoop:
 .scroll
 	lda <zWaterLevel
 	beq .nolag
-	inc <zWaterWait
-	cmp <zWaterWait
-	beq .lag
-	bcs .nolag
+	dec <zWaterWait
+	bmi .lag
+	bpl .nolag
 .lag
 	jsr FrameAdvanceWater
-	mSTZ <zWaterWait
+	mMOV #WaterLagInterval, <zWaterWait
 .nolag
 	jsr FrameAdvance1C
 	jmp MainLoop
@@ -297,14 +302,12 @@ MainLoopBossRush:
 .scroll
 	lda <zWaterLevel
 	beq .nolag
-	inc <zWaterWait
-	cmp <zWaterWait
-	beq .lag
-	bcs .nolag
+	dec <zWaterWait
+	bmi .lag
+	bpl .nolag
 .lag
 	jsr FrameAdvanceWater
-	lda #$00
-	sta <zWaterWait
+	mMOV #WaterLagInterval, <zWaterWait
 .nolag
 	jsr FrameAdvance1C
 	jmp .loop
@@ -325,16 +328,28 @@ Rockman_Warp_to_Land:
 	mMOV #$1A, aObjAnim
 .loop
 	mSTZ aObjWait, aObjFrame
+	mMOV aObjX, <$08
+	mMOV aObjRoom, <$09
 	clc
 	lda aObjY
 	adc #$10
 	sta aObjY
-	adc #$10
-	cmp #$80
-	bcc .skip
 	sta <$0A
-	mMOV aObjX, <$08
-	mMOV aObjRoom, <$09
+	jsr PickupBlock
+	lda <$00
+	and #$08
+	bne .skip
+	lda <$0A
+	adc #$10
+	sta <$0A
+	cmp #$F0
+	bcc .carry
+	adc #$0F
+	sta <$0A
+	lda <$09
+	adc #$0F
+	sta <$09
+.carry
 	jsr PickupBlock
 	lda <$00
 	and #$08
@@ -348,7 +363,7 @@ Rockman_Warp_to_Land:
 	mSTZ <zStatus, <zSliplo, <zSliphi
 	mMOV #$40, <zMoveVec
 	mMOV #$FF, aObjVY
-	rts
+	mJSR_NORTS SpawnEnemiesAll
 	
 ;8278
 ;スクロール方向$37 - 1 = 0, 1, 2, 3 → 左右上下
@@ -608,10 +623,10 @@ Item_SetBossRushBG:
 .loop
 	lda Table_BossRushBGColor,x
 	sta aPalette + $09,y
-	sta aPaletteAnimBuf + $09,y
-	sta aPaletteAnimBuf + $19,y
-	sta aPaletteAnimBuf + $29,y
-	sta aPaletteAnimBuf + $39,y
+;	sta aPaletteAnimBuf + $09,y
+;	sta aPaletteAnimBuf + $19,y
+;	sta aPaletteAnimBuf + $29,y
+;	sta aPaletteAnimBuf + $39,y
 	dex
 	dey
 	bpl .loop
@@ -838,7 +853,7 @@ Table_ShutterStart:
 ;906F
 ;ボスの居る画面数
 Table_BossRoom:
-	.db $63, $43, $5F, $15, $17, $13, $15, $13
+	.db $63, $43, $5F, $61, $17, $13, $15, $13
 	.db $00, $27, $27, $26, $00, $1F
 
 ;907D
@@ -957,10 +972,10 @@ PaletteChange_RightScroll:
 .loop
 	lda .data,x
 	sta aPalette,y
-	sta aPaletteAnimBuf,y
-	sta aPaletteAnimBuf + $10,y
-	sta aPaletteAnimBuf + $20,y
-	sta aPaletteAnimBuf + $30,y
+;	sta aPaletteAnimBuf,y
+;	sta aPaletteAnimBuf + $10,y
+;	sta aPaletteAnimBuf + $20,y
+;	sta aPaletteAnimBuf + $30,y
 	dex
 	dey
 	dec <$FD

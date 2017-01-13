@@ -211,3 +211,20 @@ en\8:
 	inc_en 70, 71, 72, 73, 74, 75, 76, 77
 	inc_en 78, 79, 7A, 7B, 7C, 7D, 7E, 7F
 	
+;アニメーションのポインタの修正
+;F900
+	.org Table_AnimationPointerEnemy_Low + $4D
+	.db LOW(en35)
+	.org Table_AnimationPointerEnemy_Low + $52
+	.db LOW(en50)
+	.org Table_AnimationPointerEnemy_Low + $57
+	.db LOW(en2F)
+	.org Table_AnimationPointerEnemy_Low + $67
+	.db LOW(en1C)
+	.org Table_AnimationPointerEnemy_High + $67
+	.db HIGH(en1C)
+	.org Table_AnimationPointerEnemy_Low + $6F
+	.db LOW(en35)
+	.org Table_AnimationPointerEnemy_High + $6F
+	.db HIGH(en35)
+

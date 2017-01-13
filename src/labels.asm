@@ -247,8 +247,8 @@ aEnemyFlash = $100      ;敵の被弾時のフラッシュ情報
 aEnemyFlash10 = $110
 aEnemyVar = $110       ;敵の汎用変数
 aEnemyVar10 = $120
-aItemLifeOffset = $110  ;アイテムのライフのためのポインタ
-aItemLifeOffset10 = $120
+;aItemLifeOffset = $110  ;アイテムのライフのためのポインタ
+;aItemLifeOffset10 = $120
 
 aItemOrder = $120       ;アイテム順序番号
 aItemOrder10 = $130
@@ -281,7 +281,8 @@ aPaletteAnim = $720     ;パレットアニメーション枚数
 aPaletteAnimWait = $721 ;パレットアニメーション速さ
 aPalette = $722         ;現在のパレット
 aPaletteSpr = $732      ;現在のスプライトのパレット
-aPaletteAnimBuf = $742  ;パレットアニメーションのバッファ
+;aPaletteAnimBuf = $742  ;パレットアニメーションのバッファ
+aPaletteOverride = $742 ;パレット上書き情報
 
 aPPULinearhi = $3B6     ;PPU線形書き込み上位
 aPPULinearlo = $3B7     ;PPU線形書き込み下位
@@ -620,3 +621,5 @@ BREAK_VECTOR = $FFFE
 SpawnEnemyBoundaryX = $04
 SpawnEnemyBoundaryY = $08
 
+;水中ラグの間隔
+WaterLagInterval = $03

@@ -1197,7 +1197,7 @@ Table_WallCheckY_dr:
 	.db $00, $FF
 ;8CF1
 Table_ConveyorFlag:
-	.db $01, $02, $80
+	.db $02, $01, $80
 
 ;8CF4
 ;アイテム、敵リフトの着地判定
@@ -1368,7 +1368,7 @@ DoRockman_DoScroll:
 	sec
 	sbc <zHScroll
 	sec
-	bit aObjFlags
+	bit <zMoveVec
 	bvc .scroll_left
 ;右スクロール
 	sbc #$78
