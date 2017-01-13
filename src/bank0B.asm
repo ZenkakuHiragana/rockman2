@@ -101,6 +101,20 @@ DoBossBehaviour_Stopping:
 ;Airman:
 	.include "src/obj/airman.asm"
 
+;84FB
+;ウッドマン
+;Woodman:
+	.include "src/obj/woodman.asm"
+
+;8655
+;バブルマン
+;Bubbleman:
+	.include "src/obj/bubbleman.asm"
+
+;879E
+;クイックマン
+;Quickman:
+;	.include "src/obj/quickman.asm"
 
 	.org $9FD3
 BossBehaviour_Dying:
@@ -401,7 +415,7 @@ BossBehaviour_FaceTowards:
 BossBehaviour_CheckExistence:
 	sta <$00
 	ldy #$0F
-.loop2
+BossBehaviour_CheckExistenceSpecified:
 	lda <$00
 .loop
 	cmp aObjAnim10,y
@@ -414,7 +428,7 @@ BossBehaviour_CheckExistence:
 	lda aObjFlags10,y
 	bmi .found
 	dey
-	bpl .loop2
+	bpl BossBehaviour_CheckExistenceSpecified
 	sec
 	rts
 .found
