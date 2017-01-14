@@ -114,7 +114,27 @@ DoBossBehaviour_Stopping:
 ;879E
 ;クイックマン
 ;Quickman:
-;	.include "src/obj/quickman.asm"
+	.include "src/obj/quickman.asm"
+
+;8956
+;フラッシュマン
+;Flashman:
+	.include "src/obj/flashman.asm"
+
+;8B20
+;メタルマン
+;Metalman:
+	.include "src/obj/metalman.asm"
+
+;8CC3
+;クラッシュマン
+;Crashman:
+	.include "src/obj/crashman.asm"
+
+;8E10
+;メカドラゴン
+;MechDragon:
+;	.include "src.obj/mechdragon.asm"
 
 	.org $9FD3
 BossBehaviour_Dying:
@@ -636,6 +656,8 @@ BossBehaviour_SetVelocityAtRockman:
 .inv_x
 	sta <$00
 	.endif
+;A3A3
+BossBehaviour_SetVelocityAtRockman_Writedx:
 	lda aObjFlags,x
 	and #%10111111
 	sta aObjFlags,x
