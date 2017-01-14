@@ -35,12 +35,26 @@ Table_TimeStopperBossDamageAmount:
 ;8047
 ;ボスの挙動アドレス下位
 Table_BossBehaviourlo:
-	.db LOW(Heatman), $E3, $FB, $56, $9E, $56, $20, $C3
+	.db LOW(Heatman)
+	.db LOW(Airman)
+	.db LOW(Woodman)
+	.db LOW(Bubbleman)
+	.db LOW(Quickman)
+	.db LOW(Flashman)
+	.db LOW(Metalman)
+	.db LOW(Crashman)
 	.db $10, $13, $9B, $6E, $C0, $2A
 ;8045
 ;ボスの挙動アドレス上位
 Table_BossBehaviourhi:
-	.db HIGH(Heatman), $82, $84, $86, $87, $89, $8B, $8C
+	.db HIGH(Heatman)
+	.db HIGH(Airman)
+	.db HIGH(Woodman)
+	.db HIGH(Bubbleman)
+	.db HIGH(Quickman)
+	.db HIGH(Flashman)
+	.db HIGH(Metalman)
+	.db HIGH(Crashman)
 	.db $8E, $92, $93, $96, $96, $9B
 ;8063
 ;時間停止中のボスの処理
