@@ -1449,7 +1449,7 @@ EN19:
 	pla
 	tay
 	lda #$00
-	sta aItemLife,y
+	sta aItemLife - 1,y
 	beq .loop_wall
 .notfound2
 	sta aEnemyOrder,x
@@ -3225,7 +3225,7 @@ EN43:
 	lda #$FF
 	sta aItemOrder,x
 	lda #$00
-	sta aItemLife,y
+	sta aItemLife - 1,y
 	sec
 	lda aObjAnim,x
 	sbc #$42

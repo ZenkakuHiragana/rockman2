@@ -2481,8 +2481,8 @@ PostSafeRemoveEnemy:
 .isitem
 	ldy aItemOrder,x
 	lda #$00
-	sta aItemOrder,x
-	mMOV aObjLife,x, aItemLife,y
+	sta aItemOrder - 1,x
+	mMOV aObjLife,x, aItemLife - 1,y
 	sec
 	rts
 

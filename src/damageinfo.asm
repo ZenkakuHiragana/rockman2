@@ -77,7 +77,7 @@
 	lda #$FF
 	sta aItemOrder,x
 	lda #$00
-	sta aItemLife,y
+	sta aItemLife - 1,y
 .skip
 	rts
 

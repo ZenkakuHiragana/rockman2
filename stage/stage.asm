@@ -19,3 +19,6 @@
 	
 	mBEGIN $06, $8000
 	.incbin "stage/metalman.bin"
+	
+	mBEGIN $07, $8000
+	.incbin "stage/crashman.bin"
