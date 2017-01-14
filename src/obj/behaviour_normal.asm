@@ -3659,6 +3659,8 @@ EN4C:
 ;B2F0
 ;スナイパーアーマー
 EN4E:
+	lda aEnemyOrder,x
+	sta <$0F
 	lda aEnemyVar,x
 	bne .1
 	lda aObjVar,x
@@ -3779,7 +3781,8 @@ EN4E:
 	jmp .destroyed
 .rts2
 	rts
-.destroyed ;破壊時の処理
+;破壊時の処理
+.destroyed
 	lda aObjLife,x
 	bne .rts2
 	lda #$4F
@@ -3787,6 +3790,8 @@ EN4E:
 	bcs .rts2
 	lda #$7E
 	sta aObjVar10,y
+	lda <$0F
+	sta aEnemyOrder10,y
 	rts
 .vylo
 	.db $6A, $A0, $88, $12, $58

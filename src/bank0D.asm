@@ -811,18 +811,27 @@ Opening_Skipped:
 
 ;A840
 ;$08~$09で示したマップアドレスからマップを読み込む
-WriteMapAddressOffScreen1A;
-	lda #$00
-	sta <zNTPointer
-	sta <zPPUSqr
+WriteMapAddressOffScreen1A:
+	sec
+	lda <zRoom
+	sbc #$02
+	sta <zRoom
+	mMOV #$80, <zHScroll
+	mSTZ <zVScroll
+	mMOV #$20, <$FD
 .loop
+	mSTZ <$01, <$02
+	mMOV #$01, <$00
 	jsr WriteNameTableByScroll_AnyBank
-	inc <$08
-	inc <zNTPointer
-	jsr WriteNameTableByScroll_AnyBank
-	jsr WritePPUSquare1A
-	lda <$08
-	and #$3F
+	jsr WritePPUScroll
+	clc
+	lda <zHScroll
+	adc #$08
+	bcc .carry_nt
+	inc <zRoom
+.carry_nt
+	sta <zHScroll
+	dec <$FD
 	bne .loop
 	rts
 

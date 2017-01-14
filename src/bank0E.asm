@@ -68,6 +68,7 @@ Reset_Continue;
 StartStageSelect:
 	lda #$03
 	sta <zLives
+StartStageSelect_NoResetLives:
 	jsr ChangeBank_DoStageSelect
 ;8079
 ;ステージセレクト処理の後から
@@ -334,6 +335,8 @@ Rockman_Warp_to_Land:
 	lda aObjY
 	adc #$10
 	sta aObjY
+	cmp #$30
+	bcc .skip
 	sta <$0A
 	jsr PickupBlock
 	lda <$00
@@ -853,7 +856,7 @@ Table_ShutterStart:
 ;906F
 ;ボスの居る画面数
 Table_BossRoom:
-	.db $63, $43, $5F, $61, $17, $13, $15, $13
+	.db $63, $43, $5F, $61, $08, $8C, $43, $25
 	.db $00, $27, $27, $26, $00, $1F
 
 ;907D

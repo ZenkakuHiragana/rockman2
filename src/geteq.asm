@@ -9,9 +9,9 @@ ___Bank0D_BeginGetEquipment:
 	lda <zStage
 	pha
 	mMOV #$05, <zStage
-	mMOVW $8F40, <zPtr
+	mMOV #$F0, <zRoom
 	jsr WriteMapAddressOffScreen1A
-	mMOVW $8F80, <zPtr
+	mMOV #$F1, <zRoom
 	jsr WriteMapAddressOffScreen1A
 	pla
 	sta <zStage

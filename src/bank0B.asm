@@ -39,7 +39,10 @@ Table_BossBehaviourlo:
 	.db LOW(Airman)
 	.db LOW(Woodman)
 	.db LOW(Bubbleman)
-	.db $9E, $56, $20, $C3
+	.db LOW(Quickman)
+	.db LOW(Flashman)
+	.db LOW(Metalman)
+	.db LOW(Crashman)
 	.db $10, $13, $9B, $6E, $C0, $2A
 ;8045
 ;ボスの挙動アドレス上位
@@ -48,7 +51,10 @@ Table_BossBehaviourhi:
 	.db HIGH(Airman)
 	.db HIGH(Woodman)
 	.db HIGH(Bubbleman)
-	.db $87, $89, $8B, $8C
+	.db HIGH(Quickman)
+	.db HIGH(Flashman)
+	.db HIGH(Metalman)
+	.db HIGH(Crashman)
 	.db $8E, $92, $93, $96, $96, $9B
 ;8063
 ;時間停止中のボスの処理
@@ -122,7 +128,27 @@ DoBossBehaviour_Stopping:
 ;879E
 ;クイックマン
 ;Quickman:
-;	.include "src/obj/quickman.asm"
+	.include "src/obj/quickman.asm"
+
+;8956
+;フラッシュマン
+;Flashman:
+	.include "src/obj/flashman.asm"
+
+;8B20
+;メタルマン
+;Metalman:
+	.include "src/obj/metalman.asm"
+
+;8CC3
+;クラッシュマン
+;Crashman:
+	.include "src/obj/crashman.asm"
+
+;8E10
+;メカドラゴン
+;MechDragon:
+;	.include "src.obj/mechdragon.asm"
 
 	.org $9FD3
 BossBehaviour_Dying:
@@ -474,8 +500,8 @@ BossBehaviour_WallCollisionY:
 	adc #$00
 	sta <.r
 	jsr PickupMap_BossBank
-	lda <.res
-	and #$08
+	ldy <.res
+	lda Table_BossTerrainBlockFlag,y
 	sta <.dy
 	sec
 	lda aObjX + 1
@@ -485,8 +511,8 @@ BossBehaviour_WallCollisionY:
 	sbc #$00
 	sta <.r
 	jsr PickupMap_BossBank
-	lda <.res
-	and #$08
+	ldy <.res
+	lda Table_BossTerrainBlockFlag,y
 	ora <.dy
 	sta <.res
 	beq .nohit_y
@@ -555,8 +581,8 @@ BossBehaviour_WallCollisionXY:
 .write_dx
 	sta <.r
 	jsr PickupMap_BossBank
-	lda <.res
-	and #$08
+	ldy <.res
+	lda Table_BossTerrainBlockFlag,y
 	sta <$03
 	beq .nohit_x
 	plp
@@ -589,8 +615,8 @@ BossBehaviour_WallCollisionXY:
 
 ;A349
 ;壁フラグ
-;Table_BossTerrainBlockFlag:
-;	.db $00, $01, $00, $01, $00, $01, $01, $01, $01
+Table_BossTerrainBlockFlag:
+	.db $00, $01, $00, $01, $00, $01, $01, $01, $01
 
 ;A352
 ;敵番号Aを生成
@@ -644,6 +670,8 @@ BossBehaviour_SetVelocityAtRockman:
 .inv_x
 	sta <$00
 	.endif
+;A3A3
+BossBehaviour_SetVelocityAtRockman_Writedx:
 	lda aObjFlags,x
 	and #%10111111
 	sta aObjFlags,x

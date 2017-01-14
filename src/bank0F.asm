@@ -334,7 +334,7 @@ DieBoss:
 	lda <zClearFlags
 	cmp #$FF
 	beq .gotowily
-	jmp $8076 ;------------------------
+	jmp StartStageSelect_NoResetLives
 .gotowily
 	mMOV #$07, <zStage
 .iswily
@@ -347,7 +347,7 @@ DieBoss:
 	lda #$0E
 	jmp Reset_JMP
 .isnotwily7
-	jmp $8079 ;------------------------
+	jmp StartStage_All
 
 ;C279
 StageBitTable:
