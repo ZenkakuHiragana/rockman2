@@ -653,15 +653,13 @@ LoadStageGraphics:
 ;背景画像読み込み
 LoadGraphicsLZ77:
 .buffer = $300
-.bufferptr = $08
-.bufferptrhi = $09
+.bufferptr = $09
 .ptr = $0A
 .ptrhi = $0B
 .op = $0C
 .amount = $0D
 	ldy #$00
 	sty <.bufferptr
-	sty <.bufferptrhi
 .loop_bg
 	lda [.ptr],y
 	cmp #$FF
