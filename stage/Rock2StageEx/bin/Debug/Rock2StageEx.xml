@@ -62,6 +62,18 @@ Rock2StageEx
 	<summary>ファイルのパスです。</summary>
 </member><member name="F:Rock2StageEx.Form1.TimeStamp">
 	<summary>ファイルの最終書き込み日時です。</summary>
+</member><member name="F:Rock2StageEx.Form1.ChrFilePath">
+	<summary>CHRファイルのパスです。</summary>
+</member><member name="F:Rock2StageEx.Form1.ChrTimeStamp">
+	<summary>CHRファイルの最終書き込み日時です。</summary>
+</member><member name="F:Rock2StageEx.Form1.CommonChrFilePath">
+	<summary>共有CHRファイルのパスです。</summary>
+</member><member name="F:Rock2StageEx.Form1.CommonChrTimeStamp">
+	<summary>共有CHRファイルの最終書き込み日時です。</summary>
+</member><member name="F:Rock2StageEx.Form1.SizeCommonChr">
+	<summary>共有CHRファイルのサイズです。</summary>
+</member><member name="F:Rock2StageEx.Form1.ClipScr">
+	<summary>タイル情報を記憶するクリップボードです。</summary>
 </member><member name="M:Rock2StageEx.Form1.SetObjectSelection(System.UInt32,System.UInt32,System.UInt32,System.Drawing.Point)">
 	<summary>
  選択したオブジェクトの情報をセットします。

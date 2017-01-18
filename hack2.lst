@@ -1,5 +1,68 @@
 #[1]   hack2.asm
- 1905  1E:CCC4            PickupMap:
+  636                     ;閭梧勹逕ｻ蜒剰ｪｭ縺ｿ霎ｼ縺ｿ
+  637           0008      .count = $08
+  638           0009      .counthi = $09
+  639           000C      .op = $0C
+  640           000D      .amount = $0D
+  641           000E      .bufferptr = $0E
+  642           0300      .buffer = $300
+  643  1E:184B                    mMOV #$A0, <.ptrhi
+  644  1E:C4BE  A0 00             ldy #$00
+  645  1E:C4C0  84 08             sty <.count
+  646  1E:C4C2  84 09             sty <.counthi
+  647  1E:C4C4  84 0E             sty <.bufferptr
+  648  1E:C4C6            .loop_bg
+  649  1E:C4C6  B1 0A             lda [.ptr],y
+  650  1E:C4C8  85 0C             sta <.op
+  651  1E:C4CA  C8                iny
+  652  1E:C4CB  29 3F             and #$3F
+  653  1E:C4CD  85 0D             sta <.amount
+  654                     ;騾｣邯壹ョ繝ｼ繧ｿ譖ｸ縺崎ｾｼ縺ｿ/髱槫悸邵ｮ譖ｸ縺崎ｾｼ縺ｿ
+  655  1E:C4CF            .loop_continuous
+  656  1E:C4CF  24 0C             bit <.op
+  657  1E:C4D1  50 1B             bvc .write_ptr ;菴ｿ縺・屓縺玲嶌縺崎ｾｼ縺ｿ縺ｮ譎・
+  658  1E:C4D3  38                sec
+  659  1E:C4D4  AD 0E 00          lda .bufferptr
+  660  1E:C4D7  F1 0A             sbc [.ptr],y
+  661  1E:C4D9  AA                tax
+  662  1E:C4DA  38                sec
+  663  1E:C4DB  A5 0C             lda <.op
+  664  1E:C4DD  29 3F             and #$3F
+  665  1E:C4DF  E5 0D             sbc <.amount
+  666  1E:C4E1  85 00             sta <$00
+  667  1E:C4E3  8A                txa
+  668  1E:C4E4  18                clc
+  669  1E:C4E5  65 00             adc <$00
+  670  1E:C4E7  AA                tax
+  671  1E:C4E8  BD 00 03          lda .buffer,x
+  672  1E:C4EB  4C F0 C4          jmp .write
+  673  1E:C4EE            .write_ptr
+  674  1E:C4EE  B1 0A             lda [.ptr],y
+  675  1E:C4F0            .write
+  676  1E:C4F0  8D 07 20          sta $2007
+  677  1E:C4F3  A6 0E             ldx <.bufferptr
+  678  1E:C4F5  9D 00 03          sta .buffer,x
+  679                             
+  680  1E:C4F8  A5 0C             lda <.op ;騾｣邯壹ョ繝ｼ繧ｿ譖ｸ縺崎ｾｼ縺ｿ縺ｮ譎ゅ（ny繧堤怐逡･
+  681  1E:C4FA  10 05             bpl .skip_incptr
+  682  1E:C4FC  C8                iny
+  683  1E:C4FD  D0 02             bne .skip_incptr
+  684  1E:C4FF  E6 0B             inc <.ptrhi
+  685  1E:C501            .skip_incptr
+  686                     
+  687  1E:C501  E6 08             inc <.count ;譖ｸ縺崎ｾｼ縺ｿ驥上き繧ｦ繝ｳ繝・邨らｫｯ譁・ｭ励ｒ謖・ｮ壹☆繧後・縺・＞縺ｮ縺ｫ
+  688  1E:C503  D0 08             bne .carry_count
+  689  1E:C505  E6 09             inc <.counthi
+  690  1E:C507  A5 09             lda <.counthi
+  691  1E:C509  C9 10             cmp #$10
+  692  1E:C50B  B0 08             bcs .end
+  693  1E:C50D            .carry_count
+  694                     
+  695  1E:C50D  E6 0E             inc <.bufferptr
+  696  1E:C50F  C6 0D             dec <.amount
+  697  1E:C511  10 BC             bpl .loop_continuous
+  698  1E:C513  30 B1             bmi .loop_bg
+  699  1E:C515            .end
 #[3]   src/sprites.asm
 #[2]   src/bank0F.asm
 #[3]   src/NMI.asm

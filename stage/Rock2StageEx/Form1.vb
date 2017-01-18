@@ -127,6 +127,18 @@ Public Class Form1
     Dim BinFilePath As String
     ''' <summary>ファイルの最終書き込み日時です。</summary>
     Dim TimeStamp As Date
+    ''' <summary>CHRファイルのパスです。</summary>
+    Dim ChrFilePath As String
+    ''' <summary>CHRファイルの最終書き込み日時です。</summary>
+    Dim ChrTimeStamp As Date
+    ''' <summary>共有CHRファイルのパスです。</summary>
+    Dim CommonChrFilePath As String
+    ''' <summary>共有CHRファイルの最終書き込み日時です。</summary>
+    Dim CommonChrTimeStamp As Date
+    ''' <summary>共有CHRファイルのサイズです。</summary>
+    Dim SizeCommonChr As UInteger
+    ''' <summary>タイル情報を記憶するクリップボードです。</summary>
+    Dim ClipScr, Clip32, Clip16 As UInteger
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         For i As UInteger = 0 To &H4000 - 1
@@ -190,6 +202,9 @@ Public Class Form1
         focus32 = 0
         focus16 = 0
         focus8 = 0
+        ClipScr = 0
+        Clip32 = 0
+        Clip16 = 0
         tile_attr = 0
         flags_selected = 0
         ComboBox_attr.SelectedIndex = 0
@@ -221,6 +236,54 @@ Public Class Form1
     End Sub
 
     Private Sub OpenStageData(ByVal path As String)
+
+        For i As UInteger = 0 To SizeBG - 1
+            bg(i) = 0
+        Next
+
+        CommonChrFilePath = IO.Path.GetDirectoryName(path) & "\chr\common.chr"
+        If Not Directory.Exists(IO.Path.GetDirectoryName(path) & "\chr") Then
+            CommonChrFilePath = IO.Path.GetDirectoryName(path) & "\common.chr"
+        End If
+
+        Try
+            Dim f As New FileStream(CommonChrFilePath, FileMode.Open, FileAccess.ReadWrite)
+            TimeStamp = File.GetLastWriteTime(CommonChrFilePath)
+            SizeCommonChr = f.Length
+            Dim b(SizeCommonChr) As Byte
+            f.Read(b, 0, f.Length)
+            f.Close()
+
+            For i As UInteger = 0 To SizeCommonChr
+                bg(i) = b(i)
+            Next
+        Catch ex As DirectoryNotFoundException
+        Catch ex As FileNotFoundException
+            MessageBox.Show("Common CHR File not found.", "", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+            Exit Sub
+        End Try
+
+        If IO.Path.GetExtension(path) = ".chr" Then
+            Try
+                Dim f As New FileStream(path, FileMode.Open, FileAccess.ReadWrite)
+                ChrTimeStamp = File.GetLastWriteTime(path)
+                Dim b(f.Length - 1) As Byte
+                f.Read(b, 0, f.Length)
+
+                For i As UInteger = SizeCommonChr To f.Length + SizeCommonChr - 1
+                    If i > &H1000 Then Exit For
+                    bg(i) = b(i - SizeCommonChr)
+                Next
+                f.Close()
+            Catch ex As FileNotFoundException
+                MessageBox.Show("CHR File not found.", "", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+            End Try
+            ChrFilePath = path
+            RefreshAll()
+
+            Exit Sub
+        End If
+
         If Not TimerStats Is Nothing Then TimerStats.Dispose()
 
         Try
@@ -236,9 +299,25 @@ Public Class Form1
         BinFilePath = path
 
         For i As UInteger = 0 To SizeBG - 1
-            bg(i) = testfile(AddrBG + i)
             room(i) = testfile(AddrRoom + i)
         Next
+
+        ChrFilePath = IO.Path.GetDirectoryName(path) & "\chr\" & IO.Path.GetFileNameWithoutExtension(path) & ".chr"
+        Try
+            Dim f As New FileStream(ChrFilePath, FileMode.Open, FileAccess.ReadWrite)
+            ChrTimeStamp = File.GetLastWriteTime(ChrFilePath)
+            Dim b(f.Length - 1) As Byte
+            f.Read(b, 0, f.Length)
+
+            For i As UInteger = SizeCommonChr To f.Length + SizeCommonChr - 1
+                If i > &H1000 Then Exit For
+                bg(i) = b(i - SizeCommonChr)
+            Next
+            f.Close()
+        Catch ex As FileNotFoundException
+            MessageBox.Show("CHR File not found.", "", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+        End Try
+        ChrTimeStamp = File.GetLastWriteTime(ChrFilePath)
 
         For i As UInteger = 0 To SizeTile16x16 - 1
             tile(i) = testfile(AddrTile16x16 + i)
@@ -629,46 +708,61 @@ Public Class Form1
 
         '位置情報を取得したら、選択や書き込みなどの処理へ
         If numroom < &H40 Then
-            If Radio_EditTerrain.Checked Then
-                '地形編集モード| 右クリック: 選択, 左クリック: 書き込み
-                If e.Button = Windows.Forms.MouseButtons.Right Then
-                    focus32 = room(numroom * &H40 + selected)
-                    DrawP32Focus(p32focus)
-                    RefreshP32Focus()
-                ElseIf e.Button = MouseButtons.Left Then
-                    room(numroom * &H40 + selected) = focus32
-                    DrawScr(scr)
-                    scr.Refresh()
+            If (Control.ModifierKeys And Keys.Control) = Keys.Control Then
+                If e.Button = MouseButtons.Left Then
+                    For i As UInteger = 0 To &H3F
+                        room(numroom * &H40 + i) = room(ClipScr * &H40 + i)
+                    Next
+
+                    EnemiesArray(numroom).Clear()
+                    For Each o As EnemiesStructure In EnemiesArray(ClipScr)
+                        EnemiesArray(numroom).Add(o)
+                    Next
+                ElseIf e.Button = MouseButtons.Right Then
+                    ClipScr = numroom
                 End If
             Else
-                If e.Button = MouseButtons.Left Then
-                    '敵編集モード| 左クリック: オブジェクト選択
+                If Radio_EditTerrain.Checked Then
+                    '地形編集モード| 右クリック: 選択, 左クリック: 書き込み
+                    If e.Button = MouseButtons.Right Then
+                        focus32 = room(numroom * &H40 + selected)
+                        DrawP32Focus(p32focus)
+                        RefreshP32Focus()
+                    ElseIf e.Button = MouseButtons.Left Then
+                        room(numroom * &H40 + selected) = focus32
+                        DrawScr(scr)
+                        scr.Refresh()
+                    End If
+                Else
+                    If e.Button = MouseButtons.Left Then
+                        '敵編集モード| 左クリック: オブジェクト選択
 
-                    Dim org As Point
-                    If obj_isenemy Then
-                        For Each en As EnemiesStructure In EnemiesArray(numroom)
-                            org = en.org
-                            org += New Point(quad.X * 256, quad.Y * 256)
-                            org -= New Point(16, 16)
-                            If e.X > org.X And e.Y > org.Y And e.X < org.X + 32 And e.Y < org.Y + 32 Then
-                                SetObjectSelection(numroom, EnemiesArray(numroom).IndexOf(en), en.type, en.org)
-                                DrawScr(scr)
-                                scr.Refresh()
-                                Exit For
-                            End If
-                        Next
-                    Else
-                        For Each it As EnemiesStructure In ItemsArray(numroom)
-                            org = it.org
-                            org += New Point(quad.X * 256, quad.Y * 256)
-                            org -= New Point(16, 16)
-                            If e.X > org.X And e.Y > org.Y And e.X < org.X + 32 And e.Y < org.Y + 32 Then
-                                SetObjectSelection(numroom, ItemsArray(numroom).IndexOf(it), it.type, it.org)
-                                DrawScr(scr)
-                                scr.Refresh()
-                                Exit For
-                            End If
-                        Next
+                        Dim org As Point
+                        If obj_isenemy Then
+                            For Each en As EnemiesStructure In EnemiesArray(numroom)
+                                org = en.org
+                                org += New Point(quad.X * 256, quad.Y * 256)
+                                org -= New Point(16, 16)
+                                If e.X > org.X And e.Y > org.Y And e.X < org.X + 32 And e.Y < org.Y + 32 Then
+                                    SetObjectSelection(numroom, EnemiesArray(numroom).IndexOf(en), en.type, en.org)
+                                    DrawScr(scr)
+                                    scr.Refresh()
+                                    Exit For
+                                End If
+                            Next
+                        Else
+                            For Each it As EnemiesStructure In ItemsArray(numroom)
+                                org = it.org
+                                org += New Point(quad.X * 256, quad.Y * 256)
+                                org -= New Point(16, 16)
+                                If e.X > org.X And e.Y > org.Y And e.X < org.X + 32 And e.Y < org.Y + 32 Then
+                                    SetObjectSelection(numroom, ItemsArray(numroom).IndexOf(it), it.type, it.org)
+                                    DrawScr(scr)
+                                    scr.Refresh()
+                                    Exit For
+                                End If
+                            Next
+                        End If
                     End If
                 End If
             End If
@@ -677,6 +771,14 @@ Public Class Form1
 
     'マップに32x32タイルを書き込み
     Private Sub scr_MouseMove(sender As Object, e As MouseEventArgs) Handles scr.MouseMove
+        If e.X < 0 And e.Y < 0 And e.X > sender.Size.Width And e.Y > sender.Size.Height Then
+            Exit Sub
+        End If
+
+        If (Control.ModifierKeys And Keys.Control) = Keys.Control Then
+            Exit Sub
+        End If
+
         If Radio_EditTerrain.Checked And (e.Button = MouseButtons.Left Or e.Button = MouseButtons.Right) Then
             Dim numroom, selected As UInteger
             Dim quad As Point '4分割した時、どこをクリックしたか
@@ -712,25 +814,39 @@ Public Class Form1
         Dim p As Point 'どのマスをクリックしたか
         p.X = Math.Floor(e.X / (sender.Size.Width / 16)) 'p = 0～15
         p.Y = Math.Floor(e.Y / (sender.Size.Width / 16))
-        If e.Button = MouseButtons.Left Then
+        If e.Button = MouseButtons.Left Then '32x32読み
 
-            focus32 = p.Y * 16 + p.X
-            DrawP32Focus(p32)
-            RefreshP32Focus()
-        Else
-            Dim bitmask() As UInteger = {3, &H30, &HC, &HC0}
-            Dim shift() As UInteger = {0, 4, 2, 6}
-            Dim selectedattr As UInteger
-            Dim selected32 As UInteger = p.Y * 16 + p.X
-            p.X = Math.Floor(e.X / (sender.Size.Width / 32)) 'p = 0～31
-            p.Y = Math.Floor(e.Y / (sender.Size.Width / 32))
-            p.X = p.X Mod 2
-            p.Y = p.Y Mod 2
+            If (Control.ModifierKeys And Keys.Control) = Keys.Control Then
+                For i As UInteger = 0 To 3
+                    chip((p.Y * 16 + p.X) * 4 + i) = chip(Clip32 * 4 + i)
+                Next
+                attr(p.Y * 16 + p.X) = attr(Clip32)
+                flag((p.Y * 16 + p.X) * 2) = flag(Clip32 * 2)
+                flag((p.Y * 16 + p.X) * 2 + 1) = flag(Clip32 * 2 + 1)
+            Else
+                focus32 = p.Y * 16 + p.X
+                DrawP32Focus(p32)
+                RefreshP32Focus()
+            End If
+        ElseIf e.Button = MouseButtons.Right Then '16x16読み
+            If (Control.ModifierKeys And Keys.Control) = Keys.Control Then
+                Clip32 = p.Y * 16 + p.X
+            Else
+                Dim bitmask() As UInteger = {3, &H30, &HC, &HC0}
+                Dim shift() As UInteger = {0, 4, 2, 6}
+                Dim selectedattr As UInteger
+                Dim selected32 As UInteger = p.Y * 16 + p.X
+                p.X = Math.Floor(e.X / (sender.Size.Width / 32)) 'p = 0～31
+                p.Y = Math.Floor(e.Y / (sender.Size.Width / 32))
+                p.X = p.X Mod 2
+                p.Y = p.Y Mod 2
 
-            focus16 = chip(selected32 * 4 + p.X * 2 + p.Y)
-            selectedattr = (attr(selected32) And bitmask(p.X * 2 + p.Y)) >> shift(p.X * 2 + p.Y)
+                focus16 = chip(selected32 * 4 + p.X * 2 + p.Y)
+                selectedattr = (attr(selected32) And bitmask(p.X * 2 + p.Y)) >> shift(p.X * 2 + p.Y)
+                tile_attr = (attr(selected32) And bitmask(p.X * 2 + p.Y)) >> shift(p.X * 2 + p.Y)
 
-            ReDraw16Focus()
+                ReDraw16Focus()
+            End If
         End If
     End Sub
 
@@ -769,24 +885,35 @@ Public Class Form1
         p.X = Math.Floor(e.X / (sender.Size.Width / 16)) 'p = 0～15
         p.Y = Math.Floor(e.Y / (sender.Size.Width / 16))
 
-        If e.Button = MouseButtons.Left Then
-            focus16 = p.Y * 16 + p.X
-            RefreshAll()
+        If e.Button = MouseButtons.Left Then '16x16読み
 
-            DrawP16Focus(p16focus)
-            p16focus.Refresh()
-            DrawP16Focus(p3216focus)
-            p3216focus.Refresh()
-        Else
-            Dim selected16 As UInteger = p.Y * 16 + p.X
-            p.X = Math.Floor(e.X / (sender.Size.Width / 32)) 'p = 0～31
-            p.Y = Math.Floor(e.Y / (sender.Size.Width / 32))
-            p.X = p.X Mod 2
-            p.Y = p.Y Mod 2
+            If (Control.ModifierKeys And Keys.Control) = Keys.Control Then
+                For i As UInteger = 0 To 3
+                    tile((p.Y * 16 + p.X) * 4 + i) = tile(Clip16 * 4 + i)
+                Next
+            Else
+                focus16 = p.Y * 16 + p.X
+                RefreshAll()
 
-            focus8 = tile(selected16 * 4 + p.X * 2 + p.Y)
-            DrawP8Focus(p8focus)
-            p8focus.Refresh()
+                DrawP16Focus(p16focus)
+                p16focus.Refresh()
+                DrawP16Focus(p3216focus)
+                p3216focus.Refresh()
+            End If
+        ElseIf e.Button = MouseButtons.Right Then '8x8読み
+            If (Control.ModifierKeys And Keys.Control) = Keys.Control Then
+                Clip16 = p.Y * 16 + p.X
+            Else
+                Dim selected16 As UInteger = p.Y * 16 + p.X
+                p.X = Math.Floor(e.X / (sender.Size.Width / 32)) 'p = 0～31
+                p.Y = Math.Floor(e.Y / (sender.Size.Width / 32))
+                p.X = p.X Mod 2
+                p.Y = p.Y Mod 2
+
+                focus8 = tile(selected16 * 4 + p.X * 2 + p.Y)
+                DrawP8Focus(p8focus)
+                p8focus.Refresh()
+            End If
         End If
     End Sub
 
@@ -984,35 +1111,27 @@ Public Class Form1
     End Sub
 
     Private Sub ButtonMapUp_Click(sender As Object, e As EventArgs) Handles ButtonMapUp.Click
-        If ViewOrigin.Y > 0 Then
-            ViewOrigin.Y -= 1
-            DrawScr(scr)
-            scr.Refresh()
-        End If
+        ViewOrigin.Y = (ViewOrigin.Y - 1) And &HF
+        DrawScr(scr)
+        scr.Refresh()
     End Sub
 
     Private Sub ButtonMapDown_Click(sender As Object, e As EventArgs) Handles ButtonMapDown.Click
-        If ViewOrigin.Y < 15 Then
-            ViewOrigin.Y += 1
-            DrawScr(scr)
-            scr.Refresh()
-        End If
+        ViewOrigin.Y = (ViewOrigin.Y + 1) And &HF
+        DrawScr(scr)
+        scr.Refresh()
     End Sub
 
     Private Sub ButtonMapLeft_Click(sender As Object, e As EventArgs) Handles ButtonMapLeft.Click
-        If ViewOrigin.X > 0 Then
-            ViewOrigin.X -= 1
-            DrawScr(scr)
-            scr.Refresh()
-        End If
+        ViewOrigin.X = (ViewOrigin.X - 1) And &HF
+        DrawScr(scr)
+        scr.Refresh()
     End Sub
 
     Private Sub ButtonMapRight_Click(sender As Object, e As EventArgs) Handles ButtonMapRight.Click
-        If ViewOrigin.X < 15 Then
-            ViewOrigin.X += 1
-            DrawScr(scr)
-            scr.Refresh()
-        End If
+        ViewOrigin.X = (ViewOrigin.X + 1) And &HF
+        DrawScr(scr)
+        scr.Refresh()
     End Sub
 
     Private Sub scr_MouseDown(sender As Object, e As MouseEventArgs) Handles scr.MouseDown
@@ -1277,6 +1396,15 @@ Public Class Form1
                                 MessageBoxDefaultButton.Button1) = DialogResult.Yes Then
                     OpenStageData(BinFilePath)
                 End If
+            End If
+        End If
+
+        If ChrFilePath <> "" Then
+            Dim t As Date = File.GetLastWriteTime(ChrFilePath)
+            Dim c As Integer = Date.Compare(ChrTimeStamp, t)
+            If c < 0 Then
+                ChrTimeStamp = File.GetLastWriteTime(ChrFilePath)
+                OpenStageData(ChrFilePath)
             End If
         End If
     End Sub

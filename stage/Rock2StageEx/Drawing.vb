@@ -233,7 +233,7 @@ Partial Public Class Form1
             SyncLock palette
                 For Xm As UInteger = 0 To 1
                     For Ym As UInteger = 0 To 1
-                        roomnum = map(((ViewOrigin.Y + Ym) * 16) + ViewOrigin.X + Xm)
+                        roomnum = map((((ViewOrigin.Y + Ym) * 16) + ViewOrigin.X + Xm) Mod &H100)
                         If roomnum < &H40 Then
                             For x32 As UInteger = 0 To 7 '32x32 chip loop
                                 For y32 As UInteger = 0 To 7

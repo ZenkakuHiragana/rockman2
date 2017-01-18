@@ -585,6 +585,7 @@ LoadStageGraphics:
 	sty <.ptr
 	sty $2006
 	sty $2006
+;ロックマン画像読み込み
 .loop_rockman
 	mMOV [.ptr],y, $2007
 	iny
@@ -594,6 +595,7 @@ LoadStageGraphics:
 	cmp #$9A
 	bcc .loop_rockman
 
+;敵キャラ画像読み込み
 	lda <zStage
 	and #$07
 	jsr ChangeBank
@@ -608,6 +610,9 @@ LoadStageGraphics:
 	sta <$00
 	ldy #$00
 .loop_graphics
+	lda <zStage
+	and #$07
+	jsr ChangeBank
 	inx
 	lda Stage_DefGraphics,x
 	sta <$01
@@ -624,31 +629,81 @@ LoadStageGraphics:
 	inc <.ptrhi
 	dec <$01
 	bne .loop_gr
-	lda <zStage
-	and #$07
-	jsr ChangeBank
 	dec <$00
 	bne .loop_graphics
 	
-;背景画像読み込み
+	mCHANGEBANK #$09
+	mMOV #$80, <.ptrhi
+	jsr LoadGraphicsLZ77
+	lda <zStage
+	and #$07
+	jsr ChangeBank
 	mMOV #$A0, <.ptrhi
-.loop_bg
-	mMOV [.ptr],y, $2007
-	iny
-	bne .loop_bg
-	inc <.ptrhi
-	lda <.ptrhi
-	cmp #$B0
-	bcc .loop_bg
-	
-	ldy #$61
+	jsr LoadGraphicsLZ77
+;パレット書き込み
+	ldy #$21
 .loop_palette
-	mMOV Stage_Palette - 2,y, aPaletteAnim,y
+	mMOV Stage_Palette - 2,y, aPalette - 2,y
 	dey
 	bpl .loop_palette
 	jsr WritePalette
 	mCHANGEBANK #$0E, 1
 	;rts
+
+;背景画像読み込み
+LoadGraphicsLZ77:
+.buffer = $300
+.bufferptr = $08
+.bufferptrhi = $09
+.ptr = $0A
+.ptrhi = $0B
+.op = $0C
+.amount = $0D
+	ldy #$00
+	sty <.bufferptr
+	sty <.bufferptrhi
+.loop_bg
+	lda [.ptr],y
+	cmp #$FF
+	beq .end
+	sta <.op
+	iny
+	bne .skip_incptr_begin
+	inc <.ptrhi
+.skip_incptr_begin
+	and #$3F
+	sta <.amount
+;連続データ書き込み/非圧縮書き込み
+.loop_continuous
+	bit <.op
+	bvc .write_ptr ;使い回し書き込みの時
+	clc
+	lda <.bufferptr
+	sbc [.ptr],y
+	tax
+	lda .buffer,x
+	jmp .write
+.write_ptr
+	lda [.ptr],y
+.write
+	sta $2007
+	ldx <.bufferptr
+	sta .buffer,x
+	lda <.amount ;連続データ書き込みであっても最後にiny
+	beq .incptr
+	lda <.op ;連続データ書き込みの時、inyを省略
+	bpl .skip_incptr
+.incptr
+	iny
+	bne .skip_incptr
+	inc <.ptrhi
+.skip_incptr
+	inc <.bufferptr ;書き込みバッファ位置 + 1
+	dec <.amount
+	bpl .loop_continuous
+	bmi .loop_bg
+.end
+	rts
 
 ;20 CD C4
 SetContinuePoint:
