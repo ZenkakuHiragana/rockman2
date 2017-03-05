@@ -94,8 +94,8 @@ mMOVW .macro
 	.if \?3
 	sta \3
 	.else
-	.endif
 	sta \2+1
+	.endif
 	.endm
 
 mMOVWB .macro
@@ -105,8 +105,8 @@ mMOVWB .macro
 	.if \?3
 	sta \3
 	.else
-	.endif
 	sta \2+1
+	.endif
 	.endm
 
 mSTZ .macro

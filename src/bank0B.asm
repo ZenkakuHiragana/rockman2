@@ -148,7 +148,17 @@ DoBossBehaviour_Stopping:
 ;8E10
 ;メカドラゴン
 ;MechDragon:
-;	.include "src.obj/mechdragon.asm"
+	.include "src/obj/mechdragon.asm"
+
+;9213
+;ピコピコくん
+;Pikopiko_kun:
+	.include "src/obj/pikopiko_kun.asm"
+
+;939B
+;ガッツタンク
+;GutsTank:
+;	.include "src/obj/gutstank.asm"
 
 	.org $9FD3
 BossBehaviour_Dying:
@@ -278,11 +288,15 @@ BossBehaviour_DyingAfterSplash:
 ;A100
 ;ワイリーステージのボス撃破後の挙動下位
 Table_DyingBossBehaviourlo:
-	.db $22, $69, $22, $69, $7B, $0F
+	.db LOW(MechDragon_Defeated)
+	.db LOW(Pikopiko_kun_Defeated)
+	.db $22, $69, $7B, $0F
 ;A106
 ;ワイリーステージのボス撃破後の挙動上位
 Table_DyingBossBehaviourhi:
-	.db $91, $93, $91, $93, $99, $9D
+	.db HIGH(MechDragon_Defeated)
+	.db HIGH(Pikopiko_kun_Defeated)
+	.db $91, $93, $99, $9D
 
 ;A10C
 ;ボスのアニメーション番号を設定, フレームカウンタをリセット
@@ -449,6 +463,7 @@ BossBehaviour_FaceTowards:
 BossBehaviour_CheckExistence:
 	sta <$00
 	ldy #$0F
+;A231
 BossBehaviour_CheckExistenceSpecified:
 	lda <$00
 .loop
