@@ -158,7 +158,17 @@ DoBossBehaviour_Stopping:
 ;939B
 ;ガッツタンク
 ;GutsTank:
-;	.include "src/obj/gutstank.asm"
+	.include "src/obj/gutstank.asm"
+
+;966E
+;ブービームトラップ
+;BooBeamTrap:
+	.include "src/obj/boobeamtrap.asm"
+
+;96C0
+;ワイリーマシン
+;WilyMachine:
+;	.include "src/obj/wilymachine.asm"
 
 	.org $9FD3
 BossBehaviour_Dying:

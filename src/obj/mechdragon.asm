@@ -437,14 +437,16 @@ MechDragon_BodyMoveXY:
 	mSTZ aObjVYlo + 1, aObjVY + 1, aObjVXlo + 1, aObjVX + 1
 	inc aBossDeath
 	mMOV #$07, <zBossBehaviour
-	bne .move
+	bne WilyBoss_MoveWithBG
 .boss_alive
 ;被弾処理
 	lda <$02
 	cmp #$01
-	bne .move
+	bne WilyBoss_MoveWithBG
 	mMOV #$30, aPaletteSpr
-.move
+;91A4
+;ボス本体と背景を移動する
+WilyBoss_MoveWithBG:
 	jsr BossBehaviour_Move
 	sec
 	lda <zVScrollApparentlo

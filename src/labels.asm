@@ -458,10 +458,10 @@ aBossPtrhi = $5A7       ;ワイリーステージのボスがポインタとし�
 aBossInvincible = $5A8  ;ボスの無敵時間
 
 aBossPtrlo = $5A9
-aBossVar2 = $5A9         ;なんだっけこれは
+aBossVar2 = $5A9        ;ワイリーステージのボスで使われる
 
 aBossDeath = $5AA       ;ボスティウンフラグ
-
+aBossVar3 = $5AB        ;ワイリーマシンとエイリアンで使用
 
 
 aObjVX = $600           ;オブジェクトの速度X上位

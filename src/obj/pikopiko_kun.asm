@@ -138,8 +138,8 @@ Table_PikopikoInfo:
 	.dw $01FF, $0000, $CB8B, $5050
 
 ;9357
-;3, ピコピコくん
-Pikopiko_kun3:
+;3, ピコピコくん/ブービームトラップ 撃破まで待つ
+WilyBoss_Wait:
 	lda aObjLife + 1
 	bne .rts
 	mMOV #$BB, <zBossVar
@@ -181,10 +181,10 @@ WilyBoss_Defeated_FlashScreen:
 Table_Pikopiko_kunBehaviourlo:
 	.db LOW(Pikopiko_kun1)
 	.db LOW(Pikopiko_kun2)
-	.db LOW(Pikopiko_kun3)
+	.db LOW(WilyBoss_Wait)
 ;9398
 ;ピコピコくん行動アドレス上位
 Table_Pikopiko_kunBehaviourhi:
 	.db HIGH(Pikopiko_kun1)
 	.db HIGH(Pikopiko_kun2)
-	.db HIGH(Pikopiko_kun3)
+	.db HIGH(WilyBoss_Wait)
