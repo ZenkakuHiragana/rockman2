@@ -168,7 +168,12 @@ DoBossBehaviour_Stopping:
 ;96C0
 ;ワイリーマシン
 ;WilyMachine:
-;	.include "src/obj/wilymachine.asm"
+	.include "src/obj/wilymachine.asm"
+
+;9B2A
+;エイリアン
+;Alien:
+;	.include "src/obj/alien.asm"
 
 	.org $9FD3
 BossBehaviour_Dying:

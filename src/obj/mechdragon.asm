@@ -262,19 +262,24 @@ MechDragon_Fire:
 	lda #$68
 	ldx #$01
 	jsr BossBehaviour_SpawnEnemy
-	bcs .rts
+	bcs WilyBoss_AlienInterrupt_rts
 	clc
 	lda aObjY10,y
 	adc #$10
 	sta aObjY10,y
-	mMOVWB $0200, <$09, <$08
+	lda #$02
+;9053
+;エイリアン線で割り込まれる
+WilyBoss_AlienInterrupt:
+	sta <$09
+	mSTZ <$08
 	tya
 	clc
 	adc #$10
 	tax
 	stx <zObjIndex
 	mJSRJMP BossBehaviour_SetVelocityAtRockman
-.rts
+WilyBoss_AlienInterrupt_rts:
 	rts
 
 ;9064

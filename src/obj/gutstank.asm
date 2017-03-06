@@ -178,7 +178,7 @@ GutsTank3:
 GutsTank_SetMoveVector:
 	sta aBossVar1
 	mMOV #$60, aObjVXlo + 1
-	mJSR_NORTS $9563
+	mJSR_NORTS GutsTank_Passive
 
 ;9537
 ;5, ガッツタンク
@@ -291,19 +291,22 @@ GutsTank_Passive:
 .waitanim
 	mMOV #$0F, aPaletteSpr
 	jsr BossBehaviour_BossTakeDamage
-	bcc .boss_alive
+	bcc GutsTank_IsAlive
+;9625
+;ワイリーマシンの撃破時にここに来る
+WilyBoss_DefeatedStart:
 	mSTZ aPaletteAnim, aPaletteAnimWait
 	mMOV #$0D, <zBossVar
 	mSTZ aObjVYlo + 1, aObjVY + 1, aObjVXlo + 1, aObjVX + 1
 	inc aBossDeath
 	mMOV #$07, <zBossBehaviour
-	bne .done
-.boss_alive
+	bne GutsTank_End
+GutsTank_IsAlive:
 	lda <$02
 	cmp #$01
-	bne .done
+	bne GutsTank_End
 	mMOV #$30, aPaletteSpr
-.done
+GutsTank_End:
 	mMOV aBossVar1, aObjFlags + 1
 	jsr WilyBoss_MoveWithBG
 	mMOV #%10000011, aObjFlags + 1

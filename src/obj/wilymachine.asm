@@ -48,7 +48,7 @@ WilyMachine1:
 	ldx <zBossVar
 	cpx #$14
 	beq .3
-	mJSR_NORTS $97F8
+	mJSR_NORTS WilyMachine_WriteAttr
 .3
 	inc aObjVar + 1
 	mSTZ <zBossVar
@@ -58,7 +58,7 @@ WilyMachine1:
 	ldx <zBossVar
 	cpx #$0E
 	bcs .5
-	mJSR_NORTS $97D4
+	mJSR_NORTS WilyMachine_WriteNameTable
 .5
 	cpx #$13
 	bcs .6
@@ -170,8 +170,11 @@ WilyMachine5:
 	bcs .change_behaviour
 	inc <zBossBehaviour
 .change_behaviour
-	mMOV #%10000011, aObjFlags + 1, aBossVar1
-	jsr $9A10
+	lda #%10000011
+WilyMachine_SetMoveVector:
+	sta aObjFlags + 1
+	sta aBossVar1
+	jsr WilyMachine_Misc
 	mMOV #%10000011, aObjFlags + 1
 	dec <zBossVar
 	bne .rts
@@ -256,7 +259,7 @@ WilyMachine4:
 	clc
 	lda aObjX + 1
 	adc <$08
-	sta aObJX10,y
+	sta aObjX10,y
 .wait
 ;ワイリーマシンの運転席部分の描画
 	lda aObjVar + 1
@@ -266,6 +269,7 @@ WilyMachine4:
 	mMOV #$14, <zBossVar
 	inc aObjVar + 1
 .1
+	lda aObjVar + 1
 	cmp #$02
 	bcs .3
 	ldx <zBossVar
@@ -277,17 +281,203 @@ WilyMachine4:
 	mSTZ aBossVar2
 	inc aObjVar + 1
 .3
-	
+	ldx <zBossVar
+	cpx #$16
+	bcs .4
+	mMOV Table_WilyMachineNThi,x, aPPULinearhi
+	mMOV Table_WilyMachineNTlo,x, aPPULinearlo
+	mMOV Table_WilyMachineNTSize,x, <zPPULinear
+	ldy #$00
+	ldx aBossVar2
+.loop
+	mMOV Table_WilyMachineNT2,x, aPPULinearData,y
+	inx
+	iny
+	cpy <zPPULinear
+	bne .loop
+	stx aBossVar2
+	inc <zBossVar
+	rts
+.4
+	lda aObjLife + 1
+	cmp #$1C
+	beq .5
+	rts
+.5
+	inc <zBossBehaviour
+	mMOV #$3E, <zBossVar
+	mMOV #$A3, aObjVXlo + 1
+	rts
 
 ;997B
-;7, ワイリーマシン
+;7, ワイリーマシン 撃破時
 WilyMachine7:
-	
+	lda aObjVar + 1
+	beq .1
+	lda aObjY
+	cmp #$E0
+	bcs .fallplayer
+	inc aObjY
+	inc aObjY
+	rts
+.fallplayer
+	mSTZ aObjFlags
+	dec <zBossVar
+	bne .rts
+	mMOV #$FF, <zBossBehaviour
+.rts
+	rts
+.1
+	jsr WilyBoss_Defeated_FlashScreen
+	lda aObjY + 1
+	beq .goupufo
+	sec
+	lda aObjYlo + 1
+	sbc #$80
+	sta aObjYlo + 1
+	lda aObjY + 1
+	sbc #$00
+	sta aObjY + 1
+	bne .goupufo
+	sta aObjFlags + 1
+.goupufo
+	mMOV <zRand, <$01
+	mMOV #$20, <$02
+	jsr Divide8
+	lda #$06
+	ldx #$01
+	jsr BossBehaviour_SpawnEnemy
+	bcs .invalid
+	lda <zRand
+	asl a
+	lda <zRand
+	rol a
+	rol a
+	rol a
+	rol a
+	ora #$08
+	sta aObjX10,y
+	clc
+	lda <$04
+	adc #$C8
+	sta aObjY10,y
+.invalid
+	inc <zBossVar
+.done
+	lda <zBossVar
+	cmp #$FD
+	beq .2
+	rts
+.2
+	lda #$0F
+	ldx #$10
+.loop
+	sta aPalette,x
+	dex
+	bpl .loop
+	inc aObjVar + 1
+	mMOV #$0B, <zStatus
+	mSTZ aObjFrame, aObjWait
+	mMOV #$0C, aObjAnim
+	mMOV #$3E, <zBossVar
+	rts
 
 ;9A10
 ;ワイリーマシン パレット変更/装備武器により弾く/その他
 WilyMachine_Misc:
-	
+	mMOV #$0F, aPaletteSpr
+	lda <zBossBehaviour
+	cmp #$04
+	bcs .is2nd
+;カバー脱落前
+	lda <zEquipment
+	cmp #$02 ;エアーシューター
+	beq .deflect
+	cmp #$05 ;クイックブーメラン
+	beq .deflect
+	bne .normal
+;カバー脱落後
+.is2nd
+	lda <zEquipment
+	cmp #$01 ;アトミックファイヤー
+	bne .normal
+;弾く
+.deflect
+	lda aObjFlags + 1
+	ora #%00001000
+	sta aObjFlags + 1
+;弾かない
+.normal
+	jsr BossBehaviour_BossTakeDamage
+	bcc .boss_alive
+	lda <zBossBehaviour
+	cmp #$04
+	bcs .is2nd_defeat
+;カバー脱落前
+	mMOV #$04, <zBossBehaviour
+	mMOV #$0C, aBossVar3
+	mSTZ aObjVX + 1, aObjVXlo + 1, aObjVar + 1
+	beq .move
+;カバー脱落後
+.is2nd_defeat
+	lda #$74
+	jsr SetBossAnimation
+	clc
+	lda aObjX + 1
+	adc #$28
+	sta aObjX + 1
+	mMOV #$57, aObjY + 1
+	mSTZ aObjVar + 1
+	lda #$56
+	jsr BossBehaviour_CheckExistence
+	bcs .jmp
+	mSTZ aObjFlags10,y
+.jmp
+	jmp WilyBoss_DefeatedStart
+;ワイリーマシン生存
+.boss_alive
+	lda <$02
+	cmp #$01
+	bne .move
+	mMOV #$30, aPaletteSpr
+.move
+	mJSR_NORTS WilyBoss_MoveWithBG
+
+;9A8C
+;ワイリーマシン NT書き込み位置上位
+Table_WilyMachineNThi:
+	.db $25, $25, $25, $25, $25, $25, $25, $25
+	.db $26, $26, $26, $26, $26, $26, $25, $25
+	.db $25, $25, $26, $26, $26, $26
+;9AA2
+;ワイリーマシン NT書き込み位置下位
+Table_WilyMachineNTlo:
+	.db $17, $36, $56, $71, $90, $B0, $D0, $F0
+	.db $0E, $2E, $4E, $6E, $93, $B4, $90, $B0
+	.db $D0, $F0, $0E, $2E, $4E, $6E
+;9AB8
+;ワイリーマシン NT書き込みサイズ
+Table_WilyMachineNTSize:
+	.db $04, $05, $06, $0B, $0D, $0D, $0D, $0D
+	.db $0F, $0E, $0D, $0C, $04, $02, $04, $04
+	.db $04, $04, $06, $07, $05, $04
+;9ACE
+;ワイリーマシン 属性テーブル
+Table_WilyMachineAttr:
+	.db $FF, $AF, $FF, $BF, $FF, $FF, $FD, $FF
+	.db $FA, $EE, $F7, $BF, $AF, $FF, $FF, $FF
+	.db $FB, $FA, $FF, $FF, $FF, $AF, $FF, $BF
+	.db $FF, $FF, $EE, $FF, $FA, $EE, $FB, $BE
+	.db $AF, $FF, $FF, $FF, $FB, $FA, $FF, $FF
+
+;9AF6
+;ワイリーマシン 第二形態のNTデータかな？
+Table_WilyMachineNT2:
+	.db $00, $E6, $E7, $E8
+	.db $00, $00, $E9, $EA, $00
+	.db $00, $EB, $EC, $ED, $EE, $EF
+	.db $F0, $00, $00, $F1, $F2, $F3, $F4, $F5, $F6, $F7, $F8
+	.db $F9, $FA, $FB, $00, $00, $00, $00, $FC, $00, $00, $00, $00
 
 ;9B1C
 ;ワイリーマシン行動アドレス下位

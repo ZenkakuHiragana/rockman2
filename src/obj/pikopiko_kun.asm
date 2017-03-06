@@ -29,7 +29,7 @@ Pikopiko_kun1:
 ;9242
 ;
 Pikopiko_kun2_jmp_rts:
-	jmp $92DC
+	jmp Pikopiko_kun2_rts
 	.endif
 
 ;9245
@@ -101,9 +101,9 @@ Pikopiko_kun2:
 	inc <zBossVar
 	lda <zBossVar
 	cmp #$0E
-	bne .rts
+	bne Pikopiko_kun2_rts
 	inc <zBossBehaviour
-.rts
+Pikopiko_kun2_rts
 	rts
 
 ;92DD
