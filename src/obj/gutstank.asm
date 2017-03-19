@@ -15,8 +15,7 @@ GutsTank1:
 	bne .0
 	mMOV #$02, aPaletteAnim
 	mMOV #$04, aPaletteAnimWait
-	mMOV #$B2, aBossVar1
-	mSTZ aBossVar2
+	mMOVWB $B200, aBossPtrhi, aBossPtrlo
 	mMOVWB $1100 - $20, aPPULinearhi
 	mMOV #$69, <zBossVar
 	inc aObjVar + 1
@@ -39,9 +38,9 @@ GutsTank1:
 	ldx <zBossVar
 	cpx #$0B
 	beq .3
-	mMOV $A9A1,x, aPPULinearhi ;Table_GutsTankNTPtrhi
-	mMOV $A9AC,x, aPPULinearlo ;Table_GutsTankNTPtrlo
-	mMOV $A9B7,x, <zPPULinear ;Table_GutsTankNTSize
+	mMOV Table_GutsTankNTPtrhi,x, aPPULinearhi
+	mMOV Table_GutsTankNTPtrlo,x, aPPULinearlo
+	mMOV Table_GutsTankNTSize,x, <zPPULinear
 	ldy #$00
 .loop_nt
 	mMOV aBossVar1, aPPULinearData,y
@@ -72,7 +71,7 @@ GutsTank1:
 	beq .5
 	ldy #$00
 .loop_nt2
-	mMOV $A9C2,x, aPPULinearData,y ;Table_GutsTankNTRaw
+	mMOV Table_GutsTankNTRaw,x, aPPULinearData,y
 	inx
 	iny
 	cpy #$16
@@ -97,7 +96,7 @@ GutsTank1:
 	beq .7
 	ldy #$00
 .loop_attr
-	mMOV $AA72,x, aPPULinearData,y ;Table_GutsTankAttr
+	mMOV Table_GutsTankAttr,x, aPPULinearData,y
 	inx
 	iny
 	cpy #$06

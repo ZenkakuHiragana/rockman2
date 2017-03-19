@@ -173,9 +173,8 @@ DoBossBehaviour_Stopping:
 ;9B2A
 ;エイリアン
 ;Alien:
-;	.include "src/obj/alien.asm"
+	.include "src/obj/alien.asm"
 
-	.org $9FD3
 BossBehaviour_Dying:
 	sec
 	lda <zBossType
@@ -371,8 +370,13 @@ BossBehaviour_MoveAndCollide:
 BossBehaviour_Move:
 	lda aObjFlags + 1
 	sta <$03
+;A154
+;移動処理(方向指定)
 BossBehaviour_Move_VectorSpecified:
 	jsr BossBehaviour_RockmanTakeDamage
+;A157
+;移動処理(当たり判定なし)
+BossBehaviour_Move_NoCollide:
 	sec
 	lda aObjYlo + 1
 	sbc aObjVYlo + 1
@@ -1370,3 +1374,46 @@ Table_BossTakeDamageMetalBlade:
 Table_BossDamageAmount:
 	.db $08, $08, $08, $04, $04, $04, $06, $04
 	.db $1C, $08, $04, $08, $0A, $14
+
+;A9A1
+;ガッツタンクのネームテーブル書き込み位置上位
+Table_GutsTankNTPtrhi:
+	.db $20, $20, $20, $21, $21, $21, $21, $21
+	.db $21, $21, $21
+
+;A9AC
+;ガッツタンクのネームテーブル書き込み位置下位
+Table_GutsTankNTPtrlo:
+	.db $C7, $E6, $EE, $06, $26, $44, $64, $85
+	.db $A5, $C5, $E6
+
+;A9B7
+;ガッツタンクのネームテーブル書き込みサイズ
+Table_GutsTankNTSize:
+	.db $03, $05, $02, $0A, $0A, $0D, $0F, $0E
+	.db $0E, $0F, $0E
+
+;A9C2
+;ガッツタンクのネームテーブル書き込みデータ(キャタピラ部分)
+Table_GutsTankNTRaw:
+	.db $00, $00, $00, $00, $00, $00, $83, $84, $85, $86, $87, $88, $89, $8A, $8B, $8C
+	.db $8D, $8D, $8D, $8E, $00, $00, $00, $00, $00, $00, $00, $00, $8F, $90, $91, $92
+	.db $93, $94, $95, $96, $97, $98, $98, $99, $9A, $9B, $00, $00, $9C, $9D, $9E, $9F
+	.db $A0, $A1, $A2, $A3, $A2, $A3, $A2, $A3, $A2, $A3, $A2, $A3, $A2, $A4, $A5, $A6
+	.db $A7, $00, $A8, $A9, $AA, $AB, $AC, $AD, $AE, $AF, $AE, $AF, $AE, $AF, $AE, $AF
+	.db $AE, $AF, $AE, $B0, $B1, $B2, $B3, $B4, $B5, $B6, $B7, $B8, $B9, $BA, $BB, $BC
+	.db $BD, $BA, $BB, $BC, $BD, $BA, $BB, $BC, $BD, $BA, $BB, $BC, $BE, $BF, $C0, $C1
+	.db $C2, $C3, $C4, $C5, $C6, $C7, $C8, $C5, $C6, $C7, $C8, $C5, $C6, $C7, $C8, $C5
+	.db $C6, $C7, $C9, $CA, $CB, $CC, $CD, $CE, $CF, $D0, $D1, $D2, $D3, $D0, $D1, $D2
+	.db $D3, $D0, $D1, $D2, $D3, $D0, $D1, $D2, $D4, $D5, $D6, $D7, $D8, $D9, $DA, $DB
+	.db $DC, $DD, $DE, $DF, $DC, $DD, $DE, $DF, $DC, $DD, $DE, $DF, $DC, $DD, $E0, $E1
+
+;AA72
+;ガッツタンクの属性テーブル
+Table_GutsTankAttr:
+	.db $FF, $3F, $0F, $FF, $FF, $FF
+	.db $FF, $33, $44, $FD, $FF, $FF
+	.db $FF, $7F, $D0, $FF, $FF, $FF
+	.db $FF, $F7, $F5, $FF, $FF, $FF
+	.db $AF, $AA, $AA, $AA, $AA, $AA
+
