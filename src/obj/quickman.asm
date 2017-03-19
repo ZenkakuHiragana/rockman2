@@ -138,7 +138,7 @@ Table_QuickmanAnimations:
 	.db $55, $58
 
 ;88B8
-;4, クイックマン
+;4, クイックマン 効かない時
 Quickman4:
 	dec aObjVar + 1
 	beq Quickman4_End
