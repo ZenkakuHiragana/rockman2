@@ -330,7 +330,7 @@ DieBoss:
 	lda <zClearFlags
 	cmp #$FF
 	beq .gotowily
-	jmp $8076 ;------------------------
+	jmp StartStageSelect_Continue ;ステージセレクトへ
 .gotowily
 	mMOV #$07, <zStage
 .iswily
@@ -341,9 +341,9 @@ DieBoss:
 	mCHANGEBANK #$0D
 	jsr Bank0D_BeginEnding
 	lda #$0E
-	jmp $F290 ;------------------------
+	jmp Reset_JMP ;エンディング終了 → リセット
 .isnotwily7
-	jmp $8079 ;------------------------
+	jmp StartStage_All ;ワイリーステージ続行
 
 ;C279
 StageBitTable:
@@ -676,7 +676,7 @@ SetContinuePoint:
 	lda <zContinuePoint
 	cmp #$02
 	bne .isnot_02
-	jsr $9115 ;-------------------------
+	jsr PaletteChange_RightScroll ;バブルマンステージボス前色変えへ対応
 .isnot_02
 	rts
 
@@ -728,7 +728,7 @@ DoBossBehaviour:
 	lda <zBossBehaviour
 	beq .jump
 	mCHANGEBANK #$0B
-	jsr $8003
+	jsr Bank0B_DoBossBehaviour
 	mCHANGEBANK #$0E
 	lda aBossDeath
 	beq .jump
@@ -1210,7 +1210,7 @@ SetPPUPos_Attr:
 	rol a
 	ora <$0B
 	ora #$C0
-	sta $03C8,x
+	sta aPPUShutterAttrlo,x
 	ldy #$23
 	lda <$09
 	and #$01
@@ -1218,7 +1218,7 @@ SetPPUPos_Attr:
 	ldy #$27
 .left
 	tya
-	sta $03C2,x
+	sta aPPUShutterAttrhi,x
 	ldy #$00
 	pla
 	and #$10
@@ -1233,10 +1233,10 @@ SetPPUPos_Attr:
 .jump2
 	pla
 	and Table_C918,y
-	sta $03CE,x
+	sta aPPUShutterMask,x
 	lda Table_C918,y
 	eor #$FF
-	sta $03D4,x
+	sta aPPUShutterMask2,x
 	rts
 
 ;1EC964
@@ -1561,7 +1561,7 @@ CountBlockableObjects:
 	lda aObjFlags10,x
 	bpl .notexist
 	and #$10
-	beq $CB99
+	beq .notexist
 	stx <zBlockObjIndex,y
 	iny
 .notexist
@@ -2627,7 +2627,7 @@ Reset_JMP:
 	lda #$06
 	sta $2001
 	mCHANGEBANK #$0E
-	jmp $8000
+	jmp Reset_Continue
 
 	.include "src/animations.asm"
 

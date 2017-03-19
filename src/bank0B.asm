@@ -304,13 +304,19 @@ BossBehaviour_DyingAfterSplash:
 Table_DyingBossBehaviourlo:
 	.db LOW(MechDragon_Defeated)
 	.db LOW(Pikopiko_kun_Defeated)
-	.db $22, $69, $7B, $0F
+	.db LOW(MechDragon_Defeated)
+	.db LOW(Pikopiko_kun_Defeated)
+	.db LOW(WilyMachine_Defeated)
+	.db LOW(Alien_Defeated)
 ;A106
 ;ワイリーステージのボス撃破後の挙動上位
 Table_DyingBossBehaviourhi:
 	.db HIGH(MechDragon_Defeated)
 	.db HIGH(Pikopiko_kun_Defeated)
-	.db $91, $93, $99, $9D
+	.db HIGH(MechDragon_Defeated)
+	.db HIGH(Pikopiko_kun_Defeated)
+	.db HIGH(WilyMachine_Defeated)
+	.db HIGH(Alien_Defeated)
 
 ;A10C
 ;ボスのアニメーション番号を設定, フレームカウンタをリセット

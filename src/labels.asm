@@ -279,6 +279,8 @@ aPPULaserData = $3C2    ;PPU書き込みデータ
 
 aPPUShutterAttrhi = $3C2;PPUシャッター書き込み時の属性テーブル位置上位
 aPPUShutterAttrlo = $3C8;PPUシャッター書き込み時の属性テーブル位置下位
+aPPUShutterMask = $3CE  ;PPUシャッター書き込み 属性テーブルへのマスク
+aPPUShutterMask2 = $3D4 ;PPUシャッター書き込み 属性テーブルへのマスク(bit反転)
 
 
 aObjAnim = $400         ;オブジェクトのアニメーション番号

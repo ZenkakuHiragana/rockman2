@@ -269,7 +269,7 @@ MechDragon_Fire:
 	sta aObjY10,y
 	lda #$02
 ;9053
-;エイリアン線で割り込まれる
+;エイリアン戦で割り込まれる
 WilyBoss_AlienInterrupt:
 	sta <$09
 	mSTZ <$08

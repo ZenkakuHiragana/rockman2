@@ -311,7 +311,7 @@ WilyMachine4:
 
 ;997B
 ;7, ワイリーマシン 撃破時
-WilyMachine7:
+WilyMachine_Defeated:
 	lda aObjVar + 1
 	beq .1
 	lda aObjY
@@ -488,7 +488,7 @@ Table_WilyMachineBehaviourlo:
 	.db LOW(WilyMachine4)
 	.db LOW(WilyMachine5)
 	.db LOW(WilyMachine6)
-	.db LOW(WilyMachine7)
+	.db LOW(WilyMachine_Defeated)
 
 ;9B23
 ;ワイリーマシン行動アドレス上位
@@ -499,4 +499,4 @@ Table_WilyMachineBehaviourhi:
 	.db HIGH(WilyMachine4)
 	.db HIGH(WilyMachine5)
 	.db HIGH(WilyMachine6)
-	.db HIGH(WilyMachine7)
+	.db HIGH(WilyMachine_Defeated)

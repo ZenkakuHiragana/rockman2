@@ -68,6 +68,9 @@ Reset_Continue;
 StartStageSelect:
 	lda #$03
 	sta <zLives
+;8076
+;ステージセレクト処理(残機はリセットしない)
+StartStageSelect_Continue:
 	jsr ChangeBank_DoStageSelect
 ;8079
 ;ステージセレクト処理の後から

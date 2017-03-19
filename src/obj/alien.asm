@@ -251,7 +251,7 @@ Alien_SetVelocity:
 
 ;9D0F
 ;3, エイリアン 倒された時
-Alien3:
+Alien_Defeated:
 	ldx aObjVar + 1
 	bne .init
 	mMOVW $0FE0, aPPULinearlo, aPPULinearhi
@@ -566,7 +566,7 @@ AlienB:
 Table_AlienBehaviourlo:
 	.db LOW(Alien1)
 	.db LOW(Alien2)
-	.db LOW(Alien3)
+	.db LOW(Alien_Defeated)
 	.db LOW(Alien4)
 	.db LOW(Alien5)
 	.db LOW(Alien6)
@@ -581,7 +581,7 @@ Table_AlienBehaviourlo:
 Table_AlienBehaviourhi:
 	.db HIGH(Alien1)
 	.db HIGH(Alien2)
-	.db HIGH(Alien3)
+	.db HIGH(Alien_Defeated)
 	.db HIGH(Alien4)
 	.db HIGH(Alien5)
 	.db HIGH(Alien6)
