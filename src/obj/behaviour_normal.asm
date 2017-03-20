@@ -969,7 +969,7 @@ EN13:
 ;9C90
 ;レーザー出現
 EN14:
-	rts
+	sec
 	lda aObjRoom,x
 	sbc #$03
 	tay
@@ -1383,7 +1383,7 @@ EN19:
 	rts
 
 ;A06B
-.die:
+.die
 	lda #$00
 	sta aObjFrame,x
 	sta aObjWait,x
@@ -3193,10 +3193,6 @@ Goblin_ChangePalette:
 	lda .palette,y
 	sta aPalette,x
 	sta aPaletteOverride,x
-;	sta aPaletteAnimBuf,x
-;	sta aPaletteAnimBuf + $10,x
-;	sta aPaletteAnimBuf + $20,x
-;	sta aPaletteAnimBuf + $30,x
 	iny
 	inx
 	dec <$02
