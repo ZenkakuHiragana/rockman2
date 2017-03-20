@@ -1985,7 +1985,7 @@ ChangeBank_ShowEndingRockman:
 ChangeBank_ShowEndingRockmanY:
 	sty <$01
 	mCHANGEBANK #$09
-	jsr $8600 ;-----------------------
+	jsr Bank09_ShowEndingSprites
 ChangeBank_ShowEndingRockman_JMP:
 	mCHANGEBANK #$0D, 1
 	;rts
@@ -1993,20 +1993,22 @@ ChangeBank_ShowEndingRockman_JMP:
 ;20 34 D6
 DrawStaffRollBossName:
 	mCHANGEBANK #$09
-	jsr $8603 ;-----------------------
+	jsr Bank09_WriteEndingBossname
 	jmp ChangeBank_ShowEndingRockman_JMP
 
 ;20 3F D6
-;スタッフロール用。$6A0に従いスタッフロールの文字を描く
-DrawStaffRollText:
+;スタッフロール用。$6A0に従いスタッフロールの文字を描くための準備
+InitStaffRollText:
 	mCHANGEBANK #$09
-	jsr $8606 ;-----------------------
+	jsr Bank09_InitStaffLine
 	jmp ChangeBank_ShowEndingRockman_JMP
 
 ;20 4A D6
-Unknown_D64A:
+;スタッフロール用。$6A0に従いスタッフロールの文字を描く
+;画面スクロールもやる
+DrawStaffRollText:
 	mCHANGEBANK #$09
-	jsr $8609 ;-----------------------
+	jsr Bank09_ScrollStaffLine
 	jmp ChangeBank_ShowEndingRockman_JMP
 
 ;20 55 D6
