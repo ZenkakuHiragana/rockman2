@@ -187,9 +187,9 @@
 	lda #$00
 	sta aObjFrame
 	sta <zRoom
-	jsr DrawStaffRollText
+	jsr InitStaffRollText
 .loop_staffroll3
-	jsr Unknown_D64A
+	jsr DrawStaffRollText
 	jsr SelectBoss_MoveIntroStar
 	jsr FrameAdvance1A
 	lda aObjFrame

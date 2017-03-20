@@ -24,6 +24,7 @@
 	.include "src/labels.asm"
 	.include "src/lib.asm"
 	.include "stage/stage.asm"
+	.include "src/bank09.asm"
 	.include "src/bank0B.asm"
 ;	.include "src/bank0C.asm"
 	.include "src/bank0D.asm"
