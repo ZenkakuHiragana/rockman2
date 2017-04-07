@@ -390,12 +390,21 @@ Sound_ProcessTracks:
 .skip_track
 	lda <zSFXChannel_Copy
 	lsr a
-	bcs $8294
+	bcs .8294
 	ldx <SoundIndex
 	inx
 	inx
 	ldy <zProcessChannel
 	jsr Sound_8222
+.8294
 	lsr <zSFXChannel_Copy
-	bcc $829E
+	bcc .829E
+	ora #$80
+	sta <zSFXChannel_Copy
+.829E
+	dec <zProcessChannel
+	beq .82B9
+	lda #$04
+	clc
+	adc <zSoundIndex
 	
