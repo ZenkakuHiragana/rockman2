@@ -7,22 +7,59 @@ Imports System.Collections.Generic
 Public Class Form1
 
     '''<summary>画面内に定義された敵1体の情報を表します。</summary>
-    Private Structure EnemiesStructure
-        Dim org As Point
-        Dim type As UInteger
+    Private Class EnemyStructure
+        Private org As Point
+        Private type As UInteger
 
         Public Sub New(ByVal p As Point, ByVal t As UInteger)
             org = p
             type = t
         End Sub
 
-        Public Shared Operator =(ByVal a As EnemiesStructure, ByVal b As EnemiesStructure) As Boolean
+        Private Sub SetFormText()
+            Form1.TextBoxObjType.Text = Hex(type)
+            Form1.TextBoxObjX.Text = Hex(org.X)
+            Form1.TextBoxObjY.Text = Hex(org.Y)
+        End Sub
+
+        Private Sub UndoTypeID(ByRef writeTo As Object, ByRef data As Object)
+            type = CUInt(data)
+            SetFormText()
+        End Sub
+
+        Private Sub UndoOrigin(ByRef writeTo As Object, ByRef data As Object)
+            org = DirectCast(data, Point)
+            SetFormText()
+        End Sub
+
+        Property TypeID() As UInteger
+            Get
+                Return type
+            End Get
+            Set(value As UInteger)
+                Form1.AddUndo(Me, type, AddressOf UndoTypeID)
+                type = value
+            End Set
+        End Property
+
+        Property Origin As Point
+            Get
+                Return org
+            End Get
+            Set(value As Point)
+                Form1.AddUndo(Me, org, AddressOf UndoOrigin)
+                org = value
+            End Set
+        End Property
+
+        Public Shared Operator =(ByVal a As EnemyStructure, ByVal b As EnemyStructure) As Boolean
             Return (a.org = b.org) And (a.type = b.type)
         End Operator
-        Public Shared Operator <>(ByVal a As EnemiesStructure, ByVal b As EnemiesStructure) As Boolean
+
+        Public Shared Operator <>(ByVal a As EnemyStructure, ByVal b As EnemyStructure) As Boolean
             Return Not ((a.org = b.org) And (a.type = b.type))
         End Operator
-    End Structure
+    End Class
 
     Const SizeTile16x16 As UInteger = &H200
     Const SizeChip32x32 As UInteger = 4 * &H100
@@ -114,9 +151,9 @@ Public Class Form1
     ''' <summary>選択したオブジェクトを表すインデックスです。</summary>
     Dim objindex_selected As UInteger
     ''' <summary>画面内に定義された敵の情報を格納するコレクションです。</summary>
-    Dim EnemiesArray(&H40) As List(Of EnemiesStructure)
+    Dim EnemiesArray(&H40) As List(Of EnemyStructure)
     ''' <summary>画面内に定義されたアイテムの情報を格納するコレクションです。</summary>
-    Dim ItemsArray(&H40) As List(Of EnemiesStructure)
+    Dim ItemsArray(&H40) As List(Of EnemyStructure)
     ''' <summary>右クリックメニューを適用する画面数です。</summary>
     Dim ContextRoom As UInteger
     ''' <summary>右クリックメニューを適用する位置です。</summary>
@@ -139,6 +176,8 @@ Public Class Form1
     Dim SizeCommonChr As UInteger
     ''' <summary>タイル情報を記憶するクリップボードです。</summary>
     Dim ClipScr, Clip32, Clip16 As UInteger
+    ''' <summary>Undoデータの記憶</summary>
+    Dim UndoBuffer As New ArrayList
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         For i As UInteger = 0 To &H4000 - 1
@@ -192,10 +231,10 @@ Public Class Form1
             PaletteBrushes(i) = GetPalette(i)
             enemies_ptr(i) = 0
             enemies_amount(i) = 0
-            EnemiesArray(i) = New List(Of EnemiesStructure)
+            EnemiesArray(i) = New List(Of EnemyStructure)
             items_ptr(i) = 0
             items_amount(i) = 0
-            ItemsArray(i) = New List(Of EnemiesStructure)
+            ItemsArray(i) = New List(Of EnemyStructure)
         Next
 
         palwait = 0
@@ -224,11 +263,7 @@ Public Class Form1
     End Sub
 
     Private Sub Form1_DragEnter(sender As Object, e As DragEventArgs) Handles MyBase.DragEnter
-        If e.Data.GetDataPresent(DataFormats.FileDrop) Then
-            e.Effect = DragDropEffects.Copy
-        Else
-            e.Effect = DragDropEffects.None
-        End If
+        e.Effect = If(e.Data.GetDataPresent(DataFormats.FileDrop), DragDropEffects.Copy, DragDropEffects.None)
     End Sub
 
     Private Sub Form1_DragDrop(sender As Object, e As DragEventArgs) Handles MyBase.DragDrop
@@ -242,9 +277,7 @@ Public Class Form1
         Next
 
         CommonChrFilePath = IO.Path.GetDirectoryName(path) & "\chr\common.chr"
-        If Not Directory.Exists(IO.Path.GetDirectoryName(path) & "\chr") Then
-            CommonChrFilePath = IO.Path.GetDirectoryName(path) & "\common.chr"
-        End If
+        If Not Directory.Exists(IO.Path.GetDirectoryName(path) & "\chr") Then CommonChrFilePath = IO.Path.GetDirectoryName(path) & "\common.chr"
 
         Try
             Dim f As New FileStream(CommonChrFilePath, FileMode.Open, FileAccess.ReadWrite)
@@ -372,20 +405,20 @@ Public Class Form1
             items_ptr(i) = testfile(AddrItemsPtr + i)
             items_amount(i) = testfile(AddrItemsAmount + i)
 
-            EnemiesArray(i) = New List(Of EnemiesStructure)
+            EnemiesArray(i) = New List(Of EnemyStructure)
             If enemies_amount(i) > 0 And enemies_ptr(i) > 0 Then
                 For a As UInteger = 0 To enemies_amount(i) - 1
-                    EnemiesArray(i).Add(New EnemiesStructure( _
+                    EnemiesArray(i).Add(New EnemyStructure( _
                                         New Point(enemiesx(enemies_ptr(i) - 1 + a), _
                                                   enemiesy(enemies_ptr(i) - 1 + a)), _
                                         enemies(enemies_ptr(i) - 1 + a)))
                 Next
             End If
 
-            ItemsArray(i) = New List(Of EnemiesStructure)
+            ItemsArray(i) = New List(Of EnemyStructure)
             If items_amount(i) > 0 And items_ptr(i) > 0 Then
                 For a As UInteger = 0 To items_amount(i) - 1
-                    ItemsArray(i).Add(New EnemiesStructure( _
+                    ItemsArray(i).Add(New EnemyStructure( _
                                         New Point(itemsx(items_ptr(i) - 1 + a), _
                                                   itemsy(items_ptr(i) - 1 + a)), _
                                         items(items_ptr(i) - 1 + a)))
@@ -447,13 +480,13 @@ Public Class Form1
         For i As UInteger = 0 To &H40 - 1
             enemies_amount(i) = 0
             enemies_ptr(i) = 0
-            For Each a As EnemiesStructure In EnemiesArray(i)
+            For Each a As EnemyStructure In EnemiesArray(i)
                 ptr += 1
                 If a = EnemiesArray(i).First() Then enemies_ptr(i) = ptr
 
-                enemies(ptr - 1) = a.type
-                enemiesx(ptr - 1) = a.org.X
-                enemiesy(ptr - 1) = a.org.Y
+                enemies(ptr - 1) = a.TypeID
+                enemiesx(ptr - 1) = a.Origin.X
+                enemiesy(ptr - 1) = a.Origin.Y
             Next
             enemies_amount(i) = EnemiesArray(i).Count
         Next
@@ -476,13 +509,13 @@ Public Class Form1
         For i As UInteger = 0 To &H40 - 1
             items_amount(i) = 0
             items_ptr(i) = 0
-            For Each a As EnemiesStructure In ItemsArray(i)
+            For Each a As EnemyStructure In ItemsArray(i)
                 ptr += 1
                 If a = ItemsArray(i).First() Then items_ptr(i) = ptr
 
-                items(ptr - 1) = a.type
-                itemsx(ptr - 1) = a.org.X
-                itemsy(ptr - 1) = a.org.Y
+                items(ptr - 1) = a.TypeID
+                itemsx(ptr - 1) = a.Origin.X
+                itemsy(ptr - 1) = a.Origin.Y
             Next
             items_amount(i) = ItemsArray(i).Count
         Next
@@ -543,9 +576,7 @@ Public Class Form1
             scrBuf.Render(e.Graphics)
         End SyncLock
         Dim s As String = "画面位置: (" & Hex(ViewOrigin.X) & ", " & Hex(ViewOrigin.Y) & ")"
-        If LabelViewOrigin.Text <> s Then
-            LabelViewOrigin.Text = s
-        End If
+        If LabelViewOrigin.Text <> s Then LabelViewOrigin.Text = s
     End Sub
 
     Private Sub p32_Paint(sender As Object, e As PaintEventArgs) Handles p32.Paint
@@ -566,13 +597,9 @@ Public Class Form1
     Private Sub pmapSelect_Paint(sender As Object, e As PaintEventArgs) Handles pmapSelect.Paint
         'DrawP32Focus(sender)
         Dim ss As String = "No.: "
-        If focus32 < 16 Then
-            ss += "0"
-        End If
+        If focus32 < 16 Then ss += "0"
         ss += Hex(focus32)
-        If ss <> Label_32Chip1.Text Then
-            Label_32Chip1.Text = ss
-        End If
+        If ss <> Label_32Chip1.Text Then Label_32Chip1.Text = ss
         SyncLock p32selectedBuf
             p32selectedBuf.Render(e.Graphics)
         End SyncLock
@@ -582,13 +609,9 @@ Public Class Form1
         'DrawP32Focus(sender)
 
         Dim ss As String = "No.: "
-        If focus32 < 16 Then
-            ss += "0"
-        End If
+        If focus32 < 16 Then ss += "0"
         ss += Hex(focus32)
-        If ss <> Label_32Chip2.Text Then
-            Label_32Chip2.Text = ss
-        End If
+        If ss <> Label_32Chip2.Text Then Label_32Chip2.Text = ss
         SyncLock p32selectedBuf
             p32selectedBuf.Render(e.Graphics)
         End SyncLock
@@ -607,11 +630,7 @@ Public Class Form1
         For i As UInteger = 0 To 1
             For k As UInteger = 0 To 1
                 a = flag(focus32 * 2 + i)
-                If k = 0 Then
-                    a = a >> 4
-                Else
-                    a = a And &HF
-                End If
+                a = If(k = 0, a >> 4, a And &HF)
                 s = Hex(a)
                 g.DrawString(s, New Font("MS UI Gothic", sender.Size.Width / 3), Brushes.Cyan, _
                              New RectangleF(sender.Size.Width / 2 * i, sender.Size.Width / 2 * k, _
@@ -622,32 +641,20 @@ Public Class Form1
 
     '16x16タイルの選択枠
     Private Sub p16focus_Paint(sender As Object, e As PaintEventArgs) Handles p16focus.Paint
-        'DrawP16Focus(sender)
-
         Dim ss As String = "No.: "
-        If focus16 < 16 Then
-            ss += "0"
-        End If
+        If focus16 < 16 Then ss += "0"
         ss += Hex(focus16)
-        If ss <> Label_16Chip1.Text Then
-            Label_16Chip1.Text = ss
-        End If
+        If ss <> Label_16Chip1.Text Then Label_16Chip1.Text = ss
         SyncLock p16selectedBuf
             p16selectedBuf.Render(e.Graphics)
         End SyncLock
     End Sub
 
     Private Sub p3216focus_Paint(sender As Object, e As PaintEventArgs) Handles p3216focus.Paint
-        'DrawP16Focus(sender)
-
         Dim ss As String = "No.: "
-        If focus16 < 16 Then
-            ss += "0"
-        End If
+        If focus16 < 16 Then ss += "0"
         ss += Hex(focus16)
-        If ss <> Label_16Chip2.Text Then
-            Label_16Chip2.Text = ss
-        End If
+        If ss <> Label_16Chip2.Text Then Label_16Chip2.Text = ss
         SyncLock p3216selectedBuf
             p3216selectedBuf.Render(e.Graphics)
         End SyncLock
@@ -655,16 +662,10 @@ Public Class Form1
 
     '8x8タイルの選択枠
     Private Sub p8focus_Paint(sender As Object, e As PaintEventArgs) Handles p8focus.Paint
-        'DrawP8Focus(sender)
-
         Dim ss As String = "No.: "
-        If focus8 < 16 Then
-            ss += "0"
-        End If
+        If focus8 < 16 Then ss += "0"
         ss += Hex(focus8)
-        If ss <> Label_8Graph.Text Then
-            Label_8Graph.Text = ss
-        End If
+        If ss <> Label_8Graph.Text Then Label_8Graph.Text = ss
         SyncLock p8selectedBuf
             p8selectedBuf.Render(e.Graphics)
         End SyncLock
@@ -672,7 +673,6 @@ Public Class Form1
 
     '8x8タイルのパレット
     Private Sub pgraphs_Paint(sender As Object, e As PaintEventArgs) Handles pgraphs.Paint
-        'DrawP8(sender)
         SyncLock p8Buf
             p8Buf.Render(e.Graphics)
         End SyncLock
@@ -680,44 +680,56 @@ Public Class Form1
 
     'パレットバーの表示
     Private Sub ppalette_Paint(sender As Object, e As PaintEventArgs) Handles ppalette.Paint, ppalette32.Paint
-        'DrawPaletteBar(sender)
         SyncLock paletteBuf
             paletteBuf.Render(e.Graphics)
         End SyncLock
     End Sub
 
-    '選択するやつ
+    'マップ画面の選択
     Private Sub scr_MouseClick(sender As Object, e As MouseEventArgs) Handles scr.MouseClick
-        Dim numroom, selected As UInteger
+        Dim numroom, roomptr, selected As UInteger
         Dim quad As Point '4分割した時、どこをクリックしたか
         Dim p As Point 'どのマスをクリックしたか
         quad.X = Math.Floor(e.X / (sender.Size.Width / 2))
         quad.Y = Math.Floor(e.Y / (sender.Size.Width / 2))
         p.X = Math.Floor(e.X / (sender.Size.Width / 16)) 'p = 0～15
         p.Y = Math.Floor(e.Y / (sender.Size.Width / 16))
-        If quad.X > 0 Then
-            p.X -= 8
-        End If
-        If quad.Y > 0 Then
-            p.Y -= 8
-        End If
+        If quad.X > 0 Then p.X -= 8
+        If quad.Y > 0 Then p.Y -= 8
 
         'p = 0～7
         selected = p.X * 8 + p.Y 'selected = 0～31
         numroom = map((ViewOrigin.Y + quad.Y) * 16 + ViewOrigin.X + quad.X)
+        roomptr = numroom * &H40 + selected
 
         '位置情報を取得したら、選択や書き込みなどの処理へ
         If numroom < &H40 Then
-            If (Control.ModifierKeys And Keys.Control) = Keys.Control Then
-                If e.Button = MouseButtons.Left Then
-                    For i As UInteger = 0 To &H3F
+            If (Control.ModifierKeys And Keys.Control) = Keys.Control Then 'Ctrl + クリックで画面単位のコピー&ペースト
+                If e.Button = MouseButtons.Left AndAlso numroom <> ClipScr Then
+                    Dim UndoData() As ArrayList = {New ArrayList, New ArrayList, New ArrayList} 'Undo情報のセットアップ
+
+                    For i As UInteger = 0 To &H3F '32x32タイルのペースト
+                        UndoData(0).Add(room(numroom * &H40 + i)) 'Undo情報に投入
                         room(numroom * &H40 + i) = room(ClipScr * &H40 + i)
                     Next
 
-                    EnemiesArray(numroom).Clear()
-                    For Each o As EnemiesStructure In EnemiesArray(ClipScr)
+                    For Each o As EnemyStructure In EnemiesArray(numroom) 'Undo情報に投入
+                        UndoData(1).Add(o)
+                    Next
+                    EnemiesArray(numroom).Clear() '敵位置情報のペースト
+                    For Each o As EnemyStructure In EnemiesArray(ClipScr)
                         EnemiesArray(numroom).Add(o)
                     Next
+
+                    For Each o As EnemyStructure In ItemsArray(numroom) 'Undo情報に投入
+                        UndoData(2).Add(o)
+                    Next
+                    ItemsArray(numroom).Clear() 'アイテム情報のペースト
+                    For Each o As EnemyStructure In ItemsArray(ClipScr)
+                        ItemsArray(numroom).Add(o)
+                    Next
+
+                    AddUndo(numroom, UndoData, AddressOf UndoPasteMap)
                 ElseIf e.Button = MouseButtons.Right Then
                     ClipScr = numroom
                 End If
@@ -728,8 +740,9 @@ Public Class Form1
                         focus32 = room(numroom * &H40 + selected)
                         DrawP32Focus(p32focus)
                         RefreshP32Focus()
-                    ElseIf e.Button = MouseButtons.Left Then
-                        room(numroom * &H40 + selected) = focus32
+                    ElseIf e.Button = MouseButtons.Left AndAlso room(roomptr) <> focus32 Then
+                        AddUndo(roomptr, room(roomptr), AddressOf UndoMap)
+                        room(roomptr) = focus32
                         DrawScr(scr)
                         scr.Refresh()
                     End If
@@ -739,24 +752,24 @@ Public Class Form1
 
                         Dim org As Point
                         If obj_isenemy Then
-                            For Each en As EnemiesStructure In EnemiesArray(numroom)
-                                org = en.org
+                            For Each en As EnemyStructure In EnemiesArray(numroom)
+                                org = en.Origin
                                 org += New Point(quad.X * 256, quad.Y * 256)
                                 org -= New Point(16, 16)
                                 If e.X > org.X And e.Y > org.Y And e.X < org.X + 32 And e.Y < org.Y + 32 Then
-                                    SetObjectSelection(numroom, EnemiesArray(numroom).IndexOf(en), en.type, en.org)
+                                    SetObjectSelection(numroom, EnemiesArray(numroom).IndexOf(en), en.TypeID, en.Origin)
                                     DrawScr(scr)
                                     scr.Refresh()
                                     Exit For
                                 End If
                             Next
                         Else
-                            For Each it As EnemiesStructure In ItemsArray(numroom)
-                                org = it.org
+                            For Each it As EnemyStructure In ItemsArray(numroom)
+                                org = it.Origin
                                 org += New Point(quad.X * 256, quad.Y * 256)
                                 org -= New Point(16, 16)
                                 If e.X > org.X And e.Y > org.Y And e.X < org.X + 32 And e.Y < org.Y + 32 Then
-                                    SetObjectSelection(numroom, ItemsArray(numroom).IndexOf(it), it.type, it.org)
+                                    SetObjectSelection(numroom, ItemsArray(numroom).IndexOf(it), it.TypeID, it.Origin)
                                     DrawScr(scr)
                                     scr.Refresh()
                                     Exit For
@@ -771,36 +784,30 @@ Public Class Form1
 
     'マップに32x32タイルを書き込み
     Private Sub scr_MouseMove(sender As Object, e As MouseEventArgs) Handles scr.MouseMove
-        If e.X < 0 And e.Y < 0 And e.X > sender.Size.Width And e.Y > sender.Size.Height Then
-            Exit Sub
-        End If
-
-        If (Control.ModifierKeys And Keys.Control) = Keys.Control Then
-            Exit Sub
-        End If
+        If e.X < 0 And e.Y < 0 And e.X > sender.Size.Width And e.Y > sender.Size.Height Then Exit Sub
+        If (Control.ModifierKeys And Keys.Control) = Keys.Control Then Exit Sub
 
         If Radio_EditTerrain.Checked And (e.Button = MouseButtons.Left Or e.Button = MouseButtons.Right) Then
-            Dim numroom, selected As UInteger
+            Dim numroom, roomptr, selected As UInteger
             Dim quad As Point '4分割した時、どこをクリックしたか
             Dim p As Point 'どのマスをクリックしたか
             quad.X = Math.Floor(e.X / (sender.Size.Width / 2))
             quad.Y = Math.Floor(e.Y / (sender.Size.Width / 2))
             p.X = Math.Floor(e.X / (sender.Size.Width / 16)) 'p = 0～15
             p.Y = Math.Floor(e.Y / (sender.Size.Width / 16))
-            If quad.X > 0 Then
-                p.X -= 8
-            End If
-            If quad.Y > 0 Then
-                p.Y -= 8
-            End If
+            If quad.X > 0 Then p.X -= 8
+            If quad.Y > 0 Then p.Y -= 8
+            If p.X < 0 OrElse p.Y < 0 Then Exit Sub
 
             'p = 0～7
             selected = p.X * 8 + p.Y 'selected = 0～31
             numroom = map((ViewOrigin.Y + quad.Y) * 16 + ViewOrigin.X + quad.X)
+            roomptr = numroom * &H40 + selected
 
             If numroom < &H40 Then
-                If e.Button = MouseButtons.Left Then
-                    room(numroom * &H40 + selected) = focus32
+                If e.Button = MouseButtons.Left AndAlso room(roomptr) <> focus32 Then
+                    AddUndo(roomptr, room(roomptr), AddressOf UndoMap) 'Undoの設定
+                    room(roomptr) = focus32
                     DrawScr(scr)
                     scr.Refresh()
                 End If
@@ -812,38 +819,46 @@ Public Class Form1
     '32x32パレットのクリック
     Private Sub p32_MouseClick(sender As Object, e As MouseEventArgs) Handles p32.MouseClick
         Dim p As Point 'どのマスをクリックしたか
+        Dim chipptr As UInteger
         p.X = Math.Floor(e.X / (sender.Size.Width / 16)) 'p = 0～15
         p.Y = Math.Floor(e.Y / (sender.Size.Width / 16))
+        chipptr = p.Y * 16 + p.X
         If e.Button = MouseButtons.Left Then '32x32読み
 
-            If (Control.ModifierKeys And Keys.Control) = Keys.Control Then
+            If (Control.ModifierKeys And Keys.Control) = Keys.Control AndAlso chipptr <> Clip32 Then 'Ctrl + クリックでペースト
+                Dim UndoData As New ArrayList
+
                 For i As UInteger = 0 To 3
-                    chip((p.Y * 16 + p.X) * 4 + i) = chip(Clip32 * 4 + i)
+                    UndoData.Add(chip(chipptr * 4 + i)) 'Undo情報に投入
+                    chip(chipptr * 4 + i) = chip(Clip32 * 4 + i)
                 Next
-                attr(p.Y * 16 + p.X) = attr(Clip32)
-                flag((p.Y * 16 + p.X) * 2) = flag(Clip32 * 2)
-                flag((p.Y * 16 + p.X) * 2 + 1) = flag(Clip32 * 2 + 1)
+
+                UndoData.Add(attr(chipptr))
+                UndoData.Add(flag(chipptr * 2))
+                UndoData.Add(flag(chipptr * 2 + 1))
+                AddUndo(chipptr, UndoData, AddressOf UndoPaste32)
+
+                attr(chipptr) = attr(Clip32)
+                flag(chipptr * 2) = flag(Clip32 * 2)
+                flag(chipptr * 2 + 1) = flag(Clip32 * 2 + 1)
             Else
-                focus32 = p.Y * 16 + p.X
+                focus32 = chipptr
                 DrawP32Focus(p32)
                 RefreshP32Focus()
             End If
         ElseIf e.Button = MouseButtons.Right Then '16x16読み
-            If (Control.ModifierKeys And Keys.Control) = Keys.Control Then
-                Clip32 = p.Y * 16 + p.X
+            If (Control.ModifierKeys And Keys.Control) = Keys.Control Then 'Ctrl + クリックでコピー
+                Clip32 = chipptr
             Else
                 Dim bitmask() As UInteger = {3, &H30, &HC, &HC0}
                 Dim shift() As UInteger = {0, 4, 2, 6}
-                Dim selectedattr As UInteger
-                Dim selected32 As UInteger = p.Y * 16 + p.X
                 p.X = Math.Floor(e.X / (sender.Size.Width / 32)) 'p = 0～31
                 p.Y = Math.Floor(e.Y / (sender.Size.Width / 32))
                 p.X = p.X Mod 2
                 p.Y = p.Y Mod 2
 
-                focus16 = chip(selected32 * 4 + p.X * 2 + p.Y)
-                selectedattr = (attr(selected32) And bitmask(p.X * 2 + p.Y)) >> shift(p.X * 2 + p.Y)
-                tile_attr = (attr(selected32) And bitmask(p.X * 2 + p.Y)) >> shift(p.X * 2 + p.Y)
+                focus16 = chip(chipptr * 4 + p.X * 2 + p.Y)
+                tile_attr = (attr(chipptr) And bitmask(p.X * 2 + p.Y)) >> shift(p.X * 2 + p.Y)
 
                 ReDraw16Focus()
             End If
@@ -861,14 +876,16 @@ Public Class Form1
         If e.Button = MouseButtons.Right Then '読み
             focus16 = chip(focus32 * 4 + p.X * 2 + p.Y) And &H7F
             tile_attr = (attr(focus32) And bitmask(p.X * 2 + p.Y)) >> shift(p.X * 2 + p.Y)
-
             ReDraw16Focus()
         ElseIf e.Button = MouseButtons.Left Then '書き
             Dim attr_write As UInteger = tile_attr << shift(p.X * 2 + p.Y)
             Dim attr_tmp As UInteger = attr(focus32)
             attr_tmp = attr_tmp And (Not bitmask(p.X * 2 + p.Y))
-            attr(focus32) = attr_tmp Or attr_write
-            chip(focus32 * 4 + p.X * 2 + p.Y) = focus16
+            If attr(focus32) <> (attr_tmp Or attr_write) OrElse chip(focus32 * 4 + p.X * 2 + p.Y) <> focus16 Then
+                AddUndo(New Point(focus32, focus32 * 4 + p.X * 2 + p.Y), New Point(attr(focus32), chip(focus32 * 4 + p.X * 2 + p.Y)), AddressOf Undo32) 'Undoを設定
+                attr(focus32) = attr_tmp Or attr_write
+                chip(focus32 * 4 + p.X * 2 + p.Y) = focus16
+            End If
 
             DrawP32Focus(p32focus)
             RefreshP32Focus()
@@ -882,17 +899,23 @@ Public Class Form1
     '16x16タイル定義パレットのクリック
     Private Sub ptile_MouseClick(sender As Object, e As MouseEventArgs) Handles ptile.MouseClick
         Dim p As Point 'どのマスをクリックしたか
+        Dim tileptr As UInteger
         p.X = Math.Floor(e.X / (sender.Size.Width / 16)) 'p = 0～15
         p.Y = Math.Floor(e.Y / (sender.Size.Width / 16))
+        tileptr = p.Y * 16 + p.X
 
         If e.Button = MouseButtons.Left Then '16x16読み
 
-            If (Control.ModifierKeys And Keys.Control) = Keys.Control Then
+            If (Control.ModifierKeys And Keys.Control) = Keys.Control AndAlso tileptr <> Clip16 Then 'Ctrl + クリックでペースト
+                Dim UndoData As New ArrayList
+
                 For i As UInteger = 0 To 3
-                    tile((p.Y * 16 + p.X) * 4 + i) = tile(Clip16 * 4 + i)
+                    UndoData.Add(tile(tileptr * 4 + i))
+                    tile(tileptr * 4 + i) = tile(Clip16 * 4 + i)
                 Next
+                AddUndo(tileptr * 4, UndoData, AddressOf UndoPaste16)
             Else
-                focus16 = p.Y * 16 + p.X
+                focus16 = tileptr
                 RefreshAll()
 
                 DrawP16Focus(p16focus)
@@ -901,16 +924,15 @@ Public Class Form1
                 p3216focus.Refresh()
             End If
         ElseIf e.Button = MouseButtons.Right Then '8x8読み
-            If (Control.ModifierKeys And Keys.Control) = Keys.Control Then
-                Clip16 = p.Y * 16 + p.X
+            If (Control.ModifierKeys And Keys.Control) = Keys.Control Then 'Ctrl + クリックでコピー
+                Clip16 = tileptr
             Else
-                Dim selected16 As UInteger = p.Y * 16 + p.X
                 p.X = Math.Floor(e.X / (sender.Size.Width / 32)) 'p = 0～31
                 p.Y = Math.Floor(e.Y / (sender.Size.Width / 32))
                 p.X = p.X Mod 2
                 p.Y = p.Y Mod 2
 
-                focus8 = tile(selected16 * 4 + p.X * 2 + p.Y)
+                focus8 = tile(tileptr * 4 + p.X * 2 + p.Y)
                 DrawP8Focus(p8focus)
                 p8focus.Refresh()
             End If
@@ -920,15 +942,18 @@ Public Class Form1
     '16x16選択枠のクリック
     Private Sub p16focus_MouseClick(sender As Object, e As MouseEventArgs) Handles p16focus.MouseClick
         Dim p As Point
+        Dim tileptr As UInteger
         p.X = Math.Floor(e.X / (sender.Size.Width / 2))
         p.Y = Math.Floor(e.Y / (sender.Size.Width / 2))
+        tileptr = focus16 * 4 + p.X * 2 + p.Y
 
         If e.Button = MouseButtons.Right Then '読み
             focus8 = tile(focus16 * 4 + p.X * 2 + p.Y)
             DrawP8Focus(p8focus)
             p8focus.Refresh()
-        ElseIf e.Button = MouseButtons.Left Then '書き
-            tile(focus16 * 4 + p.X * 2 + p.Y) = focus8
+        ElseIf e.Button = MouseButtons.Left And tile(tileptr) <> focus8 Then '書き
+            AddUndo(tileptr, tile(tileptr), AddressOf Undo16) 'Undoの設定
+            tile(tileptr) = focus8
             DrawP16(ptile)
             ptile.Refresh()
             DrawP16Focus(p16focus)
@@ -978,17 +1003,15 @@ Public Class Form1
     '32x32地形判定選択枠のクリック
     Private Sub p32focus_attr_MouseClick(sender As Object, e As MouseEventArgs) Handles p32focus_attr.MouseClick
         Dim p As Point
+        Dim chipptr As UInteger
         p.X = Math.Floor(e.X / (sender.Size.Width / 2))
         p.Y = Math.Floor(e.Y / (sender.Size.Width / 2))
+        chipptr = focus32 * 2 + p.X
 
-        Dim a As UInteger = flag(focus32 * 2 + p.X)
+        Dim a As UInteger = flag(chipptr)
         Dim write As UInteger = flags_selected
         If e.Button = MouseButtons.Right Then '読み
-            If p.Y = 0 Then
-                a = a >> 4
-            Else
-                a = a And &HF
-            End If
+            a = If(p.Y = 0, a >> 4, a And &HF)
             flags_selected = a
             ComboBox_attr.SelectedIndex = flags_selected
         ElseIf e.Button = MouseButtons.Left Then '書き
@@ -998,105 +1021,86 @@ Public Class Form1
             Else
                 a = a And &HF0
             End If
-            flag(focus32 * 2 + p.X) = a Or write
-            p32focus_attr.Refresh()
+
+            If (a Or write) <> flag(chipptr) Then
+                AddUndo(chipptr, flag(chipptr), AddressOf UndoFlags)
+                flag(chipptr) = a Or write
+                p32focus_attr.Refresh()
+            End If
         End If
     End Sub
 
     '敵番号の変更
     Private Sub TextBoxObjType_Validating(sender As Object, e As CancelEventArgs) Handles TextBoxObjType.Validating
-        Try
-            If objindex_selected = 0 Then Exit Sub
+        If objindex_selected = 0 Then Exit Sub
+        Dim obj As EnemyStructure = If(obj_isenemy, EnemiesArray(objroom_selected)(objindex_selected - 1), ItemsArray(objroom_selected)(objindex_selected - 1))
 
+        Try
             Dim t As UInteger = Convert.ToUInt32(TextBoxObjType.Text, 16)
             If t >= &H100 Then
                 e.Cancel = True
                 Exit Sub
+            ElseIf obj.TypeID = t Then
+                Exit Sub
             End If
 
-            Dim obj As EnemiesStructure
-            If obj_isenemy Then
-                obj = EnemiesArray(objroom_selected).Item(objindex_selected - 1)
-            Else
-                obj = ItemsArray(objroom_selected).Item(objindex_selected - 1)
-            End If
-
-            obj.type = t
-
-            If obj_isenemy Then
-                EnemiesArray(objroom_selected).Item(objindex_selected - 1) = obj
-            Else
-                ItemsArray(objroom_selected).Item(objindex_selected - 1) = obj
-            End If
+            obj.TypeID = t
             DrawScr(scr)
             scr.Refresh()
         Catch ex As Exception
-            e.Cancel = True
+            TextBoxObjType.Text = obj.TypeID
         End Try
     End Sub
 
+    '敵位置Xの変更
     Private Sub TextBoxObjX_Validating(sender As Object, e As CancelEventArgs) Handles TextBoxObjX.Validating
-        Try
-            If objindex_selected = 0 Then Exit Sub
+        If objindex_selected = 0 Then Exit Sub
+        Dim obj As EnemyStructure = If(obj_isenemy, EnemiesArray(objroom_selected)(objindex_selected - 1), ItemsArray(objroom_selected)(objindex_selected - 1))
 
+        Try
             Dim t As UInteger = Convert.ToUInt32(TextBoxObjX.Text, 16)
             If t >= &H100 Then
                 e.Cancel = True
                 Exit Sub
+            ElseIf obj.Origin.X = t Then
+                Exit Sub
             End If
 
-            Dim obj As EnemiesStructure
-            If obj_isenemy Then
-                obj = EnemiesArray(objroom_selected).Item(objindex_selected - 1)
-            Else
-                obj = ItemsArray(objroom_selected).Item(objindex_selected - 1)
-            End If
-            obj.org.X = t
-
-            If obj_isenemy Then
-                EnemiesArray(objroom_selected).Item(objindex_selected - 1) = obj
-            Else
-                ItemsArray(objroom_selected).Item(objindex_selected - 1) = obj
-            End If
+            obj.Origin = New Point(t, obj.Origin.Y)
             DrawScr(scr)
             scr.Refresh()
         Catch ex As Exception
-            e.Cancel = True
+            TextBoxObjX.Text = Hex(obj.Origin.X)
         End Try
     End Sub
 
+    '敵位置Yの変更
     Private Sub TextBoxObjY_Validating(sender As Object, e As CancelEventArgs) Handles TextBoxObjY.Validating
-        Try
-            If objindex_selected = 0 Then Exit Sub
+        If objindex_selected = 0 Then Exit Sub
+        Dim obj As EnemyStructure = If(obj_isenemy, EnemiesArray(objroom_selected)(objindex_selected - 1), ItemsArray(objroom_selected)(objindex_selected - 1))
 
+        Try
             Dim t As UInteger = Convert.ToUInt32(TextBoxObjY.Text, 16)
             If t >= &H100 Then
                 e.Cancel = True
                 Exit Sub
+            ElseIf obj.Origin.Y = t Then
+                Exit Sub
             End If
 
-            Dim obj As EnemiesStructure
-            If obj_isenemy Then
-                obj = EnemiesArray(objroom_selected).Item(objindex_selected - 1)
-            Else
-                obj = ItemsArray(objroom_selected).Item(objindex_selected - 1)
-            End If
-            obj.org.Y = t
-
-            If obj_isenemy Then
-                EnemiesArray(objroom_selected).Item(objindex_selected - 1) = obj
-            Else
-                ItemsArray(objroom_selected).Item(objindex_selected - 1) = obj
-            End If
+            obj.Origin = New Point(obj.Origin.X, t)
             DrawScr(scr)
             scr.Refresh()
         Catch ex As Exception
-            e.Cancel = True
+            TextBoxObjY.Text = Hex(obj.Origin.Y)
         End Try
     End Sub
 
     '矢印キーでマップ移動
     Private Sub TabControl1_KeyUp(sender As Object, e As KeyEventArgs) Handles TabControl1.KeyUp
+        'テキストボックスにフォーカスがある時、スクロールしない
+        If TextBoxObjType.Focused OrElse TextBoxObjX.Focused OrElse TextBoxObjY.Focused Then Exit Sub
+
         Select Case e.KeyValue
             Case Keys.W
                 ButtonMapUp_Click(Nothing, Nothing)
@@ -1106,10 +1110,12 @@ Public Class Form1
                 ButtonMapLeft_Click(Nothing, Nothing)
             Case Keys.D
                 ButtonMapRight_Click(Nothing, Nothing)
+            Case Keys.Z And e.Control
+                UndoToolStripMenuItem_Click(UndoToolStripMenuItem, New EventArgs())
         End Select
-        'Debug.WriteLine(ViewOrigin)
     End Sub
 
+    'マップのスクロール
     Private Sub ButtonMapUp_Click(sender As Object, e As EventArgs) Handles ButtonMapUp.Click
         ViewOrigin.Y = (ViewOrigin.Y - 1) And &HF
         DrawScr(scr)
@@ -1134,6 +1140,7 @@ Public Class Form1
         scr.Refresh()
     End Sub
 
+    '右クリック時、位置を保存
     Private Sub scr_MouseDown(sender As Object, e As MouseEventArgs) Handles scr.MouseDown
         If e.Button = MouseButtons.Right Then
             ContextViewOrigin = New Point(Math.Floor(e.X / 256), Math.Floor(e.Y / 256))
@@ -1141,6 +1148,8 @@ Public Class Form1
             ContextRoom = map((ViewOrigin.Y + Math.Floor(e.Y / 256)) * 16 + ViewOrigin.X + Math.Floor(e.X / 256))
         End If
     End Sub
+
+    '敵の新規作成
     Private Sub CreateObjectToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles オブジェクトの新規作成ToolStripMenuItem.Click
         If ContextRoom >= 0 And ContextRoom < &H40 Then
             Dim type As UInteger = 0
@@ -1153,11 +1162,13 @@ Public Class Form1
                 End Try
             End If
 
-            Dim o As New EnemiesStructure(ContextOrigin, type)
+            Dim o As New EnemyStructure(ContextOrigin, type)
             If obj_isenemy Then
+                AddUndo(ContextRoom, o, AddressOf UndoCreateEnemy) 'Undoの設定
                 EnemiesArray(ContextRoom).Add(o)
                 objindex_selected = EnemiesArray(ContextRoom).Count
             Else
+                AddUndo(ContextRoom, o, AddressOf UndoCreateItem) 'Undoの設定
                 ItemsArray(ContextRoom).Add(o)
                 objindex_selected = ItemsArray(ContextRoom).Count
             End If
@@ -1167,12 +1178,15 @@ Public Class Form1
         End If
     End Sub
 
+    '敵の削除
     Private Sub DeleteObjectToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles 選択したオブジェクトの削除ToolStripMenuItem.Click
         If objindex_selected = 0 Then Exit Sub
 
         If obj_isenemy Then
+            AddUndo(objroom_selected, (EnemiesArray(objroom_selected)(objindex_selected - 1)), AddressOf UndoDeleteEnemy) 'Undoの設定
             EnemiesArray(objroom_selected).RemoveAt(objindex_selected - 1)
         Else
+            AddUndo(objroom_selected, (ItemsArray(objroom_selected)(objindex_selected - 1)), AddressOf UndoDeleteItem) 'Undoの設定
             ItemsArray(objroom_selected).RemoveAt(objindex_selected - 1)
         End If
         ClearObjectSelection()
@@ -1225,15 +1239,10 @@ Public Class Form1
             Dim prev As Integer = -1
             ss = "未使用の32x32定義:" & vbCrLf
             For Each n As UInteger In unusedchip
-                If prev > 0 And (prev And &HF0) <> (n And &HF0) Then
-                    ss &= vbCrLf
-                End If
+                If prev > 0 And (prev And &HF0) <> (n And &HF0) Then ss &= vbCrLf
                 prev = n
-                If n < &H10 Then
-                    ss &= "0"
-                End If
-                ss &= Hex(n)
-                ss &= ", "
+                If n < &H10 Then ss &= "0"
+                ss &= Hex(n) & ", "
             Next
 
             bg_chipinfo.RunWorkerAsync(ss)
@@ -1261,15 +1270,10 @@ Public Class Form1
             Dim prev As Integer = -1
             ss = "未使用の16x16定義:" & vbCrLf
             For Each n As UInteger In unusedchip
-                If prev > 0 And (prev And &HF0) <> (n And &HF0) Then
-                    ss &= vbCrLf
-                End If
+                If prev > 0 And (prev And &HF0) <> (n And &HF0) Then ss &= vbCrLf
                 prev = n
-                If n < &H10 Then
-                    ss &= "0"
-                End If
-                ss &= Hex(n)
-                ss &= ", "
+                If n < &H10 Then ss &= "0"
+                ss &= Hex(n) & ", "
             Next
 
             ss &= vbCrLf & vbCrLf
@@ -1289,15 +1293,10 @@ Public Class Form1
 
             prev = -1
             For Each n As UInteger In unusedchip
-                If prev > 0 And (prev And &HF0) <> (n And &HF0) Then
-                    ss &= vbCrLf
-                End If
+                If prev > 0 And (prev And &HF0) <> (n And &HF0) Then ss &= vbCrLf
                 prev = n
-                If n < &H10 Then
-                    ss &= "0"
-                End If
-                ss &= Hex(n)
-                ss &= ", "
+                If n < &H10 Then ss &= "0"
+                ss &= Hex(n) & ", "
             Next
             bg_chipinfo.RunWorkerAsync(ss)
         End If
@@ -1332,8 +1331,6 @@ Public Class Form1
             TabControl1.TabPages.RemoveByKey("ttile")
 
             ppalette32.Visible = False
-            'DrawAll()
-            'RefreshAll()
         End If
     End Sub
 
@@ -1365,11 +1362,7 @@ Public Class Form1
 
     '地形/オブジェクト切り替えのラジオボタン
     Private Sub Radio_EditTerrain_CheckedChanged(sender As Object, e As EventArgs) Handles Radio_EditTerrain.CheckedChanged, Radio_EditEnemies.CheckedChanged
-        If Radio_EditTerrain.Checked Then
-            scr.ContextMenuStrip = Nothing
-        Else
-            scr.ContextMenuStrip = ContextMenuStripObj
-        End If
+        scr.ContextMenuStrip = If(Radio_EditTerrain.Checked, Nothing, ContextMenuStripObj)
         ClearObjectSelection()
         DrawScr(scr)
         scr.Refresh()
@@ -1383,6 +1376,7 @@ Public Class Form1
         scr.Refresh()
     End Sub
 
+    '外部の更新を検知
     Private Sub Form1_Activated(sender As Object, e As EventArgs) Handles MyBase.Activated
         If BinFilePath <> "" Then
             Dim t As Date = File.GetLastWriteTime(BinFilePath)
@@ -1407,5 +1401,16 @@ Public Class Form1
                 OpenStageData(ChrFilePath)
             End If
         End If
+    End Sub
+
+    '元に戻すボタン
+    'Undoを実行し、Undoオブジェクトのリストを1つ減らす
+    Private Sub UndoToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles UndoToolStripMenuItem.Click
+        If UndoBuffer.Count < 1 Then Return
+        UndoBuffer(UndoBuffer.Count - 1).DoThis()
+        UndoBuffer.RemoveAt(UndoBuffer.Count - 1)
+
+        RefreshAll()
+        UndoToolStripMenuItem.Enabled = UndoBuffer.Count <> 0
     End Sub
 End Class

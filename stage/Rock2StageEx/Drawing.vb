@@ -253,9 +253,9 @@ Partial Public Class Form1
                                     pen = Pens.Violet
                                     brush = Brushes.Violet
                                 End If
-                                For Each en As EnemiesStructure In EnemiesArray(roomnum)
-                                    type = en.type
-                                    p = en.org
+                                For Each en As EnemyStructure In EnemiesArray(roomnum)
+                                    type = en.TypeID
+                                    p = en.Origin
                                     p += New Point(Xm * 256, Ym * 256)
                                     If type < 16 Then
                                         s = "0"
@@ -278,9 +278,9 @@ Partial Public Class Form1
                                     pen = Pens.Violet
                                     brush = Brushes.Violet
                                 End If
-                                For Each it As EnemiesStructure In ItemsArray(roomnum)
-                                    type = it.type
-                                    p = it.org
+                                For Each it As EnemyStructure In ItemsArray(roomnum)
+                                    type = it.TypeID
+                                    p = it.Origin
                                     p += New Point(Xm * 256, Ym * 256)
                                     If type < 16 Then
                                         s = "0"

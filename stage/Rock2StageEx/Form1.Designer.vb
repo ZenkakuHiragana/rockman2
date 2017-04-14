@@ -46,6 +46,7 @@ Partial Class Form1
         Me.ButtonMapRight = New System.Windows.Forms.Button()
         Me.ButtonMapUp = New System.Windows.Forms.Button()
         Me.ButtonMapLeft = New System.Windows.Forms.Button()
+        Me.LabelViewOrigin = New System.Windows.Forms.Label()
         Me.Label_ScreenNum = New System.Windows.Forms.Label()
         Me.Label_ObjY = New System.Windows.Forms.Label()
         Me.Label_ObjX = New System.Windows.Forms.Label()
@@ -83,7 +84,7 @@ Partial Class Form1
         Me.画面番号の変更ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.bg_chipinfo = New System.ComponentModel.BackgroundWorker()
         Me.bg_tileinfo = New System.ComponentModel.BackgroundWorker()
-        Me.LabelViewOrigin = New System.Windows.Forms.Label()
+        Me.UndoToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         CType(Me.scr, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.MenuStrip1.SuspendLayout()
         Me.TabControl1.SuspendLayout()
@@ -116,7 +117,7 @@ Partial Class Form1
         '
         'MenuStrip1
         '
-        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.Menu_File, Me.Menu_ShowAll, Me.Menu_ShowPartial})
+        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.Menu_File, Me.Menu_ShowAll, Me.Menu_ShowPartial, Me.UndoToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
         Me.MenuStrip1.Size = New System.Drawing.Size(556, 26)
@@ -133,19 +134,19 @@ Partial Class Form1
         'Menu_Open
         '
         Me.Menu_Open.Name = "Menu_Open"
-        Me.Menu_Open.Size = New System.Drawing.Size(119, 22)
+        Me.Menu_Open.Size = New System.Drawing.Size(152, 22)
         Me.Menu_Open.Text = "開く(&O)"
         '
         '保存SToolStripMenuItem
         '
         Me.保存SToolStripMenuItem.Name = "保存SToolStripMenuItem"
-        Me.保存SToolStripMenuItem.Size = New System.Drawing.Size(119, 22)
+        Me.保存SToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.保存SToolStripMenuItem.Text = "保存(&S)"
         '
         'Menu_Exit
         '
         Me.Menu_Exit.Name = "Menu_Exit"
-        Me.Menu_Exit.Size = New System.Drawing.Size(119, 22)
+        Me.Menu_Exit.Size = New System.Drawing.Size(152, 22)
         Me.Menu_Exit.Text = "終了(&X)"
         '
         'Menu_ShowAll
@@ -336,6 +337,16 @@ Partial Class Form1
         Me.ButtonMapLeft.TabIndex = 12
         Me.ButtonMapLeft.Text = "←"
         Me.ButtonMapLeft.UseVisualStyleBackColor = True
+        '
+        'LabelViewOrigin
+        '
+        Me.LabelViewOrigin.AutoSize = True
+        Me.LabelViewOrigin.Font = New System.Drawing.Font("MS UI Gothic", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
+        Me.LabelViewOrigin.Location = New System.Drawing.Point(140, 527)
+        Me.LabelViewOrigin.Name = "LabelViewOrigin"
+        Me.LabelViewOrigin.Size = New System.Drawing.Size(95, 19)
+        Me.LabelViewOrigin.TabIndex = 7
+        Me.LabelViewOrigin.Text = "画面位置: "
         '
         'Label_ScreenNum
         '
@@ -674,15 +685,12 @@ Partial Class Form1
         'bg_tileinfo
         '
         '
-        'LabelViewOrigin
+        'UndoToolStripMenuItem
         '
-        Me.LabelViewOrigin.AutoSize = True
-        Me.LabelViewOrigin.Font = New System.Drawing.Font("MS UI Gothic", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
-        Me.LabelViewOrigin.Location = New System.Drawing.Point(140, 527)
-        Me.LabelViewOrigin.Name = "LabelViewOrigin"
-        Me.LabelViewOrigin.Size = New System.Drawing.Size(95, 19)
-        Me.LabelViewOrigin.TabIndex = 7
-        Me.LabelViewOrigin.Text = "画面位置: "
+        Me.UndoToolStripMenuItem.Enabled = False
+        Me.UndoToolStripMenuItem.Name = "UndoToolStripMenuItem"
+        Me.UndoToolStripMenuItem.Size = New System.Drawing.Size(68, 22)
+        Me.UndoToolStripMenuItem.Text = "元に戻す"
         '
         'Form1
         '
@@ -785,5 +793,6 @@ Partial Class Form1
     Friend WithEvents ButtonTileInfo As System.Windows.Forms.Button
     Friend WithEvents 保存SToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents LabelViewOrigin As System.Windows.Forms.Label
+    Friend WithEvents UndoToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 
 End Class
