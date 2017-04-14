@@ -22,33 +22,18 @@ Pikopiko_kun1:
 	mMOV #$6F, aObjVar + 1
 	inc <zBossBehaviour
 	mSTZ <zBossVar
-.rts
+.rts .public
 	rts
-
-	.ifndef ___OPTIMIZE
-;9242
-;
-Pikopiko_kun2_jmp_rts:
-	jmp Pikopiko_kun2_rts
-	.endif
 
 ;9245
 ;2, ピコピコくん 破壊までのループ
 Pikopiko_kun2:
 	dec aObjVar + 1
-	.ifndef ___OPTIMIZE
-	bne Pikopiko_kun2_jmp_rts
-	.else
-	beq .rts
-	.endif
+	bne Pikopiko_kun1.rts
 	mMOV #$1F, aObjVar + 1
 	lda #$6A
 	jsr BossBehaviour_CheckExistence
-	.ifndef ___OPTIMIZE
-	bcc Pikopiko_kun2_jmp_rts
-	.else
-	bcs .rts
-	.endif
+	bcc Pikopiko_kun1.rts
 	ldx <zBossVar
 	ldy Table_PikopikoPtr,x
 	ldx #$00

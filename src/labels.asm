@@ -491,7 +491,7 @@ aBossPtrlo = $5A9
 aBossVar2 = $5A9         ;なんだっけこれは
 
 aBossDeath = $5AA       ;ボスティウンフラグ
-
+aBossVar3 = $5AB
 
 
 aObjVX = $600           ;オブジェクトの速度X上位
