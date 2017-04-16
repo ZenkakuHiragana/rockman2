@@ -19,17 +19,17 @@
 	sta <z2001
 	sta $2001 ;PPU Reg1
 	lda $2002 ;PPU Stats
-	jsr WritePPUScroll
+	jsr WritePPUScroll ;スクロール用NT書き込み
 	lda #$00
 	sta $2003 ;Sprite Address
 	lda #$02
 	sta $4014 ;Sprite DMA
-	lda <zPPUSqr
+	lda <zPPUSqr ;矩形書き込み
 	beq .sqr
 	jsr WritePPUSquare
 .sqr
-	jsr WritePalette
-	lda <zPPULinear
+	jsr WritePalette ;パレット書き込み
+	lda <zPPULinear ;線型書き込み
 	beq .linear
 	jsr WritePPULinear
 .linear
@@ -548,7 +548,7 @@ WritePPULaser:
 	tax
 	jmp .jump_alt
 .isplus
-	ldx #$20
+	ldx #$14
 .jump_alt
 	ldy #$02
 .loop_alt
@@ -557,9 +557,12 @@ WritePPULaser:
 	lda aPPULaserlo
 	sta $2006
 	stx $2007
-	inx
-	stx $2007
-	inx
+	clc
+	txa
+	adc #$10
+	sta $2007
+	sbc #$0E
+	tax
 	inc aPPULaserlo
 	dey
 	bne .loop_alt
