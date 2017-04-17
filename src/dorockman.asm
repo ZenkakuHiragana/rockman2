@@ -1371,7 +1371,7 @@ DoRockman_DoScroll:
 	bit <zMoveVec
 	bvc .scroll_left
 ;右スクロール
-	sbc #$78
+	sbc #Scroll_RightBound
 	bcc .skip_horizontal
 	cmp <.dx
 	bcs .changedx_r
@@ -1404,7 +1404,7 @@ DoRockman_DoScroll:
 	jmp .merge_h
 ;左スクロール
 .scroll_left
-	sbc #$88
+	sbc #Scroll_LeftBound
 	bcs .skip_horizontal
 	eor #$FF
 	adc #$01

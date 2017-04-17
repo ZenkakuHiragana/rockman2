@@ -476,12 +476,12 @@ WritePPULinear:
 ;20 F6 D1
 WritePPULaser:
 	lda <z2000
-	ora #$04
+	ora #%00000100
 	sta $2000
 	lda <zPPUShutterFlag
-	bne .alternate
+	bne .shutter
 	ldy <zPPULaser
-	bmi .shutter
+	bmi .alternate
 .loop
 	lda aPPULaserhi - 1,y
 	sta $2006
@@ -497,83 +497,85 @@ WritePPULaser:
 .shutter_done
 	sty <zPPULaser
 	lda <z2000
-	and #$FB
+	and #%11111011
 	sta $2000
 	rts
 
-.shutter
+.alternate
 	tya
 	and #$7F
 	tay
-.loop_shutter_3
+.loop_alt3
 	lda #$02
 	sta <$00
 	lda #$E4
 	sta <$01
-.loop_shutter_2
+.loop_alt2
 	lda aPPULaserhi - 1,y
 	sta $2006
 	lda aPPULaserlo - 1,y
 	sta $2006
 	lda #$02
 	sta <$02
-.loop_shutter
+.loop_alt
 	lda <$01
 	sta $2007
 	inc <$01
 	dec <$02
-	bne .loop_shutter
+	bne .loop_alt
 	dec <$00
 	beq .jump
 	clc
 	lda aPPULaserlo - 1,y
 	adc #$01
 	sta aPPULaserlo - 1,y
-	jmp .loop_shutter_2
+	jmp .loop_alt2
 .jump
 	dey
-	bne .loop_shutter_3
+	bne .loop_alt3
 	beq .shutter_done
 
-.alternate
-	bpl .isplus
-	lda aPPULaserhi
-	sta $2006
+.shutter
+	sec
+	sta <$00
+.loop_shutter
+	ldy aPPULaserhi
+	lda <$00
+	bpl .isclosing
+	sty $2006
 	ldx aPPULaserlo
 	dex
 	dex
-	stx $2006
+	stx $2006 ;シャッター書き込み位置 より左2つズレた位置
 	lda $2007
 	lda $2007
-	tax
-	jmp .jump_alt
-.isplus
+	ldx $2007
+	jmp .jump_shutter
+.isclosing
 	ldx #$14
-.jump_alt
-	ldy #$02
-.loop_alt
-	lda aPPULaserhi
-	sta $2006
-	lda aPPULaserlo
-	sta $2006
-	stx $2007
-	clc
+	bcs .1
+	inx
+.1
 	txa
-	adc #$10
+.jump_shutter
+	sty $2006
+	ldy aPPULaserlo
+	sty $2006
 	sta $2007
-	sbc #$0E
-	tax
+	stx $2007
 	inc aPPULaserlo
-	dey
-	bne .loop_alt
-	lda $03C2
+	tya
+	lsr a
+	bcc .loop_shutter
+;属性テーブル書き込み
+	lda aPPUShutterAttrhi
 	sta $2006
-	lda $03C8
-	sta $2006
-	lda <zPPUShutterFlag
-	bpl .isplus_2
+	ldy aPPUShutterAttrlo
+	sty $2006
 	lda $2007
 	lda $2007
+	ldx <zPPUShutterFlag
+	bpl .isclosing2
 	sta <$00
 	lda $03D4
 	eor #$FF
@@ -584,19 +586,15 @@ WritePPULaser:
 	asl a
 	sta $03CE
 	lda <$00
-	jmp .not_read
-.isplus_2
-	lda $2007
-	lda $2007
-.not_read
+.isclosing2
 	and $03D4
 	ora $03CE
 	tax
-	lda $03C2
+	lda aPPUShutterAttrhi
 	sta $2006
-	lda $03C8
-	sta $2006
+	sty $2006
 	stx $2007
+	ldy #$00
 	sty <zPPUShutterFlag
 	jmp .shutter_done
 

@@ -2454,7 +2454,7 @@ CheckOffscreenEnemy_Break:
 	mMOV #%10000000, aObjFlags,x
 	mSTZ aObjWait,x, aObjFrame,x
 	jmp PostSafeRemoveEnemy
-CheckOffscreenEnemy_CheckOffscreen:
+CheckOffscreenEnemy_CheckOffscreen: ;画面外判定
 	lda aObjFlags,x
 	asl a
 	sta <$02
@@ -2533,8 +2533,7 @@ PostSafeRemoveEnemy:
 	rts
 .isitem
 	ldy aItemOrder,x
-	lda #$00
-	sta aItemOrder - 1,x
+	mSTZ aItemOrder,x
 	mMOV aObjLife,x, aItemLife - 1,y
 	sec
 	rts
