@@ -10,10 +10,8 @@
 ;84EE
 ;ロックマン状態別の処理
 ;DoRockman:
-	lda aObjX
-	pha
-	lda aObjY
-	pha
+	mMOV aObjX, <zPrevX
+	mMOV aObjY, <zPrevY
 	lda <zStopFlag
 	and #$04
 	bne DoRockman01_Fall
@@ -31,10 +29,6 @@
 	lda #$00
 	rol a
 	sta <zOffscreen
-	pla
-	tay
-	pla
-	tax
 	jmp DoRockman_DoScroll
 
 ;8508
@@ -1351,11 +1345,82 @@ DoRockman_DoScroll:
 .f = $02 ;スクロール方向フラグ: L... ...U(U: 上, L: 左)
 .dx = $03 ;移動差X
 .dy = $04 ;移動差Y
+.clip_dx = $05 ;スクロール制限用X
+.clip_dy = $06 ;スクロール制限用Y
 .scroll_max = $08
-	mSTZ <.nth, <.ntv, <.f
-	sty <.dy
+	ldx #(.dy - .nth)
+	lda #$00
+.loop_init
+	sta <.nth,x
+	dex
+	bpl .loop_init
+	
+	lda <zScrollClipFlag
+	beq .skip_scrollclip
+	lsr a
+	pha
+	ldy <zScrollClipRoom
+	ldx <zRoom
+	bcc .skip_scrollclip_y
+;縦スクロール制限
+	lda <zVScroll
+	bne .continue_scrollclip_y
+	pla
+	pha
+	asl a
+	sta <zScrollClipFlag
+	bpl .skip_scrollclip_y
+.continue_scrollclip_y
+	tya
+	and #$F0
+	sta <.ntv
+	txa
+	and #$F0
+	sbc <.ntv
+	bcs .scrollclip_up
+;下方向にスクロール制限
+	inc <.dy
+	.db $2C
+.scrollclip_up
+;上方向にスクロール制限
+	dec <.dy
+.skip_scrollclip_y
+	pla
+	beq .skip_scrollclip
+;横スクロール制限
+	lda <zHScroll
+	bne .continue_scrollclip_x
+	lda <zScrollClipFlag
+	and #%00000001
+	sta <zScrollClipFlag
+	bpl .skip_scrollclip
+.continue_scrollclip_x
+	tya
+	and #$0F
+	sta <.nth
 	sec
 	txa
+	and #$0F
+	sbc <.nth
+	bcs .scrollclip_left
+;右方向にスクロール制限
+	inc <.dx
+	.db $2C
+.scrollclip_left
+;左方向にスクロール制限
+	dec <.dx
+.skip_scrollclip
+	lda <.dx
+	beq .noclip_x
+	bpl .finalizedx_r
+	and #$01
+	sta <.dx
+	jmp .finalizedx_l
+.noclip_x
+	
+;スクロール量の決定
+	sec
+	lda <zPrevX
 	sbc aObjX
 	bcs .borrow_dx
 	eor #$FF
@@ -1449,10 +1514,17 @@ DoRockman_DoScroll:
 	lsr a
 	sta <.nth ;横スクロールのための書き込み量
 .skip_horizontal
-	ldy <.dy
 ;縦スクロール
+	lda <.dy
+	beq .noclip_y
+	bpl .finalizedy_d
+	lda #$01
+	sta <.dy
+	jmp .finalizedy_u
+.noclip_y
+	
 	sec
-	tya
+	lda <zPrevY
 	sbc aObjY
 	bne .usevy
 	clc
@@ -1464,7 +1536,6 @@ DoRockman_DoScroll:
 .inv_dy
 	clc
 	adc #$01
-.usevy2
 	sta <.dy
 	sec
 	lda aObjY
