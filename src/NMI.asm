@@ -167,7 +167,7 @@ WritePalette:
 	sta <z3A ;---------------------------?
 	rts
 	
-	.beginregion "PPU_4way_scroll"
+;	.beginregion "PPU_4way_scroll"
 WritePPUScroll:
 	lda <zPPUVScr
 	bne .do_v
@@ -350,7 +350,7 @@ WritePPUScroll:
 	
 	mSTZ <zPPUHScr, <zPPUVScr
 	rts
-	.endregion "PPU_4way_scroll"
+;	.endregion "PPU_4way_scroll"
 
 ;20 18 D1
 WritePPUSquare:

@@ -260,6 +260,11 @@ Public Class Form1
         p3216selectedBuf = BufContext.Allocate(p3216focus.CreateGraphics(), p3216focus.DisplayRectangle())
         p8selectedBuf = BufContext.Allocate(p8focus.CreateGraphics(), p8focus.DisplayRectangle())
         paletteBuf = BufContext.Allocate(ppalette.CreateGraphics(), ppalette.DisplayRectangle())
+
+        Dim cmd As String() = Environment.GetCommandLineArgs()
+        If cmd.Count() > 1 Then
+            OpenStageData(cmd(1))
+        End If
     End Sub
 
     Private Sub Form1_DragEnter(sender As Object, e As DragEventArgs) Handles MyBase.DragEnter
@@ -447,6 +452,8 @@ Public Class Form1
 
         DrawAll()
         RefreshAll()
+
+        ClearUndo()
     End Sub
 
     Private Sub 保存SToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles 保存SToolStripMenuItem.Click
@@ -1099,7 +1106,8 @@ Public Class Form1
     '矢印キーでマップ移動
     Private Sub TabControl1_KeyUp(sender As Object, e As KeyEventArgs) Handles TabControl1.KeyUp
         'テキストボックスにフォーカスがある時、スクロールしない
-        If TextBoxObjType.Focused OrElse TextBoxObjX.Focused OrElse TextBoxObjY.Focused Then Exit Sub
+        If TextBoxObjType.Focused OrElse TextBoxObjX.Focused OrElse _
+            TextBoxObjY.Focused OrElse TextBoxScreenNum.Focused Then Exit Sub
 
         Select Case e.KeyValue
             Case Keys.W

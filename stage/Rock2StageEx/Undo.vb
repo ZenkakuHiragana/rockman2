@@ -149,4 +149,10 @@ Partial Public Class Form1
 
         UndoToolStripMenuItem.Enabled = True
     End Sub
+
+    'Undo情報を消去する
+    Private Sub ClearUndo()
+        UndoBuffer.Clear()
+        UndoToolStripMenuItem.Enabled = False
+    End Sub
 End Class

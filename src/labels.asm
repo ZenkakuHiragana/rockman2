@@ -67,6 +67,8 @@ zObjIndex = $2B         ;オブジェクトインデックス
 
 zStatus = $2C           ;ロックマンの状態値
 
+zPrevX = $2D            ;ロックマンの移動処理前X座標
+zPrevY = $2E            ;ロックマンの移動処理前Y座標
 zRScreenX = $2D         ;ロックマンの画面内X座標(他に用途あり)
 zEScreenX = $2E         ;敵の画面内X座標(他に用途あり)
 zEScreenRoom = $2F      ;$440,x - $20
@@ -113,6 +115,9 @@ zPPULinear = $47        ;PPU線形書き込みサイズ予約
 
 zEnemyIndexPrev = $48   ;敵番号・戻る方
 zEnemyIndexNext = $49   ;敵番号・進む方
+
+zScrollClipFlag = $48   ;スクロール制限のフラグ .... ..XY
+zScrollClipRoom = $49   ;スクロール制限で移動する画面位置
 
 zRand = $4A             ;乱数
 

@@ -1,6 +1,7 @@
 ;3C000-3CFFF
-
+	.beginregion "EmptySpace38000"
 	mBEGIN #$0F, #$C000
+	.endregion "EmptySpace38000"
 ;20 00 C0
 ChangeBank:
 	sta <zBank
@@ -2490,14 +2491,14 @@ CheckOffscreenEnemy_CheckOffscreen: ;画面外判定
 .borrow_x
 	bpl SafeRemoveEnemy
 .cont_x
-	bit <$02
-	bvc .inv_x
-	clc
-	eor #$FF
-	adc #$01
-.inv_x
-	cmp #SpawnEnemyBoundaryX
-	bcc SafeRemoveEnemy
+;	bit <$02
+;	bvc .inv_x
+;	clc
+;	eor #$FF
+;	adc #$01
+;.inv_x
+;	cmp #SpawnEnemyBoundaryX
+;	bcc SafeRemoveEnemy
 ;縦の画面外判定
 	sec
 	lda aObjY,x
@@ -2509,14 +2510,13 @@ CheckOffscreenEnemy_CheckOffscreen: ;画面外判定
 .borrow_y
 	bpl SafeRemoveEnemy
 .cont_y
-	ldy <$02
-	bpl .inv_y
-	clc
-	eor #$FF
-	adc #$01
-.inv_y
-	cmp #SpawnEnemyBoundaryY
-	bcc SafeRemoveEnemy
+;	ldy <$02
+;	bpl .inv_y
+;	clc
+;	eor #$FF
+;.inv_y
+;	cmp #SpawnEnemyBoundaryY
+;	bcc SafeRemoveEnemy
 	clc
 	rts
 ;画面外に出たオブジェクトを消去する
@@ -2802,14 +2802,12 @@ SetVelocityAtRockman:
 	sec
 	lda <zRScreenX
 	sbc <zEScreenX
-	sta <.lx
 	bcs .inv_x
-	lda <.lx
 	eor #$FF
 	adc #$01
 	ldy #$00
-	sta <.lx
 .inv_x
+	sta <.lx
 	lda aObjFlags,x
 	and #%10111111
 	sta aObjFlags,x
@@ -2817,8 +2815,13 @@ SetVelocityAtRockman:
 	ora aObjFlags,x
 	sta aObjFlags,x
 	sec
+	lda aObjY,x
+	sbc <zVScroll
+	sta <.ly
+	sec
 	lda aObjY
-	sbc aObjY,x
+	sbc <zVScroll
+	sbc <.ly
 	php
 	bcs .inv_y
 	eor #$FF
@@ -2961,6 +2964,9 @@ Reset_JMP:
 ;zPtrに示すアドレスへjsr
 IndirectJSR:
 	jmp [zPtr]
+	.beginregion "EmptySpace"
+	.org Table_AnimationPointer_Low
+	.endregion "EmptySpace"
 	.include "src/animations.asm"
 
 	.org Reset_Start
