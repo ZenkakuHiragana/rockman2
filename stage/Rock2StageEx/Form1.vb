@@ -822,7 +822,6 @@ Public Class Form1
         End If
     End Sub
 
-
     '32x32パレットのクリック
     Private Sub p32_MouseClick(sender As Object, e As MouseEventArgs) Handles p32.MouseClick
         Dim p As Point 'どのマスをクリックしたか
@@ -848,11 +847,15 @@ Public Class Form1
                 attr(chipptr) = attr(Clip32)
                 flag(chipptr * 2) = flag(Clip32 * 2)
                 flag(chipptr * 2 + 1) = flag(Clip32 * 2 + 1)
+
+                DrawP32(p32)
+                p32.Refresh()
             Else
                 focus32 = chipptr
-                DrawP32Focus(p32)
-                RefreshP32Focus()
             End If
+
+            DrawP32Focus(p32)
+            RefreshP32Focus()
         ElseIf e.Button = MouseButtons.Right Then '16x16読み
             If (Control.ModifierKeys And Keys.Control) = Keys.Control Then 'Ctrl + クリックでコピー
                 Clip32 = chipptr
@@ -921,15 +924,17 @@ Public Class Form1
                     tile(tileptr * 4 + i) = tile(Clip16 * 4 + i)
                 Next
                 AddUndo(tileptr * 4, UndoData, AddressOf UndoPaste16)
+
+                DrawP16(ptile)
+                ptile.Refresh()
             Else
                 focus16 = tileptr
-                RefreshAll()
-
-                DrawP16Focus(p16focus)
-                p16focus.Refresh()
-                DrawP16Focus(p3216focus)
-                p3216focus.Refresh()
             End If
+
+            DrawP16Focus(p16focus)
+            p16focus.Refresh()
+            DrawP16Focus(p3216focus)
+            p3216focus.Refresh()
         ElseIf e.Button = MouseButtons.Right Then '8x8読み
             If (Control.ModifierKeys And Keys.Control) = Keys.Control Then 'Ctrl + クリックでコピー
                 Clip16 = tileptr
@@ -1418,6 +1423,7 @@ Public Class Form1
         UndoBuffer(UndoBuffer.Count - 1).DoThis()
         UndoBuffer.RemoveAt(UndoBuffer.Count - 1)
 
+        DrawAll()
         RefreshAll()
         UndoToolStripMenuItem.Enabled = UndoBuffer.Count <> 0
     End Sub
