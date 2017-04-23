@@ -1,0 +1,89 @@
+
+.tempo = 150
+FROZEN_TEMPO = 3600 / .tempo / 4
+	TRACK SQ1_FROZEN, SQ2_FROZEN, TRI_FROZEN, NOI_FROZEN, MOD_FROZEN
+MOD_FROZEN:
+	.dw $0000, $0080
+	.dw $2101, $0080
+	
+SQ1_FROZEN:
+	TEMPO FROZEN_TEMPO
+	TONE 0
+	VOL 15
+	KEY O6 - 3
+	ENV 1, 4, 1
+	
+.1
+	n2 8
+	n2
+	n2 6
+	n2 8
+	n2
+	n2 1
+	n2 6
+	n2 8
+	n2
+	n2 6
+	n2 8
+	n2 13
+	n2 15
+	n2 13
+	n2 8
+	n2 6
+	LOOP 3, .1
+	END
+
+SQ2_FROZEN:
+	TEMPO FROZEN_TEMPO
+	TONE 0
+	VOL 9
+	KEY O4
+	ENV 8, 1
+.1
+	n4 20
+	n4 13
+	n4 18
+	n4 11
+	n4 16
+	n4 9
+	n4 15
+	n4 8
+	LOOP 1, .1
+	END
+	
+TRI_FROZEN:
+	TEMPO FROZEN_TEMPO
+	VOL $7F - $30
+	KEY O3
+.1
+	n4 22
+	n4 15
+	n4 20
+	n4 13
+	n4 17
+	n4 11
+	n4 15
+	n4 10
+	LOOP 1, .1
+	END
+	
+NOI_FROZEN:
+	TEMPO FROZEN_TEMPO
+	VOL 15
+	ENV 3, 1
+	
+	n4 5
+	n4
+	n4
+	n4
+	n4 5
+	n4
+	ENV 3, 1, 1
+	n5 5
+	ENV 2, 1
+	n3 5
+	n2 12
+	n2 5
+	n1 5
+	n1 12
+	END
