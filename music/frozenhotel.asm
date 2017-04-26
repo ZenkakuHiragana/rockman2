@@ -8,10 +8,10 @@ MOD_FROZEN:
 	
 SQ1_FROZEN:
 	TEMPO FROZEN_TEMPO
-	TONE 0
+	TONE 1
 	VOL 15
 	KEY O6 - 3
-	ENV 1, 4, 1
+	ENV 3, 1
 	
 .1
 	n2 8
@@ -36,18 +36,18 @@ SQ1_FROZEN:
 SQ2_FROZEN:
 	TEMPO FROZEN_TEMPO
 	TONE 0
-	VOL 9
-	KEY O4
+	VOL 11
+	KEY O5 - 5
 	ENV 8, 1
 .1
-	n4 20
 	n4 13
-	n4 18
 	n4 11
 	n4 16
 	n4 9
-	n4 15
+	n4 9
+	n4 2
 	n4 8
+	n4 1
 	LOOP 1, .1
 	END
 	
