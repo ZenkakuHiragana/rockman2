@@ -30,7 +30,9 @@
 ;ETUDEFORGHOSTS:
 ;	.include "music/etudeforghosts.asm"
 FROZENHOTEL:
+	.beginregion "Frozen Hotel"
 	.include "music/frozenhotel.asm"
+	.endregion "Frozen Hotel"
 	
 	.list
 	mNULL
