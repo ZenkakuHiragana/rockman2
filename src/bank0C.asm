@@ -1,7 +1,7 @@
 
 	mBEGIN #$0C, #$8000
 	
-	jmp Sound_ProcessTracks:
+	jmp Sound_ProcessTracks
 	
 ;8003
 ;20 51 C0で予約された曲を鳴らし始める処理
@@ -391,11 +391,10 @@ Sound_ProcessTracks:
 	lda <zSFXChannel_Copy
 	lsr a
 	bcs $8294
-	ldx <SoundIndex
+	ldx <zSoundIndex
 	inx
 	inx
 	ldy <zProcessChannel
 	jsr Sound_8222
 	lsr <zSFXChannel_Copy
 	bcc $829E
-	

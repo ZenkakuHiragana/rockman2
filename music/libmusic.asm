@@ -9,10 +9,6 @@ O6 = $3B
 O7 = $47
 O8 = $53
 
-;サイズ測定
-;測定始点と終点をlist, mNULL, nolistで挟む
-;出てきた.lstファイルにあるアドレスの差を読む
-
 TRACK .macro
 	.db $0F
 	.db LOW(\1), HIGH(\1)

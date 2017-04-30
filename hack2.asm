@@ -23,6 +23,7 @@
 	.incbin "rockman2.prg"
 	.include "src/labels.asm"
 	.include "src/lib.asm"
+	.include "music/libmusic.asm"
 	.include "stage/stage.asm"
 	.include "src/bank09.asm"
 	.include "src/bank0B.asm"
@@ -32,4 +33,4 @@
 	.include "src/bank0F.asm"
 ;	.include "src/patch.asm"
 	
-;	.include "music/music.asm"
+	.include "music/music.asm"
