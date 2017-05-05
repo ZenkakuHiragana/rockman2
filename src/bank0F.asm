@@ -1269,15 +1269,10 @@ WriteNameTableByScroll:
 	and #$07
 	jsr ChangeBank
 ;書き込み開始位置の設定
-	lda <zRoom
-	and #$F0
-	sta <$09
-	lda <zRoom
-	and #$0F
-	tax
+	ldx <zRoom
 	clc
 	lda <zHScroll
-	adc #$88
+	adc #$E8
 	bcc .carry_x_init
 	inx
 .carry_x_init
@@ -1286,26 +1281,22 @@ WriteNameTableByScroll:
 	lsr a
 	and #$38
 	sta <$03 ;$03: 00XX X000
+	stx <$09
 	
 	lda <zVScroll
 	sta <$10
-	clc
-	txa
-	adc <$09
-	sta <$09
 	
-	ldx #$00
-	ldy #$00
 	lda <$08
 	and #$08
-	beq .inx_8
-	ldy #$02
-.inx_8
+	lsr a
+	lsr a
+	tay ;Y = 0, 2
 	lda <$08
 	and #$10
-	beq .inx_16
-	ldx #$02
-.inx_16
+	lsr a
+	lsr a
+	lsr a
+	tax ;X = 0, 2
 	lda <$10
 	asl a
 	rol a
@@ -1346,37 +1337,33 @@ WriteNameTableByScroll:
 	bmi .horizontal_v ;右スクロール時
 	sec
 	lda <$08
-	sbc #$08
+	sbc #$C0
 	sta <$08
 	bcs .carry_h_v
 	dec <$09
 .carry_h_v
-	tya ;横の書き込み開始位置を-8[dot]
-	eor #$02
-	tay
-	and #$02
-	beq .horizontal_v
-	txa
-	eor #$02
-	tax
-	and #$02
-	beq .horizontal_v
-	sec
+;	tya ;横の書き込み開始位置を-8[dot]
+;	eor #$02
+;	tay
+;	and #$02
+;	beq .horizontal_v
+;	txa
+;	eor #$02
+;	tax
+;	and #$02
+;	beq .horizontal_v
+	inc <$09
+	clc
 	lda <$03
-	sbc #$08
+	adc #$10
 	and #$3F
 	sta <$03
+	bpl .done_h
 .horizontal_v
-	stx <$04
-	sty <$05
-	
-	ldy <$02
-	bmi .left_nt
-	inc <$09
-	jmp .done_h
-.left_nt
 	dec <$09
 .done_h
+	stx <$04
+	sty <$05
 	
 ;ネームテーブル書き込み位置指定
 	lda <$09
@@ -1556,7 +1543,7 @@ WriteNameTableByScroll:
 .up_dy
 	stx <$04
 	sty <$05
-
+	
 	ldy <$09
 	dey
 	tya
@@ -1642,14 +1629,14 @@ WriteNameTableByScroll:
 	inc <$06
 	inx
 	cpx <$07
-	beq .skip_yscroll
+	beq .skip_yscroll ;横スクロール境界
 	cpx #$40
-	bcs .end_ptr_v
+	bcs .end_ptr_v ;ネームテーブル右端
 	cpx #$20
-	beq .end_ptr_v
+	beq .end_ptr_v ;ネームテーブル右端
 	tya
 	and #$02
-	bne .go_right16 ;16x16定義を1つ下のものへ
+	bne .go_right16 ;16x16定義を1つ右のものへ
 	iny
 	iny
 	sty <$05
