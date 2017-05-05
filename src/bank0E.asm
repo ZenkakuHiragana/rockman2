@@ -158,8 +158,7 @@ StartStage_Continue:
 	sta $2000
 	sta <zIsLag
 	mMOV #$40, <zGravity
-	ldx <zStage
-	mPLAYTRACK Table_StageMusic,x
+	mPLAYTRACK <zStage
 	ldx #$13
 .spriteloop
 	mMOV Table_SpriteREADY,x, aSprite,x
@@ -735,7 +734,7 @@ Scroll_GoForward:
 	sta <zScrollNumber
 	sec
 	sbc #$02
-	ldx #$80
+	ldx #$D8
 	ldy #$20
 	jsr DrawRoom
 	mMOV #$19, <$FD
@@ -754,7 +753,7 @@ Scroll_GoForward:
 	sta <$08
 	lda <$FD
 	asl a
-	adc Table_ShutterHeight,x
+	adc <zShutterHeight
 	sta <$0A
 	jsr SetPPUPos
 	jsr SetPPUPos_Attr
@@ -778,13 +777,13 @@ Scroll_GoForward:
 	sta <zRoom
 	sta aObjRoom
 	sbc #$02
-	ldx #$00
+	ldx #$18
 	ldy #$10
 	jsr DrawRoom
 	sec
 	lda <zScrollNumber
 	sbc #$01
-	ldx #$80
+	ldx #$D8
 	ldy #$10
 	jsr DrawRoom
 ;シャッター閉じる処理
@@ -815,7 +814,7 @@ Scroll_GoForward:
 	sta <$08
 	lda <$FD
 	asl a
-	adc Table_ShutterHeight,x
+	adc <zShutterHeight
 	sta <$0A
 	jsr SetPPUPos
 	ldx <zStage
@@ -837,9 +836,9 @@ Scroll_GoForward:
 
 ;9045
 ;ステージごとのシャッターの高さ
-Table_ShutterHeight:
-	.db $60, $40, $40, $40, $40, $40, $40, $40
-	.db $00, $00, $80, $80, $00, $80
+;Table_ShutterHeight:
+;	.db $60, $40, $40, $40, $40, $40, $40, $40
+;	.db $00, $00, $80, $80, $00, $80
 
 ;9053
 ;ステージごとのシャッターの色

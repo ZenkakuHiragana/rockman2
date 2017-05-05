@@ -31,6 +31,7 @@ Partial Class Form1
         Me.Menu_Exit = New System.Windows.Forms.ToolStripMenuItem()
         Me.Menu_ShowAll = New System.Windows.Forms.ToolStripMenuItem()
         Me.Menu_ShowPartial = New System.Windows.Forms.ToolStripMenuItem()
+        Me.UndoToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.tmap = New System.Windows.Forms.TabPage()
         Me.Panel1 = New System.Windows.Forms.Panel()
@@ -84,7 +85,6 @@ Partial Class Form1
         Me.画面番号の変更ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.bg_chipinfo = New System.ComponentModel.BackgroundWorker()
         Me.bg_tileinfo = New System.ComponentModel.BackgroundWorker()
-        Me.UndoToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         CType(Me.scr, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.MenuStrip1.SuspendLayout()
         Me.TabControl1.SuspendLayout()
@@ -134,19 +134,19 @@ Partial Class Form1
         'Menu_Open
         '
         Me.Menu_Open.Name = "Menu_Open"
-        Me.Menu_Open.Size = New System.Drawing.Size(152, 22)
+        Me.Menu_Open.Size = New System.Drawing.Size(119, 22)
         Me.Menu_Open.Text = "開く(&O)"
         '
         '保存SToolStripMenuItem
         '
         Me.保存SToolStripMenuItem.Name = "保存SToolStripMenuItem"
-        Me.保存SToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.保存SToolStripMenuItem.Size = New System.Drawing.Size(119, 22)
         Me.保存SToolStripMenuItem.Text = "保存(&S)"
         '
         'Menu_Exit
         '
         Me.Menu_Exit.Name = "Menu_Exit"
-        Me.Menu_Exit.Size = New System.Drawing.Size(152, 22)
+        Me.Menu_Exit.Size = New System.Drawing.Size(119, 22)
         Me.Menu_Exit.Text = "終了(&X)"
         '
         'Menu_ShowAll
@@ -160,6 +160,13 @@ Partial Class Form1
         Me.Menu_ShowPartial.Name = "Menu_ShowPartial"
         Me.Menu_ShowPartial.Size = New System.Drawing.Size(68, 22)
         Me.Menu_ShowPartial.Text = "部分表示"
+        '
+        'UndoToolStripMenuItem
+        '
+        Me.UndoToolStripMenuItem.Enabled = False
+        Me.UndoToolStripMenuItem.Name = "UndoToolStripMenuItem"
+        Me.UndoToolStripMenuItem.Size = New System.Drawing.Size(68, 22)
+        Me.UndoToolStripMenuItem.Text = "元に戻す"
         '
         'TabControl1
         '
@@ -684,13 +691,6 @@ Partial Class Form1
         '
         'bg_tileinfo
         '
-        '
-        'UndoToolStripMenuItem
-        '
-        Me.UndoToolStripMenuItem.Enabled = False
-        Me.UndoToolStripMenuItem.Name = "UndoToolStripMenuItem"
-        Me.UndoToolStripMenuItem.Size = New System.Drawing.Size(68, 22)
-        Me.UndoToolStripMenuItem.Text = "元に戻す"
         '
         'Form1
         '

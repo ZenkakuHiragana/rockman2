@@ -1391,6 +1391,15 @@ Public Class Form1
 
     '外部の更新を検知
     Private Sub Form1_Activated(sender As Object, e As EventArgs) Handles MyBase.Activated
+        If ChrFilePath <> "" Then
+            Dim ct As Date = File.GetLastWriteTime(ChrFilePath)
+            Dim cc As Integer = Date.Compare(ChrTimeStamp, ct)
+            If cc < 0 Then
+                ChrTimeStamp = File.GetLastWriteTime(ChrFilePath)
+                OpenStageData(ChrFilePath)
+            End If
+        End If
+
         If BinFilePath <> "" Then
             Dim t As Date = File.GetLastWriteTime(BinFilePath)
             Dim c As Integer = Date.Compare(TimeStamp, t)
@@ -1403,15 +1412,6 @@ Public Class Form1
                                 MessageBoxDefaultButton.Button1) = DialogResult.Yes Then
                     OpenStageData(BinFilePath)
                 End If
-            End If
-        End If
-
-        If ChrFilePath <> "" Then
-            Dim t As Date = File.GetLastWriteTime(ChrFilePath)
-            Dim c As Integer = Date.Compare(ChrTimeStamp, t)
-            If c < 0 Then
-                ChrTimeStamp = File.GetLastWriteTime(ChrFilePath)
-                OpenStageData(ChrFilePath)
             End If
         End If
     End Sub
