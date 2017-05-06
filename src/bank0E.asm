@@ -1161,11 +1161,7 @@ DoEnemyObjects:
 	lda aObjX
 	sbc <zHScroll
 	sta <zRScreenX
-	lda <zStopFlag
-	beq .do_normal
-	cmp #$04
-	bne .stopping
-.do_normal
+	
 	ldx #$10
 	stx <zObjIndex
 .loop_normal
@@ -1179,62 +1175,30 @@ DoEnemyObjects:
 	sbc <zRoom
 	sta <zEScreenRoom
 	ldy aObjAnim,x
-	lda .enemyaddr_lo,y
-	sta <zPtrlo
+	
+	lda <zStopFlag
+	and #$01
+	beq .do_normal
+	lda .stoppingindex,y
+	beq .do_normal
+;時間停止中はこっち
+	tay
+	dey
+	mMOV .stoppingaddrlo,y, <zPtrlo
+	lda .stoppingaddrhi,y
+	bne .do
+.do_normal
+;通常時はこっち
+	mMOV .enemyaddr_lo,y, <zPtrlo
 	lda .enemyaddr_hi,y
+.do
 	sta <zPtrhi
-	lda #HIGH(.return - 1)
-	pha
-	lda #LOW(.return - 1)
-	pha
-	jmp [zPtr]
+	jsr IndirectJSR
 .return
 	inc <zObjIndex
 	ldx <zObjIndex
 	cpx #$20
 	bne .loop_normal
-	rts
-;92A2
-;時間停止中
-.stopping
-	ldx #$10
-	stx <zObjIndex
-.loop_stopping
-	lda aObjFlags,x
-	bpl .return_stopping
-	sec
-	lda aObjX,x
-	sbc <zHScroll
-	sta <zEScreenX
-	lda aObjRoom,x
-	sbc <zRoom
-	sta <zEScreenRoom
-	lda #HIGH(.return_stopping - 1)
-	pha
-	lda #LOW(.return_stopping - 1)
-	pha
-	ldy aObjAnim,x
-	lda .stoppingindex,y
-	bne .specify
-	ldy aObjAnim,x
-	lda .enemyaddr_lo,y
-	sta <zPtrlo
-	lda .enemyaddr_hi,y
-	sta <zPtrhi
-	jmp [zPtr]
-.specify
-	tay
-	dey
-	lda .stoppingaddrlo,y
-	sta <zPtrlo
-	lda .stoppingaddrhi,y
-	sta <zPtrhi
-	jmp [zPtr]
-.return_stopping
-	inc <zObjIndex
-	ldx <zObjIndex
-	cpx #$20
-	bne .loop_stopping
 	rts
 
 .enemyaddr_lo
