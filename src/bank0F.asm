@@ -1261,7 +1261,9 @@ Table_C918:
 ;$0E~$0F 16x16タイル定義へのポインタ
 ;$10 縦スクロール始点
 ;$11 縦スクロール時、$09をバックアップ
+	.list
 WriteNameTableByScroll:
+	.nolist
 .xscroll = $00
 .yscroll = $01
 .f = $02
@@ -1315,7 +1317,9 @@ WriteNameTableByScroll:
 	sty <$05 ;$05: 16x16 LT LB RT RB
 	
 ;横スクロール
+	.list
 	lda <.xscroll
+	.nolist
 	sta <zPPUHScr
 	bne .do_h
 	jmp .skip_xscroll
@@ -1501,8 +1505,10 @@ WriteNameTableByScroll:
 	sta <$04
 	pla
 	sta <$03
+	.list
 .skip_xscroll
 ;縦スクロール
+	.nolist
 	lda <.yscroll
 	sta <zPPUVScr
 	bne .do_yscroll
@@ -1524,18 +1530,16 @@ WriteNameTableByScroll:
 	sbc #$10
 	sta <$09
 .borrow_nt
-	dey
 	tya
+	eor #$01
+	tay
 	lsr a
 	bcc .up_dy
-	iny
-	iny
-	dex
 	txa
+	eor #$01
+	tax
 	lsr a
 	bcc .up_dy
-	inx
-	inx
 	lda <$03
 	sbc #$01
 	and #$3F
@@ -1634,32 +1638,22 @@ WriteNameTableByScroll:
 	bcs .end_ptr_v ;ネームテーブル右端
 	cpx #$20
 	beq .end_ptr_v ;ネームテーブル右端
+;	bne .go_right16 ;16x16定義を1つ右のものへ
 	tya
+	eor #$02
+	sta <$05
 	and #$02
-	bne .go_right16 ;16x16定義を1つ右のものへ
-	iny
-	iny
-	sty <$05
 	bne .loop_nt_v_8
 .go_right16
-	dey
-	dey
-	sty <$05
 	lda <$04
+	eor #$02
+	sta <$04
 	and #$02
-	bne .go_right32
-	clc
-	lda <$04
-	adc #$02
-	sta <$04
 	bne .loop_nt_v_16
-.go_right32
-	sec
-	lda <$04
-	sbc #$02
-	sta <$04
+	
+	clc
 	lda <$03
-	adc #$07
+	adc #$08
 	sta <$03
 	bne .loop_nt_v_32
 .end_ptr_v
@@ -1729,7 +1723,9 @@ WriteNameTableByScroll:
 	and #$07
 	sta <$03
 	bpl .loop_attr_y
+	.list
 .end_scroll
+	.nolist
 	mCHANGEBANK #$0E, 1
 
 ;スクロール位置の補正
