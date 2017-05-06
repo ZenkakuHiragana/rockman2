@@ -611,6 +611,13 @@ Stage_DefRoom = $B000
 ;画像格納位置
 Stage_Graphics = $A000
 
+Table_SpriteObjPtrLow = $8000 ;Obj[00-0F]の画像定義へのポインタLow
+Table_SpriteObjPtrHigh = $8200 ;Obj[00-0F]の画像定義へのポインタHigh
+Table_SpriteEnemyPtrLow = $8100 ;Obj[10-1F]の画像定義へのポインタLow
+Table_SpriteEnemyPtrHigh = $8300 ;Obj[10-1F]の画像定義へのポインタHigh
+Table_SpriteShapePtrLow = $8400 ;形定義へのポインタLow
+Table_SpriteShapePtrHigh = $8500 ;形定義へのポインタHigh
+Table_SpriteInvertX = $8600 ;形を反転させるためのテーブル 潰せ
 
 Table_AnimationPointer_Low = $F900
 Table_AnimationPointerEnemy_Low = $F980

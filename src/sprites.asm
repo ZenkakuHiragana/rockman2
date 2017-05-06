@@ -3,68 +3,117 @@
 ;SpriteSetup
 .offset = $06
 	mCHANGEBANK #$0A
-	jsr ClearSprites
-	lda #$00
-	sta <.offset ;τDMA元の書き込み位置
-	sta <$0D
-	sta <$0C
+	jsr ClearSprites ;終了時、X = 0
+	stx <.offset ;τDMA元の書き込み位置
+	stx <$0D
+	stx <$0C
+	
+;スプライトアニメーションを進める
+;zStopFlag = .... WRBE
+;W: 武器停止 R: ロックマン停止 B: ボス停止 E: ザコ停止
+	ldx #$1F
+.loop_anim
+	lda aObjFlags,x
+	bpl .skip_anim
+	ldy aObjAnim,x
+	cpx #$10
+	bcc .isnotenemy
+;Y ≧ 10
+	tya
+	ora #$80
+	tay
 	lda <zStopFlag
-	beq .standard
-	jmp .stopping
+	and #$01
+	bpl .merge_anim
+.isnotenemy
+;Y < 10
+	lda <zStopFlag
+	cpx #$01
+	beq .isboss
+;Y ≠ 1
+	bcs .isnotrockman
+;Y = 0
+	and #$04
+	bpl .merge_anim
+.isboss ;Y = 1
+	and #$02
+	bpl .merge_anim
+.isnotrockman ;Y > 1
+	and #$08
+.merge_anim ;ここに合流
+	bne .skip_anim
+;アニメーション進行
+	mMOV Table_AnimationPointer_Low,y, <zPtrlo
+	mMOV Table_AnimationPointer_High,y, <zPtrhi
+	ldy #$01
+	lda [zPtr],y
+	inc aObjWait,x
+	cmp aObjWait,x
+	bcs .skip_anim
+	dey
+	tya
+	sta aObjWait,x
+	lda [zPtr],y
+	inc aObjFrame,x
+	cmp aObjFrame,x
+	bcs .skip_anim
+	tya
+	sta aObjFrame,x
+.skip_anim
+	dex
+	bpl .loop_anim ;X = FF
 
 ;スプライトセットアップ(標準時)
 .standard
 	lda <zFrameCounter
-	and #$01
-	bne .oddframe
+	lsr a
+	bcs .oddframe
 ;スプライトセットアップ標準/偶数フレーム（Obj[00->1F]->ゲージ）
-	lda #$FF
-	sta <$0C
-	lda #$00
-	sta <zObjIndex
+	stx <$0C
+	inx
+	stx <zObjIndex
 .loopobj
-	jsr AnimateObjects
+	jsr AnimateObjects ;Obj[00->0F] スプライト描画
 	bcs .overflow
 	inc <zObjIndex
-	lda <zObjIndex
-	cmp #$10
+	ldx <zObjIndex
+	cpx #$10
 	bne .loopobj
 .loopenemy
-	jsr AnimateEnemies
+	jsr AnimateEnemies ;Obj[10->1F] スプライト描画
 	bcs .overflow
 	inc <zObjIndex
-	lda <zObjIndex
-	cmp #$20
+	ldx <zObjIndex
+	cpx #$20
 	bne .loopenemy
-	lda <.offset
-	sta <$0C
-	jsr DrawBar
+	mMOV <.offset, <$0C
+	jsr DrawBar ;体力バー描画
 .overflow
 	jmp .done
 ;スプライトセットアップ標準/奇数フレーム（ゲージ->Obj[1F->00]）
 .oddframe
 	jsr DrawBar
-	lda <.offset
-	sta <$0D
-	lda #$1F
-	sta <zObjIndex
+	mMOV <.offset, <$0D
+	ldx #$1F
+	stx <zObjIndex
 .loopenemyodd
 	jsr AnimateEnemies
 	bcs .done
 	dec <zObjIndex
-	lda <zObjIndex
-	cmp #$0F
+	ldx <zObjIndex
+	cpx #$0F
 	bne .loopenemyodd
 .loopobjodd
 	jsr AnimateObjects
 	bcs .done
 	dec <zObjIndex
+	ldx <zObjIndex
 	bpl .loopobjodd
-	lda <.offset
-	sta <$0C
+	mMOV <.offset, <$0C
 
 .done
 ;エアーマンステージではスプライトが背面に回る→rts
+;Sprites[$0D->$0C]を背面に回す
 	lda <zStage
 	cmp #$01
 	bne .notairman
@@ -82,253 +131,103 @@
 	bne .loop
 .notairman
 	mCHANGEBANK #$0E, 1
-	;rts
 
-;4C 02 CD
-;スプライトセットアップ(特殊時 タイムストッパーなど)
-;$AA, 04のビットが1なら、ロックマンのアニメーション処理を行わない
-;$AA, 02のビットが1なら、Obj[00-0F]のアニメーション処理を行わない
-;どの場合でも、Obj[10-1F]のアニメーション処理を行わない
-.stopping
-	lda <zFrameCounter
-	and #$01
-	bne .odd_stop
-;スプライトセットアップ特殊/偶数フレーム（Obj[00->1F]->ゲージ）
-	lda #$FF
-	sta <$0C
-	lda #$00
-	sta <zObjIndex
-	lda <zStopFlag
-	and #$04
-	beq .dorockman
-	jsr DontAnimateObjects
-	jmp .skiprockman
-.dorockman
-	jsr AnimateObjects
-.skiprockman
-	inc <zObjIndex
-.loop_stop
-	lda <zStopFlag
-	and #$02
-	bne .dontobj
-	jsr AnimateObjects
-	jmp .skipobj
-.dontobj
-	jsr DontAnimateObjects
-.skipobj
-	bcs .overflow_stop
-	inc <zObjIndex
-	lda <zObjIndex
-	cmp #$10
-	bne .loop_stop
-.loop_stop_enemies
-	jsr DontAnimateEnemies
-	bcs .overflow_stop
-	inc <zObjIndex
-	lda <zObjIndex
-	cmp #$20
-	bne .loop_stop_enemies
-	lda <.offset
-	sta <$0C
-	jsr DrawBar
-.overflow_stop
-	jmp .done
-;スプライトセットアップ特殊/奇数フレーム（ゲージ->Obj[1F->00]）
-.odd_stop
-	jsr DrawBar
-	lda <.offset
-	sta <$0D
-	lda #$1F
-	sta <zObjIndex
-.loop_odd_enemies_stop
-	jsr DontAnimateEnemies
-	bcs .overflow_stop_odd
-	dec <zObjIndex
-	lda <zObjIndex
-	cmp #$0F
-	bne .loop_odd_enemies_stop
-.loop_odd_obj_stop
-	lda <zStopFlag
-	and #$02
-	bne .dontobj_odd
-	jsr AnimateObjects
-	jmp .doneobj_odd
-.dontobj_odd
-	jsr DontAnimateObjects
-.doneobj_odd
-	bcs .overflow_stop_odd
-	dec <zObjIndex
-	bne .loop_odd_obj_stop
-	lda <zStopFlag
-	and #$04
-	beq .dorockman_odd
-	jsr DontAnimateObjects
-	jmp .donerockman
-.dorockman_odd
-	jsr AnimateObjects
-.donerockman
-	lda <.offset
-	sta <$0C
-.overflow_stop_odd
-	jmp .done
-
-;20 94 CD
-;アニメーション処理をせずにスプライト描画(X = 00～0F)
-DontAnimateObjects:
-	ldx <zObjIndex
+;20 F6 CE
+;アニメーション処理をしてスプライト描画(X = 10～1F)
+AnimateEnemies:
 	lda aObjFlags,x
-	bmi .do
-	clc
-	rts
-.do
+	bpl AnimateObjects.notexist
+	and #%00100000
+	bne AnimateObjects.notexist
 	ldy aObjAnim,x
-	lda Table_AnimationPointer_Low,y
-	sta <zPtrlo
-	lda Table_AnimationPointer_High,y
-	sta <zPtrhi
-	lda aObjFrame,x
-	clc
-	adc #$02
-	tay
+	mMOV Table_AnimationPointerEnemy_Low,y, <zPtrlo
+	mMOV Table_AnimationPointerEnemy_High,y, <zPtrhi
+	ldy aObjFrame,x
+	iny
+	iny
 	lda [zPtr],y
-	beq .deleteobject
-	jmp DrawObjectSprites
-.deleteobject
-	lsr aObjFlags,x
-	.ifdef ___BUGFIX
-	clc ;------added clc
-	.endif
-	rts
-
-;20 BC CD
-;アニメーション処理をせずにスプライト描画(X = 10～1F)
-DontAnimateEnemies:
-	ldx <zObjIndex
-	lda aObjFlags,x
-	bmi .do
-	clc
-	rts
-.do
-	ldy aObjAnim,x
-	lda Table_AnimationPointerEnemy_Low,y
-	sta <zPtrlo
-	lda Table_AnimationPointerEnemy_High,y
-	sta <zPtrhi
-	lda aObjFrame,x
-	clc
-	adc #$02
+	beq AnimateObjects.deleteobject
+;4C 3E CF
+;DrawEnemySprites;
 	tay
-	lda [zPtr],y
-	beq .deleteobject
-	jmp DrawEnemySprites
-.deleteobject
-	lsr aObjFlags,x
-	.ifdef ___BUGFIX
-	clc ;------added clc
-	.endif
-	rts
+	mMOV Table_SpriteEnemyPtrLow,y, <zPtrlo
+	mMOV Table_SpriteEnemyPtrHigh,y, <zPtrhi
+	lda aEnemyFlash,x
+	bpl DrawSprites
 
 ;20 E4 CD
 ;アニメーション処理をしてスプライト描画(X = 00～0F)
 AnimateObjects:
-	ldx <zObjIndex
 	lda aObjFlags,x
-	bmi .do
-	clc
-	rts
-.do
+	bpl .notexist
 	ldy aObjAnim,x
-	lda Table_AnimationPointer_Low,y
-	sta <zPtrlo
-	lda Table_AnimationPointer_High,y
-	sta <zPtrhi
-	lda aObjFrame,x
-	pha
-	inc aObjWait,x
-	ldy #$01
-	lda [zPtr],y
-	cmp aObjWait,x
-	bcs .skip
-	lda #$00
-	sta aObjWait,x
-	inc aObjFrame,x
-	dey
-	lda [zPtr],y
-	cmp aObjFrame,x
-	bcs .skip
-	lda #$00
-	sta aObjFrame,x
-.skip
-	pla
-	clc
-	adc #$02
-	tay
+	mMOV Table_AnimationPointer_Low,y, <zPtrlo
+	mMOV Table_AnimationPointer_High,y, <zPtrhi
+	ldy aObjFrame,x
+	iny
+	iny
 	lda [zPtr],y
 	bne DrawObjectSprites
+.deleteobject .public
 	lsr aObjFlags,x
-	.ifdef ___BUGFIX
-	clc ;------added clc
-	.endif
+.notexist .public
+	clc
 	rts
 
 ;4C 2C CE
 DrawObjectSprites:
-.attr = $03
 	tay
 	cpx #$01
-	bcs	.isntrockman
+	bcs	.isnotrockman
+;X = 0
 	lda <zInvincible
-	beq .rockman
-	dec <zInvincible
-	lda <zFrameCounter
+	beq .nodmg
+	dec <zInvincible ;無敵時間カウンタ減少
+;	lda <zFrameCounter
 	and #$02
-	beq .rockman
-.dontdraw
-	jmp DrawObjectSprites_DontDraw
-.rockman
+	bne AnimateObjects.notexist
+.nodmg
 	lda <zOffscreen
-	bne .dontdraw
+	bne AnimateObjects.notexist ;画面外なら描画しない
 	beq .draw
-.isntrockman
+.isnotrockman
+;X > 0
 	bne .draw
+;X = 1
 	lda aBossInvincible
 	beq .draw
-	lda <zFrameCounter
-	and #$02
-	bne .bossnoeffect
-	ldy #$18
-.bossnoeffect
 	dec aBossInvincible
+;	lda <zFrameCounter
+	and #$02
+	bne .draw
+	ldy #$18 ;ボスのトゲトゲエフェクト
 .draw
-	lda $8000,y ;-------------SpriteDataLow
-	sta <zPtrlo
-	lda $8200,y ;-------------SpriteDataHigh
-	sta <zPtrhi
+	mMOV Table_SpriteObjPtrLow,y, <zPtrlo
+	mMOV Table_SpriteObjPtrHigh,y, <zPtrhi
 	lda #$00
-	sta <.attr
 
 ;4C 66 CE
 DrawSprites:
 .x = $00      ;τ画面相対中心X
 .y = $01      ;τ画面相対中心Y
 .dir = $02    ;τ右向きフラグ
-.attr = $03   ;τAttrのor値
+.attr = $03   ;τスプライトの属性データのor値
 .n = $04      ;τスプライト数
-.offset = $06 ;τ$200+offset
-.itr = $07    ;τスプライトデータのイテレータ
+.offset = $06 ;τ$200 + offset
+;.itr = $07    ;τスプライトデータのイテレータ
 .shape = $0A  ;τΔ位置データアドレス
 .slo = $0A    ;τΔ位置データアドレスlo
 .shi = $0B    ;τΔ位置データアドレスhi
+	sta <.attr
+	
 	ldy #$00
 	lda [zPtr],y
 	sta <.n
 	iny
 	lda [zPtr],y
 	tay
-	lda $8400,y ;-------------SpriteShapeLow
-	sta <.slo
-	lda $8500,y ;-------------SpriteShapeHigh
-	sta <.shi
+	mMOV Table_SpriteShapePtrLow,y, <.slo
+	mMOV Table_SpriteShapePtrHigh,y, <.shi
 	sec
 	lda aObjX,x
 	sbc <zHScroll
@@ -336,168 +235,105 @@ DrawSprites:
 	sec
 	lda aObjY,x
 	sbc <zVScroll
-	bcs .boundary_y
+	bcs .boundary_y ;画面境界を挟んだ場合、-10の補正
 	sbc #$0F
 .boundary_y
 	sta <.y
 	lda aObjFlags,x
 	and #%01000000
 	sta <.dir
-
-	lda #$02
-	sta <.itr
-.loop
+	
+	ldy #$02
+;	sty <.itr ;<.itr = 2
 	ldx <.offset
-	ldy <.itr
-	lda [zPtr],y
-	sta aSpriteNumber,x
+.loop ;スプライト配置ループ
 	clc
 	lda [.shape],y
 	adc <.y
-	sta aSpriteY,x
+	sta aSpriteY,x ;Spr.Y = Y + dy
+	mMOV [zPtr],y, aSpriteNumber,x
 	iny
+	
 	lda <.attr
-	beq .nomodify
+	beq .jump_attr
 	lda [zPtr],y
 	and #$F0
 	ora <.attr
-	bne .jump_attr
-.nomodify
-	lda [zPtr],y
+	bne .write_attr
 .jump_attr
+	lda [zPtr],y
+.write_attr
 	eor <.dir
 	sta aSpriteAttr,x
+	
 	lda <.dir
 	beq .obj_is_left
+	sec
 	lda [.shape],y
-	tay
-	lda $8600,y ;-------------SpriteInvertX
-	jmp .merge
+	eor #$FF
+	sbc #$07
+	jmp .calc_dx
 .obj_is_left
 	lda [.shape],y
-.merge
+.calc_dx
 	clc
 	bmi .sprite_is_left
+;dx ≧ 0
 	adc <.x
 	bcc .write
-	bcs .over
+	bcs .delete
 .sprite_is_left
+;dx < 0
 	adc <.x
 	bcs .write
-.over
-	lda #$F8
-	sta aSpriteY,x
+.delete
+	mMOV #$F8, aSpriteY,x
 	bne .skip
 .write
 	sta aSpriteX,x
-	clc
-	txa
-	adc #$04
-	sta <.offset
-	beq DrawSprites_sprite_overflow
+	inx
+	inx
+	inx
+	inx
+	stx <.offset
+	beq .overflow
 .skip
-	inc <.itr
-	inc <.itr
+	iny
 	dec <.n
 	bne .loop
-DrawObjectSprites_DontDraw:
 	clc
 	rts
-DrawSprites_sprite_overflow:
+.overflow
 	sec
-	rts
-
-
-;20 F6 CE
-;アニメーション処理をしてスプライト描画(X = 10～1F)
-AnimateEnemies:
-	ldx <zObjIndex
-	lda aObjFlags,x
-	bmi .do
-	clc
-	rts
-.do
-	ldy aObjAnim,x
-	lda Table_AnimationPointerEnemy_Low,y
-	sta <zPtrlo
-	lda Table_AnimationPointerEnemy_High,y
-	sta <zPtrhi
-	lda aObjFrame,x
-	pha
-	inc aObjWait,x
-	ldy #$01
-	lda [zPtr],y
-	cmp aObjWait,x
-	bcs .skip
-	lda #$00
-	sta aObjWait,x
-	inc aObjFrame,x
-	dey
-	lda [zPtr],y
-	cmp aObjFrame,x
-	bcs .skip
-	lda #$00
-	sta aObjFrame,x
-.skip
-	pla
-	clc
-	adc #$02
-	tay
-	lda [zPtr],y
-	bne DrawEnemySprites
-	lsr aObjFlags,x
-;	clc ;------added clc
-	rts
-
-;4C 3E CF
-DrawEnemySprites;
-.attr = $03
-	tay
-	lda aObjFlags,x
-	and #%00100000
-	bne .invisible
-	lda $8100,y ;------------------SpriteDataEnemyLow
-	sta <zPtrlo
-	lda $8300,y ;------------------SpriteDataEnemyHigh
-	sta <zPtrhi
-	lda aEnemyFlash,x
-	sta <.attr
-	jmp DrawSprites
-.invisible
-	clc
 	rts
 
 ;20 5A CF
 ;ゲージのスプライトをセットアップ
 DrawBar:
-.amount = $00
-.x = $01
-.pal = $02
-.offset = $06
-	lda aObjLife
-	sta <.amount
+.amount = $00 ;ゲージ量
+.x = $01      ;X位置
+.pal = $02    ;パレット
+.offset = $06 ;$200 + offset
+;ロックマンの体力バー
+	mMOV aObjLife, <.amount
 	ldx <.offset
-	lda #$01
-	sta <.pal
-	lda #$18
-	sta <.x
+	mMOV #$01, <.pal
+	mMOV #$18, <.x
 	jsr .draw
 	bcs .done
+;特殊武器のエネルギー
 	ldy <zEquipment
 	beq .isbuster
-	lda zEnergyArray - 1,y
-	sta <.amount
-	lda #$00
-	sta <.pal
-	lda #$10
-	sta <.x
+	mMOV zEnergyArray - 1,y, <.amount
+	mMOV #$00, <.pal
+	mMOV #$10, <.x
 	jsr .draw
 	bcs .done
 .isbuster
+;ボスの体力バー
 	lda <zBossBehaviour
 	beq .done
-	lda aObjLife + 1
-	sta <.amount
+	mMOV aObjLife + 1, <.amount
 	lda #$03
 	ldy <zBossType
 	cpy #$08
@@ -505,39 +341,31 @@ DrawBar:
 	cpy #$0D
 	bne .skip
 .exception
-	lda #$01
+	lsr a ;A = 1
 .skip
 	sta <.pal
-	lda #$28
-	sta <.x
-	mJSRJMP .draw
-.done
-	rts
+	mMOV #$28, <.x
 
 .draw
 	ldy #$06
-.loop
-	lda Table_BarPositionY,y
-	sta aSpriteY,x
+.loop ;値を4ずつ引いて、スプライトの番号を決めていく
+	mMOV Table_BarPositionY,y, aSpriteY,x
 	sec
 	lda <.amount
 	sbc #$04
 	bcs .over4
 	ldx <.amount
-	lda #$00
-	sta <.amount
+	mSTZ <.amount
 	lda Table_BarGraphics,x
 	ldx <.offset
-	jmp .write
-.over4
+	jmp .write ;27
+.over4 ;メモリが4以上
 	sta <.amount
-	lda #$87
+	lda #$87 ;15
 .write
 	sta aSpriteNumber,x
-	lda <.pal
-	sta aSpriteAttr,x
-	lda <.x
-	sta aSpriteX,x
+	mMOV <.pal, aSpriteAttr,x
+	mMOV <.x, aSpriteX,x
 	inx
 	inx
 	inx
@@ -550,6 +378,7 @@ DrawBar:
 	rts
 .end
 	sec
+.done
 	rts
 
 ;CFE2

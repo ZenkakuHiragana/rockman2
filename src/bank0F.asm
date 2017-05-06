@@ -2033,6 +2033,7 @@ PickupMap_BossBank:
 	mCHANGEBANK #$0B, 1
 	;rts
 
+	.beginregion "SpriteSetup"
 ;20 69 CC
 ClearSprites:
 	lda #$F8
@@ -2040,13 +2041,16 @@ ClearSprites:
 .loop
 	sta aSprite,x
 	inx
+	inx
+	inx
+	inx
 	bne .loop
 	rts
 
 ;20 74 CC
 SpriteSetup:
 	.include "src/sprites.asm"
-
+	.endregion "SpriteSetup"
 ;CFED NMI Inturrupt
 NMI_Start:
 	.include "src/NMI.asm"

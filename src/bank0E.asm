@@ -203,7 +203,9 @@ MainLoop:
 	jsr OpenSubMenu
 .submenu
 	jsr CountBlockableObjects
+	.list
 	jsr DoRockman
+	.nolist
 	jsr WeaponObjectProcess
 	jsr SpawnEnemyByScroll
 	jsr DoBossBehaviour
@@ -223,7 +225,9 @@ MainLoop:
 	mMOV #WaterLagInterval, <zWaterWait
 .nolag
 	jsr FrameAdvance1C
+	.list
 	jmp MainLoop
+	.nolist
 
 Table_Unknown81B6:
 	.db $10, $10, $10, $15, $15, $10
