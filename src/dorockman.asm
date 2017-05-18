@@ -1,7 +1,8 @@
 
 ;ロックマンの処理を最適化して空き領域を得る
 ;移動処理とスクロール処理は分離
-;TODO: スクロール時のネームテーブル書き込み予約処理を書く
+
+;TODO 左と下スクロール時、スクロール境界にぶつかった場合に押し戻す処理
 
 ;$440～$44F: YYYY XXXX
 ;Y = Y screen(0～F)
@@ -14,22 +15,336 @@
 	mMOV aObjY, <zPrevY
 	lda <zStopFlag
 	and #$04
-	bne DoRockman01_Fall
-	mSTZ <zScrollFlag
+	beq .do
+	rts
+.do
+	sta <zScrollFlag
 	ldx <zStatus
 	mMOV Table_DoRockmanlo,x, <zPtrlo
 	mMOV Table_DoRockmanhi,x, <zPtrhi
 	jsr IndirectJSR
+	sec ;ロックマンの実際の移動量X
+	lda aObjX
+	sbc <zPrevX
+	sta <zPrevX
+	sec ;ロックマンの実際の移動量Y
+	lda aObjY
+	sbc <zPrevY
+	sta <zPrevY
+	sec ;ロックマンの画面内のX座標
+	lda aObjX
+	sbc <zHScroll
+	sta <zRScreenX
 	ldx #$00
 	lda aObjFlags
 	pha
 	jsr CheckOffscreenEnemy_CheckOffscreen
 	pla
 	sta aObjFlags
-	lda #$00
+	txa
 	rol a
 	sta <zOffscreen
-	jmp DoRockman_DoScroll
+	
+	.beginregion "Scroll Setup"
+;8DF5
+;ロックマンの右方向スクロール処理
+;ロックマンのスクロール処理
+;y = 移動前y
+;x = 移動前x
+DoRockman_DoScroll:
+.nth = $00 ;ネームテーブル書き込み予約判定(横スクロール)
+.ntv = $01 ;ネームテーブル書き込み予約判定(縦スクロール)
+.f = $02 ;スクロール方向フラグ: L... ...U(U: 上, L: 左)
+.dx = $03 ;移動差X
+.dy = $04 ;移動差Y
+.sh = $05 ;スクロール値変更前X
+.sv = $06 ;スクロール値変更前Y
+.scroll_max = $08 ;スクロール可能な最大量
+	txa
+	ldx #(.dy - .nth) ;一時変数の初期化
+.loop_init
+	sta <.nth,x
+	dex
+	bpl .loop_init
+	
+	lda <zScrollClipFlag ;スクロール制限中は画面を強制移動 .... ..XY
+	beq .skip_scrollclip
+	lsr a
+	ldy <zScrollClipRoom
+	ldx <zRoom
+	bcc .skip_scrollclip_y
+;縦スクロール制限
+	lda <zVScroll
+	bne .continue_scrollclip_y
+	lda #%00000010
+	bpl .end_scrollclip_y
+.continue_scrollclip_y
+	tya
+	and #$F0
+	sta <.sv
+	txa
+	and #$F0
+	sbc <.sv
+	bcs .scrollclip_up
+;下方向にスクロール制限
+	inc <.dy
+	.db $2C
+.scrollclip_up
+;上方向にスクロール制限
+	dec <.dy
+	bne .skip_scrollclip
+.skip_scrollclip_y
+;横スクロール制限
+	lda <zHScroll
+	bne .continue_scrollclip_x
+	lda #%00000001
+.end_scrollclip_y
+	and <zScrollClipFlag
+	sta <zScrollClipFlag
+	bpl .skip_scrollclip
+.continue_scrollclip_x
+	tya
+	and #$0F
+	sta <.sh
+	sec
+	txa
+	and #$0F
+	sbc <.sh
+	bcs .scrollclip_left
+;右方向にスクロール制限
+	inc <.dx
+	.db $2C
+.scrollclip_left
+;左方向にスクロール制限
+	dec <.dx
+.skip_scrollclip
+	
+;横スクロール
+	mMOV <zHScroll, <.sh
+	lda <.dx
+	beq .noclip_x
+	bpl .scroll_right_do ;<.dx == #$01
+	lda #$01 ;<.dx = #$FF
+	sta <.dx ;<.dx = #$01
+	bpl .scroll_left_do
+.noclip_x
+;スクロール量の決定
+	clc
+	lda <zPrevX ;|ロックマンの実際の移動量X| < #$80
+	bpl .inv_dx
+	eor #$FF
+	sec
+.inv_dx
+	php
+	adc #$01
+	cmp #.scroll_max ;スクロール最大量の制限
+	bcc .limit_dx
+	lda #.scroll_max
+.limit_dx
+	sta <.dx
+	
+	lda <zRScreenX
+	ldy #$00 ;ChangeBank_GetScrollableの引数
+	ldx <zRoom
+	plp
+	bcs .scroll_left
+;右スクロール
+	cmp #Scroll_RightBound ;画面内X座標が規定値より右ならスクロール可能
+	beq .scroll_left
+	bcc .scroll_left
+	sbc #Scroll_RightBound
+	cmp <.dx
+	bcs .changedx_r ;右寄りにいる時は規定のスクロール量
+	sta <.dx        ;画面左側から境界へ侵入した時、その差分にする
+.changedx_r
+	inx ;現在の画面の1つ右
+	jsr ChangeBank_GetScrollable ;スクロール可能なら
+	tya
+	bpl .scroll_right_do
+	mMOV <zHScroll, <.dx ;不可能な場合、横スクロール値の分だけ左へスクロール
+	bpl .scroll_left_do
+.scroll_right_do
+	clc
+	lda <zHScroll ;スクロール値の変更
+	adc <.dx
+	sta <zHScroll
+	bcc .carry_right
+	inc <zRoom
+.carry_right
+	lda #$00
+	beq .merge_h ;ネームテーブル書き込み予約の判定へ
+	
+;左スクロール
+.scroll_left
+	sbc #Scroll_LeftBound
+	bcs .skip_horizontal
+	eor #$FF ;A = -A
+	adc #$01
+	cmp <.dx
+	bcs .changedx_l
+	sta <.dx
+.changedx_l
+	dex ;現在の画面の1つ左
+	jsr ChangeBank_GetScrollable
+	tya
+	bpl .scroll_left_do
+	lda <zHScroll
+	cmp <.dx
+	bcs .scroll_left_do
+	sta <.dx
+.scroll_left_do
+	sec
+	ror <.f ;左スクロールフラグの設定
+	sec
+	lda <zHScroll ;スクロール値の変更
+	sbc <.dx
+	sta <zHScroll
+	bcs .borrow_left
+	dec <zRoom
+.borrow_left
+	lda #$FF
+.merge_h ;ネームテーブル書き込み予約の判定
+	clc
+	eor <.sh
+	and #$07
+	adc <.dx
+	lsr a
+	lsr a
+	lsr a
+	sta <.nth ;横スクロールのための書き込み量
+.skip_horizontal
+	
+;縦スクロール
+	mMOV <zVScroll, <.sv
+	lda <.dy
+	beq .noclip_y
+	bpl .scroll_down_do ;<.dy == #$01
+	lda #$01 ;<.dy = #$FF
+	sta <.dy ;<.dy = #$01
+	bpl .scroll_up_do
+;	.beginregion "scrollup"
+.noclip_y
+;スクロール量の決定
+	clc
+	lda <zPrevY ;|ロックマンの実際の移動量Y| < #$80
+	bpl .inv_dy
+	eor #$FF
+	sec
+.inv_dy
+	php
+	adc #$01
+	cmp #.scroll_max ;スクロール最大量の制限
+	bcc .limit_dy
+	lda #.scroll_max
+.limit_dy
+	sta <.dy
+	
+	sec
+	lda aObjY
+	sbc <zVScroll
+	bcs .borrow_y
+	sbc #$0F
+.borrow_y ;A = ロックマンの画面内のY座標
+	ldy #$01 ;ChangeBank_GetScrollableの引数
+	ldx <zRoom
+	plp
+	bcs .scroll_up
+;下スクロール
+	cmp #Scroll_DownBound ;画面内Y座標が規定値より下ならスクロール可能
+	beq .scroll_up
+	bcc .scroll_up
+	sbc #Scroll_DownBound
+	cmp <.dy
+	bcs .changedy_d ;下寄りにいる時は規定のスクロール量
+	sta <.dy ;画面上から境界へ侵入した時、その差分にする
+.changedy_d
+	clc
+	txa
+	adc #$10
+	tax
+	jsr ChangeBank_GetScrollable
+	tya
+	bpl .scroll_down_do
+	lda <zVScroll
+	beq .skip_vertical
+	bmi .skip_vertical
+	bpl .scroll_up_fromdown
+.scroll_down_do
+	clc
+	lda <zVScroll ;スクロール値の変更
+	adc <.dy
+	sta <zVScroll
+	cmp #$F0
+	bcc .cross_page_down
+	adc #$0F
+	sta <zVScroll
+	lda <zRoom
+	adc #$0F
+	sta <zRoom
+.cross_page_down
+	lda #$00 ;ネームテーブル書き込み予約の判定
+	beq .merge_v
+;上スクロール
+.scroll_up
+	sbc #Scroll_UpBound
+	bcs .skip_vertical
+	eor #$FF ;A = -A
+	adc #$01
+	cmp <.dy
+	bcs .changedy_u
+	sta <.dy
+.changedy_u
+	sec
+	txa
+	sbc #$10
+	tax
+	jsr ChangeBank_GetScrollable
+	tya
+	bpl .scroll_up_do
+	lda <zVScroll
+	cmp <.dy
+	bcs .scroll_up_do
+.scroll_up_fromdown
+	sta <.dy
+;	.endregion "scrollup"
+.scroll_up_do
+	sec
+	inc <.f ;上スクロールフラグの設定
+	lda <zVScroll
+	sbc <.dy
+	sta <zVScroll
+	cmp #$F0
+	bcc .cross_page_up
+	sbc #$10
+	sta <zVScroll
+	sec
+	lda <zRoom
+	sbc #$10
+	sta <zRoom
+.cross_page_up
+	lda #$FF
+.merge_v ;ネームテーブル書き込み予約の判定
+	clc
+	eor <.sv
+	and #$07
+	adc <.dy
+	lsr a
+	lsr a
+	lsr a
+	sta <.ntv
+.skip_vertical
+	
+;ネームテーブル書き込み予約
+;$00 書き込み量, X
+;$01 書き込み量, Y
+;$02 スクロール方向フラグ
+	lda <.nth
+	ora <.ntv
+	beq .noscroll
+	jmp WriteNameTableByScroll
+.noscroll
+	rts
+	.endregion "Scroll Setup"
 
 ;8508
 ;ロックマン状態#0メニューを閉じたときの「ぴちゃっ」
@@ -50,12 +365,12 @@ DoRockman00_Land:
 	bne .skip
 	sta <zWaterLevel
 .skip
-DoRockman01_Fall:
-	rts
-
 ;8545
 ;ロックマン状態#1転落
 ;	rts
+DoRockman01_Fall:
+	rts
+
 
 ;8546
 ;ロックマン状態#2ノックバック
@@ -619,6 +934,11 @@ Table_RockmanVXlo:
 ;ロックマン横移動
 DoRockman_BodyMoveX:
 	mSTZ <$00
+	lda aObjVXlo
+	ora aObjVX
+	bne .do
+	jmp .nohit_left
+.do
 	bit <zMoveVec
 	bvc .left
 ;右へ移動
@@ -780,11 +1100,21 @@ Table_JumpPowerlo:
 ;Table_WallCheck_Attr:
 ;	.db $00, $01, $00, $03, $00, $01, $01, $01, $81
 ;8A7E
+
+;横の壁判定の縦方向の原点からの相対位置
+Const_WallCheckX1 = -$000C
+Const_WallCheckX2 = -$0004
+Const_WallCheckX3 = $000B
+
 Table_WallCheckX_dy:
-	.db $F4, $FC, $0B
+	.db LOW(Const_WallCheckX1)
+	.db LOW(Const_WallCheckX2)
+	.db LOW(Const_WallCheckX3)
 ;8A81
 Table_WallCheckX_dr:
-	.db $FF, $FF, $00
+	.db HIGH(Const_WallCheckX1)
+	.db HIGH(Const_WallCheckX2)
+	.db HIGH(Const_WallCheckX3)
 
 ;8A84
 ;はしごや水中判定のための地形判定
@@ -1183,12 +1513,17 @@ DoRockman_WallCheckY:
 .ladder
 	rts
 
+Const_WallCheckY1 = $0007
+Const_WallCheckY2 = -$0008
+
 ;8CED
 Table_WallCheckY_dx:
-	.db $07, $F9
+	.db LOW(Const_WallCheckY1)
+	.db LOW(Const_WallCheckY2)
 ;8CEF
 Table_WallCheckY_dr:
-	.db $00, $FF
+	.db HIGH(Const_WallCheckY1)
+	.db HIGH(Const_WallCheckY2)
 ;8CF1
 Table_ConveyorFlag:
 	.db $02, $01, $80
@@ -1333,322 +1668,3 @@ DoRockman_CheckLift:
 	rts
 .skip_item
 	jmp .done_item
-
-;8DF5
-;ロックマンの右方向スクロール処理
-;ロックマンのスクロール処理
-;y = 移動前y
-;x = 移動前x
-DoRockman_DoScroll:
-.nth = $00 ;ネームテーブル書き込み予約判定(横スクロール)
-.ntv = $01 ;ネームテーブル書き込み予約判定(縦スクロール)
-.f = $02 ;スクロール方向フラグ: L... ...U(U: 上, L: 左)
-.dx = $03 ;移動差X
-.dy = $04 ;移動差Y
-.clip_dx = $05 ;スクロール制限用X
-.clip_dy = $06 ;スクロール制限用Y
-.scroll_max = $08
-	ldx #(.dy - .nth)
-	lda #$00
-.loop_init
-	sta <.nth,x
-	dex
-	bpl .loop_init
-	
-	lda <zScrollClipFlag
-	beq .skip_scrollclip
-	lsr a
-	pha
-	ldy <zScrollClipRoom
-	ldx <zRoom
-	bcc .skip_scrollclip_y
-;縦スクロール制限
-	lda <zVScroll
-	bne .continue_scrollclip_y
-	pla
-	pha
-	asl a
-	sta <zScrollClipFlag
-	bpl .skip_scrollclip_y
-.continue_scrollclip_y
-	tya
-	and #$F0
-	sta <.ntv
-	txa
-	and #$F0
-	sbc <.ntv
-	bcs .scrollclip_up
-;下方向にスクロール制限
-	inc <.dy
-	.db $2C
-.scrollclip_up
-;上方向にスクロール制限
-	dec <.dy
-.skip_scrollclip_y
-	pla
-	beq .skip_scrollclip
-;横スクロール制限
-	lda <zHScroll
-	bne .continue_scrollclip_x
-	lda <zScrollClipFlag
-	and #%00000001
-	sta <zScrollClipFlag
-	bpl .skip_scrollclip
-.continue_scrollclip_x
-	tya
-	and #$0F
-	sta <.nth
-	sec
-	txa
-	and #$0F
-	sbc <.nth
-	bcs .scrollclip_left
-;右方向にスクロール制限
-	inc <.dx
-	.db $2C
-.scrollclip_left
-;左方向にスクロール制限
-	dec <.dx
-.skip_scrollclip
-	lda <.dx
-	beq .noclip_x
-	bpl .finalizedx_r
-	and #$01
-	sta <.dx
-	jmp .finalizedx_l
-.noclip_x
-	
-;スクロール量の決定
-	sec
-	lda <zPrevX
-	sbc aObjX
-	bcs .borrow_dx
-	eor #$FF
-	adc #$01
-.borrow_dx
-	clc
-	adc #$01
-	sta <.dx
-	lda aObjX
-	sec
-	sbc <zHScroll
-	sec
-	bit <zMoveVec
-	bvc .scroll_left
-;右スクロール
-	sbc #Scroll_RightBound
-	bcc .skip_horizontal
-	cmp <.dx
-	bcs .changedx_r
-	sta <.dx
-.changedx_r
-	ldx <zRoom
-	inx
-	ldy #$00
-	jsr ChangeBank_GetScrollable
-	tya
-	bpl .scroll_right_do
-	lda <zHScroll
-	sta <.dx
-	jmp .changedx_lscr
-.scroll_right_do
-	lda #.scroll_max
-	cmp <.dx
-	bcs .finalizedx_r
-	sta <.dx
-.finalizedx_r
-	clc
-	lda <zHScroll
-	pha
-	adc <.dx
-	sta <zHScroll
-	bcc .carry_right
-	inc <zRoom
-.carry_right
-	pla ;ネームテーブル書き込み予約の判定
-	jmp .merge_h
-;左スクロール
-.scroll_left
-	sbc #Scroll_LeftBound
-	bcs .skip_horizontal
-	eor #$FF
-	adc #$01
-	cmp <.dx
-	bcs .changedx_l
-	sta <.dx
-.changedx_l
-	ldx <zRoom
-	dex
-	ldy #$00
-	jsr ChangeBank_GetScrollable
-	tya
-	bpl .changedx_lscr
-	lda <zHScroll
-	cmp <.dx
-	bcs .changedx_lscr
-	sta <.dx
-.changedx_lscr
-	lda #.scroll_max
-	cmp <.dx
-	bcs .finalizedx_l
-	sta <.dx
-.finalizedx_l
-	sec
-	ror <.f
-	sec
-	lda <zHScroll
-	pha
-	sbc <.dx
-	sta <zHScroll
-	bcs .borrow_left
-	dec <zRoom
-.borrow_left
-	pla ;ネームテーブル書き込み予約の判定
-	eor #$FF
-.merge_h
-	clc
-	and #$07
-	adc <.dx
-	lsr a
-	lsr a
-	lsr a
-	sta <.nth ;横スクロールのための書き込み量
-.skip_horizontal
-;縦スクロール
-	lda <.dy
-	beq .noclip_y
-	bpl .finalizedy_d
-	lda #$01
-	sta <.dy
-	jmp .finalizedy_u
-.noclip_y
-	
-	sec
-	lda <zPrevY
-	sbc aObjY
-	bne .usevy
-	clc
-.usevy
-	php
-	bcs .inv_dy
-	eor #$FF
-	adc #$01
-.inv_dy
-	clc
-	adc #$01
-	sta <.dy
-	sec
-	lda aObjY
-	sbc <zVScroll
-	bcs .borrow_y
-	sbc #$0F
-.borrow_y
-	plp
-	bcs .scroll_up
-;下スクロール
-	sbc #$7F
-	bcs .go_down
-	adc #$80
-	jmp .scroll_up
-.go_down
-	cmp <.dy
-	bcs .changedy_d
-	sta <.dy
-.changedy_d
-	lda <zRoom
-	clc
-	adc #$10
-	tax
-	ldy #$01
-	jsr ChangeBank_GetScrollable
-	tya
-	bpl .scroll_down_do
-	lda <zVScroll
-	sta <.dy
-	jmp .changedy_uscr
-.scroll_down_do
-	lda #.scroll_max
-	cmp <.dy
-	bcs .finalizedy_d
-	sta <.dy
-.finalizedy_d
-	clc
-	lda <zVScroll
-	pha
-	adc <.dy
-	sta <zVScroll
-	cmp #$F0
-	bcc .cross_page_down
-	adc #$0F
-	sta <zVScroll
-	lda <zRoom
-	adc #$0F
-	sta <zRoom
-.cross_page_down
-	pla ;ネームテーブル書き込み予約の判定
-	jmp .merge_v
-;上スクロール
-.scroll_up
-	sbc #$60
-	bcs .skip_vertical
-	eor #$FF
-	adc #$01
-	cmp <.dy
-	bcs .changedy_u
-	sta <.dy
-.changedy_u
-	lda <zRoom
-	sec
-	sbc #$10
-	tax
-	ldy #$01
-	jsr ChangeBank_GetScrollable
-	tya
-	bpl .changedy_uscr
-	lda <zVScroll
-	cmp <.dy
-	bcs .changedy_uscr
-	sta <.dy
-.changedy_uscr
-	lda #.scroll_max
-	cmp <.dy
-	bcs .finalizedy_u
-	sta <.dy
-.finalizedy_u
-	sec
-	inc <.f
-	lda <zVScroll
-	pha
-	sbc <.dy
-	sta <zVScroll
-	cmp #$F0
-	bcc .cross_page_up
-	sbc #$10
-	sta <zVScroll
-	sec
-	lda <zRoom
-	sbc #$10
-	sta <zRoom
-.cross_page_up
-	pla ;ネームテーブル書き込み予約の判定
-	eor #$FF
-.merge_v
-	clc
-	and #$07
-	adc <.dy
-	lsr a
-	lsr a
-	lsr a
-	sta <.ntv
-.skip_vertical
-	
-;ネームテーブル書き込み予約
-;$00 書き込み量, X
-;$01 書き込み量, Y
-;$02 スクロール方向フラグ
-	lda <.nth
-	ora <.ntv
-	beq .noscroll
-	jmp WriteNameTableByScroll
-.noscroll
-	rts

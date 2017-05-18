@@ -386,40 +386,32 @@ WeaponObjectProcess:
 .loop
 	stx <zObjIndex
 	lda aObjFlags,x
-	bpl .skip
+	bpl .skip_x
+	tay
+	sec
+	lda aObjX,x
+	sbc <zHScroll
+	sta aWeaponScreenX,x
+	tya
 	and #$02
 	bne .ctrl
-	sec
-	lda aObjX,x
-	sbc <zHScroll
-	sta aWeaponScreenX,x
 	jsr MoveObjectForWeapon
-.skip
-	ldx <zObjIndex
-	dex
-	cpx #$01
-	bne .loop
-	rts
+	jmp .skip
 .ctrl
-.low = LOW(.skip - 1)
-.high = HIGH(.skip - 1)
-	lda #.high
-	pha
-	lda #.low
-	pha
-	sec
-	lda aObjX,x
-	sbc <zHScroll
-	sta aWeaponScreenX,x
 	sec
 	lda aObjAnim,x
 	sbc #$2F
 	tay
-	lda Table_WeaponObjectLow,y
-	sta <zPtrlo
-	lda Table_WeaponObjectHigh,y
-	sta <zPtrhi
-	jmp [zPtr]
+	mMOV Table_WeaponObjectLow,y, <zPtrlo
+	mMOV Table_WeaponObjectHigh,y, <zPtrhi
+	jsr IndirectJSR
+.skip
+	ldx <zObjIndex
+.skip_x
+	dex
+	cpx #$01
+	bne .loop
+	rts
 
 ;DD11
 Table_WeaponObjectLow:

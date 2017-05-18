@@ -131,6 +131,7 @@ StartStage_Continue:
 	sta <zHScrollApparentlo
 	sta <zHScrollApparenthi
 	sta <zRoomApparent
+	sta <zOffscreen
 	sta aObjX
 	sta aObjXlo
 	sta <zPaletteIndex

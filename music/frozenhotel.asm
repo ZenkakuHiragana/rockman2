@@ -13,7 +13,7 @@ MOD_FROZEN:
 	.dw $3F04, $0080
 	.dw $A201, $0080
 SQ1_FROZEN:
-	.beginregion "sq1"
+;	.beginregion "sq1"
 .vol = 11
 .vol2 = 9
 	TEMPO FROZEN_TEMPO
@@ -346,10 +346,10 @@ SQ1_FROZEN:
 	DOT
 	n4
 	LOOP 0, SQ1_FROZEN
-	.endregion "sq1"
+;	.endregion "sq1"
 
 SQ2_FROZEN:
-	.beginregion "sq2"
+;	.beginregion "sq2"
 .vol = 9
 	TEMPO FROZEN_TEMPO * 2
 	TONE 0
@@ -416,10 +416,10 @@ SQ2_FROZEN:
 	n0 5 +12
 	LOOP 31, .4
 	LOOP 0, SQ2_FROZEN
-	.endregion "sq2"
+;	.endregion "sq2"
 	
 TRI_FROZEN:
-	.beginregion "tri"
+;	.beginregion "tri"
 	TEMPO FROZEN_TEMPO * 2
 	VOL $FF - $30
 	KEY O3
@@ -458,10 +458,10 @@ TRI_FROZEN:
 	n5 10
 	LOOP 7, .2
 	LOOP 0, .1
-	.endregion "tri"
+;	.endregion "tri"
 	
 NOI_FROZEN:
-	.beginregion "noise"
+;	.beginregion "noise"
 	TEMPO FROZEN_TEMPO
 	VOL 15
 .begin
@@ -675,4 +675,4 @@ NOI_FROZEN:
 	n1 8
 	n1 8
 	LOOP 0, .begin
-	.endregion "noise"
+;	.endregion "noise"

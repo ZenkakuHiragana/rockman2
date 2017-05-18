@@ -1,6 +1,6 @@
 #[1]   hack2.asm
-  207  1C:8173  20 FE 84          jsr DoRockman
-  229  1C:81A0  4C 60 81          jmp MainLoop
+  208  1C:8175  20 00 85          jsr DoRockman
+  230  1C:81A2  4C 62 81          jmp MainLoop
 #[3]   src/dorockman.asm
 #[2]   src/bank0E.asm
 #[3]   src/obj/behaviour_normal.asm

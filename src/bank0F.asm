@@ -1781,7 +1781,7 @@ WriteNameTableByScroll_AnyBank:
 
 ;その画面位置にスクロール可能かを調べる
 ;X 画面位置
-;Y = 1 → 縦スクロールで侵入可能か
+;Y = 0 → 横スクロールで侵入可能か, 1 → 縦スクロールで侵入可能か
 ChangeBank_GetScrollable:
 	lda <zStage
 	and #$07
