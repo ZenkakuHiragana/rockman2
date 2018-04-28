@@ -5,27 +5,27 @@
 	
 ;8003
 ;20 51 C0で予約された曲を鳴らし始める処理
-SOUND_STARTPLAY:
+SOUND_STARTPLAY: ;A = 曲番号
 	cmp #$FC
-	bne .continue1
-	jmp Bank0CStartFC
-.continue1
+	bne .notFC
+	jmp Bank0C_StartFC ;A = #$FC
+.notFC
 	cmp #$FD
-	bne .continue2
-	jmp Bank0CStartFD
-.continue2
+	bne .notFD
+	jmp Bank0C_StartFD ;A = #$FD
+.notFD
 	cmp #$FE
-	bne .continue3
+	bne .notFE
 	mMOV #$01, <zNMILock
 	mSTZ <zSoundBase
-	jmp Bank0CStartFE
-.continue3
+	jmp Bank0C_StartFE ;A = #$FE
+.notFE
 	cmp #$FF
-	bne .continue4
+	bne .other
 	mMOV #$01, <zNMILock
 	mSTZ <zSoundBase
-	jmp Bank0CStartFF
-.continue4
+	jmp Bank0C_StartFF ;A = #$FF
+.other
 	asl a
 	tax
 	mMOV $8A50,x, <zTrackPtr
@@ -34,31 +34,33 @@ SOUND_STARTPLAY:
 	lda [zTrackPtr],y
 	tax
 	and #$0F
-	beq Bank0CStartSound_IsSFX
+	beq Bank0CStartSFX
+	
+;8044, 曲セットアップ開始
+.TestStrength = zSoundVar1
 	lda <zSoundAttr
 	and #$0F
-	sta <zSoundVar1
-	cpx <zSoundVar1
-	bcs .continue5
+	sta <.TestStrength
+	cpx <.TestStrength
+	bcs .play_music ;現在の優先度 - 鳴らそうとする曲の優先度X ≧ 0の時続行
 	rts
 ;曲の上書き優先順位00～0Fが大きい時鳴らす
-.continue5
-	stx <zSoundVar1
+.play_music
+	stx <.TestStrength
 	lda <zSoundAttr
 	and #$F0
-	ora <zSoundVar1
-	sta <zSoundAttr
+	ora <.TestStrength
+	sta <zSoundAttr ;優先度を更新
 	mMOV #$01, <zNMILock
 	.ifndef ___OPTIMIZE
-	lda #$00
-	sta <zSoundBase
-	lda #$00
-	sta <zSoundSpeed
-	sta <zSoundFade
+	mSTZ <zSoundBase
+	mSTZ <zSoundSpeed, <zSoundFade
 	.else
 	mSTZ <zSoundBase, <zSoundSpeed, <zSoundFade
 	.endif
-	mMOV #$04, <zSoundVar1
+;8067, 曲セットアップのチャンネルごとのループ開始
+.LoopCounter = zSoundVar1
+	mMOV #$04, <.LoopCounter
 	lda #$01
 .loop_init
 	clc
@@ -66,55 +68,61 @@ SOUND_STARTPLAY:
 	sta <zTrackPtr
 	lda #$00
 	adc <zTrackPtrhi
-	sta <zTrackPtrhi
-	ldx <zSoundBase
+	sta <zTrackPtrhi ;0F構造体中の曲開始ポインタの参照先を1つ進める
+	ldx <zSoundBase ;x = {zSoundBase|0, 0, 0, 0}
 	ldy #$00
-.loop_init_trackptr
+.loop_init_trackptr ;トラックごとの曲ポインタを初期化
 	mMOV [zTrackPtr],y, aSQ1Ptr,x
-	inx
-	iny
+	inx ;{x|zSoundBase, zSoundBase + 1}
+	iny ;{y|0, 1}
 	cpy #$02
 	bne .loop_init_trackptr
+	
 	ldy #$0E
 	lda #$00
 .loop_stz
-	sta aSQ1Ptr,x
-	inx
+	sta aSQ1Ptr,x ;トラックごとの曲用一時変数を初期化
+	inx ;{x|zSoundBase + 2 ≦ x < zSoundBase + #$10}
 	dey
 	bne .loop_stz
+	
 	lda <zSFXChannel
 	lsr a
-	bcs .skip_for_sfx
+	bcs .skip_for_sfx ;現在のトラックが効果音再生中なら飛ぶ
 	jsr Sound_ClearLFOs
 .skip_for_sfx
-	jsr Sound_GotoNextTrack
-	dec <zSoundVar1
-	beq .continue6
+	jsr Sound_GotoNextTrack ;ループを進める
+	dec <.LoopCounter
+	beq .end_init
 	lda #$02
 	jmp .loop_init
-.continue6
-	ldy #$02
+	
+.end_init ;この時、zTrackPtrはノイズ開始アドレスを指している
+	ldy #$02 ;+2バイト → MOD定義
 	mMOV [zTrackPtr],y, aModDefine
 	iny
 	mMOV [zTrackPtr],y, aModDefinehi
-	jsr Sound_ClearSFXReserve
+	jsr Sound_RestoreSFXReservation
 	mSTZ <zNMILock
 	rts
+
 ;80BB
-Bank0CStartSound_IsSFX:
+;効果音セットアップ開始
+Bank0CStartSFX:
+.TestStrength = zSoundVar1
 	lda <zSoundAttr
 	and #$F0
-	sta <zSoundVar1
-	cpx <zSoundVar1
-	bcs .dosfx
+	sta <.TestStrength
+	cpx <.TestStrength
+	bcs .play_sfx ;現在の優先度 - 鳴らそうとする曲の優先度X ≧ 0の時続行
 	rts
 ;効果音上書き優先順位00～F0が大きい時に続く
-.dosfx
-	stx <zSoundVar1
+.play_sfx
+	stx <.TestStrength
 	lda <zSoundAttr
 	and #$0F
-	ora <zSoundVar1
-	sta <zSoundAttr
+	ora <.TestStrength
+	sta <zSoundAttr ;優先度を更新
 	mMOV #$01, <zNMILock
 	mSTZ <zSoundBase
 	ldx #$00
@@ -124,51 +132,59 @@ Bank0CStartSound_IsSFX:
 	sta <zSFXPtr
 	txa
 	adc <zTrackPtrhi
-	sta <zSFXPtrhi
+	sta <zSFXPtrhi ;効果音ポインタ = トラック開始ポインタ + 2
+	
 	stx <zSFXWait
-	stx <zSFXLoop
+	stx <zSFXLoop ;一時変数の初期化
+	
 	ldy #$01
-	lda [zTrackPtr],y
+	lda [zTrackPtr],y ;A = 使用チャンネル
 	and #$0F
 	tax
 	ora <zSFXChannel
 	pha
-	stx <zSFXChannel
-	mMOV #$04, <zSoundVar1
-	mMOV #$02, <zSoundVar2
+	stx <zSFXChannel ;使用チャンネルを上書き
+
+.LoopCounter = zSoundVar1
+.FreqRegPtr = zSoundVar2 ;周波数レジスタへのポインタ
+	mMOV #$04, <.LoopCounter
+	mMOV #$02, <.FreqRegPtr
 .loop_initsfx
 	pla
-	lsr a
+	lsr a ;対象は今から使うチャンネルと現在効果音再生中のチャンネル
 	pha
 	bcc .skip
-		jsr Sound_ClearLFOs
-		lda <zSFXChannel
-		lsr a
-		bcs .skip
-			jsr Sound_816C
+	jsr Sound_ClearLFOs
+	lda <zSFXChannel
+	lsr a
+	bcs .skip
+	jsr Sound_RestoreModulation ;効果音再生中 かつ もう使わない時
 .skip
 	jsr Sound_GotoNextTrack
 	lda #$04
 	clc
-	adc <zSoundVar2
-	sta <zSoundVar2
-	dec <zSoundVar1
+	adc <.FreqRegPtr
+	sta <.FreqRegPtr ;{FreqRegPtr|2, 6, A, E}
+	dec <.LoopCounter
 	bne .loop_initsfx
-	jsr $8219
+	
+	jsr Sound_RestoreSFXReservation
 	lda <zSFXChannel
 	sta <zSFXChannel_Copy
 	pla
 	mSTZ <zNMILock
 	rts
+
 ;8129
 ;#FCを実行 曲を早くする
-Bank0CStartFC:
+Bank0C_StartFC:
 	iny
 	sty <zSoundSpeed
 	rts
+
 ;812D
 ;#FDを実行 曲をフェードアウト/インする
-Bank0CStartFD:
+Bank0C_StartFD:
 	sty <zSoundFade
 	lda #$01
 	sta <zSoundFadeProg
@@ -176,72 +192,79 @@ Bank0CStartFD:
 	and #$01
 	sta <zSoundCounter
 	rts
+
 ;813A
 ;#FEを実行 効果音を止める
-Bank0CStartFE:
+Bank0C_StartFE:
 	lda <zSoundAttr
 	and #$0F
 	sta <zSoundAttr
-	mMOV #$04, <zSoundVar1
-	mMOV #$02, <zSoundVar2
+.LoopCounter = zSoundVar1
+.FreqRegPtr = zSoundVar2 ;周波数レジスタへのポインタ
+	mMOV #$04, <.LoopCounter
+	mMOV #$02, <.FreqRegPtr
 .loop_sfx
 	lda <zSFXChannel
 	lsr a
-	bcc .nosfx
-		jsr Sound_ClearLFOs
-		jsr Sound_816C
-.nosfx
+	bcc .skip
+	jsr Sound_ClearLFOs
+	jsr Sound_RestoreModulation
+.skip
 	jsr Sound_GotoNextTrack
 	lda #$04
 	clc
-	adc <zSoundVar2
-	sta <zSoundVar2
-	dec <zSoundVar1
+	adc <.FreqRegPtr
+	sta <.FreqRegPtr ;{zSoundVar2|2, 6, A, E}
+	dec <.LoopCounter
 	bne .loop_sfx
-	lda #$00
-	sta <zSFXChannel
-	sta <zSFXChannel_Copy
 	.ifndef ___OPTIMIZE
-	lda #$00
+	mSTZ <zSFXChannel, <zSFXChannel_Copy
+	mSTZ <zNMILock
+	.else
+	mSTZ <zSFXChannel, <zSFXChannel_Copy, <zNMILock
 	.endif
-	sta <zNMILock
 	rts
+
 ;816C
-;なんだこれその1
-Sound_816C:
+;処理中のチャンネルが音を鳴らしている時
+;もしくは曲で使用される時、モジュレーション定義をリセット
+;音を鳴らしていない時、周波数レジスタをリセット
+Sound_RestoreModulation:
+.Channel = zSoundVar1
+.RegPtr = zSoundVar2
 	lda <zSoundBase
 	clc
 	adc #$0A
 	tax
-	lda aSQ1Ptr,x ; = aSQ1Reg
-	ora aSQ1Ptrhi,x ; = aSQ1Reghi
-	bne Sound_CopyModulation
-	ldy <zSoundVar1
-	ldx <zSoundVar2
-	jsr Sound_8222
+	lda aSQ1Ptr,x   ;A = aSQ1Reg
+	ora aSQ1Ptrhi,x ;A = A or aSQ1Reghi
+	bne Sound_CopyModulation ;音を鳴らしている時に飛ぶ
+	ldy <.Channel ;{y|4, 3, 2, 1}
+	ldx <.RegPtr  ;{x|2, 6, A, E}
+	jsr Sound_ResetFreqRegisters
 	ldx <zSoundBase
 	lda aSQ1Ptr,x
-	ora aSQ1Ptrhi,x
+	ora aSQ1Ptrhi,x ;曲で使われないトラックならrts
 	bne Sound_CopyModulation
 	rts
+
 ;818C
 ;#FFを実行 曲を止める
-Bank0CStartFF:
+Bank0C_StartFF:
 	lda <zSoundAttr
 	and #$F0
 	sta <zSoundAttr
-	lda #$00
-	sta <zSoundSpeed
-	sta <zSoundFade
-	mMOV #$04, <zSoundVar1
-.loop_del
+	mSTZ <zSoundSpeed, <zSoundFade
+.LoopCounter = zSoundVar1
+	mMOV #$04, <.LoopCounter
+.loop
 	lda #$00
 	ldx <zSoundBase
 	sta aSQ1Ptr,x
-	sta aSQ1Ptrhi,x
-	jsr $8211
-	dec <zSoundVar1
-	bne .loop_del
+	sta aSQ1Ptrhi,x ;曲ポインタ = 0
+	jsr Sound_GotoNextTrack_Music
+	dec <.LoopCounter
+	bne .loop
 	mSTZ <zNMILock
 	rts
 
@@ -252,7 +275,7 @@ Sound_ClearLFOs:
 	lda #$10
 	clc
 	adc <zSoundBase
-	tax
+	tax ;X = zSoundBase + 10
 	lda #$00
 .loop
 	sta aSQ1Ptr,x ;SFXPitch～VolModVolume($510～$51E) = 0
@@ -268,38 +291,41 @@ Sound_CopyModulation:
 	pha
 	lda <zSoundVar2
 	pha
-	mMOV aModDefine, <zSoundVar1
-	mMOV aModDefinehi, <zSoundVar2
+.ModPtr = zSoundVar1
+.ModPtrhi = zSoundVar2
+	mMOV aModDefine, <.ModPtr
+	mMOV aModDefinehi, <.ModPtrhi
 	lda <zSoundBase
 	clc
 	adc #$06
 	tax
-	lda aSQ1Ptr,x
+	lda aSQ1Ptr,x ;A = aSQ1Mod
 	and #$1F ;現在のモジュレーション定義番号にアクセス
-	beq .nomod
-		tay
-		lda #$00
+	beq .skip
+	tay ;MOD ≠ 0の時、Y = モジュレーション番号
+	lda #$00
 .loop_mod
-		clc
-		adc #$04
-		dey
-		bne .loop_mod
-.nomod
-	tay ;Y = モジュレーション定義へのポインタ
-	txa
 	clc
-	adc #$0E
-	tax ;X = 6 + E = 14, モジュレーション定義の内容を格納
-	lda #$04
-.loop_copy
+	adc #$04
+	dey
+	bne .loop_mod
+.skip
+	tay ;Y = 4 * MOD番号
+	txa ;A = zSoundBase + 6
+	clc
+	adc #$0E ;A = zSoundBase + 6 + E = zSoundBase + 14
+	tax ;X = zSoundBase + 14
+	lda #$04 ;ループ変数
+.loop_copy ;モジュレーション定義の内容を格納
 	pha
-	mMOV [zSoundVar1],y, aSQ1Ptr,x
-	iny
-	inx
+	mMOV [.ModPtr],y, aSQ1Ptr,x ;aModDefine1, 2, 3, 4
+	iny ;{y|4 * MOD ≦ y < 4 * MOD + 4}
+	inx ;{x|14, 15, 16, 17}
 	pla
 	sec
 	sbc #$01
 	bne .loop_copy ;4バイトコピー
+;一時変数の復元
 	pla
 	sta <zSoundVar2
 	pla
@@ -307,14 +333,16 @@ Sound_CopyModulation:
 	rts
 
 ;8207
-;次のチャンネルの処理をするための処理？
+;現在の処理を次のチャンネルを対象にするように進める
+;効果音処理チャンネルのシフトとチャンネルベースポインタの加算
 Sound_GotoNextTrack:
 	lsr <zSFXChannel
-	bcc .skip_sfx
+	bcc Sound_GotoNextTrack_Music
 	lda <zSFXChannel
-	ora #$80
+	ora #$80 ;Sound_RestoreSFXReservationで戻すためのora
 	sta <zSFXChannel
-.skip_sfx
+;8211
+Sound_GotoNextTrack_Music:
 	lda #$1F
 	clc
 	adc <zSoundBase
@@ -322,8 +350,8 @@ Sound_GotoNextTrack:
 	rts
 
 ;8219
-;効果音を鳴らすチャンネルの予約を全部消す
-Sound_ClearSFXReserve:
+;効果音を鳴らすチャンネルの予約を上位ニブルを使って戻す
+Sound_RestoreSFXReservation:
 	lsr <zSFXChannel
 	lsr <zSFXChannel
 	lsr <zSFXChannel
@@ -331,14 +359,14 @@ Sound_ClearSFXReserve:
 	rts
 
 ;8222
-;音を止める？
-Sound_8222:
-	cpy #$01
-	beq .play
-	mSTZ $4000,x, $4001,x
+;周波数レジスタをリセットする
+Sound_ResetFreqRegisters:
+	cpy #$01 ;{x|2, 6, A, E}, {y|4, 3, 2, 1}
+	beq .noise ;処理中のチャンネル = NOIなら飛ぶ
+	mSTZ $4000,x, $4001,x ;周波数レジスタリセット $400X, $400X+1 = 0, 0
 	rts
-.play
-	mMOV #$07, $4015
+.noise ;ノイズなら、音声再生制御レジスタをいじる
+	mMOV #%00000111, $4015 ;ノイズとDPCMは再生しない
 	rts
 
 ;8235
@@ -395,6 +423,6 @@ Sound_ProcessTracks:
 	inx
 	inx
 	ldy <zProcessChannel
-	jsr Sound_8222
+	jsr Sound_ResetFreqRegisters
 	lsr <zSFXChannel_Copy
 	bcc $829E
