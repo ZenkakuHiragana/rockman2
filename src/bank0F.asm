@@ -15,12 +15,12 @@ ChangeBank:
 	sta $FFF0
 	lsr a
 	sta $FFF0
-	mMOV #$00, <zPostProcSemaphore
+	mSTZ <zPostProcSemaphore
 	lda <zPostProcessSound
 	bne .PostProcess
 	rts
 
-
+;NMI後の音処理(バンク切り替え中の割り込みで呼び出し)
 .PostProcess:
 	.ifdef ___BUGFIX
 	tya
@@ -45,7 +45,7 @@ ChangeBank:
 	dec <zSoundQueue
 	bne .loop_postsound
 .end_postsound
-	mMOV #$00, <zPostProcessSound
+	mSTZ <zPostProcessSound
 	.ifdef ___BUGFIX
 	pla
 	tay
@@ -85,13 +85,14 @@ ChangeBank_DoEnterWilyCastle:
 	;rts
 
 ;20 7F C0
+;1フレーム経過するまで待ってから、バンク0Eに切り替えて戻る
 FrameAdvance1C:
 	mMOV <zKeyDown, <zKeyDownPrev
 	.ifdef ___2P
 	mMOV <zKeyDown2P, <zKeyDownPrev2P
 	.endif
 	jsr DoPaletteAnimation
-	mMOV #$00, <zIsLag
+	mSTZ <zIsLag
 .wait_for_NMI
 	lda <zIsLag
 	beq .wait_for_NMI
@@ -107,17 +108,16 @@ FrameAdvance1C:
 	sta <zKeyPress2P
 	.endif
 	mCHANGEBANK #$0E, 1
-	;rts
 
 ;20 AB C0
+;1フレーム経過するまで待ってから、バンク0Dに切り替えて戻る
 FrameAdvance1A:
 	mMOV <zKeyDown, <zKeyDownPrev
 	.ifdef ___2P
 	mMOV <zKeyDown2P, <zKeyDownPrev2P
 	.endif
 	jsr DoPaletteAnimation
-	lda #$00
-	sta <zIsLag
+	mSTZ <zIsLag
 .wait_for_NMI
 	lda <zIsLag
 	beq .wait_for_NMI
@@ -133,9 +133,9 @@ FrameAdvance1A:
 	sta <zKeyPress2P
 	.endif
 	mCHANGEBANK #$0D, 1
-	;rts
 
-;20 D7 C0 Water Lagging
+;20 D7 C0
+;水中でラグを発生させるための処理
 FrameAdvanceWater:
 	lda <zKeyDown
 	pha
@@ -149,12 +149,8 @@ FrameAdvanceWater:
 ;	lda <zKeyPress2P
 ;	pha
 ;	.endif
-	lda #$1E
-	ora <z2001
-	sta <z2001
-	sta $2001
-	lda #$00
-	sta <zIsLag
+	mORA #$1E, <z2001, <z2001, $2001
+	mSTZ <zIsLag
 .wait_for_NMI
 	lda <zIsLag
 	beq .wait_for_NMI
@@ -174,7 +170,8 @@ FrameAdvanceWater:
 	;rts
 
 	.ifdef ___WAITFRAMES
-;20 00 C1 Wait regA frames
+;20 00 C1
+;Aレジスタで指定したフレーム数だけ経過させる
 FrameAdvance1C_Multi:
 	pha
 	jsr FrameAdvance1C
@@ -185,57 +182,48 @@ FrameAdvance1C_Multi:
 	rts
 	.endif
 
-;4C 0B C1 Die Now!!!
+;4C 0B C1
+;ロックマンの死亡処理
 DieRockman:
-	mPLAYTRACK #$41
-	mPLAYTRACK #$FF
+	mPLAYTRACK #$41 ;ティウン音
+	mPLAYTRACK #$FF ;曲停止
 	lda <zStatus
-	bne .isfail
-	sta <zShootPoseTimer
+	bne .isfall
+.TiwnroundAngle = zShootPoseTimer
+	sta <.TiwnroundAngle ;{TiwnroundAngle|0 ≦ TiwnroundAngle < F}
 .loop_tiwninit
 	and #$01
-	bne .jump
-	lda <zShootPoseTimer
+	bne .wait_tiwnround
+	lda <.TiwnroundAngle
 	and #$07
 	tax
 	ldy #$01
 .loop_tiwnround
-	mMOV #$25, aObjAnim + $0E,y
-	mMOV #%10000000, aObjFlags + $0E,y
+	mMOV #$25, aObjAnim+$E,y
+	mMOV #%10000000, aObjFlags+$E,y
 	clc
-	lda aObjX
-	adc Table_TiwnBalldx,x
-	sta aObjX + $0E,y
-	lda aObjRoom
-	adc Table_TiwnBalldr,x
-	sta aObjRoom + $0E,y
-	lda aObjY
-	adc Table_TiwnBalldy,x
-	sta aObjY + $0E,y
-	lda #$01
-	sta aObjFrame + $0E,y
-	lda #$00
-	sta aObjVXlo + $0E,y
-	sta aObjVX + $0E,y
-	sta aObjVYlo + $0E,y
-	sta aObjVY + $0E,y
-	sta aObjWait + $0E,y
+	mADD aObjX, Table_TiwnBalldx,x, aObjX+$E,y
+	mADD aObjRoom, Table_TiwnBalldr,x, aObjRoom+$E,y
+	mADD aObjY, Table_TiwnBalldy,x, aObjY+$E,y
+	mMOV #$01, aObjFrame + $0E,y
+	mSTZ aObjVXlo+$E,y, aObjVX+$E,y, aObjVYlo+$E,y, aObjVY+$E,y, aObjWait+$E,y
 	inx
 	dey
 	bpl .loop_tiwnround
-.jump
+.wait_tiwnround
 	jsr MainRoutine_WhileDeath
-	inc <zShootPoseTimer
-	lda <zShootPoseTimer
+	inc <.TiwnroundAngle
+	lda <.TiwnroundAngle
 	cmp #$10
 	bcc .loop_tiwninit
+;爆散開始
 	lsr aObjFlags + $0E
 	lsr aObjFlags + $0F
 	jsr SpawnTiwnRound
-	lda #$A0
+	lda #$A0 ;ティウン時の復活待ち時間
 	bne .continue_tiwn
-.isfail
-	lda #$E0
+.isfall
+	lda #$E0 ;落下死の時の復活待ち時間
 .continue_tiwn
 	sta <zShootPoseTimer
 .wait_tiwn
@@ -243,7 +231,7 @@ DieRockman:
 	jsr MainRoutine_WhileDeath
 	dec <zShootPoseTimer
 	bne .wait_tiwn
-
+;爆散終了
 	mMOV #$10, $2000
 	mMOV #$06, $2001
 	lda <zStage
@@ -264,11 +252,12 @@ DieRockman:
 	mCHANGEBANK #$0E
 	dec <zLives
 	bne .notgameover
+;ゲームオーバー
 	mSTZ <zETanks
 	mCHANGEBANK #$0D
 	jsr Bank0D_BeginGameOver
 	mCHANGEBANK #$0E
-	lda <$FD
+	lda <$FD ;ゲームオーバー画面での選択が入っている
 	bne .stageselect
 	jmp StartStage_FillingEnergy ;ゲームオーバー→コンティニュー
 .stageselect
@@ -286,6 +275,7 @@ Table_TiwnBalldr:
 
 
 ;4C F0 C1
+;ボスの死亡処理
 DieBoss:
 	jsr BossDeadInit
 	inc <zNoDamage
@@ -294,9 +284,11 @@ DieBoss:
 	lda <zStage
 	cmp #$08
 	bne .notwily1
+;メカドラゴン戦の時
 	lda <zScrollFlag
 	cmp #$03
 	bne .notwily1
+;ボス撃破後も落下死する可能性がある
 	mSTZ <zNoDamage
 	mMOV #$01, <zStatus
 	jmp DieRockman
@@ -305,12 +297,8 @@ DieBoss:
 	cmp #$FF
 	bne .loop
 	mSTZ <zNoDamage
-	lda #$10
-	sta <z2000
-	sta $2000
-	lda #$06
-	sta <z2001
-	sta $2001
+	mMOV #$10, <z2000, $2000
+	mMOV #$06, <z2001, $2001
 	mSTZ <zContinuePoint
 	ldx #$FF
 	txs
@@ -318,12 +306,8 @@ DieBoss:
 	ldx <zStage
 	cpx #$08
 	bcs .iswily
-	lda StageBitTable,x
-	ora <zClearFlags
-	sta <zClearFlags
-	lda ItemBitTable,x
-	ora <zItemFlags
-	sta <zItemFlags
+	mORA StageBitTable,x, <zClearFlags, <zClearFlags
+	mORA ItemBitTable,x, <zItemFlags, <zItemFlags
 	mCHANGEBANK #$0D
 	jsr Bank0D_BeginGetEquipment
 	mCHANGEBANK #$0E
@@ -354,14 +338,8 @@ ItemBitTable:
 
 ;20 89 C2
 BossDeadInit:
-	lda #$00
-	sta aBossDeath
-	sta aBossVar1
-	sta aBossVar2
-	sta aBossInvincible
-	sta <zStopFlag
-	lda #$FE
-	sta <zBossBehaviour
+	mSTZ aBossDeath, aBossVar1, aBossVar2, aBossInvincible, <zStopFlag
+	mMOV #$FE, <zBossBehaviour
 	rts
 
 ;20 9E C2
@@ -374,19 +352,14 @@ Unknown_C29E
 	jsr Unknown_C386
 	dec <$FD
 	bne .loop_wait2
-	lda #$00
-	sta aPaletteAnimWait
-	sta aPaletteAnim
+	mSTZ aPaletteAnimWait, aPaletteAnim
 	ldx #$02
 .loop2
-	lda C29E_Palette,x
-	sta $0357,x
+	mMOV C29E_Palette,x, aPalette + 1,x ;第一BGパレット → C29E_Palette
 	dex
 	bpl .loop2
-	lda #$86
-	sta <$FF
-	lda #$00
-	sta <$FE
+	mMOV #$86, <$FF
+	mSTZ <$FE
 .loop
 	mCHANGEBANK #$09
 	lda <$FD
@@ -397,31 +370,23 @@ Unknown_C29E
 	lda <$FD
 	and #$01
 	beq .begin_ppu
-	lda aPPULinearlo
-	ora #$20
-	sta aPPULinearlo
+	mORA aPPULinearlo, #%00100000, aPPULinearlo
 .begin_ppu
 	ldy #$20
 .loop_ppu
-	lda [$FE],y
-	sta aPPULinearData,y
+	mMOV [$FE],y, aPPULinearData,y
 	dey
 	bpl .loop_ppu
 	mMOV #$20, <zPPULinear
 	clc
-	lda <$FE
-	adc #$20
-	sta <$FE
-	lda <$FF
-	adc #$00
-	sta <$FF
+	mADD <$FE, #$20
+	mADD <$FF
 	jsr Unknown_C386
 	inc <$FD
 	lda <$FD
 	cmp #$2E
 	bne .loop
 	mCHANGEBANK #$0E, 1
-	;rts
 
 ;C321
 C29E_Palette:
@@ -485,9 +450,7 @@ SpawnTiwnRound:
 SpawnTiwnRound_Specified:
 	ldy #$0B
 .loop
-	lda #%10000000
-	ora TiwnRoundVector,y
-	sta aObjFlags,x
+	mORA #%10000000, TiwnRoundVector,y, aObjFlags,x
 	mMOV <$0B, aObjAnim,x
 	mMOV <$09, aObjRoom,x
 	mMOV <$08, aObjX,x
@@ -496,29 +459,26 @@ SpawnTiwnRound_Specified:
 	mMOV TiwnRoundVXhi,y, aObjVX,x
 	mMOV TiwnRoundVYlo,y, aObjVYlo,x
 	mMOV TiwnRoundVYhi,y, aObjVY,x
-	lda #$00
-	sta aObjWait,x
-	sta aObjFrame,x
+	mSTZ aObjWait,x, aObjFrame,x
 	dex
 	dey
 	bpl .loop
 	rts
 
 TiwnRoundVXlo:
-	.db $00, $00, $00, $00, $60, $60, $60, $60
-	.db $00, $C0, $00, $E0
+	.ifndef ___BUGFIX
+	.db $00, $00, $00, $00, $60, $60, $60, $60, $00, $C0, $00, $E0
+	.else
+	.db $00, $00, $00, $00, $60, $60, $60, $60, $00, $C0, $00, $C0
+	.endif
 TiwnRoundVXhi:
-	.db $00, $02, $00, $02, $01, $01, $01, $01
-	.db $00, $00, $00, $00
+	.db $00, $02, $00, $02, $01, $01, $01, $01, $00, $00, $00, $00
 TiwnRoundVYlo:
-	.db $00, $00, $00, $00, $60, $A0, $A0, $60
-	.db $C0, $00, $40, $00
+	.db $00, $00, $00, $00, $60, $A0, $A0, $60, $C0, $00, $40, $00
 TiwnRoundVYhi:
-	.db $02, $00, $FE, $00, $01, $FE, $FE, $01
-	.db $00, $00, $FF, $00
+	.db $02, $00, $FE, $00, $01, $FE, $FE, $01, $00, $00, $FF, $00
 TiwnRoundVector:
-	.db $00, $40, $00, $00, $40, $40, $00, $00
-	.db $00, $40, $00, $00
+	.db $00, $40, $00, $00, $40, $40, $00, $00, $00, $40, $00, $00
 
 ;20 27 C4
 DoPaletteAnimation:
@@ -569,10 +529,7 @@ LoadStageGraphics:
 .is8bosses
 	ldy #$00
 	mMOV [.ptr],y, <$00
-	lda #$00
-	sta $2006
-	sta $2006
-	sta <zPtrlo
+	mSTZ $2006, $2006, <zPtrlo
 	iny
 	sty <$01
 .loop3
@@ -616,31 +573,18 @@ SetContinuePoint:
 	and #$07
 	jsr ChangeBank
 	ldy <zContinuePoint
-	lda $BB06,y ;-----------------------
-	sta <zRoom
-	sta aObjRoom
-	lda $BB0C,y ;-----------------------
-	sta <zEnemyIndexPrev
-	sta <zEnemyIndexNext
-	lda $BB12,y ;-----------------------
-	sta <zItemIndexPrev
-	sta <zItemIndexNext
-	lda $BB18,y ;-----------------------
-	sta <zNTPrevhi
-	lda $BB1E,y ;-----------------------
-	sta <zNTPrevlo
-	lda $BB24,y ;-----------------------
-	sta <zNTNexthi
-	lda $BB2A,y ;-----------------------
-	sta <zNTNextlo
-	lda $BB30,y ;-----------------------
-	sta <zScrollNumber
-	lda $BB36,y ;-----------------------
-	sta <zScrollLeft
-	lda $BB3C,y ;-----------------------
-	sta <zScrollRight
+	mMOV $BB06,y, <zRoom, aObjRoom
+	mMOV $BB0C,y, <zEnemyIndexPrev, <zEnemyIndexNext
+	mMOV $BB12,y, <zItemIndexPrev, <zItemIndexNext
+	mMOV $BB18,y, <zNTPrevhi
+	mMOV $BB1E,y, <zNTPrevlo
+	mMOV $BB24,y, <zNTNexthi
+	mMOV $BB2A,y, <zNTNextlo
+	mMOV $BB30,y, <zScrollNumber
+	mMOV $BB36,y, <zScrollLeft
+	mMOV $BB3C,y, <zScrollRight
 	ldx <zScrollNumber
-	jsr Unknown_CB61
+	jsr SetEnemyPalette
 	tya
 	clc
 	adc #$0B
@@ -652,13 +596,8 @@ SetContinuePoint:
 	dey
 	dex
 	bne .loop_pha
-	lda #$0A
-	sta $2006
-	lda #$00
-	sta $2006
-	sta <zPtrlo
-	lda #$06
-	sta <$00
+	mMOVWB $0A00, $2006, $2006, <zPtrlo
+	mMOV #$06, <$00
 .loop_enemygraphics
 	pla
 	sta <zPtrhi
@@ -666,8 +605,7 @@ SetContinuePoint:
 	jsr ChangeBank
 	ldy #$00
 .loop
-	lda [zPtr],y
-	sta $2007
+	mMOV [zPtr],y, $2007
 	iny
 	bne .loop
 	dec <$00
@@ -681,6 +619,7 @@ SetContinuePoint:
 	rts
 
 ;20 57 C5
+;タイトルスクリーンの開始
 BeginTitleScreen:
 	mCHANGEBANK #$0D
 	jsr Bank0D_BeginTitleScreen
@@ -688,6 +627,7 @@ BeginTitleScreen:
 	;rts
 
 ;20 65 C5
+;ステージセレクト処理の開始
 ChangeBank_DoStageSelect
 	mCHANGEBANK #$0D
 	jsr Bank0D_BeginStageSelect
@@ -695,6 +635,7 @@ ChangeBank_DoStageSelect
 	;rts
 
 ;20 73 C5
+;武器選択メニューを開く
 OpenSubMenu:
 	ldx #$0F
 .loop_check
@@ -744,15 +685,12 @@ DoBossBehaviour:
 	dex
 	bpl .loop_erase
 	jsr BossDeadInit
-	lda #$00
-	sta <zObjIndex
+	mSTZ <zObjIndex
 	lda #$7D
 	ldx #$0F
 	jsr CreateEnemyHere_Middle
-	lda #$20
-	sta aObjX10 + $0F
-	lda #$AB
-	sta aObjY10 + $0F
+	mMOV #$20, aObjX10 + $0F
+	mMOV #$AB, aObjY10 + $0F
 	bne .jump
 .notbossrush
 	jmp DieBoss
@@ -762,26 +700,16 @@ DoBossBehaviour:
 ;20 F1 C5
 LoadBossBG:
 	pha
-	lda aBossPtrhi
-	sta <$09
-	lda aBossPtrlo
-	sta <$08
+	mMOV aBossPtrhi, <$09
+	mMOV aBossPtrlo, <$08
 	pla
 	jsr WritePPUData
 	clc
-	lda aPPULinearlo
-	adc #$20
-	sta aPPULinearlo
-	lda aPPULinearhi
-	adc #$00
-	sta aPPULinearhi
+	mADD aPPULinearlo, #$20
+	mADD aPPULinearhi
 	clc
-	lda aBossPtrlo
-	adc #$20
-	sta aBossPtrlo
-	lda aBossPtrhi
-	adc #$00
-	sta aBossPtrhi
+	mADD aBossPtrlo, #$20
+	mADD aBossPtrhi
 	mCHANGEBANK #$0B, 1
 	;rts
 
@@ -790,12 +718,10 @@ LoadBossBG:
 ;ネームテーブル書き換え用かな
 LoadScreenData:
 	jsr ChangeBank
-	lda #$00
-	sta <zPtrlo
+	mSTZ <zPtrlo
 	ldx #$04
 .loop
-	lda [zPtr],y
-	sta $2007
+	mMOV [zPtr],y, $2007
 	iny
 	bne .loop
 	inc <zPtrhi
@@ -808,26 +734,17 @@ LoadScreenData:
 LoadGraphicsSet:
 	sta <$00
 	tax
-	lda Table_GraphicsSetNum,x
-	sta <$01
-	lda Table_GraphicsBeginPointer,x
-	sta <$02
-	lda #$00
-	sta <zPtrlo
-	sta $2006
-	sta $2006
+	mMOV Table_GraphicsSetNum,x, <$01
+	mMOV Table_GraphicsBeginPointer,x, <$02
+	mSTZ <zPtrlo, $2006, $2006
 .loop2
 	ldx <$02
-	lda Table_GraphicsPosition,x
-	sta <zPtrhi
-	lda Table_GraphicsAmount,x
-	sta <$03
-	lda Table_GraphicsBank,x
-	jsr ChangeBank
+	mMOV Table_GraphicsPosition,x, <zPtrhi
+	mMOV Table_GraphicsAmount,x, <$03
+	mCHANGEBANK Table_GraphicsBank,x
 	ldy #$00
 .loop
-	lda [zPtr],y
-	sta $2007
+	mMOV [zPtr],y, $2007
 	iny
 	bne .loop
 	inc <zPtrhi
@@ -875,14 +792,11 @@ WritePPUData:
 	jsr ChangeBank
 	ldy #$1F
 .loop
-	lda [zPtr],y
-	sta aPPULinearData,y
+	mMOV [zPtr],y, aPPULinearData,y
 	dey
 	bpl .loop
-	lda #$20
-	sta <zPPULinear
+	mMOV #$20, <zPPULinear
 	mCHANGEBANK #$0D, 1
-	;rts
 
 	.ifndef ___DISABLE_INTRO_PIPI
 ;20 20 C7
@@ -890,18 +804,12 @@ SelectStage_LoadPipiGraphics:
 	mCHANGEBANK #$01
 	ldx #$1F
 .loop
-	lda $9CD0,x ;----------------------------
-	sta aPPULinearData,x
+	mMOV $9CD0,x, aPPULinearData,x
 	dex
 	bpl .loop
-	lda #$08
-	sta aPPULinearhi
-	lda #$00
-	sta aPPULinearlo
-	lda #$20
-	sta <zPPULinear
+	mMOVWB $0800, aPPULinearhi, aPPULinearlo
+	mMOV #$20, <zPPULinear
 	mCHANGEBANK #$0D, 1
-	;rts
 	.endif
 
 ;20 44 C7
@@ -910,19 +818,15 @@ WriteTableToPPULinear:
 	mCHANGEBANK #$09
 	ldy #$1F
 .loop
-	lda [$FE],y
-	sta aPPULinearData,y
+	mMOV [$FE],y, aPPULinearData,y
 	dey
 	bpl .loop
-	lda #$20
-	sta <zPPULinear
+	mMOV #$20, <zPPULinear
 	mCHANGEBANK #$0D, 1
-	;rts
 
 ;20 5D C7
 Unknown_C75D:
-	lda <$FD
-	sta <zPtrhi
+	mMOV <$FD, <zPtrhi
 	lda #$00
 	lsr <zPtrhi
 	ror a
@@ -950,14 +854,11 @@ Unknown_C75D:
 	jsr ChangeBank
 	ldy #$1F
 .loop
-	lda [zPtr],y
-	sta aPPULinearData,y
+	mMOV [zPtr],y, aPPULinearData,y
 	dey
 	bpl .loop
-	lda #$20
-	sta <zPPULinear
+	mMOV #$20, <zPPULinear
 	mCHANGEBANK #$0D, 1
-	;rts
 
 ;20 A1 C7
 GetScrollInfo:
@@ -971,25 +872,17 @@ GetScrollInfo:
 
 ;20 B2 C7: 棒状になって降りてきて着地まで
 Rockman_Warp_to_Land:
-	lda #%11000000
-	sta aObjFlags
-	lda #$80
-	sta aObjX
-	lda #$14
-	sta aObjY
-	lda #$1A
-	sta aObjAnim
+	mMOV #%11000000, aObjFlags
+	mMOV #$80, aObjX
+	mMOV #$14, aObjY
+	mMOV #$1A, aObjAnim
 .loop
 	lda <zStage
 	and #$07
 	jsr ChangeBank
-	lda #$00
-	sta aObjWait
-	sta aObjFrame
+	mSTZ aObjWait, aObjFrame
 	clc
-	lda aObjY
-	adc #$10
-	sta aObjY
+	mADD aObjY, #$10
 	ldx <zContinuePoint
 	cmp $BB00,x ;----------------------
 	beq .onland
@@ -998,29 +891,20 @@ Rockman_Warp_to_Land:
 	jmp .loop
 .onland
 	mPLAYTRACK #$30
-	lda #$00
-	sta <zStatus
-	sta <zSliplo
-	sta <zSliphi
-	lda #$40
-	sta <zMoveVec
+	mSTZ <zStatus, <zSliplo, <zSliphi
+	mMOV #$40, <zMoveVec
 	mCHANGEBANK #$0E, 1
-	;rts
-
 
 ;20 05 C8
 SpawnBoss:
-	lda <zStage
-	sta <zBossType
+	mMOV <zStage, <zBossType
 SpawnBoss_BossRushBegin:
 	mCHANGEBANK #$0B
 	jsr $8000
 	mCHANGEBANK #$0E
 SpawnBoss_Loop_Begin:
 .loop
-	lda #$00
-	sta <zKeyDown
-	sta <zKeyPress
+	mSTZ <zKeyDown, <zKeyPress
 	jsr DoRockman
 	jsr WeaponObjectProcess
 	jsr SpawnEnemyByScroll
@@ -1035,8 +919,7 @@ SpawnBoss_Loop_Begin:
 	bcs .nolag
 .lag
 	jsr FrameAdvanceWater
-	lda #$00
-	sta <zWaterWait
+	mSTZ <zWaterWait
 .nolag
 	jsr FrameAdvance1C
 	lda <zBossBehaviour
@@ -1047,9 +930,7 @@ SpawnBoss_Loop_Begin:
 ;20 4B C8 Random: $04 = math.random(0, $02)
 ;$01 / $02 = $03×$02 + $04
 Divide8:
-	lda #$00
-	sta <$03
-	sta <$04
+	mSTZ <$03, <$04
 	lda <$01
 	ora <$02
 	bne .jump
@@ -1081,9 +962,7 @@ Divide:
 .Bhi = $0B
 .C = $0C
 .Chi = $0D
-	lda #$00
-	sta <$11
-	sta <$10
+	mSTZ <$11, <$10
 	lda <.Bhi
 	ora <.B
 	ora <.Chi
@@ -1118,10 +997,8 @@ Divide:
 .cc
 	dey
 	bne .loop
-	lda <.B
-	sta <.Ahi
-	lda <$10
-	sta <.A
+	mMOV <.B, <.Ahi
+	mMOV <$10, <.A
 	rts
 
 ;20 AE C8: $300, $304, $308, $30C = 画面$09, 位置$08
@@ -1147,9 +1024,7 @@ SetPPUSquareInfo:
 	ror a
 	and #$FC
 	sta aPPUSqrlo,x
-	lda <$0B
-	ora #$03
-	sta aPPUSqrAttrhi,x
+	mORA <$0B, #$03, aPPUSqrAttrhi,x
 	pla
 	sta <$0A
 	lsr a
@@ -1186,8 +1061,7 @@ SetPPUPos:
 	lsr a
 	ora aPPULaserlo,x
 	sta aPPULaserlo,x
-	lda <$0B
-	sta aPPULaserhi,x
+	mMOV <$0B, aPPULaserhi,x
 	rts
 
 ;20 18 C9
@@ -1232,15 +1106,13 @@ SetPPUPos_Attr:
 	iny
 .jump2
 	pla
-	and Table_C918,y
+	and Table_ShutterAttrMask,y
 	sta aPPUShutterMask,x
-	lda Table_C918,y
-	eor #$FF
-	sta aPPUShutterMask2,x
+	mEOR Table_ShutterAttrMask,y, #$FF, aPPUShutterMask2,x
 	rts
 
 ;1EC964
-Table_C918:
+Table_ShutterAttrMask:
 	.db $03, $0C, $30, $C0
 
 ;20 68 C9
@@ -1249,8 +1121,7 @@ WriteNameTableByScroll:
 	lda <zStage
 	and #$07
 	jsr ChangeBank
-	lda #$20
-	sta <$0B
+	mMOV #$20, <$0B
 	ldy #$00
 	lda [zPtr],y
 	tax
@@ -1299,8 +1170,7 @@ WriteNameTableByScroll:
 	ldy #$24
 .jump
 	sty <$0D
-	lda <zNTPointer
-	sta <$0C
+	mMOV <zNTPointer, <$0C
 	lsr a
 	ror <$0C
 	lda <$0C
@@ -1312,11 +1182,8 @@ WriteNameTableByScroll:
 	and #$FC
 	ldx <zPPUSqr
 	sta aPPUSqrlo,x
-	lda <$0D
-	sta aPPUSqrhi,x
-	lda <$0D
-	ora #$03
-	sta aPPUSqrAttrhi,x
+	mMOV <$0D, aPPUSqrhi,x
+	mORA <$0D, #$03, aPPUSqrAttrhi,x
 	lda <zNTPointer
 	sta <$0C
 	lsr a
@@ -1332,7 +1199,6 @@ WriteNameTableByScroll:
 	sta aPPUSqrAttrData,x
 	inc <zPPUSqr
 	mCHANGEBANK #$0E, 1
-	;rts
 
 ;1ECA04
 Table_C968:
@@ -1392,8 +1258,7 @@ VerticalScroll_DrawNT:
 	txa
 	ora #$03
 	sta aPPUSqrData + 2
-	lda #$00
-	sta <$00
+	mSTZ <$00
 	lda <.VertScrollCounter
 	and #$3B
 	lsr a
@@ -1418,9 +1283,7 @@ VerticalScroll_DrawNT:
 	stx <$01
 .loop2
 	ldy <$00
-	lda [zPtr],y
-	sta <$03
-	sta <$0A
+	mMOV [zPtr],y, <$03, <$0A
 	lda #$20
 	asl <$0A
 	rol a
@@ -1433,8 +1296,7 @@ VerticalScroll_DrawNT:
 	beq .jump
 	iny
 .jump
-	lda #$02
-	sta <$02
+	mMOV #$02, <$02
 .loop
 	lda [$0A],y
 	asl a
@@ -1465,22 +1327,16 @@ VerticalScroll_DrawNT:
 	and aPPUSqrData + 4
 	ldy <$01
 	sta aPPUSqrData + 5,y
-	lda <$00
-	ora #$08
-	sta <$00
+	mORA <$00, #$08
 	inc <$01
 	lda <$01
 	cmp #$02
 	beq .jump3
 	jmp .loop2
 .jump3
-	lda #$80
-	sta <zPPUSqr
-	lda #$FF
-	eor aPPUSqrData + 4
-	sta aPPUSqrData + 4
+	mMOV #$80, <zPPUSqr
+	mEOR #$FF, aPPUSqrData + 4, aPPUSqrData + 4
 	mCHANGEBANK #$0E, 1
-	;rts
 
 ;20 09 CB
 ;上下スクロール時のパターンテーブル描画に密接に関わる
@@ -1513,23 +1369,19 @@ Unknown_CB09:
 	and #$07
 	jsr ChangeBank
 	ldx <$FE
-	jsr Unknown_CB61
+	jsr SetEnemyPalette
 	clc
 	pla
 	adc $B42C,x
 	tax
-	lda $B460,x
-	sta <$09
-	lda $B461,x
-	jsr ChangeBank
+	mMOV $B460,x, <$09
+	mCHANGEBANK $B461,x
 	ldy #$1F
 .loop
-	lda [zPtr],y
-	sta aPPULinearData,y
+	mMOV [zPtr],y, aPPULinearData,y
 	dey
 	bpl .loop
-	lda #$20
-	sta <zPPULinear
+	mMOV #$20, <zPPULinear
 	inc <$FD
 	inc <$FD
 	pla
@@ -1537,20 +1389,15 @@ Unknown_CB09:
 	rts
 
 ;20 61 CB
-Unknown_CB61:
+;おそらく、スクロール番号Xから敵パレットを設定する
+SetEnemyPalette:
 	ldy $B42C,x
-	lda $B46C,y
-	sta aPaletteSpr + $09 ;現Pal[19]
-	lda $B46D,y
-	sta aPaletteSpr + $0A ;現Pal[1A]
-	lda $B46E,y
-	sta aPaletteSpr + $0B ;現Pal[1B]
-	lda $B46F,y
-	sta aPaletteSpr + $0D ;現Pal[1D]
-	lda $B470,y
-	sta aPaletteSpr + $0E ;現Pal[1E]
-	lda $B471,y
-	sta aPaletteSpr + $0F ;現Pal[1F]
+	mMOV $B46C,y, aPaletteSpr + $09 ;敵パレット1
+	mMOV $B46D,y, aPaletteSpr + $0A ;
+	mMOV $B46E,y, aPaletteSpr + $0B ;
+	mMOV $B46F,y, aPaletteSpr + $0D ;敵パレット2
+	mMOV $B470,y, aPaletteSpr + $0E ;
+	mMOV $B471,y, aPaletteSpr + $0F ;
 	rts
 
 ;20 89 CB
@@ -1585,8 +1432,7 @@ PickupBlock:
 	and aObjBlockH10,x
 	cmp aObjBlockY10,x
 	bne .loop
-	lda aObjVar10,x
-	sta <$00
+	mMOV aObjVar10,x, <$00
 	rts
 
 ;20 C0 CB
@@ -1601,16 +1447,14 @@ PickupMap:
 	lda <zStage
 	and #$07
 	jsr ChangeBank
-	lda #$00
-	sta <.result
+	mSTZ <.result
 	lda <.Yhi
 	beq .do
 	bmi .above
 	jmp .skip
 ;上にはみ出しているときはY=0に補正して処理
 .above
-	lda #$00
-	sta <.Y
+	mSTZ <.Y
 ;処理を開始
 .do
 	lda <.X
@@ -1628,8 +1472,7 @@ PickupMap:
 	ora <.result
 	sta <.result
 ;$00=00XX XYYY
-	lda #$00
-	sta <.ptr
+	mSTZ <.ptr
 	lda <.Xhi
 	lsr a
 	ror <.ptr
@@ -1639,8 +1482,7 @@ PickupMap:
 	adc #$85
 	sta <.ptrhi
 	ldy <.result
-	lda [.ptr],y
-	sta <.ptr
+	mMOV [.ptr],y, <.ptr
 	lda #$20
 	asl <.ptr
 	rol a
@@ -1659,8 +1501,7 @@ PickupMap:
 	beq .jump
 	iny
 .jump
-	lda [.ptr],y
-	sta <.result
+	mMOV [.ptr],y, <.result
 	asl <.result
 	rol a
 	asl <.result
@@ -1675,11 +1516,9 @@ PickupMap:
 	asl a
 	adc <.result
 	tax
-	lda Table_Terrain,x ;ステージ
-	sta <.result
+	mMOV Table_Terrain,x, <.result ;ステージ
 .skip
 	mCHANGEBANK #$0E, 1
-	;rts
 
 ;1ECC44
 Table_Terrain:
@@ -1703,7 +1542,6 @@ Table_Terrain:
 PickupMap_BossBank:
 	jsr PickupBlock
 	mCHANGEBANK #$0B, 1
-	;rts
 
 ;20 69 CC
 ClearSprites:
@@ -1733,8 +1571,7 @@ ChangeBodyColor_Specified:
 	inx
 	ldy #$01
 .loop
-	lda Table_BodyColor,x
-	sta aPaletteSpr,y
+	mMOV Table_BodyColor,x, aPaletteSpr,y
 	iny
 	inx
 	cpy #$04
@@ -1759,27 +1596,15 @@ Table_BodyColor:
 ;20 2F D3
 DamageRockman:
 	mPLAYTRACK #$26
-	lda #$00
-	sta <zShootPose
-	sta <zShootPoseTimer
-	lda #$02
-	sta <zStatus
+	mSTZ <zShootPose, <zShootPoseTimer
+	mMOV #$02, <zStatus
 	jsr SetRockmanAnimation
-	lda #$01
-	sta aObjFrame
-	lda #$6F
-	sta <zInvincible
-	lda #$01
-	sta aObjVY
-	lda #$40
-	sta aObjVYlo
-	lda #$00
-	sta aObjVX
-	lda #$90
-	sta aObjVXlo
+	mMOV #$01, aObjFrame
+	mMOV #$6F, <zInvincible
+	mMOVWB $0140, aObjVY, aObjVYlo
+	mMOVWB $0090, aObjVX, aObjVXlo
 	lsr aObjFlags + $0F
-	lda #$00
-	sta <zStopFlag
+	mSTZ <zStopFlag
 	ldx #$0E
 .loop
 	lda aObjFlags,x
@@ -1789,24 +1614,13 @@ DamageRockman:
 	bne .loop
 	rts
 .isvalid
-	lda #%10000000
-	sta aObjFlags,x
-	lda #$24
-	sta aObjAnim,x
-	lda aObjRoom
-	sta aObjRoom,x
-	lda aObjX
-	sta aObjX,x
-	lda aObjY
-	sta aObjY,x
-	lda #$08
-	sta aObjVYlo,x
-	lda #$00
-	sta aObjVY,x
-	sta aObjVXlo,x
-	sta aObjVX,x
-	sta aObjWait,x
-	sta aObjFrame,x
+	mMOV #%10000000, aObjFlags,x
+	mMOV #$24, aObjAnim,x
+	mMOV aObjRoom, aObjRoom,x
+	mMOV aObjX, aObjX,x
+	mMOV aObjY, aObjY,x
+	mMOV #$08, aObjVYlo,x
+	mSTZ aObjVY,x, aObjVXlo,x, aObjVX,x, aObjWait,x, aObjFrame,x
 	rts
 
 ;20 A5 D3
@@ -1828,11 +1642,9 @@ SetRockmanAnimation:
 	rts
 .noshoot
 ;D3C4
-	lda #$00
-	sta <zShootPose
+	mSTZ <zShootPose
 	ldx <zStatus
-	lda Table_RockmanAnimation,x
-	sta aObjAnim
+	mMOV Table_RockmanAnimation,x, aObjAnim
 	rts
 
 ;D3D1
@@ -1842,8 +1654,7 @@ Table_RockmanAnimation:
 
 ;20 DD D3
 CreateWeaponObject:
-	lda Table_WeaponObjectAnim,y
-	sta aObjAnim,x
+	mMOV Table_WeaponObjectAnim,y, aObjAnim,x
 	lda aObjFlags
 	and #%01000000
 	php
@@ -1852,39 +1663,21 @@ CreateWeaponObject:
 	plp
 	bne .right
 	sec
-	lda aObjX
-	sbc Table_WeaponObjectdx,y
-	sta aObjX,x
-	lda aObjRoom
-	sbc #$00
-	sta aObjRoom,x
+	mSUB aObjX, Table_WeaponObjectdx,y, aObjX,x
+	mSUB aObjRoom, #$00, aObjRoom,x
 	jmp .do
 .right
 	clc
-	lda aObjX
-	adc Table_WeaponObjectdx,y
-	sta aObjX,x
-	lda aObjRoom
-	adc #$00
-	sta aObjRoom,x
+	mADD aObjX, Table_WeaponObjectdx,y, aObjX,x
+	mADD aObjRoom, #$00, aObjRoom,x
 .do
-	lda aObjY
-	sta aObjY,x
-	lda Table_WeaponObjectVXlo,y
-	sta aObjVXlo,x
-	lda Table_WeaponObjectVXhi,y
-	sta aObjVX,x
-	lda Table_WeaponObjectVYlo,y
-	sta aObjVYlo,x
-	lda Table_WeaponObjectVYhi,y
-	sta aObjVY,x
-	lda Table_WeaponObjectCollision,y
-	sta aWeaponCollision,x
-	lda #$00
-	sta aObjFrame,x
-	sta aObjWait,x
-	sta aObjVar,x
-	sta aObjLife,x
+	mMOV aObjY, aObjY,x
+	mMOV Table_WeaponObjectVXlo,y, aObjVXlo,x
+	mMOV Table_WeaponObjectVXhi,y, aObjVX,x
+	mMOV Table_WeaponObjectVYlo,y, aObjVYlo,x
+	mMOV Table_WeaponObjectVYhi,y, aObjVY,x
+	mMOV Table_WeaponObjectCollision,y, aWeaponCollision,x
+	mSTZ aObjFrame,x, aObjWait,x, aObjVar,x, aObjLife,x
 	rts
 
 ;D44C
@@ -1938,29 +1731,6 @@ CollisionSizeW1 = $08
 CollisionSizeW2 = $0C
 CollisionSizeW3 = $10
 CollisionDataLength = $20 ;当たり判定データの長さ
-
-;敵の当たり判定データX
-_collisionx .macro
-	.db \1 + $08, \1 + $0C, \1 + $0C, \1 + $0C
-	.db \1 + $04, \1 + $10, \1 + $28, \1 + $08
-	.db \1 + $0C, \1 + $10, \1 + $00, \1 + $28
-	.db \1 + $04, \1 + $10, \1 + $08, \1 + $06
-	.db \1 + $04, \1 + $18, \1 + $18, \1 + $20
-	.db \1 + $40,      $02, \1 + $00, \1 + $00
-	.db \1 + $00, \1 + $00, \1 + $00, \1 + $00
-	.db \1 + $00, \1 + $00, \1 + $00, \1 + $00
-	.endm
-;敵の当たり判定データY
-_collisiony .macro
-	.db \1 + $10, \1 + $0C, \1 + $08, \1 + $04
-	.db \1 + $04, \1 + $08, \1 + $20, \1 + $08
-	.db \1 + $16, \1 + $10, \1 + $20, \1 + $28
-	.db \1 + $0C, \1 + $1C, \1 + $04, \1 + $08
-	.db \1 + $10, \1 + $08, \1 + $18, \1 + $30
-	.db \1 + $10, \1 + $10, \1 + $00, \1 + $00
-	.db \1 + $00, \1 + $00, \1 + $00, \1 + $00
-	.db \1 + $00, \1 + $00, \1 + $00, \1 + $00
-	.endm
 
 ;CollisionSizeRX[$0A] = $06 -> $09
 ;CollisionSizeW1[$10] = $0C -> $0A
@@ -2069,23 +1839,15 @@ MoveEnemy_Start:
 	jsr CreateItemFromEnemy
 ;20 B8 EE
 MoveEnemy_Break:
-	lda #$06
-	sta aObjAnim,x
-	lda #$80
-	sta aObjFlags,x
-	lda #$00
-	sta aObjWait,x
-	sta aObjFrame,x
+	mMOV #$06, aObjAnim,x
+	mMOV #%10000000, aObjFlags,x
+	mSTZ aObjWait,x, aObjFrame,x
 	jmp PostSafeRemoveEnemy
 ;20 CD EE
 MoveObjectForWeapon:
 	sec
-	lda aObjYlo,x
-	sbc aObjVYlo,x
-	sta aObjYlo,x
-	lda aObjY,x
-	sbc aObjVY,x
-	sta aObjY,x
+	mSUB aObjYlo,x, aObjVYlo,x
+	mSUB aObjY,x, aObjVY,x
 	cmp #$F0
 	bcc .continue
 ;縦画面外判定
@@ -2095,30 +1857,18 @@ MoveObjectForWeapon:
 	and #%00000100
 	beq .gravity
 	clc
-	lda aObjVYlo,x
-	sbc <zGravity
-	sta aObjVYlo,x
-	lda aObjVY,x
-	sbc <zGravityhi
-	sta aObjVY,x
+	mSUB aObjVYlo,x, <zGravity
+	mSUB aObjVY,x, <zGravityhi
 .gravity
 	lda aObjFlags,x
 	and #%01000000
 	bne .right
 	sec
-	lda aObjXlo,x
-	sbc aObjVXlo,x
-	sta aObjXlo,x
-	lda aObjX,x
-	sbc aObjVX,x
-	sta aObjX,x
-	lda aObjRoom,x
-	sbc #$00
-	sta aObjRoom,x
+	mSUB aObjXlo,x, aObjVXlo,x
+	mSUB aObjX,x, aObjVX,x
+	mSUB aObjRoom,x
 	sec
-	lda aObjX,x
-	sbc <zHScroll
-	sta <$08
+	mSUB aObjX,x, <zHScroll, <$08
 	lda aObjRoom,x
 	sbc <zRoom
 	bne SafeRemoveEnemy
@@ -2128,19 +1878,11 @@ MoveObjectForWeapon:
 	bcs .done
 .right
 	clc
-	lda aObjXlo,x
-	adc aObjVXlo,x
-	sta aObjXlo,x
-	lda aObjX,x
-	adc aObjVX,x
-	sta aObjX,x
-	lda aObjRoom,x
-	adc #$00
-	sta aObjRoom,x
+	mADD aObjXlo,x, aObjVXlo,x
+	mADD aObjX,x, aObjVX,x
+	mADD aObjRoom,x
 	sec
-	lda aObjX,x
-	sbc <zHScroll
-	sta <$08
+	mSUB aObjX,x, <zHScroll, <$08
 	lda aObjRoom,x
 	sbc <zRoom
 	bne SafeRemoveEnemy
@@ -2157,18 +1899,15 @@ PostSafeRemoveEnemy:
 	bcc .weapons
 	lda <zObjItemFlag
 	bne .isitem
-	lda #$FF
-	sta aEnemyOrder,x
+	mMOV #$FF, aEnemyOrder,x
 .weapons
 	sec
 	rts
 .isitem
-	lda #$FF
-	sta aItemOrder,x
+	mMOV #$FF, aItemOrder,x
 	lda aItemLifeOffset,x
 	tay
-	lda aObjLife,x
-	sta aItemLife,y
+	mMOV aObjLife,x, aItemLife,y
 	sec
 	rts
 
@@ -2196,13 +1935,9 @@ CheckOffscreenEnemy_Start:
 	bcc .check
 ;撃破時
 	jsr CreateItemFromEnemy
-	lda #$06
-	sta aObjAnim,x
-	lda #$80
-	sta aObjFlags,x
-	lda #$00
-	sta aObjWait,x
-	sta aObjFrame,x
+	mMOV #$06, aObjAnim,x
+	mMOV #%10000000, aObjFlags,x
+	mSTZ aObjWait,x, aObjFrame,x
 	jmp PostSafeRemoveEnemy
 .check
 	lda <zEScreenRoom
@@ -2212,21 +1947,12 @@ CheckOffscreenEnemy_Start:
 
 ;20 CC EF
 FaceTowards:
-	lda aObjFlags,x
-	and #%10111111
-	sta aObjFlags,x
+	mAND aObjFlags,x, #%10111111
 	sec
-	lda <zEScreenX
-	sbc <zRScreenX
-	sta <$00
+	mSUB <zEScreenX, <zRScreenX, <$00
 	bcs .left
-	lda <$00
-	eor #$FF
-	adc #$01
-	sta <$00
-	lda #%01000000
-	ora aObjFlags,x
-	sta aObjFlags,x
+	mNEG <$00
+	mORA #%01000000, aObjFlags,x, aObjFlags,x
 .left
 	rts
 
@@ -2265,8 +1991,7 @@ WallCollisionY:
 .xhi = $09
 .y = $0A
 .yhi = $0B
-	lda #$00
-	sta <.yhi
+	mSTZ <.yhi
 	lda aObjVY,x
 	php
 	bpl .up
@@ -2281,12 +2006,8 @@ WallCollisionY:
 .write
 	sta <.y
 	clc
-	lda aObjX,x
-	adc <.dx
-	sta <.x
-	lda aObjRoom,x
-	adc #$00
-	sta <.xhi
+	mADD aObjX,x, <.dx, <.x
+	mADD aObjRoom,x, #$00, <.xhi
 	cpx #$0F
 	bcs .isenemy_right
 	jsr PickupBlock
@@ -2295,16 +2016,11 @@ WallCollisionY:
 	jsr PickupMap
 .result_right
 	ldy <.result
-	lda WallCollision_Terrain,y
-	sta <$02
+	mMOV WallCollision_Terrain,y, <$02
 	ldx <zObjIndex
 	sec
-	lda aObjX,x
-	sbc <.dx
-	sta <.x
-	lda aObjRoom,x
-	sbc #$00
-	sta <.xhi
+	mSUB aObjX,x, <.dx, <.x
+	mSUB aObjRoom,x, #$00, <.xhi
 	cpx #$0F
 	bcs .isenemy_left
 	jsr PickupBlock
@@ -2314,9 +2030,7 @@ WallCollisionY:
 .result_left
 	ldx <zObjIndex
 	ldy <.result
-	lda WallCollision_Terrain,y
-	ora <$02
-	sta <.result
+	mORA WallCollision_Terrain,y, <$02, <.result
 	beq .inair
 	plp
 	bmi .down
@@ -2329,23 +2043,17 @@ WallCollisionY:
 .down
 	lda aObjY,x
 	pha
-	lda <.y
-	and #$0F
-	sta <.dy
+	mAND <.y, #$0F, <.dy
 	pla
 	sec
 	sbc <.dy
 .write_pos
 	sta aObjY,x
-	lda #$00
-	sta aObjYlo,x
+	mSTZ aObjYlo,x
 	lda aObjFlags,x
 	and #%00000100
 	beq .nogravity
-	lda #$C0
-	sta aObjVYlo,x
-	lda #$FF
-	sta aObjVY,x
+	mMOVW $FFC0, aObjVYlo,x, aObjVY,x
 .nogravity
 	rts
 .inair
@@ -2364,26 +2072,20 @@ WallCollisionXY:
 .xhi = $09
 .y = $0A
 .yhi = $0B
-	lda aObjY,x
-	sta <.y
-	lda #$00
-	sta <.yhi
+	mMOV aObjY,x, <.y
+	mSTZ <.yhi
 	lda aObjFlags,x
 	and #%01000000
 	php
 	beq .left
 	sec
-	lda aObjX,x
-	adc <.dx
-	sta <.x
+	mADD aObjX,x, <.dx, <.x
 	lda aObjRoom,x
 	adc #$00
 	jmp .write
 .left
 	clc
-	lda aObjX,x
-	sbc <.dx
-	sta <.x
+	mSUB aObjX,x, <.dx, <.x
 	lda aObjRoom,x
 	sbc #$00
 .write
@@ -2397,21 +2099,14 @@ WallCollisionXY:
 .result_h
 	ldx <zObjIndex
 	ldy <.result
-	lda WallCollision_Terrain,y
-	sta <.res_h
+	mMOV WallCollision_Terrain,y, <.res_h
 	beq .nohitwall
 	plp
 	beq .left_wallfix
-	lda <.x
-	and #$0F
-	sta <$00
+	mAND <.x, #$0F, <$00
 	sec
-	lda aObjX,x
-	sbc <$00
-	sta aObjX,x
-	lda aObjRoom,x
-	sbc #$00
-	sta aObjRoom,x
+	mSUB aObjX,x, <$00
+	mSUB aObjRoom,x
 	jmp WallCollisionY
 .left_wallfix
 	lda <.x
@@ -2420,9 +2115,7 @@ WallCollisionXY:
 	sec
 	adc aObjX,x
 	sta aObjX,x
-	lda aObjRoom,x
-	adc #$00
-	sta aObjRoom,x
+	mADD aObjRoom,x
 	jmp WallCollisionY
 .nohitwall
 	plp
@@ -2445,16 +2138,11 @@ CreateEnemyHere_Middle:
 	and #%01000000
 	ora aObjFlags10,y
 	sta aObjFlags10,y
-	lda aObjXlo,x
-	sta aObjXlo10,y
-	lda aObjX,x
-	sta aObjX10,y
-	lda aObjRoom,x
-	sta aObjRoom10,y
-	lda aObjYlo,x
-	sta aObjYlo10,y
-	lda aObjY,x
-	sta aObjY10,y
+	mMOV aObjXlo,x, aObjXlo10,y
+	mMOV aObjX,x, aObjX10,y
+	mMOV aObjRoom,x, aObjRoom10,y
+	mMOV aObjYlo,x, aObjYlo10,y
+	mMOV aObjY,x, aObjY10,y
 	clc
 	rts
 CreateEnemyHere_Error:
@@ -2472,9 +2160,7 @@ SetVelocityAtRockman:
 .vhi = $09
 	ldy #$40
 	sec
-	lda <zRScreenX
-	sbc <zEScreenX
-	sta <.lx
+	mSUB <zRScreenX, <zEScreenX, <.lx
 	bcs .inv_x
 	lda <.lx
 	eor #$FF
@@ -2482,9 +2168,7 @@ SetVelocityAtRockman:
 	ldy #$00
 	sta <.lx
 .inv_x
-	lda aObjFlags,x
-	and #%10111111
-	sta aObjFlags,x
+	mAND aObjFlags,x, #%10111111
 	tya
 	ora aObjFlags,x
 	sta aObjFlags,x
@@ -2499,69 +2183,39 @@ SetVelocityAtRockman:
 	sta <.ly
 	cmp <.lx
 	bcs .vertical
-	lda <.vhi
-	sta <$0D
-	sta aObjVX,x
-	lda <.vlo
-	sta <$0C
-	sta aObjVXlo,x
-	lda <.lx
-	sta <$0B
-	lda #$00
-	sta <$0A
+	mMOV <.vhi, <$0D, aObjVX,x
+	mMOV <.vlo, <$0C, aObjVXlo,x
+	mMOV <.lx, <$0B
+	mSTZ <$0A
 	jsr Divide
-	lda <$0F
-	sta <$0D
-	lda <$0E
-	sta <$0C
-	lda <.ly
-	sta <$0B
-	lda #$00
-	sta <$0A
+	mMOV <$0F, <$0D
+	mMOV <$0E, <$0C
+	mMOV <.ly, <$0B
+	mSTZ <$0A
 	jsr Divide
 	ldx <zObjIndex
-	lda <$0F
-	sta aObjVY,x
-	lda <$0E
-	sta aObjVYlo,x
+	mMOV <$0F, aObjVY,x
+	mMOV <$0E, aObjVYlo,x
 	jmp .done
 .vertical
-	lda <.vhi
-	sta <$0D
-	sta aObjVY,x
-	lda <.vlo
-	sta <$0C
-	sta aObjVYlo,x
-	lda <.ly
-	sta <$0B
-	lda #$00
-	sta <$0A
+	mMOV <.vhi, <$0D, aObjVY,x
+	mMOV <.vlo, <$0C, aObjVYlo,x
+	mMOV <.ly, <$0B
+	mSTZ <$0A
 	jsr Divide
-	lda <$0F
-	sta <$0D
-	lda <$0E
-	sta <$0C
-	lda <.lx
-	sta <$0B
-	lda #$00
-	sta <$0A
+	mMOV <$0F, <$0D
+	mMOV <$0E, <$0C
+	mMOV <.lx, <$0B
+	mSTZ <$0A
 	jsr Divide
 	ldx <zObjIndex
-	lda <$0F
-	sta aObjVX,x
-	lda <$0E
-	sta aObjVXlo,x
+	mMOV <$0F, aObjVX,x
+	mMOV <$0E, aObjVXlo,x
 .done
 	plp
 	bcc .inv_v
-	lda aObjVYlo,x
-	eor #$FF
-	adc #$01
-	sta aObjVYlo,x
-	lda aObjVY,x
-	eor #$FF
-	adc #$00
-	sta aObjVY,x
+	mNEG aObjVYlo,x
+	mNEGhi aObjVY,x
 .inv_v
 	rts
 
@@ -2572,10 +2226,8 @@ CreateItemFromEnemy:
 	beq .create
 	rts
 .create
-	lda <zRand
-	sta <$01
-	lda #$64
-	sta <$02
+	mMOV <zRand, <$01
+	mMOV #$64, <$02
 	jsr Divide8
 	lda <$04
 	cmp #$30
@@ -2613,21 +2265,16 @@ CreateItemFromEnemy:
 .do
 	jsr CreateEnemyHere
 	bcs .invalid
-	lda #%10000100
-	sta aObjFlags10,y
-	lda #$02
-	sta aObjVY10,y
-	lda #$01
-	sta aObjVar10,y
+	mMOV #%10000100, aObjFlags10,y
+	mMOV #$02, aObjVY10,y
+	mMOV #$01, aObjVar10,y
 .invalid
 	rts
 
 ;20 90 F2
 Reset_JMP:
-	lda #$10
-	sta $2000
-	lda #$06
-	sta $2001
+	mMOV #%00010000, $2000
+	mMOV #%00000110, $2001
 	mCHANGEBANK #$0E
 	jmp Reset_Continue
 
