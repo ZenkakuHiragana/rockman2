@@ -44,21 +44,18 @@ mSEC .macro
 	.endm
 
 mCHANGEBANK .macro
-	lda \1
 	.if \?2
+	lda \1
 	mJSR_NORTS ChangeBank
 	.else
+	lda \1
 	jsr ChangeBank
 	.endif
 	.endm
 
 mPLAYTRACK .macro
 	lda \1
-	.if \?2
-	mJSR_NORTS PlayTrack
-	.else
 	jsr PlayTrack
-	.endif
 	.endm
 
 mMOV .macro
@@ -136,6 +133,27 @@ mSTZ .macro
 	.if \?9
 		sta \9
 	.endif
+	.endm
+
+_collisionx .macro
+	.db $08+\1, $0C+\1, $0C+\1, $0C+\1
+	.db $04+\1, $10+\1, $28+\1, $08+\1
+	.db $0C+\1, $10+\1, $00+\1, $28+\1
+	.db $04+\1, $10+\1, $08+\1, $06+\1
+	.db $04+\1, $18+\1, $18+\1, $20+\1
+	.db $40+\1, $02,    $00+\1, $00+\1
+	.db $00+\1, $00+\1, $00+\1, $00+\1
+	.db $00+\1, $00+\1, $00+\1, $00+\1
+	.endm
+_collisiony .macro
+	.db $10+\1, $0C+\1, $08+\1, $04+\1
+	.db $04+\1, $08+\1, $20+\1, $08+\1
+	.db $16+\1, $10+\1, $20+\1, $28+\1
+	.db $0C+\1, $1C+\1, $04+\1, $08+\1
+	.db $10+\1, $08+\1, $18+\1, $30+\1
+	.db $10+\1, $10+\1, $00+\1, $00+\1
+	.db $00+\1, $00+\1, $00+\1, $00+\1
+	.db $00+\1, $00+\1, $00+\1, $00+\1
 	.endm
 
 _enemyptrlo .macro
