@@ -25,7 +25,7 @@
 	.include "src/lib.asm"
 	.include "src/bank09.asm"
 	.include "src/bank0B.asm"
-;	.include "src/bank0C.asm"
+	.include "src/bank0C.asm"
 	.include "src/bank0D.asm"
 	.include "src/bank0E.asm"
 	.include "src/bank0F.asm"

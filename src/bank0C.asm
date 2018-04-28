@@ -380,49 +380,510 @@ Sound_ProcessTracks:
 	ldx #$00
 	ldy #$05
 	stx <zSoundBase
-	sty <zSoundBasehi
+	sty <zSoundBasehi ;[zSoundBase] = $0500
 	mSTZ <zSoundIndex
-	mMOV #$04, <zProcessChannel
+	mMOV #$04, <zProcessChannel ;処理中のチャンネル = SQ1
+.loop
 	lda #$01
 	ldy #$18
 	clc
-	adc [zSoundBase],y
-	sta [zSoundBase],y
+	adc [zSoundBase],y ;$518, ピッチMOD用カウンタ
+	sta [zSoundBase],y ;$518 += 1
 	lda #$01
 	ldy #$1D
 	clc
-	adc [zSoundBase],y
-	sta [zSoundBase],y
+	adc [zSoundBase],y ;$51D, 音量MOD用カウンタ
+	sta [zSoundBase],y ;$51D += 1
+	
 	lda <zSFXChannel_Copy
 	lsr a
-	bcc $8266 ;Sound_ProcessTracks_IsMusic
-	jsr $856D
+	bcc .nosfx
+	jsr $856D ;処理中のトラックは効果音を鳴らしている
+.nosfx
 	lda <zMusicPause
 	lsr a
 	bcc .continue
-	jmp $8286
+	jmp .skip_track ;曲が一時停止している
 .continue
 	ldy #$00
-	lda [zSoundBase],y
+	lda [zSoundBase],y ;$500
 	iny
-	ora [zSoundBase],y
-	beq $8286
+	ora [zSoundBase],y ;$501
+	beq .skip_track
+;処理中のトラックは曲で使われている
 	lda #$01
 	ldy #$0E
 	clc
-	adc [zSoundBase],y
-	sta [zSoundBase],y
+	adc [zSoundBase],y ;$50E, 音量env用カウンタ
+	sta [zSoundBase],y ;$50E += 1
 	jsr $86B4
-	jmp $8294
-;8286
+	jmp .done
 .skip_track
 	lda <zSFXChannel_Copy
 	lsr a
-	bcs $8294
+	bcs .done
+;効果音も曲も鳴ってない
 	ldx <zSoundIndex
 	inx
 	inx
 	ldy <zProcessChannel
 	jsr Sound_ResetFreqRegisters
+.done
 	lsr <zSFXChannel_Copy
-	bcc $829E
+	bcc .advanceSFX
+	mORA <zSFXChannel_Copy, #$80
+.advanceSFX
+	dec <zProcessChannel
+	beq .endloop
+	lda #$04
+	clc
+	adc <zSoundIndex
+	sta <zSoundIndex ;zSoundIndex += 4
+	lda #$1F
+	clc
+	adc <zSoundBase
+	sta <zSoundBase
+	lda #$00
+	adc <zSoundBasehi
+	sta <zSoundBasehi ;zSoundBase += 001F
+	jmp .loop
+
+.endloop
+	lda <zSoundFade
+	and #$7F
+	beq .nofade
+	cmp <zSoundCounter
+	bne .nofade
+;フェードイン/アウトの処理
+	mAND <zSoundCounter, #$01
+	inc <zSoundFadeProg
+	lda #$10
+	cmp <zSoundFadeProg
+	bne .nofade
+	lda <zSoundFade
+	bmi .isfadeout
+	mSTZ <zSoundFade
+.isfadeout
+	mMOV #$0F, <zSoundFadeProg
+.nofade
+;効果音音長カウンタ--;
+	lda <zSFXWait
+	beq .decsfx
+	dec <zSFXWait
+.decsfx
+	lsr <zSFXChannel_Copy
+	lsr <zSFXChannel_Copy
+	lsr <zSFXChannel_Copy
+	lsr <zSFXChannel_Copy
+	rts
+
+;82EC
+Sound_ManipulateModulations: ;$86FBで呼ばれる
+	ldy #$0C
+	lda [zSoundBase],y ;$50C, 02と03命令から音量レジスタへ入れる値
+	ldy #$02
+	cpy <zProcessChannel
+	beq .istri_mask ;三角波以外を処理中なら、
+	and #$0F ;音量成分のみを抽出(bit6, bit7は音色)
+.istri_mask
+	sta <zSoundPtr
+	lda <zSoundFade
+	and #$7F
+	beq .nofade
+;フェードイン/アウトの適用
+	lda <zSoundFadeProg
+	ldy #$02
+	cpy <zProcessChannel
+	bne .isnottri
+;三角波を処理中
+	ldx #$0C
+.loop_mul
+	clc
+	adc <zSoundFadeProg
+	dex
+	bne .loop_mul
+.isnottri
+	tay
+	lda <zSoundFade
+	bmi .isfadein
+;フェードアウト
+	ldx #$FF
+.loop_fadeout
+	inx
+	cpx <zSoundPtr
+	beq .nofade
+	dey
+	bne .loop_fadeout
+	stx <zSoundPtr
+	jmp .nofade
+;8324, フェードイン
+.isfadein
+	dec <zSoundPtr
+	beq .nofade
+	dey
+	bne .isfadein
+.nofade
+	lda #$02
+	cmp <zProcessChannel
+	beq .noenv
+	ldy #$0D
+	lda [zSoundBase],y ;$50D, 07命令の第一引数
+	tax
+	and #$7F
+	beq .noenv
+	iny
+	cmp [zSoundBase],y ;$50E, 音量env用カウンタ
+	beq .wait
+	iny
+	lda [zSoundBase],y ;$50F, 音量envでの現在の音量
+	and #$0F
+	jmp .isvalidvolume
+.wait
+	mSTZ [zSoundBase],y ;$50E
+	iny
+	lda [zSoundBase],y ;$50F
+	lsr a
+	lsr a
+	lsr a
+	lsr a
+	sta <zSoundPtrhi
+	txa ;A = $507
+	bpl .iscresc
+;音量envが音量を下げている
+	lda #$00
+	sec
+	sbc <zSoundPtrhi
+	sta <zSoundPtrhi
+.iscresc
+	lda [zSoundBase],y ;$50F
+	and #$0F
+	clc
+	adc <zSoundPtrhi
+	bpl .isvalidvolume
+	lda #$00
+	jmp .overwrite
+.isvalidvolume
+	cmp <zSoundPtr
+	bcc .overwrite
+	lda <zSoundPtr
+.overwrite
+	sta <zSoundPtr
+	lda [zSoundBase],y
+	and #$F0
+	ora <zSoundPtr
+	sta [zSoundBase],y
+.noenv
+	lda <zSFXChannel_Copy
+	lsr a
+	bcs .isplayingSFX
+	mMOV #$0C, <zSoundPtrhi
+	jmp Sound_838F
+.isplayingSFX
+	mMOV #$09, <zSoundPtrhi
+	jmp Sound_83FE
+Sound_838F:
+	ldy #$16
+	lda [zSoundBase],y ;$516, MOD定義YY
+	and #$7F ;A = MODの音量変化周期
+	beq .endvolmod
+	ldy #$1D
+	cmp [zSoundBase],y ;$51D, 音量MOD用カウンタ
+	beq .changemod
+	jmp .nochangemod
+.changemod
+	mSTZ [zSoundBase],y ;$51D
+	ldy #$17
+	lda [zSoundBase],y ;$517, MOD定義ZZ
+	ldy #$1E
+	clc
+	adc [zSoundBase],y ;$51E, 音量MODの現在の音量
+	beq .zero
+	bpl .isplaying
+.zero
+	mMOV #$01, [zSoundBase],y ;$51E
+	jmp .iszerovolmod
+.isplaying
+	sta [zSoundBase],y
+	cmp #$10
+	bcc .nochangemod
+	mMOV #$0F, [zSoundBase],y
+.iszerovolmod
+	lda #$00
+	ldy #$17
+	sec
+	sbc [zSoundBase],y ;$517, MOD定義ZZ
+	sta [zSoundBase],y
+.nochangemod
+	ldy #$1E
+	lda [zSoundBase],y ;$51E, 音量MODの現在の音量
+	cmp <zSoundPtr
+	bcs .endvolmod
+	sta <zSoundPtr
+.endvolmod
+	ldy #$02
+	cpy <zProcessChannel
+	beq .istri_mod
+	lda <zSoundPtrhi
+	and #$7F
+	tay
+	lda [zSoundBase],y
+	and #$F0
+	ora <zSoundPtr
+	sta <zSoundPtr
+.istri_mod
+	ldx <zSoundIndex
+	mMOV <zSoundPtr, $4000,x
+	lda <zSoundPtrhi
+	bpl .positive
+	mMOV #$90, <zSoundPtrhi
+	jmp Sound_83FE
+.positive
+	mMOV #$09, <zSoundPtrhi
+Sound_83FE:
+	lda <zSoundPtrhi
+	and #$7F
+	tay
+	ldx #$00
+	lda [zSoundBase],y
+	beq .jump8418
+	bpl .jump840C
+	dex
+.jump840C
+	iny
+	clc
+	adc [zSoundBase],y
+	sta [zSoundBase],y
+	txa
+	iny
+	adc [zSoundBase],y
+	sta [zSoundBase],y
+.jump8418
+	lda <zSoundPtrhi
+	bmi .playingsfx
+	lda <zSFXChannel_Copy
+	lsr a
+	bcc .playingsfx
+	rts
+.playingsfx
+	ldy #$14
+	lda [zSoundBase],y ;$514, MOD定義のWW
+	and #$7F
+	bne .pitchmod
+	jmp .jump84A9
+.pitchmod
+	ldy #$18
+	cmp [zSoundBase],y ;$518, ピッチMOD用カウンタ
+	beq .dopitchmod
+	jmp .jump84A9
+;8436
+.dopitchmod
+	mSTZ [zSoundBase],y ;$518
+	tax
+	ldy #$15
+	lda [zSoundBase],y ;$515, MOD定義のXX
+	rol a
+	rol a
+	rol a
+	rol a
+	and #$07
+	sta <zSoundPtr
+	ldy #$19
+	lda [zSoundBase],y ;$519, ピッチMOD用上下動情報
+	asl a
+	bcc .negatepitch
+	lda #$00
+	sec
+	sbc <zSoundPtr
+	sta <zSoundPtr
+	dex
+.negatepitch
+	lda <zSoundPtr
+	clc
+	ldy #$1A
+	adc [zSoundBase],y
+	sta [zSoundBase],y ;$51A, ピッチMOD変動下位
+	iny
+	txa
+	adc [zSoundBase],y
+	sta [zSoundBase],y ;$51B, ピッチMOD変動上位
+	ldy #$15
+	mAND [zSoundBase],y, #$1F, <zSoundPtr ;zSoundPtr = ピッチの最大変位回数
+	ldy #$19
+	lda [zSoundBase],y ;$519, ピッチMOD用上下動情報
+	clc
+	adc #$01
+	sta [zSoundBase],y
+	and #$7F
+	cmp <zSoundPtr
+	bne .jump84A9
+	mAND [zSoundBase],y, #$80 ;$519
+	ldy #$14
+	lda [zSoundBase],y ;$514, MOD定義のWW
+	asl a
+	bcs .jump84A3
+	mORA [zSoundBase],y, #$80 ;$514
+	ldy #$19
+	lda [zSoundBase],y ;$519, ピッチMOD用上下動情報
+	bpl .positivepitchmod
+	and #$7F
+	sta [zSoundBase],y
+	jmp .jump84A9
+.positivepitchmod
+	ora #$80
+	sta [zSoundBase],y
+	jmp .jump84A9
+;84A3
+.jump84A3
+	mAND [zSoundBase],y, #$7F
+.jump84A9
+	mAND <zSoundPtrhi, #$7F
+	inc <zSoundPtrhi
+	ldy #$1A
+	lda [zSoundBase],y ;$51A, ピッチMOD変動下位
+	ldy <zSoundPtrhi
+	clc
+	adc [zSoundBase],y
+	tax
+	ldy #$1B
+	lda [zSoundBase],y ;$51B, ピッチMOD変動上位
+	inc <zSoundPtrhi
+	ldy <zSoundPtrhi
+	adc [zSoundBase],y
+	tay
+	lda #$01
+	cmp <zProcessChannel
+	bne .isnotnoi
+;ノイズを処理中
+	mMOV #$0F, $4015
+	txa
+	and #$0F
+	tax
+	inc <zSoundPtrhi
+	ldy <zSoundPtrhi
+	mAND [zSoundBase],y, #$80, <zSoundPtr
+	txa
+	ora <zSoundPtr
+	tax
+	ldy #$00
+.isnotnoi
+	txa
+	ldx <zSoundIndex
+	inx
+	inx
+	sta $4000,x
+	tya
+	ldy #$1C
+	cmp [zSoundBase],y ;$51C, 二度書き防止用退避変数
+	bne .writemod
+	rts
+.writemod
+	sta [zSoundBase],y
+	ora #$08
+	sta $4001,x
+	rts
+
+;84FD
+Sound_MuteCurrentTrack: ;$85BF, $879Fで呼ばれる
+	ldy #$01
+	cpy <zProcessChannel
+	bne .isnotnoi
+	mMOV #$07, $4015 ;ノイズは再生しない
+	rts
+.isnotnoi
+	lda #$00
+	ldx <zSoundIndex
+	inx
+	inx
+	sta $4000,x
+	sta $4001,x
+	rts
+
+;8516
+Sound_Unknown8516: ;
+	ldy #$14
+	mAND [zSoundBase],y, #$7F ;$514, MOD定義WW
+	ldy #$16
+	lda [zSoundBase],y ;$516, MOD定義YY
+	asl a
+	bcc .volmod
+	ldy <zSoundPtr
+	lda [zSoundBase],y
+	ldx #$02
+	cpx <zProcessChannel
+	beq .istri
+	and #$0F
+.istri
+	ldy #$1E
+	sta [zSoundBase],y
+.volmod
+	ldx #$06
+	lda #$00
+	ldy #$18
+.loop
+	sta [zSoundBase],y ;addr = 0, $518 ≦ addr ≦ $51D
+	iny
+	dex
+	bne .loop
+	lda #$FF
+	ldy #$1C
+	sta [zSoundBase],y ;$51C, 二度書き防止用退避変数
+	rts
+
+;8548
+Sound_8548:
+	ldy #$1C
+	lda [zSoundBase],y
+	pha
+	jsr Sound_Unknown8516
+	pla
+	ldy #$1C
+	sta [zSoundBase],y
+	rts
+
+;8556
+Sound_8556:
+	txa
+	asl a
+	tay
+	iny
+	pla
+	sta <zSoundPtr
+	pla
+	sta <zSoundPtrhi
+	lda [zSoundPtr],y
+	tax
+	iny
+	lda [zSoundPtr],y
+	sta <zSoundPtrhi
+	stx <zSoundPtr
+	jmp [zSoundPtr]
+
+;856D
+Sound_856D:
+	lda <zSFXWait
+	bne Sound_8574
+	jmp $8592
+
+;8574
+Sound_8574:
+	ldy #$11
+	lda [zSoundBase],y
+	iny
+	ora [zSoundBase],y
+	bne .do
+	rts
+.do
+	iny
+	lda [zSoundBase],y
+	ldy #$02
+	cpy <zProcessChannel
+	beq .istri
+	and #$0F
+.istri
+	sta <zSoundPtr
+	mMOV #$93, <zSoundPtrhi
+	jmp Sound_838F
+
+;8592
+Sound_8592:
+	
