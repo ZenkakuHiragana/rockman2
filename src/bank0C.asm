@@ -419,10 +419,11 @@ Sound_ProcessTracks:
 	jsr Sound_ProcessMusic
 	jmp .done
 .skip_track
+;処理中のトラックは曲で使われてない
 	lda <zSFXChannel_Copy
 	lsr a
 	bcs .done
-;効果音も曲も鳴ってない
+;効果音も曲も鳴ってない時、周波数レジスタリセット
 	ldx <zSoundIndex
 	inx
 	inx
@@ -431,8 +432,10 @@ Sound_ProcessTracks:
 .done
 	lsr <zSFXChannel_Copy
 	bcc .advanceSFX
+;効果音の予約状況を保持
 	mORA <zSFXChannel_Copy, #$80
 .advanceSFX
+;処理するトラックを1つ進める
 	dec <zProcessChannel
 	beq .endloop
 	lda #$04
@@ -466,7 +469,7 @@ Sound_ProcessTracks:
 .isfadeout
 	mMOV #$0F, <zSoundFadeProg
 .nofade
-;効果音音長カウンタ--;
+;効果音音長カウンタを減らす
 	lda <zSFXWait
 	beq .decsfx
 	dec <zSFXWait
@@ -526,6 +529,7 @@ Sound_ManipulateModulations:
 	lda #$02
 	cmp <zProcessChannel
 	beq .noenv
+;三角波以外を処理中、音量envの適用
 	ldy #$0D
 	lda [zSoundBase],y ;$50D, 07命令の第一引数
 	tax
@@ -546,14 +550,14 @@ Sound_ManipulateModulations:
 	lsr a
 	lsr a
 	lsr a
-	sta <zSoundPtrhi
+	sta <zSoundPtrhi ;zSoundPtrhi = 音量envの変化量(Y0)
 	txa ;A = $507
 	bpl .iscresc
 ;音量envが音量を下げている
 	lda #$00
 	sec
 	sbc <zSoundPtrhi
-	sta <zSoundPtrhi
+	sta <zSoundPtrhi ;zSoundPtrhi = -zSoundPtrhi
 .iscresc
 	lda [zSoundBase],y ;$50F
 	and #$0F
@@ -568,20 +572,23 @@ Sound_ManipulateModulations:
 	lda <zSoundPtr
 .overwrite
 	sta <zSoundPtr
-	lda [zSoundBase],y
+	lda [zSoundBase],y ;$50F
 	and #$F0
 	ora <zSoundPtr
-	sta [zSoundBase],y
+	sta [zSoundBase],y ;$50F
 .noenv
+
 	lda <zSFXChannel_Copy
 	lsr a
 	bcs .isplayingSFX
 	mMOV #$0C, <zSoundPtrhi
-	jmp Sound_838F
+	jmp Sound_ManipulateVolumeMod
 .isplayingSFX
 	mMOV #$09, <zSoundPtrhi
 	jmp Sound_83FE
-Sound_838F:
+;838F
+;音量MODの処理
+Sound_ManipulateVolumeMod:
 	ldy #$16
 	lda [zSoundBase],y ;$516, MOD定義YY
 	and #$7F ;A = MODの音量変化周期
@@ -593,7 +600,7 @@ Sound_838F:
 .changemod
 	mSTZ [zSoundBase],y ;$51D
 	ldy #$17
-	lda [zSoundBase],y ;$517, MOD定義ZZ
+	lda [zSoundBase],y ;$517, MOD定義ZZ, 音量MOD変化量
 	ldy #$1E
 	clc
 	adc [zSoundBase],y ;$51E, 音量MODの現在の音量
@@ -603,16 +610,17 @@ Sound_838F:
 	mMOV #$01, [zSoundBase],y ;$51E
 	jmp .iszerovolmod
 .isplaying
-	sta [zSoundBase],y
+	sta [zSoundBase],y ;$51E += $517
 	cmp #$10
 	bcc .nochangemod
 	mMOV #$0F, [zSoundBase],y
 .iszerovolmod
+;音量MODの変化後が0になったら変化方向を逆転
 	lda #$00
 	ldy #$17
 	sec
 	sbc [zSoundBase],y ;$517, MOD定義ZZ
-	sta [zSoundBase],y
+	sta [zSoundBase],y ;$517 = -$517
 .nochangemod
 	ldy #$1E
 	lda [zSoundBase],y ;$51E, 音量MODの現在の音量
@@ -622,15 +630,15 @@ Sound_838F:
 .endvolmod
 	ldy #$02
 	cpy <zProcessChannel
-	beq .istri_mod
+	beq .istri
 	lda <zSoundPtrhi
 	and #$7F
-	tay
-	lda [zSoundBase],y
+	tay ;Y = 0C, 13
+	lda [zSoundBase],y ;$50C, $513, 音量系レジスタへの値(曲, SFX)
 	and #$F0
 	ora <zSoundPtr
 	sta <zSoundPtr
-.istri_mod
+.istri
 	ldx <zSoundIndex
 	mMOV <zSoundPtr, $4000,x
 	lda <zSoundPtrhi
@@ -799,7 +807,7 @@ Sound_MuteCurrentTrack:
 	rts
 
 ;8516
-Sound_8516: ;
+Sound_8516:
 	ldy #$14
 	mAND [zSoundBase],y, #$7F ;$514, MOD定義WW
 	ldy #$16
@@ -880,7 +888,7 @@ Sound_ProcessSFX:
 .istri
 	sta <zSoundPtr
 	mMOV #$93, <zSoundPtrhi
-	jmp Sound_838F
+	jmp Sound_ManipulateVolumeMod
 
 ;8592
 ;効果音の処理単位を1つ進める
@@ -1050,6 +1058,7 @@ Sound_86A0:
 	rts
 
 ;86B4
+;曲の処理
 Sound_ProcessMusic:
 	lda <zSoundSpeed
 	beq .normalspeed
@@ -1062,15 +1071,16 @@ Sound_ProcessMusic:
 	bne .loop
 	rts
 .normalspeed
+;倍速を考慮しない曲の処理
 	ldy #$05
 	lda [zSoundBase],y ;$505, 連符フラグ
 	asl a
 	bcc .notriplet
-;三連符フラグ
+;三連符フラグが立っている
 	lda <zSoundCounter
 	and #$01
 	beq .notriplet
-	jsr .notriplet
+	jsr .notriplet ;三連符の時、2フレームに1回曲処理を2回行う
 .notriplet
 	ldy #$02
 	lda [zSoundBase],y ;$502, 音長下位
@@ -1080,17 +1090,17 @@ Sound_ProcessMusic:
 ;音長カウンタ > 0
 	ldx #$FF
 	dey
-	lda [zSoundBase],y
+	lda [zSoundBase],y ;$502, 音長下位
 	sec
 	sbc #$04
 	sta [zSoundBase],y ;音長下位 -= 4
-	txa
+	txa ;A = #$FF
 	iny
-	adc [zSoundBase],y
-	sta [zSoundBase],y ;音長上位
+	adc [zSoundBase],y ;$503, 音長上位
+	sta [zSoundBase],y ;音長 -= 4
 	dey
-	ora [zSoundBase],y ;音長下位
-	beq .advancemusic
+	ora [zSoundBase],y ;$502, 音長下位
+	beq .advancemusic ;if ($502 || $503) == 0
 ;音長カウンタ > 0
 	ldy #$0A
 	lda [zSoundBase],y ;音高レジスタ値下位
