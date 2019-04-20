@@ -1,5 +1,5 @@
 
-
+ETUDEFORGHOSTS:
 	TRACK SQ1_ETUDE, SQ2_ETUDE, TRI_ETUDE, $0000, MODULATION_ETUDE
 MODULATION_ETUDE:
 	.dw $0000, $0080
@@ -37,7 +37,7 @@ TRI_ETUDE:
 	n1 17
 	n1 25
 	n1 22
-	
+
 	n1 9
 	n1 27
 	n1 24
@@ -73,7 +73,7 @@ TRI_ETUDE:
 	n1 24
 	n1 17
 	n2 29
-	
+
 	KEY O3
 	n1 1
 	n1 20
@@ -170,7 +170,7 @@ TRI_ETUDE:
 	n2 2
 	n2 2
 	n3
-	
+
 	TEMPO 9
 	n3 3
 	n3 27
@@ -182,7 +182,7 @@ TRI_ETUDE:
 	n3 17
 	n2 7
 	n2 26
-	
+
 	KEY O3
 	n2 25
 	n2 29
@@ -221,7 +221,7 @@ TRI_ETUDE:
 	DOT
 	n5
 	n1
-	
+
 	n4 18
 	DOT
 	n3 30
@@ -289,7 +289,7 @@ SQ1_ETUDE:
 	n1 18
 	n1 20
 	n4 25
-	
+
 	KEY O5
 	n4 1
 	DOT
@@ -375,7 +375,7 @@ SQ1_ETUDE:
 ;3
 	n1 23
 	LOOP 1,.1
-	
+
 	KEY O4 -3
 	n1 1
 	n1 3
@@ -420,7 +420,7 @@ SQ1_ETUDE:
 	n1 13+12
 	n2 13
 	n1 13+12
-	
+
 	n1 13
 	n1 17
 	n1 22
@@ -466,7 +466,7 @@ SQ1_ETUDE:
 	n1 4+12
 	n2 3
 	n1 3+12
-	
+
 	n1 3
 	n1 7+12
 	n1 10+12
@@ -550,7 +550,7 @@ SQ1_ETUDE:
 	n1 22
 	n1 27
 	LOOP 1,.2
-	
+
 	n1 31
 	n1 27
 	n1 26
@@ -711,7 +711,7 @@ SQ1_ETUDE:
 	DOT
 	n3 31
 	n1
-	
+
 	KEY O5
 	n4 1
 	DOT
@@ -751,7 +751,7 @@ SQ2_ETUDE:
 	n2 13
 	TEMPO 6
 	n4 25
-	
+
 	KEY O4 -5
 	n4 13
 	DOT
@@ -794,7 +794,7 @@ SQ2_ETUDE:
 	n1 15
 	DOT
 	n3 8
-	
+
 	n2
 	n1 16
 	n1 4
@@ -832,7 +832,7 @@ SQ2_ETUDE:
 	n1 11
 	n1 13
 	n1 14
-	
+
 	n2 9
 	n1 21
 	n2 9
@@ -987,7 +987,7 @@ SQ2_ETUDE:
 	KEY O5 -5
 	n2 13
 	n2 25
-	
+
 	TEMPO 6
 	n3
 	KEY O4 -5

@@ -9,27 +9,6 @@ O6 = $3B
 O7 = $47
 O8 = $53
 
-;サイズ測定
-;測定始点と終点をlist, mNULL, nolistで挟む
-;出てきた.lstファイルにあるアドレスの差を読む
-mNULL .macro
-	.endm
-
-mBEGIN	.macro
-	.bank \1*2
-	.org \2
-	.endm
-
-mBEGINRAW .macro
-	.bank \1
-	.org \2
-	.endm
-
-mBEGINLABEL .macro
-	.bank BANK(\1)
-	.org \1
-	.endm
-
 TRACK .macro
 	.db $0F
 	.db LOW(\1), HIGH(\1)
@@ -53,6 +32,10 @@ TONE .macro
 
 VOL .macro
 	.db 3, $30 + \1
+	.endm
+
+VOLRAW .macro
+	.db 3, \1
 	.endm
 
 LOOP .macro

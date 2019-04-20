@@ -1,4 +1,5 @@
 
+SBOMB1_5:
 	TRACK SQ1_5, SQ2_5, TRI_5, NOI_5, MODULATION_5
 MODULATION_5:
 	.dw $0000, $0080
@@ -30,7 +31,7 @@ TRI_5:
 	PITCH 0
 	DOT
 	n1 9
-	
+
 	PITCH 100
 	n0 23
 	PITCH 0
@@ -80,7 +81,7 @@ TRI_5:
 	PITCH 0
 	DOT
 	n1 4
-	
+
 	PITCH 100
 	n0 23
 	PITCH 0
@@ -130,7 +131,7 @@ TRI_5:
 	PITCH 0
 	DOT
 	n1 9
-	
+
 	PITCH 100
 	n0 23
 	PITCH 0
@@ -183,7 +184,7 @@ TRI_5:
 	PITCH 0
 	DOT
 	n1 4
-	
+
 	PITCH 100
 	n0 23
 	PITCH 0
@@ -236,7 +237,7 @@ TRI_5:
 	PITCH 0
 	DOT
 	n1 13
-	
+
 	PITCH 100
 	n0 23
 	PITCH 0
@@ -286,7 +287,7 @@ TRI_5:
 	PITCH 0
 	DOT
 	n1 13
-	
+
 	PITCH 100
 	n0 23
 	PITCH 0
@@ -313,9 +314,9 @@ TRI_5:
 	PITCH 0
 	DOT
 	n1 1
-	
+
 	;---------------
-	
+
 	PITCH 100
 	n0 18
 	PITCH 0
@@ -339,7 +340,7 @@ TRI_5:
 	PITCH 0
 	DOT
 	n1 13
-	
+
 	PITCH 100
 	n0 23
 	PITCH 0
@@ -392,7 +393,7 @@ TRI_5:
 	PITCH 0
 	DOT
 	n1 13
-	
+
 	PITCH 100
 	n0 23
 	PITCH 0
@@ -433,7 +434,7 @@ NOI_5:
 	n1 5
 	n1 6
 	n2 5
-	
+
 	n1 5
 	n1 5
 	n1 6
@@ -445,7 +446,7 @@ NOI_5:
 	n1 5
 	n1 6
 	n2 5
-	
+
 	n1 5
 	n1 5
 	n1 6
@@ -457,7 +458,7 @@ NOI_5:
 	n1 5
 	n1 6
 	n2 5
-	
+
 	n1 5
 	n1 5
 	n1 6
@@ -470,7 +471,7 @@ NOI_5:
 	n1 5
 	n1 6
 	n2 5
-	
+
 	n1 5
 	n1 5
 	n1 6
@@ -499,7 +500,7 @@ SQ1_5:
 	ENV 8,1
 	n5 6
 	ENV 1,2,1
-	
+
 	n3 6
 	n2 3
 	n2 6
@@ -512,7 +513,7 @@ SQ1_5:
 	n2 3
 	ENV 8,1
 	n4 3
-	
+
 	ENV 1,2,1
 	n3 6
 	n2 3
@@ -524,7 +525,7 @@ SQ1_5:
 	ENV 8,1
 	n5 6
 	ENV 1,2,1
-	
+
 	n3 6
 	n2 3
 	n2 6
@@ -537,7 +538,7 @@ SQ1_5:
 	n2 3
 	ENV 8,1
 	n5 3
-	
+
 	ENV 1,2,1
 	n2 3
 	n2 9
@@ -552,7 +553,7 @@ SQ1_5:
 	ENV 8,1
 	DOT
 	n4 10
-	
+
 	ENV 1,2,1
 	n2 3
 	n2 9
@@ -590,7 +591,7 @@ SQ1_5:
 	ENV 8,1
 	n4 14
 	ENV 1,2,1
-	
+
 	n2 15
 	n2 17
 	n3 18
@@ -694,7 +695,7 @@ SQ2_5:
 ;	n1 6
 ;	n1 3
 ;	LOOP 11,.loop
-;	
+;
 ;.1
 ;	n1 10
 ;	n1 6
@@ -728,7 +729,7 @@ SQ2_5:
 ;	n1 6
 ;	n1 3
 ;	VOL 15
-;	
+;
 ;	n1 8
 ;	n1 5
 ;	n1 1

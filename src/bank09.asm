@@ -17,7 +17,7 @@ Bank09_ScrollStaffLine:
 	jmp ___Bank09_ScrollStaffLine
 
 ;860C
-;ƒGƒ“ƒfƒBƒ“ƒO‚Ì•à‚­ƒƒbƒNƒ}ƒ“ + •ŠíŽæ“¾‚ÌƒƒbƒNƒ}ƒ“‚ÌƒXƒvƒ‰ƒCƒg•\Ž¦
+;ã‚¨ãƒ³ãƒ‡ã‚£ãƒ³ã‚°ã®æ­©ããƒ­ãƒƒã‚¯ãƒžãƒ³ + æ­¦å™¨å–å¾—ã®ãƒ­ãƒƒã‚¯ãƒžãƒ³ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆè¡¨ç¤º
 ___Bank09_ShowEndingSprites:
 	ldy <$01
 	mMOV $8700,y, <zPtrlo
@@ -40,7 +40,7 @@ ___Bank09_ShowEndingSprites:
 	rts
 
 ;8637
-;ƒXƒ^ƒbƒtƒ[ƒ‹‚Ìƒ{ƒX–¼•\Ž¦ˆ—
+;ã‚¹ã‚¿ãƒƒãƒ•ãƒ­ãƒ¼ãƒ«ã®ãƒœã‚¹åè¡¨ç¤ºå‡¦ç†
 ___Bank09_WriteEndingBossname:
 	lda <zFrameCounter
 	and #$03
@@ -69,7 +69,7 @@ ___Bank09_WriteEndingBossname:
 	rts
 
 ;8678
-;ƒXƒ^ƒbƒtƒ[ƒ‹‚Ì‰Šú‰»‚©‚ÈH
+;ã‚¹ã‚¿ãƒƒãƒ•ãƒ­ãƒ¼ãƒ«ã®åˆæœŸåŒ–ã‹ãªï¼Ÿ
 ___Bank09_InitStaffLine:
 	mMOV #$8C, <$DF
 	mMOV #$95, <$DE
@@ -132,7 +132,7 @@ ___Bank09_ScrollStaffLine:
 	rts
 
 ;86EB
-;ƒXƒ^ƒbƒtƒ[ƒ‹‚Ì‘‚«ž‚ÝˆÊ’uŽw’è
+;ã‚¹ã‚¿ãƒƒãƒ•ãƒ­ãƒ¼ãƒ«ã®æ›¸ãè¾¼ã¿ä½ç½®æŒ‡å®š
 Bank09_SetStaffLineAddr:
 	mMOV #$20 >> 2, <$00
 	lda <$01
@@ -145,4 +145,4 @@ Bank09_SetStaffLineAddr:
 	rts
 
 ;8700
-;•ŠíŽæ“¾ƒXƒvƒ‰ƒCƒg‚âƒGƒ“ƒfƒBƒ“ƒO‚Ìƒf[ƒ^
+;æ­¦å™¨å–å¾—ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚„ã‚¨ãƒ³ãƒ‡ã‚£ãƒ³ã‚°ã®ãƒ‡ãƒ¼ã‚¿

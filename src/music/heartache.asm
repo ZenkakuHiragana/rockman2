@@ -1,4 +1,5 @@
-	
+
+HEARTACHE:
 	TRACK SQ1_HEART, $0000, TRI_HEART, $0000, MOD_HEART
 MOD_HEART:
 	.dw $0000, $0080
@@ -33,7 +34,7 @@ SQ1_HEART:
 	TEMPO 15
 	n1 8
 	LOOP 2,.begin
-	
+
 	TONE 1
 	ENV 1,2,1
 	n1 6
@@ -78,7 +79,7 @@ SQ1_HEART:
 	VOL .vol -3
 	n1 16
 	VOL .vol
-	
+
 	KEY O4 -2
 	ENV 1,7,1
 	n1 6+12
@@ -138,7 +139,7 @@ SQ1_HEART:
 	TEMPO 15
 	n1 8
 	LOOP 2,.1
-	
+
 	ENV 1,2,1
 	n1 6
 	n1 15
@@ -151,7 +152,7 @@ SQ1_HEART:
 	n1 8
 	n1 11
 	n1 13
-	
+
 	ENV 1,2
 	TEMPO 7
 	n1 3
@@ -169,7 +170,7 @@ SQ1_HEART:
 	n1 11
 	TEMPO 15
 	n1 8
-	
+
 	TEMPO 7
 	n1 1
 	TEMPO 8
@@ -190,7 +191,7 @@ SQ1_HEART:
 	n1 11
 	TEMPO 15
 	n1 8
-	
+
 	TEMPO 7
 	n1 6
 	TEMPO 8
@@ -216,7 +217,7 @@ SQ1_HEART:
 	TEMPO 8
 	n1 8
 	;----------------------------
-	
+
 	TEMPO 15
 	TONE 1
 	ENV 1,7,1
@@ -252,7 +253,7 @@ SQ1_HEART:
 	n3 13+12
 	DOT
 	n2
-	
+
 	ENV 1,7,1
 	KEY O5 -2
 	TEMPO 7
@@ -273,11 +274,11 @@ SQ1_HEART:
 	ENV 3,1
 	n2 20
 	LOOP 0,.2a
-	
+
 .2b
 	n2 13
-	
-	
+
+
 	TONE 2
 	VOL .vol2
 	ENV 1,4,1
@@ -306,7 +307,7 @@ SQ1_HEART:
 	n2 8
 	ENV 3,1
 	n2 8
-	
+
 .2a
 	TONE 1
 	VOL .vol
@@ -340,7 +341,7 @@ SQ1_HEART:
 	ENV 4,1
 	LOOP 1,.2b
 	n3 13
-	
+
 	TONE 2
 	VOL .vol3
 	ENV 1,2,1
@@ -377,7 +378,7 @@ SQ1_HEART:
 	TEMPO 8
 	n1
 	LOOP 1,.2d
-	
+
 	TEMPO 7
 	n1 21
 	TEMPO 8
@@ -386,9 +387,9 @@ SQ1_HEART:
 	n1 23
 	TEMPO 8
 	n1
-	
+
 	;----------------------------
-	
+
 	TONE 0
 	VOL .vol
 	KEY O3 -2
@@ -428,7 +429,7 @@ SQ1_HEART:
 	n1 23
 	TEMPO 7
 	n1
-	
+
 	VOL .vol
 	TEMPO 15
 	n1 23
@@ -455,7 +456,7 @@ SQ1_HEART:
 	VOL .vol - 10
 	SHORT
 	n1 20
-	
+
 	TONE 0
 	VOL .vol
 	KEY O3 -2
@@ -467,7 +468,7 @@ SQ1_HEART:
 	n1 14
 	TEMPO 15
 	n1 9
-	
+
 	TEMPO 7
 	n1 2
 	TEMPO 8
@@ -488,7 +489,7 @@ SQ1_HEART:
 	n1 14
 	TEMPO 15
 	n1 9
-	
+
 	TONE 1
 	KEY O4 -2
 	ENV 3,1
@@ -521,9 +522,9 @@ SQ1_HEART:
 	TEMPO 15
 	n1 22
 	LOOP 1,.3b
-	
+
 	;---------------------------
-	
+
 	TEMPO 15
 	TONE 1
 	KEY O4 -2
@@ -561,7 +562,7 @@ SQ1_HEART:
 	n1 23
 	TEMPO 7
 	n1
-	
+
 	VOL .vol
 	TEMPO 15
 	n1 23
@@ -569,7 +570,7 @@ SQ1_HEART:
 	n1 22
 	TEMPO 8
 	n1 20
-	
+
 	TONE 1
 	ENV 1,7,1
 	TEMPO 15
@@ -634,7 +635,7 @@ SQ1_HEART:
 	TEMPO 15
 	n1 13
 	n1 11
-	
+
 	TONE 0
 	n2 8
 	n1 9
@@ -651,9 +652,9 @@ SQ1_HEART:
 	TEMPO 15
 	n3 8
 	LOOP 1,.4b
-	
+
 	;--------------------------------
-	
+
 	TONE 1
 	KEY O5 -2
 	n1
@@ -689,7 +690,7 @@ SQ1_HEART:
 	n3 13
 	DOT
 	n2
-	
+
 	ENV 1,7,1
 	TEMPO 7
 	n1 8
@@ -709,7 +710,7 @@ SQ1_HEART:
 	ENV 3,1
 	n2 20
 	LOOP 0,.5a
-	
+
 .5b
 	TONE 2
 	VOL .vol2
@@ -739,7 +740,7 @@ SQ1_HEART:
 	n2 8
 	ENV 3,1
 	n2 8
-	
+
 .5a
 	TONE 1
 	VOL .vol
@@ -773,7 +774,7 @@ SQ1_HEART:
 	ENV 4,1
 	n2 13
 	LOOP 1,.5b
-	
+
 	ENV 1,7,1
 	TEMPO 7
 	n1 16
@@ -835,7 +836,7 @@ TRI_HEART:
 	DOT
 	n2 4
 	LOOP 1,.1
-	
+
 	TEMPO 15+7
 	n1 8
 	TEMPO 15+8
@@ -844,7 +845,7 @@ TRI_HEART:
 	n1 8
 	n1 8
 	n1 8
-	
+
 	VOL .vol +20
 	n1 6
 	n1 1
@@ -856,7 +857,7 @@ TRI_HEART:
 	TEMPO 15
 	n1 10
 	n1 13
-	
+
 	;----------------------
 	VOL .vol2
 	LOOP 0,.2a
@@ -909,7 +910,7 @@ TRI_HEART:
 	TEMPO 8
 	n1 3
 	LOOP 2,.2c
-	
+
 	TEMPO 7
 	n1 6
 	TEMPO 8
@@ -918,7 +919,7 @@ TRI_HEART:
 	VOL .vol
 	n1 1
 	n1 6
-	
+
 	DOT
 	n2 4
 	DOT
@@ -992,7 +993,7 @@ TRI_HEART:
 	n1 8
 	TEMPO 8
 	n1 10
-	
+
 	TEMPO 15
 	n1 8
 	n1 8
@@ -1017,9 +1018,9 @@ TRI_HEART:
 	TEMPO 15
 	n1 10
 	n1 13
-	
+
 	;-----------------------
-	
+
 	VOL .vol2
 	LOOP 0,.3a
 .3b

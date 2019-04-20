@@ -347,7 +347,7 @@ Bank0E_Start:
 ;A1D9
 BeginTitleScreenSkipped:
 	jsr Titlelogo_ShowSprites
-	mPLAYTRACK #$0D
+	mPLAYTRACK #$00
 	lda #$0B
 	sta <zTitleScreenWaithi
 	lda #$00
@@ -363,7 +363,7 @@ BeginTitleScreenSkipped:
 	jsr FrameAdvance1A
 	sec
 	lda <zTitleScreenWaitlo
-	sbc #$01
+	;sbc #$01
 	sta <zTitleScreenWaitlo
 	lda <zTitleScreenWaithi
 	sbc #$00
@@ -489,7 +489,7 @@ BeginTitleScreenSkipped:
 	sta aSprite,x
 	dex
 	bpl .loop_sprite_cursor
-	
+
 	lda <zFrameCounter
 	and #$08
 	bne .skip_sety_cursor
@@ -643,7 +643,7 @@ BeginTitleScreenSkipped:
 	txa
 	clc
 	adc #$05
-	tax 
+	tax
 	lda #$00
 	sta <$01
 	sta <$02
@@ -704,7 +704,7 @@ BeginTitleScreenSkipped:
 	jsr FrameAdvance1A
 	jsr FadeinPaletteA896
 	jmp .begin_gamemenu
-	
+
 .valid_password
 	lda <$02
 	sta <zClearFlags

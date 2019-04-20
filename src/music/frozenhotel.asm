@@ -1,4 +1,5 @@
 
+FROZENHOTEL:
 .tempo = 150
 FROZEN_TEMPO = 3600 / .tempo / 4
 	TRACK SQ1_FROZEN, SQ2_FROZEN, TRI_FROZEN, NOI_FROZEN, MOD_FROZEN
@@ -40,7 +41,7 @@ SQ1_FROZEN:
 	n2 8
 	n2 6
 	LOOP 3, .1
-	
+
 	TONE 0
 	KEY O4 -3
 	VOL .vol2
@@ -49,7 +50,7 @@ SQ1_FROZEN:
 	DOT
 	n4 3
 	n2
-	
+
 	VOL 15
 	ENV 3, 1
 	n1 8 +12
@@ -75,7 +76,7 @@ SQ1_FROZEN:
 	n1 17 +12
 	n1 16 +12
 	n1 15 +12
-	
+
 	VOL .vol2
 	ENV 1, 1, 1
 	TIE 4
@@ -86,12 +87,12 @@ SQ1_FROZEN:
 	n5
 	DOT
 	n4
-	
+
 	VOL 15
 	ENV 3, 1
 	n2 15 +12
 	n2 15 +12
-	
+
 	n2 13 +12
 	n1 14 +12
 	n3 15 +12
@@ -111,14 +112,14 @@ SQ1_FROZEN:
 	n1 14 +12
 	n3 15 +12
 	n1 14 +12
-	
+
 	VOL .vol2
 	ENV 1, 1, 1
 	TIE 1
 	DOT
 	n5 3
 	n3
-	
+
 	VOL 15
 	ENV 6, 1
 	SHORT
@@ -132,7 +133,7 @@ SQ1_FROZEN:
 	MOD 4
 	n5
 	n4
-	
+
 	TEMPO FROZEN_TEMPO
 	TONE 1
 	VOL .vol
@@ -157,7 +158,7 @@ SQ1_FROZEN:
 	n2 8
 	n2 6
 	LOOP 1, .3
-	
+
 	VOL 15
 	KEY O5 -3
 	ENV 7, 1
@@ -175,7 +176,7 @@ SQ1_FROZEN:
 	n4 1
 	n4 4
 	n5 6
-	
+
 	TONE 0
 	ENV 1, 13 , 1
 	n2
@@ -196,7 +197,7 @@ SQ1_FROZEN:
 	TIE 1
 	n3 4 +12
 	n1
-	
+
 	MOD 1
 	SHORT
 	n3 9
@@ -211,7 +212,7 @@ SQ1_FROZEN:
 	n1
 	MOD 5
 	n4
-	
+
 	MOD 1
 	n4
 	n2
@@ -239,7 +240,7 @@ SQ1_FROZEN:
 	TIE 1
 	n3 4
 	n1
-	
+
 	MOD 3
 	TIE 2
 	PITCH -1
@@ -254,7 +255,7 @@ SQ1_FROZEN:
 	MOD 2
 	DOT
 	n4 11
-	
+
 	MOD 0
 	n4
 	n2
@@ -281,7 +282,7 @@ SQ1_FROZEN:
 	MOD 7
 	DOT
 	n3
-	
+
 	MOD 0
 	n3 19
 	DOT
@@ -300,7 +301,7 @@ SQ1_FROZEN:
 	n2 12
 	n2 7
 	n3 2
-	
+
 	DOT
 	n3
 	SHORT
@@ -367,7 +368,7 @@ SQ2_FROZEN:
 	n3 4
 	n3 2
 	LOOP 1, .1
-	
+
 	VOL 5
 	KEY O5 -1
 .2
@@ -381,7 +382,7 @@ SQ2_FROZEN:
 	n2 6 +24
 	n1 1 +24
 	LOOP 3, .2
-	
+
 	VOL .vol
 	KEY O4 -1
 	n3 9
@@ -392,7 +393,7 @@ SQ2_FROZEN:
 	n3 3
 	n3 4
 	n3 2
-	
+
 	TONE 2
 	VOL 5
 	ENV 1, 1, 1
@@ -400,7 +401,7 @@ SQ2_FROZEN:
 	n5 6 +12
 	n5 6 +12
 	n5 6 +12
-	
+
 	TONE 1
 	KEY O3 -1
 	VOL 15
@@ -417,7 +418,7 @@ SQ2_FROZEN:
 	LOOP 31, .4
 	LOOP 0, SQ2_FROZEN
 	.endregion "sq2"
-	
+
 TRI_FROZEN:
 	.beginregion "tri"
 	TEMPO FROZEN_TEMPO * 2
@@ -434,12 +435,12 @@ TRI_FROZEN:
 	n3 15
 	n3 10
 	LOOP 1, .1
-	
+
 	n5 5
 	n5 5
 	n5 5
 	n5 5
-	
+
 	n3 22
 	n3 15
 	n3 20
@@ -448,25 +449,25 @@ TRI_FROZEN:
 	n3 11
 	n3 15
 	n3 10
-	
+
 	n5 20
 	n5 19
 	n5 20
 	n5 19
-	
+
 .2
 	n5 10
 	LOOP 7, .2
 	LOOP 0, .1
 	.endregion "tri"
-	
+
 NOI_FROZEN:
 	.beginregion "noise"
 	TEMPO FROZEN_TEMPO
 	VOL 15
 .begin
 	ENV 3, 1
-	
+
 	n5 5
 	n5
 	n5 5
@@ -493,7 +494,7 @@ NOI_FROZEN:
 	n2 1
 	n2 12
 	n2 8
-	
+
 	n1 12
 	n1 8
 	n2 1
@@ -517,7 +518,7 @@ NOI_FROZEN:
 	n2 12
 	n2 8
 	LOOP 1, .1
-	
+
 .2
 	n3 5
 	n2 12
@@ -538,7 +539,7 @@ NOI_FROZEN:
 	n2 1
 	n2 12
 	n2 8
-	
+
 	n1 12
 	n1 8
 	n2 1
@@ -564,7 +565,7 @@ NOI_FROZEN:
 	n1 8
 	n1 8
 	LOOP 1, .2
-	
+
 	LOOP 0, .3_1
 .3
 	n1 1
@@ -593,7 +594,7 @@ NOI_FROZEN:
 	n2 1
 	n2 12
 	n2 8
-	
+
 	n1 12
 	n1 8
 	n2 1
@@ -619,7 +620,7 @@ NOI_FROZEN:
 	n1 8
 	n1 8
 	n1 8
-	
+
 	LOOP 0, .4_1
 .4
 	n1 1
@@ -648,7 +649,7 @@ NOI_FROZEN:
 	n2 1
 	n2 12
 	n2 8
-	
+
 	n1 12
 	n1 8
 	n2 1

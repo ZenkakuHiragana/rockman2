@@ -1,4 +1,5 @@
 
+SBOMB1_6:
 	TRACK SQ1_6, SQ2_6, TRI_6, NOI_6, MODULATION_6
 MODULATION_6:
 	.dw $0000, $0080
@@ -98,7 +99,7 @@ TRI_6:
 	n1 5
 	TEMPO 7
 	n1 5
-	
+
 	TEMPO 8
 	n1 5
 	TEMPO 7
@@ -118,7 +119,7 @@ TRI_6:
 	n1 5
 	TEMPO 7
 	n1 5
-	
+
 	TEMPO 8
 	n1 2
 	TEMPO 7
@@ -153,7 +154,7 @@ TRI_6:
 	n1 8
 	TEMPO 7
 	n1 4
-	
+
 	TEMPO 8
 	n1 3
 	TEMPO 7
@@ -173,7 +174,7 @@ TRI_6:
 	n1 5
 	TEMPO 7
 	n1 5
-	
+
 	TEMPO 8
 	n1 5
 	TEMPO 7
@@ -193,7 +194,7 @@ TRI_6:
 	n1 5
 	TEMPO 7
 	n1 5
-	
+
 	TEMPO 8
 	n1 5
 	TEMPO 7
@@ -210,7 +211,7 @@ TRI_6:
 	TEMPO 7
 	n1 6
 	LOOP 1,.1
-	
+
 	TEMPO 4
 	PITCH 90
 	n1 31
@@ -279,7 +280,7 @@ TRI_6:
 	n1 8
 	TEMPO 7
 	n1 12
-	
+
 	TEMPO 8
 	n1 15
 	TEMPO 7
@@ -456,7 +457,7 @@ TRI_6:
 	n1 12
 	TEMPO 7
 	n1 10
-	
+
 	TEMPO 8
 	n1 13
 	TEMPO 7
@@ -495,7 +496,7 @@ TRI_6:
 	n1 13
 	TEMPO 7
 	n1 13
-	
+
 	TEMPO 8
 	n1 15
 	TEMPO 7
@@ -752,7 +753,7 @@ NOI_6:
 	n1 1
 	n1 6
 	LOOP 3,.2
-	
+
 	TEMPO 8
 	n1 6
 	TEMPO 7
@@ -789,7 +790,7 @@ NOI_6:
 	n1 6
 	n1 1
 	LOOP 3,.4
-	
+
 	TEMPO 8
 	n1 6
 	TEMPO 7
@@ -940,7 +941,7 @@ SQ1_6:
 	n1 17
 	TEMPO 7
 	n1 18
-	
+
 	TEMPO 15
 	n4 19
 	TIE 1
@@ -1146,7 +1147,7 @@ SQ2_6:
 	n1 14
 	TEMPO 7
 	n1 9
-	
+
 	TEMPO 8
 	n1 13
 	TEMPO 7
@@ -1179,7 +1180,7 @@ SQ2_6:
 	n1 13
 	TEMPO 7
 	n1 1
-	
+
 	TEMPO 8
 	n1 14
 	TEMPO 7
@@ -1267,7 +1268,7 @@ SQ2_6:
 	n1 14
 	TEMPO 7
 	n1 7
-	
+
 	TEMPO 8
 	n1 14
 	TEMPO 7
@@ -1333,7 +1334,7 @@ SQ2_6:
 	n1 14
 	TEMPO 7
 	n1 9
-	
+
 	TEMPO 8
 	n1 16
 	TEMPO 7
@@ -1368,7 +1369,7 @@ SQ2_6:
 	n1 12
 	TEMPO 8
 	LOOP 1,.2
-	
+
 	n1 14
 	TEMPO 7
 	n1 14
@@ -1400,7 +1401,7 @@ SQ2_6:
 	n1 14
 	TEMPO 7
 	n1 10
-	
+
 	TEMPO 8
 	n1 16
 	TEMPO 7
@@ -1472,7 +1473,7 @@ SQ2_6:
 	TEMPO 7
 	n1 10
 	LOOP 1,.4
-	
+
 	TEMPO 8
 	n1 12
 	TEMPO 7
