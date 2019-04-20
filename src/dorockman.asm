@@ -849,7 +849,7 @@ DoRockman_CheckAttr_Center:
 	ldx #$00
 	lda <zBossBehaviour
 	beq .notboss
-	lda <zBossKind
+	lda <zBossType
 	cmp #$03
 	beq .water
 .notboss

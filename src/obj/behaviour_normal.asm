@@ -4383,7 +4383,7 @@ EN64:
 	lda #$07
 	sta aObjLife,x
 	lda #$08
-	sta <zBossKind
+	sta <zBossType
 	lda #$01
 	sta <zBossBehaviour
 	lda #$17
@@ -4500,7 +4500,7 @@ EN65_GutsHand:
 	lda aBossVar1
 	sta aObjFlags,x
 	jsr MoveEnemy
-	lda <zBossKind
+	lda <zBossType
 	cmp #$08
 	beq .wilyobj
 	lda aObjAnim,x

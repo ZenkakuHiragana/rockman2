@@ -44,26 +44,24 @@ mSEC .macro
 	.endm
 
 mCHANGEBANK .macro
-	.if \?2
 	lda \1
+	.if \?2
 	mJSR_NORTS ChangeBank
 	.else
-	lda \1
 	jsr ChangeBank
 	.endif
 	.endm
 
 mPLAYTRACK .macro
 	lda \1
+	.if \?2
+	mJSR_NORTS PlayTrack
+	.else
 	jsr PlayTrack
+	.endif
 	.endm
 
-mMOV .macro
-	lda \1
-	sta \2
-	.if \?3
-		sta \3
-	.endif
+mSTOREALL .macro
 	.if \?4
 		sta \4
 	.endif
@@ -84,15 +82,25 @@ mMOV .macro
 	.endif
 	.endm
 
+mMOV .macro
+	lda \1
+	sta \2
+	.if \?3
+		sta \3
+	.endif
+	mSTOREALL \1, \2, \3, \4, \5, \6, \7, \8, \9
+	.endm
+
 mMOVW .macro
 	lda #LOW(\1)
 	sta \2
 	lda #HIGH(\1)
 	.if \?3
 	sta \3
+	mSTOREALL \1, \2, \3, \4, \5, \6, \7, \8, \9
 	.else
-	.endif
 	sta \2+1
+	.endif
 	.endm
 
 mMOVWB .macro
@@ -101,9 +109,10 @@ mMOVWB .macro
 	lda #LOW(\1)
 	.if \?3
 	sta \3
+	mSTOREALL \1, \2, \3, \4, \5, \6, \7, \8, \9
 	.else
-	.endif
 	sta \2+1
+	.endif
 	.endm
 
 mSTZ .macro
@@ -115,23 +124,122 @@ mSTZ .macro
 	.if \?3
 		sta \3
 	.endif
-	.if \?4
-		sta \4
+	mSTOREALL \1, \2, \3, \4, \5, \6, \7, \8, \9
+	.endm
+
+mADD .macro
+	lda \1
+	.if \?2
+	adc \2
+	.if \?3
+	sta \3
+	mSTOREALL \1, \2, \3, \4, \5, \6, \7, \8, \9
+	.else
+	sta \1
 	.endif
-	.if \?5
-		sta \5
+	.else
+	adc #$00
+	sta \1
 	.endif
-	.if \?6
-		sta \6
+	.endm
+
+mSUB .macro
+	lda \1
+	.if \?2
+	sbc \2
+	.if \?3
+	sta \3
+	mSTOREALL \1, \2, \3, \4, \5, \6, \7, \8, \9
+	.else
+	sta \1
 	.endif
-	.if \?7
-		sta \7
+	.else
+	sbc #$00
+	sta \1
 	.endif
-	.if \?8
-		sta \8
+	.endm
+
+mORA .macro
+	lda \1
+	ora \2
+	.if \?3
+	sta \3
+	mSTOREALL \1, \2, \3, \4, \5, \6, \7, \8, \9
+	.else
+	sta \1
 	.endif
-	.if \?9
-		sta \9
+	.endm
+
+mAND .macro
+	lda \1
+	and \2
+	.if \?3
+	sta \3
+	mSTOREALL \1, \2, \3, \4, \5, \6, \7, \8, \9
+	.else
+	sta \1
+	.endif
+	.endm
+
+mEOR .macro
+	lda \1
+	.if \?2
+	eor \2
+	.if \?3
+	sta \3
+	mSTOREALL \1, \2, \3, \4, \5, \6, \7, \8, \9
+	.else
+	sta \1
+	.endif
+	.else
+	eor #$FF
+	sta \1
+	.endif
+	.endm
+
+mNEGC .macro
+	clc
+	lda \1
+	eor #$FF
+	adc #$01
+	.if \?2
+	sta \2
+	.if \?3
+	sta \3
+	.endif
+	mSTOREALL \1, \2, \3, \4, \5, \6, \7, \8, \9
+	.else
+	sta \1
+	.endif
+	.endm
+	
+mNEG .macro
+	lda \1
+	eor #$FF
+	adc #$01
+	.if \?2
+	sta \2
+	.if \?3
+	sta \3
+	.endif
+	mSTOREALL \1, \2, \3, \4, \5, \6, \7, \8, \9
+	.else
+	sta \1
+	.endif
+	.endm
+
+mNEGhi .macro
+	lda \1
+	eor #$FF
+	adc #$00
+	.if \?2
+	sta \2
+	.if \?3
+	sta \3
+	.endif
+	mSTOREALL \1, \2, \3, \4, \5, \6, \7, \8, \9
+	.else
+	sta \1
 	.endif
 	.endm
 

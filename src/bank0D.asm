@@ -27,8 +27,7 @@ ___Bank0D_BeginSelectStage:
 WritePaletteX_1A:
 	ldy #$1F
 .loop_palette_specified
-	lda Table_PaletteData1A,x
-	sta aPalette,y
+	mMOV Table_PaletteData1A,x, aPalette,y
 	dex
 	dey
 	bpl .loop_palette_specified
@@ -53,8 +52,7 @@ SelectBossFocus:
 	clc
 	adc <$00
 	tax
-	lda Table_SelectBoss_CursorRelationship,x
-	sta <zStage
+	mMOV Table_SelectBoss_CursorRelationship,x, <zStage
 .end
 	rts
 ;82CA
@@ -78,27 +76,19 @@ SelectBoss_SetFocusSprite:
 	and #$08
 	bne .hide_selectsprite
 	ldy <zStage
-	lda Table_SelectBoss_CursorSpritesY,y
-	sta <.dy
-	lda Table_SelectBoss_CursorSpritesX,y
-	sta <.dx
+	mMOV Table_SelectBoss_CursorSpritesY,y, <.dy
+	mMOV Table_SelectBoss_CursorSpritesX,y, <.dx
 	ldx #$00
 .loop
 	clc
-	lda Table_SelectBoss_CursorSprites,x
-	adc <.dy
-	sta aSprite + $E0,x
+	mADD Table_SelectBoss_CursorSprites,x, <.dy, aSprite + $E0,x
 	inx
-	lda Table_SelectBoss_CursorSprites,x
-	sta aSprite + $E0,x
+	mMOV Table_SelectBoss_CursorSprites,x, aSprite + $E0,x
 	inx
-	lda Table_SelectBoss_CursorSprites,x
-	sta aSprite + $E0,x
+	mMOV Table_SelectBoss_CursorSprites,x, aSprite + $E0,x
 	inx
 	clc
-	lda Table_SelectBoss_CursorSprites,x
-	adc <.dx
-	sta aSprite + $E0,x
+	mADD Table_SelectBoss_CursorSprites,x, <.dx, aSprite + $E0,x
 	inx
 	cpx #$10
 	bne .loop
@@ -117,33 +107,24 @@ SelectBoss_SetFocusSprite:
 SelectBoss_MoveIntroStar:
 	ldy #$50
 	ldx #$00
-	lda #$30
-	sta <$00
-	lda #$02
-	sta <$03
+	mMOV #$30, <$00
+	mMOV #$02, <$03
 .loop
 	sty <$04
 	stx <$05
 	lda aObjFlags
 	beq .skip
-	lda #$80
-	sta <$00
+	mMOV #$80, <$00
 	lda <zFrameCounter
 	and #$04
 	bne .skip
 	inc <$00
 .skip
 	ldx <$03
-	lda .table_introstar_num,x
-	sta <$01
+	mMOV .table_introstar_num,x, <$01
 	clc
-	lda aObjXlo + 1,x
-	adc .table_introstar_vxlo,x
-	sta aObjXlo + 1,x
-	lda aObjX + 1,x
-	adc .table_introstar_vxhi,x
-	sta aObjX + 1,x
-	sta <$02
+	mADD aObjXlo + 1,x, .table_introstar_vxlo,x, aObjXlo + 1,x
+	mADD aObjX + 1,x, .table_introstar_vxhi,x, aObjX + 1,x, <$02
 	ldx <$05
 	ldy <$04
 	jsr .introstar_sprite_setup
@@ -160,11 +141,9 @@ SelectBoss_MoveIntroStar:
 	.db $04, $01, $00
 ;83AC
 .introstar_sprite_setup
-	lda Table_SelectBoss_IntroStarPos,x
-	sta aSprite,y
+	mMOV Table_SelectBoss_IntroStarPos,x, aSprite,y
 	iny
-	lda <$00
-	sta aSprite,y
+	mMOV <$00, aSprite,y
 	iny
 	lda aObjFlags
 	beq .ispipi
@@ -173,9 +152,7 @@ SelectBoss_MoveIntroStar:
 	sta aSprite,y
 	iny
 	clc
-	lda Table_SelectBoss_IntroStarPos + 1,x
-	adc <$02
-	sta aSprite,y
+	mADD Table_SelectBoss_IntroStarPos + 1,x, <$02, aSprite,y
 	iny
 	inx
 	inx
@@ -190,8 +167,7 @@ SelectBoss_AnimateBossIntro:
 	lda aObjWait
 	cmp Table_SelectBoss_IntroAnimWait,x
 	bcc .wait_animation_bossintro
-	lda #$00
-	sta aObjWait
+	mSTZ aObjWait
 	inc aObjFrame
 	lda Table_SelectBoss_IntroAnimFrames,x
 	cmp aObjFrame
@@ -203,34 +179,25 @@ SelectBoss_AnimateBossIntro:
 	adc aObjFrame
 	tax
 	ldy Table_SelectBoss_AnimationData,x
-	lda Table_SelectBoss_AnimFramelo,y
-	sta <zPtrlo
-	lda Table_SelectBoss_AnimFramehi,y
-	sta <zPtrhi
+	mMOV Table_SelectBoss_AnimFramelo,y, <zPtrlo,
+	mMOV Table_SelectBoss_AnimFramehi,y, <zPtrhi
 	ldy #$00
-	lda [zPtr],y
-	sta <$00 ;スプライトの数
+	mMOV [zPtr],y, <$00 ;スプライトの数
 	iny
 	ldx #$00
 .loop
 	clc
-	lda aObjY
-	adc [zPtr],y
-	sta aSprite,x
+	mADD aObjY, [zPtr],y, aSprite,x
 	iny
 	inx
-	lda [zPtr],y
-	sta aSprite,x
+	mMOV [zPtr],y, aSprite,x
 	iny
 	inx
-	lda [zPtr],y
-	sta aSprite,x
+	mMOV [zPtr],y, aSprite,x
 	iny
 	inx
 	clc
-	lda aObjX
-	adc [zPtr],y
-	sta aSprite,x
+	mADD aObjX, [zPtr],y, aSprite,x
 	inx
 	iny
 	dec <$00
@@ -241,12 +208,10 @@ SelectBoss_AnimateBossIntro:
 LoadNameTable843C:
 	lda #$00
 	jsr LoadGraphicsSet
-	lda #$20
-	sta $2006
+	mMOV #$20, $2006
 	ldy #$00
 	sty $2006
-	lda #$AE
-	sta <$09
+	mMOV #$AE, <$09
 	lda #$0B
 	jsr LoadScreenData
 	ldy #$1F
@@ -324,24 +289,15 @@ ___Bank0D_BeginTitleScreen:
 ;A4EB
 ;画面をONにする
 EnableScreen1A:
-	lda <z2001
-	ora #%00011000
-	sta <z2001
-	lda <z2000
-	ora #%10000000
-	sta <z2000
-	sta $2000
+	mORA <z2001, #%00011000,
+	mORA <z2000, #%10000000, <z2000, $2000
 	rts
 
 ;A4FB
 ;画面をOFFにする
 DisableScreen1A:
-	lda #%00010000
-	sta <z2000
-	sta $2000
-	lda #%00000110
-	sta <z2001
-	sta $2001
+	mMOV #%00010000, <z2000, $2000
+	mMOV #%00000110, <z2001, $2001
 	rts
 
 ;A50A
@@ -368,8 +324,7 @@ WriteOpeningQuotes:
 	ldx <$FD
 	ldy #$00
 .loop
-	lda Table_Opening_Quotes,x
-	sta aPPULinearData,y
+	mMOV Table_Opening_Quotes,x, aPPULinearData,y
 	inx
 	iny
 	cpy #$15
@@ -390,19 +345,15 @@ Opening_WriteTitleScreenByScroll:
 	lda <$00
 	eor #$3F
 	tax
-	lda Table_TitleScreen,x
-	sta aPPULinearData + 1
-	lda Table_TitleScreen + 1,x
-	sta aPPULinearData
-	lda #$23
-	sta aPPULinearhi
+	mMOV Table_TitleScreen,x, aPPULinearData + 1
+	mMOV Table_TitleScreen + 1,x, aPPULinearData
+	mMOV #$23, aPPULinearhi
 	ldx <$00
 	dex
 	txa
 	ora #$C0
 	sta aPPULinearlo
-	lda #$02
-	sta <zPPULinear
+	mMOV #$02, <zPPULinear
 	rts
 
 ;A562
@@ -439,20 +390,14 @@ Opening_WriteTitleScreenByScroll:
 	ror a
 	sta <zPtrlo
 	clc
-	lda <zPtrlo
-	adc #LOW(Table_TitleScreen)
-	sta <zPtrlo
-	lda <zPtrhi
-	adc #HIGH(Table_TitleScreen)
-	sta <zPtrhi
+	mADD <zPtrlo, #LOW(Table_TitleScreen)
+	mADD <zPtrhi, #HIGH(Table_TitleScreen)
 	ldy #$1F
 .loop
-	lda [zPtr],y
-	sta aPPULinearData,y
+	mMOV [zPtr],y, aPPULinearData,y
 	dey
 	bpl .loop
-	lda #$20
-	sta <zPPULinear
+	mMOV #$20, <zPPULinear
 	rts
 
 ;A5AF
@@ -460,14 +405,12 @@ Opening_WriteTitleScreenByScroll:
 Opening_DoRockmanAnimationHair:
 	dec aObjWait10
 	bne .end
-	lda #$05
-	sta aObjWait10
+	mMOV #$05, aObjWait10
 	inc aObjAnim10
 	lda aObjAnim10
 	cmp #$02
 	bne .end
-	lda #$00
-	sta aObjAnim10
+	mSTZ aObjAnim10
 .end
 	rts
 
@@ -476,8 +419,7 @@ Opening_DoRockmanAnimationHair:
 Titlelogo_ShowSprites:
 	ldx #$14
 .loop
-	lda Table_Title_Sprites_N,x
-	sta aSprite + $EC,x
+	mMOV Table_Title_Sprites_N,x, aSprite + $EC,x
 	dex
 	bpl .loop
 	rts
@@ -492,21 +434,14 @@ Opening_MoveBuildingSprites:
 	lda aObjAnim,x
 	beq .skip
 	clc
-	lda aObjYlo,x
-	adc aObjVYlo
-	sta aObjYlo,x
-	lda aObjY,x
-	adc aObjVY
-	sta aObjY,x
-	lda aObjRoom,x
-	adc #$00
-	sta aObjRoom,x
+	mADD aObjYlo,x, aObjVYlo
+	mADD aObjY,x, aObjVY
+	mADD aObjRoom,x
 	bne .skip
 	lda aObjY,x
 	cmp #$E8
 	bcc .skip
-	lda #$00
-	sta aObjAnim,x
+	mSTZ aObjAnim,x
 .skip
 	ldx <zObjIndex
 	inx
@@ -520,57 +455,34 @@ Opening_MoveBuildingSprites:
 .skip_ascend
 ;上昇中、窓が出現する処理
 	sec
-	lda aObjYlo
-	sbc aObjVYlo
-	sta aObjYlo
-	lda aObjY
-	sbc aObjVY
-	sta aObjY
+	mSUB aObjYlo, aObjVYlo
+	mSUB aObjY, aObjVY
 	bcs .skip_0
 	lda #$01
 	jsr Opening_SpawnDetail
-	lda #$00
-	sta aObjYlo
-	lda #$48
-	sta aObjY
+	mMOVW $4800, aObjYlo, aObjY
 .skip_0
 ;上昇中、突起部が出現する処理
 	sec
-	lda aObjYlo + 1
-	sbc aObjVYlo
-	sta aObjYlo + 1
-	lda aObjY + 1
-	sbc aObjVY
-	sta aObjY + 1
+	mSUB aObjYlo + 1, aObjVYlo
+	mSUB aObjY + 1, aObjVY
 	bcs .skip_1
 	lda #$02
 	jsr Opening_SpawnDetail
-	lda #$00
-	sta aObjYlo + 1
-	lda #$48
-	sta aObjY + 1
+	mMOVW $4800, aObjYlo + 1, aObjY + 1
 .skip_1
 ;加速する
 	clc
-	lda aObjVYlo
-	adc #$02
-	sta aObjVYlo
-	lda aObjVY
-	adc #$00
-	sta aObjVY
+	mADD aObjVYlo, #$02,
+	mADD aObjVY
 	cmp #$02
 	bne .accel_max
-	lda #$00
-	sta aObjVYlo
+	mSTZ aObjVYlo
 .accel_max
 ;ロックマンの移動
 	clc
-	lda aObjY10
-	adc aObjVY
-	sta aObjY10
-	lda aObjRoom10
-	adc #$00
-	sta aObjRoom10
+	mADD aObjY10, aObjVY
+	mADD aObjRoom10
 	rts
 
 ;A68D
@@ -588,22 +500,16 @@ Opening_SpawnDetail:
 ;A69C
 ;スプライトを出現させる
 .found
-	lda <$00
-	sta aObjAnim,x
-	lda #$FF
-	sta aObjRoom,x
-	lda #$E0
-	sta aObjY,x
-	lda #$00
-	sta aObjYlo,x
+	mMOV <$00, aObjAnim,x
+	mMOV #$FF, aObjRoom,x
+	mMOVWB $E000, aObjY,x, aObjYlo,x
 	rts
 
 ;A6B1
 ;オープニングの建物ディテール部分を描画する
 Opening_DrawBuildingSprites:
 	jsr ClearSprite1A
-	lda #$00
-	sta <$00
+	mSTZ <$00
 	ldx #$02
 .loop_obj
 	stx <zObjIndex
@@ -624,22 +530,16 @@ Opening_DrawBuildingSprites:
 	ldy <$00
 .loop
 	clc
-	lda <$08
-	adc Table_BuildingSprites,x
-	sta aSprite,y
+	mADD <$08, Table_BuildingSprites,x, aSprite,y
 	lda <$09
 	adc #$00
 	beq .hide
-	lda #$F8
-	sta aSprite,y
+	mMOV #$F8, aSprite,y
 	bne .skip
 .hide
-	lda Table_BuildingSprites + 1,x
-	sta aSprite + 1,y
-	lda Table_BuildingSprites + 2,x
-	sta aSprite + 2,y
-	lda Table_BuildingSprites + 3,x
-	sta aSprite + 3,y
+	mMOV Table_BuildingSprites + 1,x, aSprite + 1,y
+	mMOV Table_BuildingSprites + 2,x, aSprite + 2,y
+	mMOV Table_BuildingSprites + 3,x, aSprite + 3,y
 	iny
 	iny
 	iny
@@ -663,21 +563,16 @@ Opening_DrawBuildingSprites:
 ;タイトル画面のロックマンを描く
 Opening_DrawRockman:
 	ldx aObjAnim10
-	lda Table_Title_RockmanSpriteslo,x
-	sta <zPtrlo
-	lda Table_Title_RockmanSpriteshi,x
-	sta <zPtrhi
+	mMOV Table_Title_RockmanSpriteslo,x, <zPtrlo
+	mMOV Table_Title_RockmanSpriteshi,x, <zPtrhi
 	ldy #$00
-	lda [zPtr],y
-	sta <$01
+	mMOV [zPtr],y, <$01
 	ldx <$00
 	beq .end
 	iny
 .loop
 	clc
-	lda aObjY10
-	adc [zPtr],y
-	sta aSprite,x
+	mADD aObjY10, [zPtr],y, aSprite,x
 	lda aObjRoom10
 	adc #$00
 	beq .hide
@@ -685,19 +580,15 @@ Opening_DrawRockman:
 	iny
 	iny
 	iny
-	lda #$F8
-	sta aSprite,x
+	mMOV #$F8, aSprite,x
 	bne .continue_loop
 .hide
 	iny
-	lda [zPtr],y
-	sta aSprite + 1,x
+	mMOV [zPtr],y, aSprite + 1,x
 	iny
-	lda [zPtr],y
-	sta aSprite + 2,x
+	mMOV [zPtr],y, aSprite + 2,x
 	iny
-	lda [zPtr],y
-	sta aSprite + 3,x
+	mMOV [zPtr],y, aSprite + 3,x
 	iny
 .continue_loop
 	inx
@@ -722,60 +613,43 @@ Opening_Skipped:
 	jsr WriteTableToPPULinear
 	jsr WritePPULinear
 	clc
-	lda aPPULinearlo
-	adc #$20
-	sta aPPULinearlo
-	lda aPPULinearhi
-	adc #$00
-	sta aPPULinearhi
+	mADD aPPULinearlo, #$20
+	mADD aPPULinearhi
 	clc
-	lda <$FE
-	adc #$20
-	sta <$FE
-	lda <$FF
-	adc #$00
-	sta <$FF
+	mADD <$FE, #$20
+	mADD <$FF
 	dec <$FD
 	bne .loop_loadbg
 	mMOVW #Table_TitleScreen + $400 - $20, <zPtr
-	lda #$20
-	sta $2006
+	mMOV #$20, $2006
 	ldy #$00
 	sty $2006
 	ldx #$1E
 .loop_write_titlescreen
 	ldy #$00
 .loop_write_titlescreen_line
-	lda [zPtr],y
-	sta $2007
+	mMOV [zPtr],y, $2007
 	iny
 	cpy #$20
 	bne .loop_write_titlescreen_line
 	sec
-	lda <zPtrlo
-	sbc #$20
-	sta <zPtrlo
-	lda <zPtrhi
-	sbc #$00
-	sta <zPtrhi
+	mSUB <zPtrlo, #$20
+	mSUB <zPtrhi
 	dex
 	bne .loop_write_titlescreen
 	ldy #$3F
 .loop_bg_attr
-	lda Table_TitleScreen,y
-	sta $2007
+	mMOV Table_TitleScreen,y, $2007
 	dey
 	bpl .loop_bg_attr
 	ldx #$1F
 .loop_bg_palette1
-	lda Table_Opening_Palette,x
-	sta aPalette,x
+	mMOV Table_Opening_Palette,x, aPalette,x
 	dex
 	bpl .loop_bg_palette1
 	ldx #$0F
 .loop_bg_palette2
-	lda Table_Title_Palette,x
-	sta aPalette,x
+	mMOV Table_Title_Palette,x, aPalette,x
 	dex
 	bpl .loop_bg_palette2
 	ldx #$1F
@@ -785,36 +659,22 @@ Opening_Skipped:
 	sta aObjAnim,x
 	dex
 	bpl .loop_init_obj
-	lda #$67
-	sta aObjY10
-	lda #$00
-	sta aObjAnim10
-	lda #$08
-	sta aObjWait10
-	lda #$01
-	sta aObjAnim + 2
-	lda #$B0
-	sta aObjY + 2
-	lda #$02
-	sta aObjAnim + 3
-	sta aObjAnim + 4
-	lda #$88
-	sta aObjY + 3
-	lda #$D2
-	sta aObjY + 4
+	mMOV #$67, aObjY10
+	mMOV #$00, aObjAnim10
+	mMOV #$08, aObjWait10
+	mMOV #$01, aObjAnim + 2
+	mMOV #$B0, aObjY + 2
+	mMOV #$02, aObjAnim + 3, aObjAnim + 4
+	mMOV #$88, aObjY + 3
+	mMOV #$D2, aObjY + 4
 	jsr EnableScreen1A
-	lda #$00
-	sta <zKeyPress
-	sta <zVScroll
-	sta <zScreenMod
+	mSTZ <zKeyPress, <zVScroll, <zScreenMod
 	jmp BeginTitleScreenSkipped
 
 ;A840
 ;$08~$09で示したマップアドレスからマップを読み込む
 WriteMapAddressOffScreen1A;
-	lda #$00
-	sta <zNTPointer
-	sta <zPPUSqr
+	mSTZ <zNTPointer, <zPPUSqr
 .loop
 	jsr WriteNameTableByScroll_AnyBank
 	inc <$08
@@ -829,8 +689,7 @@ WriteMapAddressOffScreen1A;
 ;A85A
 ;BGパレット#2、スプライトのパレット全部を黒くなるまでフェードアウトさせる
 FadeoutPalette_BG2_Spr:
-	lda #$04
-	sta <$FD
+	mMOV #$04, <$FD
 .loop_wait
 	lda <zFrameCounter
 	and #$03
@@ -869,8 +728,7 @@ FadeoutPalette_BG2_Spr:
 ;A896
 ;パレットをフェードインさせる
 FadeinPaletteA896:
-	lda #$04
-	sta <$FD
+	mMOV #$04, <$FD
 .loop
 	lda <zFrameCounter
 	and #$03
@@ -924,27 +782,19 @@ Password_DrawCursorStones:
 .dx = $08
 .dy = $09
 	ldx aObjFrame
-	lda Table_PasswordCursorPositionY,x
-	sta <.dy
-	lda Table_PasswordCursorPositionX,x
-	sta <.dx
+	mMOV Table_PasswordCursorPositionY,x, <.dy
+	mMOV Table_PasswordCursorPositionX,x, <.dx
 	ldx #$0F
 .loopcursor
 	clc
-	lda Table_PasswordCursorSprites,x
-	adc <.dx
-	sta aSprite + $30,x
+	mADD Table_PasswordCursorSprites,x, <.dx, aSprite + $30,x
 	dex
-	lda Table_PasswordCursorSprites,x
-	sta aSprite + $30,x
+	mMOV Table_PasswordCursorSprites,x, aSprite + $30,x
 	dex
-	lda Table_PasswordCursorSprites,x
-	sta aSprite + $30,x
+	mMOV Table_PasswordCursorSprites,x, aSprite + $30,x
 	dex
 	clc
-	lda Table_PasswordCursorSprites,x
-	adc <.dy
-	sta aSprite + $30,x
+	mADD Table_PasswordCursorSprites,x, <.dy, aSprite + $30,x
 	dex
 	bpl .loopcursor
 
@@ -952,12 +802,9 @@ Password_DrawCursorStones:
 	lsr a
 	and #$07
 	tax
-	lda Table_PasswordCursorColor,x ;cursor color table
-	sta aPaletteSpr + 6
+	mMOV Table_PasswordCursorColor,x, aPaletteSpr + 6
 	clc
-	lda aObjWait
-	adc #$24
-	sta aSprite + $2C + 1
+	mADD aObjWait, #$24, aSprite + $2C + 1
 	ldx #$00
 	ldy #$40
 .loop_stones
@@ -983,19 +830,15 @@ Password_DrawCursorStones:
 WriteKeyword1A:
 	lda Table_Keywords_ptr,x
 	tax
-	lda Table_Keywords,x
-	sta aPPULinearhi
+	mMOV Table_Keywords,x, aPPULinearhi
 	inx
-	lda Table_Keywords,x
-	sta aPPULinearlo
+	mMOV Table_Keywords,x, aPPULinearlo
 	inx
-	lda Table_Keywords,x
-	sta <zPPULinear
+	mMOV Table_Keywords,x, <zPPULinear
 	inx
 	ldy #$00
 .loop
-	lda Table_Keywords,x
-	sta aPPULinearData,y
+	mMOV Table_Keywords,x, aPPULinearData,y
 	inx
 	iny
 	cpy <zPPULinear
@@ -1007,13 +850,10 @@ WriteKeyword1A:
 ;さらにスプライトを消して画面表示を有効にする。なんだこれ。
 Password_SetScreenPalette:
 	sta <zRoom
-	lda #$00
-	sta <zHScroll
-	sta <zVScroll
+	mSTZ <zHScroll, <zVScroll
 	ldx #$21
 .loop
-	lda Table_Password_PaletteData,x
-	sta aPaletteAnim,x
+	mMOV Table_Password_PaletteData,x, aPaletteAnim,x
 	dex
 	bpl .loop
 	jsr ClearSprite1A
@@ -1023,13 +863,9 @@ Password_SetScreenPalette:
 ;パスワード画面で、右へスクロールする
 Password_ScrollRight:
 	clc
-	lda <zHScroll
-	adc #$08
-	sta <zHScroll
+	mADD <zHScroll, #$08
 	php
-	lda <zRoom
-	adc #$00
-	sta <zRoom
+	mADD <zRoom
 	plp
 	beq .rts
 	jsr FrameAdvance1A
@@ -1042,14 +878,10 @@ Password_ScrollRight:
 ;A9AC
 ;$08~$09で指定したマップアドレスからマップを読み込む
 WriteMapAddressOnScreen1A:
-	lda #$00
-	sta <zPPUSqr
-	sta <zNTPointer
+	mSTZ <zPPUSqr, <zNTPointer
 .loop
-	lda <$FD
-	sta <$08
-	lda <$FE
-	sta <$09
+	mMOV <$FD, <$08
+	mMOV <$FE, <$09
 	jsr WriteNameTableByScroll_AnyBank
 	inc <$FD
 	inc <zNTPointer
@@ -1063,13 +895,9 @@ WriteMapAddressOnScreen1A:
 ;パスワード画面で、左にスクロールする
 Password_ScrollLeft:
 	sec
-	lda <zHScroll
-	sbc #$08
-	sta <zHScroll
+	mSUB <zHScroll, #$08
 	beq .rts
-	lda <zRoom
-	sbc #$00
-	sta <zRoom
+	mSUB <zRoom
 	jsr FrameAdvance1A
 	jsr FrameAdvance1A
 	jsr FrameAdvance1A
@@ -1084,20 +912,14 @@ Password_InitStones:
 	ldy #$40
 .loop
 	clc
-	lda Table_PasswordCursorPositionY,x
-	adc #$04
-	sta aSprite,y
+	mADD Table_PasswordCursorPositionY,x, #$04, aSprite,y
 	iny
-	lda #$0F
-	sta aSprite,y
+	mMOV #$0F, aSprite,y
 	iny
-	lda #$00
-	sta aSprite,y
+	mSTZ aSprite,y
 	iny
 	clc
-	lda Table_PasswordCursorPositionX,x
-	adc #$04
-	sta aSprite,y
+	mADD Table_PasswordCursorPositionX,x, #$04, aSprite,y
 	iny
 	inx
 	cpx #$19

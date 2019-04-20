@@ -50,7 +50,7 @@
 .not_quickman_stage
 	lda <zBossBehaviour
 	beq .not_wily_boss
-	lda <zBossKind
+	lda <zBossType
 	cmp #$08
 	bcc .not_wily_boss
 	ldx #$00
