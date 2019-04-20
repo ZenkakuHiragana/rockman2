@@ -250,7 +250,7 @@
     ENV 1, 1
     n1 7
     TEMPO 6
-    ENV 2, 1
+    ENV 1, 2
     n1 2
     TEMPO 5
     n1 2
@@ -258,7 +258,7 @@
     ENV 1, 1
     n1 7
     TEMPO 5
-    ENV 2, 1
+    ENV 1, 2
     n1 2
     TEMPO 6
     n1 2
@@ -340,7 +340,7 @@
     ENV 1, 1
     n1 7
     TEMPO 6
-    ENV 2, 1
+    ENV 1, 2
     n1 2
     TEMPO 5
     n1 2
@@ -348,7 +348,7 @@
     ENV 1, 1
     n1 7
     TEMPO 5
-    ENV 2, 1
+    ENV 1, 2
     n1 2
     TEMPO 6
     n1 2
@@ -411,7 +411,7 @@
     ENV 1, 1
     n1 7
     TEMPO 6
-    ENV 2, 1
+    ENV 1, 2
     n1 2
     TEMPO 5
     n1 2
@@ -419,7 +419,7 @@
     ENV 1, 1
     n1 7
     TEMPO 5
-    ENV 2, 1
+    ENV 1, 2
     n1 2
     TEMPO 6
     n1 7
