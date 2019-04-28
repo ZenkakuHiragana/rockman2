@@ -1,0 +1,43 @@
+
+	KEY O4
+	TEMPO 25 + 12
+	VOLRAW 25
+	n1 1 + 12
+	TEMPO 25 + 13
+	n1 8
+	TEMPO 25
+	VOLRAW 50
+	n1 6
+	n1 6
+	n1 6
+	TEMPO 25 + 12
+	VOLRAW 25
+	n1 11
+	TEMPO 25 + 13
+	n1 6
+	TEMPO 25
+	VOLRAW 50
+	n1 4
+	n1 4
+	n1 4
+	TEMPO 25 + 12
+	VOLRAW 25
+	n1 9
+	TEMPO 25 + 13
+	n1 4
+	TEMPO 25
+	VOLRAW 50
+	n1 6
+	n1 6
+	n1 6
+	TEMPO 25 + 12
+	VOLRAW 25
+	n1 3 + 12
+	TEMPO 25 + 13
+	n1 10
+	TEMPO 25
+	VOLRAW 50
+	n1 8
+	n1 8
+	n1 8
+    END
