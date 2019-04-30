@@ -2,8 +2,8 @@
     TONE 1
     KEY O3 + 9
     ENV 2, 1
-    LOOP 0, .sq2_miniloop_A
-.sq2_miniloop_A1
+    LOOP 0, .sq2_A
+.sq2_A1
     VOL 7
     TEMPO 5
     n1 6 + 12 + 12
@@ -36,7 +36,7 @@
     TEMPO 6
     n1 1 + 12 + 12
     n1 0 + 12 + 12
-.sq2_miniloop_A
+.sq2_A
     VOL 15
     TEMPO 5
     n1 6 + 12 + 12
@@ -69,7 +69,7 @@
     TEMPO 6
     n1 1 + 12 + 12
     n1 0 + 12 + 12
-    LOOP 1, .sq2_miniloop_A1
+    LOOP 1, .sq2_A1
 
     TEMPO 11
     TONE 0
@@ -295,7 +295,7 @@
 
     TONE 2
     VOL 15
-    ENV 6, 1
+    ENV 9, 1
     TIE 1
     TEMPO 6
     PITCH -4
@@ -357,13 +357,15 @@
 
     TEMPO 11 + 11
     VOL 7
-    ENV 6, 1
+    ENV 12, 5
     n1 3 + 12
     TEMPO 12 + 11
     VOL 5
+    ENV 12, 4
     n1 3 + 12
     TEMPO 11
     VOL 3
+    ENV 12, 3
     n1 3 + 12
     TEMPO 23
     PITCH -2
@@ -375,7 +377,7 @@
     TEMPO 22 + 11
     TONE 0
     PITCH 0
-    ENV 6, 1
+    ENV 9, 1
     n1 6 + 12
     TEMPO 6
     n1 5 + 12
@@ -450,16 +452,16 @@
     n1 6
     n1 3
 
-    LOOP 0, .sq2_miniloop_B
-.sq2_miniloop_B1
+    LOOP 0, .sq2_B
+.sq2_B1
     TEMPO 23
     PITCH -2
     n1 10
     PITCH 0
     TONE 0
     VOL 12
-    ENV 6, 1
-.sq2_miniloop_B
+    ENV 9, 1
+.sq2_B
     TEMPO 11
     n1 10
     TEMPO 5
@@ -511,7 +513,7 @@
     TONE 2
     VOL 15
     ENV 0, 0
-    LOOP 1, .sq2_miniloop_B1
+    LOOP 1, .sq2_B1
     PITCH -9
     n1 10
     TEMPO 5
@@ -520,10 +522,10 @@
     n1 10
     n1 10
     PITCH 0
-    ENV 6, 1
+    ENV 9, 1
 
-    LOOP 0, .sq2_miniloop_C
-.sq2_miniloop_C1
+    LOOP 0, .sq2_C
+.sq2_C1
     TEMPO 5
     n1 9
     TEMPO 6
@@ -538,7 +540,7 @@
     PITCH 0
     TONE 0
     VOL 12
-    ENV 6, 1
+    ENV 9, 1
     n1 10
     TEMPO 11
     PITCH -4
@@ -551,8 +553,8 @@
     n1 10
     n1 10
     PITCH 0
-    ENV 6, 1
-.sq2_miniloop_C
+    ENV 9, 1
+.sq2_C
     TEMPO 11
     TONE 1
     n1 10
@@ -599,7 +601,7 @@
     TEMPO 6
     n1 10
     n1 3
-    LOOP 1, .sq2_miniloop_C1
+    LOOP 1, .sq2_C1
     TEMPO 5
     PITCH -9
     TONE 2
@@ -615,8 +617,8 @@
     PITCH -2
     n1 10
 
-    LOOP 0, .sq2_miniloop_D
-.sq2_miniloop_D1
+    LOOP 0, .sq2_D
+.sq2_D1
     TEMPO 5
     n1 3
     TEMPO 6
@@ -627,11 +629,11 @@
     VOL 15
     ENV 0, 0
     n1 10
-.sq2_miniloop_D
+.sq2_D
     TEMPO 11
     PITCH 0
     TONE 1
-    ENV 6, 1
+    ENV 9, 1
     n1 10 + 12
     TEMPO 5
     TONE 0
@@ -680,7 +682,7 @@
     n1 9
     TEMPO 6
     n1 10
-    LOOP 1, .sq2_miniloop_D1
+    LOOP 1, .sq2_D1
     TEMPO 5
     PITCH -9
     TONE 2
@@ -709,20 +711,20 @@
     TEMPO 12
     n1 10
 
-.sq2_miniloop_E
+.sq2_E
     TEMPO 22
     PITCH -2
     n1 10
     TEMPO 23
     n1 10
-    LOOP 2, .sq2_miniloop_E
+    LOOP 2, .sq2_E
 
     TEMPO 11
     PITCH 0
     TONE 2
     VOL 12
     KEY O4
-    ENV 6, 1
+    ENV 9, 1
     n1
     TEMPO 5
     n1 6 + 12 + 12
@@ -735,8 +737,8 @@
     n1 10 + 12
     n1 8 + 12
 
-    LOOP 0, .sq2_miniloop_F
-.sq2_miniloop_F1
+    LOOP 0, .sq2_F
+.sq2_F1
     TEMPO 11
     PITCH -4
     VOL 15
@@ -756,8 +758,8 @@
     n1 10
     PITCH 0
     KEY O4
-    ENV 6, 1
-.sq2_miniloop_F
+    ENV 9, 1
+.sq2_F
     TEMPO 11
     VOL 15
     n1 6
@@ -812,7 +814,7 @@
     TONE 0
     KEY O3
     VOL 12
-    ENV 6, 1
+    ENV 9, 1
     n1 1 + 12
     TEMPO 3
     n1 1
@@ -913,11 +915,11 @@
     ENV 12, 6
     n1 3 + 12
 
-    LOOP 1, .sq2_miniloop_F1
+    LOOP 1, .sq2_F1
 
     TEMPO 11
     KEY O2
-    ENV 6, 1
+    ENV 9, 1
     n1 3 + 12
     n1 1 + 12
     n1 3

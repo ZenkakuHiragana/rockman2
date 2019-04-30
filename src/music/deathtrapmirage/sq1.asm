@@ -2,9 +2,9 @@
     TONE 2
     VOL 15
     KEY O4
-    ENV 6, 1
-    LOOP 0, .sq1_miniloop_A
-.sq1_miniloop_A1
+    ENV 9, 1
+    LOOP 0, .sq1_A
+.sq1_A1
     TEMPO 5
     n1 3 + 12
     TEMPO 6
@@ -35,7 +35,7 @@
     n1 10
     KEY O4
     n1 6 + 12
-.sq1_miniloop_A
+.sq1_A
     TEMPO 5
     n1 3 + 12
     TEMPO 6
@@ -64,7 +64,7 @@
     TEMPO 6
     n1 6 + 12 + 12
     n1 8 + 12
-    LOOP 1, .sq1_miniloop_A1
+    LOOP 1, .sq1_A1
 
     TEMPO 22
     PITCH -2
@@ -87,7 +87,7 @@
 .sq1_loop_start
     TONE 2
     KEY O3
-    ENV 6, 1
+    ENV 9, 1
     TIE 1
     TEMPO 6
     PITCH -4
@@ -145,7 +145,7 @@
     PITCH -2
     n1 10
     PITCH 0
-    ENV 6, 1
+    ENV 9, 1
 
     TEMPO 22 + 11
     n1 6 + 12
@@ -176,7 +176,7 @@
     n1 6 + 12
 
     TEMPO 11
-    ENV 6, 1
+    ENV 9, 1
     n1 10 + 12
     TEMPO 11 + 11
     n1 3 + 12
@@ -191,7 +191,7 @@
     PITCH -2
     n1 10
     PITCH 0
-    ENV 6, 1
+    ENV 9, 1
 
     TIE 1
     TEMPO 5
@@ -260,7 +260,7 @@
     n1 3 + 12
     TEMPO 12
     KEY O3
-    ENV 6, 1
+    ENV 9, 1
     VOL 5
     n1 10 + 12
 
@@ -298,7 +298,7 @@
     TEMPO 22 + 11
     TONE 2
     KEY O4
-    ENV 6, 1
+    ENV 9, 1
     n1 3 + 12
     TEMPO 6
     n1 1 + 12
@@ -370,15 +370,15 @@
     n1 6 + 12
     n1 6 + 12
 
-    LOOP 0, .sq1_miniloop_B
-.sq1_miniloop_B1
+    LOOP 0, .sq1_B
+.sq1_B1
     TEMPO 12 + 11
     n1 12
     TEMPO 11 + 11
     n1 11
     TEMPO 12
     n1 10
-.sq1_miniloop_B
+.sq1_B
     TEMPO 11
     TONE 1
     n1 3
@@ -434,7 +434,7 @@
 
     TEMPO 11 + 11
     n1 1 + 12
-    LOOP 1, .sq1_miniloop_B1
+    LOOP 1, .sq1_B1
 
     TEMPO 6
     n1 5 + 12
@@ -456,15 +456,15 @@
     n1 1 + 12
 
     TONE 2
-    LOOP 0, .sq1_miniloop_C
-.sq1_miniloop_C1
+    LOOP 0, .sq1_C
+.sq1_C1
     TEMPO 12 + 11
     n1 12 + 12
     TEMPO 11 + 11
     n1 11 + 12
     TEMPO 12
     n1 10 + 12
-.sq1_miniloop_C
+.sq1_C
     TEMPO 11
     n1 3 + 12
     n1
@@ -519,7 +519,7 @@
 
     TEMPO 11 + 11
     n1 1 + 12 + 12
-    LOOP 1, .sq1_miniloop_C1
+    LOOP 1, .sq1_C1
 
     TEMPO 6
     n1 5 + 12 + 12
@@ -539,8 +539,8 @@
     n1 6 + 12
     n1 5 + 12
 
-    LOOP 0, .sq1_miniloop_D
-.sq1_miniloop_D1
+    LOOP 0, .sq1_D
+.sq1_D1
     TEMPO 5
     TONE 1
     n1 3 + 12 + 12
@@ -571,7 +571,7 @@
     TEMPO 6
     n1 1 + 12
     n1 2 + 12
-.sq1_miniloop_D
+.sq1_D
     TEMPO 11
     TONE 2
     KEY O4
@@ -641,7 +641,7 @@
 
     TEMPO 11
     PITCH 0
-    ENV 6, 1
+    ENV 9, 1
     KEY O4
     n1 11
     n1
@@ -695,8 +695,8 @@
     n1 10
 
     PITCH 0
-    ENV 6, 1
-    LOOP 1, .sq1_miniloop_D1
+    ENV 9, 1
+    LOOP 1, .sq1_D1
     TONE 0
     KEY O2
     TEMPO 11
