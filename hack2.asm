@@ -1,20 +1,12 @@
 
-	.catbank $00
-	.catbank $02
-	.catbank $04
-	.catbank $06
-	.catbank $08
-	.catbank $0A
-	.catbank $0C
-	.catbank $0E
-	.catbank $10
-	.catbank $12
-	.catbank $14
-	.catbank $16
-	.catbank $18
-	.catbank $1A
-	.catbank $1C
-	.catbank $1E
+	.catbank $08 * 2
+	.catbank $09 * 2
+	.catbank $0A * 2
+	.catbank $0B * 2
+	.catbank $0C * 2
+	.catbank $0D * 2
+	.catbank $0E * 2
+	.catbank $0F * 2
 	.inesprg $10 ;プログラムバンク数
 	.ineschr $00 ;キャラクタバンク数
 	.inesmir 1   ;
@@ -23,7 +15,7 @@
 	.incbin "rockman2.prg"
 	.include "src/labels.asm"
 	.include "src/lib.asm"
-	.include "music/libmusic.asm"
+	.include "src/music/libmusic.asm"
 	.include "stage/stage.asm"
 	.include "src/bank09.asm"
 	.include "src/bank0B.asm"
@@ -31,6 +23,4 @@
 	.include "src/bank0D.asm"
 	.include "src/bank0E.asm"
 	.include "src/bank0F.asm"
-;	.include "src/patch.asm"
-
-	.include "music/music.asm"
+	.include "src/music/music.asm"
