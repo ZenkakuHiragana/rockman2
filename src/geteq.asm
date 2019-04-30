@@ -205,7 +205,7 @@ GetEquipment_Item:
 	ora #$A0
 	sta aObjFlags
 	inc aObjFlags
-	jsr WriteMinus2_1A
+	jsr WriteMinus_Item_1A
 	lda #$0E
 	jsr WriteWeaponName1A
 	lda #$0B
@@ -219,7 +219,7 @@ GetEquipment_Item:
 	jsr ClearSprite1A
 	mMOV #$06, aObjAnim
 	jsr ChangeBank_ShowEndingRockman
-	jsr WriteMinus2_1A
+	jsr WriteMinus_Item_1A
 	lda aObjFlags
 	and #$0F
 	clc
@@ -284,7 +284,7 @@ WriteWeaponName1A:
 .loop_write_weaponname
 	jsr WaitForAWhile1A
 	ldx <$FE
-	cpx #$AE
+	cpx #(($0E * $0C) + 2 + 4) ;0E: アイテム○コ゛ウの数字部分の分岐
 	bne .skip
 	lda aObjFlags
 	bne .skip2
@@ -335,8 +335,8 @@ GetEquipment_ClearScreen:
 	rts
 
 ;BCC5
-;-を2つ書いてる……？
-WriteMinus2_1A
+;アイテム入手時の、-?-の描画
+WriteMinus_Item_1A:
 	jsr WaitForAWhile1A
 	jsr WriteMinus1A
 	jsr WaitForAWhile1A

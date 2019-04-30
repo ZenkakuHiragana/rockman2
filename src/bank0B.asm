@@ -204,16 +204,10 @@ BossBehaviour_Dying:
 	jsr BossBehaviour_SpawnEnemy_Specified
 	ldx <$02
 	clc
-	lda aObjX + 1
-	adc Table_TiwnBalldx,x
-	sta aObjX10,y
-	lda aObjRoom + 1
-	adc Table_TiwnBalldr,x
-	sta aObjRoom10,y
+	mADD aObjX + 1, Table_TiwnBalldx,x, aObjX10,y
+	mADD aObjRoom + 1, Table_TiwnBalldr,x, aObjRoom10,y
 	clc
-	lda aObjY + 1
-	adc Table_TiwnBalldy,x
-	sta aObjY10,y
+	mADD aObjY + 1, Table_TiwnBalldy,x, aObjY10,y
 	mMOV #$01, aObjFrame10,y
 	inx
 	stx <$02
@@ -260,8 +254,7 @@ BossBehaviour_DyingAfterSplash:
 .clearmusic
 	bne .wait
 	inc aBossVar1
-	lda #$FD
-	sta aBossVar2
+	mMOV #$FD, aBossVar2
 	mPLAYTRACK #$15, 1
 .wait
 	cmp #$FE
@@ -287,9 +280,7 @@ BossBehaviour_DyingAfterSplash:
 	lda aObjFlags
 	bpl .dec
 	sec
-	lda aObjY
-	sbc #$08
-	sta aObjY
+	mSUB aObjY, #$08
 	bcs .rts
 	lsr aObjFlags
 .dec
@@ -354,9 +345,7 @@ BossBehaviour_ChargeLifeWily:
 ;A12E
 ;向きを一時的に逆にして、後ろ向きに動く
 BossBehaviour_MoveBackward:
-	lda aObjFlags + 1
-	eor #%01000000
-	sta aObjFlags + 1
+	mEOR aObjFlags + 1, #%01000000
 	jsr BossBehaviour_WallCollisionXY
 	lda aObjFlags + 1
 	sta <$03
@@ -374,8 +363,7 @@ BossBehaviour_MoveAndCollide:
 ;A14F
 ;移動処理
 BossBehaviour_Move:
-	lda aObjFlags + 1
-	sta <$03
+	mMOV aObjFlags + 1, <$03
 ;A154
 ;移動処理(方向指定)
 BossBehaviour_Move_VectorSpecified:
@@ -384,45 +372,28 @@ BossBehaviour_Move_VectorSpecified:
 ;移動処理(当たり判定なし)
 BossBehaviour_Move_NoCollide:
 	sec
-	lda aObjYlo + 1
-	sbc aObjVYlo + 1
-	sta aObjYlo + 1
-	lda aObjY + 1
-	sbc aObjVY + 1
-	sta aObjY + 1
+	mSUB aObjYlo + 1, aObjVYlo + 1
+	mSUB aObjY + 1, aObjVY + 1
 	cmp #$F0
 	bcc .out_y
-	lda #$F0
-	sta aObjY + 1
+	mMOV #$F0, aObjY + 1
 .out_y
 	lda aObjFlags + 1
 	and #%00000100
 	beq .nogravity
 	clc
-	lda aObjVYlo + 1
-	sbc <zGravity
-	sta aObjVYlo + 1
-	lda aObjVY + 1
-	sbc <zGravityhi
-	sta aObjVY + 1
+	mSUB aObjVYlo + 1, <zGravity
+	mSUB aObjVY + 1, <zGravityhi
 .nogravity
 	lda <$03
 	and #$40
 	bne .goright
 	sec
-	lda aObjXlo + 1
-	sbc aObjVXlo + 1
-	sta aObjXlo + 1
-	lda aObjX + 1
-	sbc aObjVX + 1
-	sta aObjX + 1
-	lda aObjRoom + 1
-	sbc #$00
-	sta aObjRoom + 1
+	mSUB aObjXlo + 1, aObjVXlo + 1
+	mSUB aObjX + 1, aObjVX + 1
+	mSUB aObjRoom + 1
 	sec
-	lda aObjX + 1
-	sbc <zHScroll
-	sta <$08
+	mSUB aObjX + 1, <zHScroll, <$08
 	lda aObjRoom + 1
 	sbc <zRoom
 	bne .out_x
@@ -433,22 +404,14 @@ BossBehaviour_Move_NoCollide:
 	mMOV <zRoom, aObjRoom
 	mMOV #$08, aObjX + 1
 	bne .rts
-	
+
 .goright
 	clc
-	lda aObjXlo + 1
-	adc aObjVXlo + 1
-	sta aObjXlo + 1
-	lda aObjX + 1
-	adc aObjVX + 1
-	sta aObjX + 1
-	lda aObjRoom + 1
-	adc #$00
-	sta aObjRoom + 1
+	mADD aObjXlo + 1, aObjVXlo + 1
+	mADD aObjX + 1, aObjVX + 1
+	mADD aObjRoom + 1
 	sec
-	lda aObjX + 1
-	sbc <zHScroll
-	sta <$08
+	mSUB aObjX + 1, <zHScroll, <$08
 	lda aObjRoom + 1
 	sbc <zRoom
 	bne .out_x_right
@@ -465,21 +428,12 @@ BossBehaviour_Move_NoCollide:
 ;A209
 ;ボスがロックマンの方を向く, $00に横距離
 BossBehaviour_FaceTowards:
-	lda aObjFlags + 1
-	and #%10111111
-	sta aObjFlags + 1
+	mAND aObjFlags + 1, #%10111111
 	sec
-	lda aObjX + 1
-	sbc aObjX
-	sta <$00
+	mSUB aObjX + 1, aObjX, <$00
 	bcs .rts
-	lda <$00
-	eor #$FF
-	adc #$01
-	sta <$00
-	lda #%01000000
-	ora aObjFlags + 1
-	sta aObjFlags + 1
+	mNEG <$00
+	mORA #%01000000, aObjFlags + 1, aObjFlags + 1
 .rts
 	rts
 
@@ -533,28 +487,17 @@ BossBehaviour_WallCollisionY:
 .write_dy
 	sta <.y
 	clc
-	lda aObjX + 1
-	adc <.dx
-	sta <.x
-	lda aObjRoom + 1
-	adc #$00
-	sta <.r
+	mADD aObjX + 1, <.dx, <.x
+	mADD aObjRoom + 1, #$00, <.r
 	jsr PickupMap_BossBank
 	ldy <.res
-	lda Table_BossTerrainBlockFlag,y
-	sta <.dy
+	mMOV Table_BossTerrainBlockFlag,y, <.dy
 	sec
-	lda aObjX + 1
-	sbc <.dx
-	sta <.x
-	lda aObjRoom + 1
-	sbc #$00
-	sta <.r
+	mSUB aObjX + 1, <.dx, <.x
+	mSUB aObjRoom + 1, #$00, <.r
 	jsr PickupMap_BossBank
 	ldy <.res
-	lda Table_BossTerrainBlockFlag,y
-	ora <.dy
-	sta <.res
+	mORA Table_BossTerrainBlockFlag,y, <.dy, <.res
 	beq .nohit_y
 	plp
 	bmi .godown
@@ -567,9 +510,7 @@ BossBehaviour_WallCollisionY:
 .godown
 	lda aObjY + 1
 	pha
-	lda <.y
-	and #$0F
-	sta <.dy
+	mAND <.y, #$0F, <.dy
 	pla
 	sec
 	sbc <.dy
@@ -597,46 +538,34 @@ BossBehaviour_WallCollisionXY:
 .x = $08
 .r = $09
 .y = $0A
-	lda aObjY + 1
-	sta <$0A
+	mMOV aObjY + 1, <$0A
 	mSTZ <$0B
 	lda aObjFlags + 1
 	and #%01000000
 	php
 	beq .goleft
 	sec
-	lda aObjX + 1
-	adc <.dx
-	sta <.x
+	mADD aObjX + 1, <.dx, <.x
 	lda aObjRoom + 1
 	adc #$00
 	jmp .write_dx
 .goleft
 	clc
-	lda aObjX + 1
-	sbc <.dx
-	sta <.x
+	mSUB aObjX + 1, <.dx, <.x
 	lda aObjRoom + 1
 	sbc #$00
 .write_dx
 	sta <.r
 	jsr PickupMap_BossBank
 	ldy <.res
-	lda Table_BossTerrainBlockFlag,y
-	sta <$03
+	mMOV Table_BossTerrainBlockFlag,y, <$03
 	beq .nohit_x
 	plp
 	beq .hitleft
-	lda <.x
-	and #$0F
-	sta <.res
+	mAND <.x, #$0F, <.res
 	sec
-	lda aObjX + 1
-	sbc <.res
-	sta aObjX + 1
-	lda aObjRoom + 1
-	sbc #$00
-	sta aObjRoom + 1
+	mSUB aObjX + 1, <.res
+	mSUB aObjRoom + 1
 	jmp BossBehaviour_WallCollisionY
 .hitleft
 	lda <.x
@@ -645,9 +574,7 @@ BossBehaviour_WallCollisionXY:
 	sec
 	adc aObjX + 1
 	sta aObjX + 1
-	lda aObjRoom + 1
-	adc #$00
-	sta aObjRoom + 1
+	mADD aObjRoom + 1
 	jmp BossBehaviour_WallCollisionY
 .nohit_x
 	plp
@@ -712,13 +639,11 @@ BossBehaviour_SetVelocityAtRockman:
 	.endif
 ;A3A3
 BossBehaviour_SetVelocityAtRockman_Writedx:
-	lda aObjFlags,x
-	and #%10111111
-	sta aObjFlags,x
+	mAND aObjFlags,x, #%10111111
 	tya
 	ora aObjFlags,x
 	sta aObjFlags,x
-	
+
 	sec
 	lda aObjY
 	sbc aObjY,x
@@ -733,7 +658,7 @@ BossBehaviour_SetVelocityAtRockman_Writedx:
 ;dx > dy
 	mMOV <$09, <$0D, aObjVX,x
 	mMOV <$08, <$0C, aObjVXlo,x
-	
+
 	mMOV <$00, <$0B
 	mSTZ <$0A
 	jsr Divide
@@ -765,14 +690,8 @@ BossBehaviour_SetVelocityAtRockman_Writedx:
 .done
 	plp
 	bcc .rts
-	lda aObjVYlo,x
-	eor #$FF
-	adc #$01
-	sta aObjVYlo,x
-	lda aObjVY,x
-	eor #$FF
-	adc #$00
-	sta aObjVY,x
+	mNEG aObjVYlo,x
+	mNEGhi aObjVY,x
 .rts
 	rts
 
@@ -882,18 +801,14 @@ BossBehaviour_RockmanTakeDamage:
 	bne .rts
 	ldy <zBossType
 	sec
-	lda aObjLife
-	sbc Table_BossDamageAmount,y
-	sta aObjLife
+	mSUB aObjLife, Table_BossDamageAmount,y
 	beq .dead
 	bcs .alive
 .dead
 	mSTZ <zStatus, aObjLife
 	jmp DieRockman
 .alive
-	lda aObjFlags
-	and #%10111111
-	sta aObjFlags
+	mAND aObjFlags, #%10111111
 	lda aObjFlags + 1
 	and #%01000000
 	eor #%01000000
@@ -977,9 +892,7 @@ BossBehaviour_TakeRockBuster:
 	mMOV #$01, <$02
 	inc <zBossVar2
 	sec
-	lda aObjLife + 1
-	sbc <$00
-	sta aObjLife + 1
+	mSUB aObjLife + 1, <$00
 	beq .dead
 	bcs .alive
 .dead
@@ -1036,9 +949,7 @@ BossBehaviour_TakeAtomicFire:
 	mMOV #$01, <$02
 	inc <zBossVar2
 	sec
-	lda aObjLife + 1
-	sbc <$00
-	sta aObjLife + 1
+	mSUB aObjLife + 1, <$00
 	beq .dead
 	bcs BossBehaviour_TakeAtomicFireEnd
 .dead
@@ -1073,9 +984,7 @@ BossBehaviour_TakeAirShooter:
 	mMOV #$01, <$02
 	inc <zBossVar2
 	sec
-	lda aObjLife + 1
-	sbc <$00
-	sta aObjLife + 1
+	mSUB aObjLife + 1, <$00
 	beq .dead
 	bcs BossBehaviour_TakeAtomicFireEnd
 .dead
@@ -1085,9 +994,7 @@ BossBehaviour_TakeAirShooter:
 .skip
 	mPLAYTRACK #$2D
 	mMOV #$02, <$02
-	lda aObjFlags,x
-	and #%11111110
-	sta aObjFlags,x
+	mAND aObjFlags,x, #%11111110
 	mMOV #$3D, aObjAnim,x
 	mSTZ aObjFrame,x, aObjWait,x
 	clc
@@ -1100,8 +1007,7 @@ BossBehaviour_TakeLeafShield:
 	and #%00001000
 	bne .skip
 	ldy <zBossType
-	lda Table_BossTakeDamageLeafShield,y
-	sta <$00
+	mMOV Table_BossTakeDamageLeafShield,y, <$00
 	beq .skip
 	bpl .dmg
 	jmp BossBehaviour_MaxBossLife
@@ -1110,9 +1016,7 @@ BossBehaviour_TakeLeafShield:
 	mMOV #$01, <$02
 	inc <zBossVar2
 	sec
-	lda aObjLife + 1
-	sbc <$00
-	sta aObjLife + 1
+	mSUB aObjLife + 1, <$00
 	beq .dead
 	bcs BossBehaviour_TakeLeafShieldEnd
 .dead
@@ -1122,9 +1026,7 @@ BossBehaviour_TakeLeafShield:
 .skip
 	mPLAYTRACK #$2D
 	mMOV #$02, <$02
-	lda aObjFlags,x
-	and #%11110010
-	sta aObjFlags,x
+	mAND aObjFlags,x, #%11110010
 	mMOV #$3B, aObjAnim,x
 	mSTZ aObjFrame,x, aObjWait,x, aObjVar,x, aObjLife,x
 BossBehaviour_TakeLeafShieldRTS:
@@ -1141,8 +1043,7 @@ BossBehaviour_TakeBubbleLead:
 	and #%00001000
 	bne .skip
 	ldy <zBossType
-	lda Table_BossTakeDamageBubbleLead,y
-	sta <$00
+	mMOV Table_BossTakeDamageBubbleLead,y, <$00
 	beq .skip
 	bpl .dmg
 	jmp BossBehaviour_MaxBossLife
@@ -1151,9 +1052,7 @@ BossBehaviour_TakeBubbleLead:
 	mMOV #$01, <$02
 	inc <zBossVar2
 	sec
-	lda aObjLife + 1
-	sbc <$00
-	sta aObjLife + 1
+	mSUB aObjLife + 1, <$00
 	beq .dead
 	bcs BossBehaviour_TakeLeafShieldEnd
 .dead
@@ -1176,8 +1075,7 @@ BossBehaviour_TakeQuickBoomerang:
 	and #%00001000
 	bne .skip
 	ldy <zBossType
-	lda Table_BossTakeDamageQuickBoomerang,y
-	sta <$00
+	mMOV Table_BossTakeDamageQuickBoomerang,y, <$00
 	beq .skip
 	bpl .dmg
 	jmp BossBehaviour_MaxBossLife
@@ -1186,9 +1084,7 @@ BossBehaviour_TakeQuickBoomerang:
 	mMOV #$01, <$02
 	inc <zBossVar2
 	sec
-	lda aObjLife + 1
-	sbc <$00
-	sta aObjLife + 1
+	mSUB aObjLife + 1, <$00
 	beq .dead
 	bcs BossBehaviour_TakeQuickBoomerangEnd
 .dead
@@ -1222,8 +1118,7 @@ BossBehaviour_TakeCrashBomb:
 	and #%00001000
 	bne .skip
 	ldy <zBossType
-	lda Table_BossTakeDamageCrashBomb,y
-	sta <$00
+	mMOV Table_BossTakeDamageCrashBomb,y, <$00
 	beq .skip
 	bpl .dmg
 	jmp BossBehaviour_MaxBossLife
@@ -1232,9 +1127,7 @@ BossBehaviour_TakeCrashBomb:
 	mMOV #$01, <$02
 	inc <zBossVar2
 	sec
-	lda aObjLife + 1
-	sbc <$00
-	sta aObjLife + 1
+	mSUB aObjLife + 1, <$00
 	beq .dead
 	bcs BossBehaviour_TakeQuickBoomerangEnd
 .dead
@@ -1265,8 +1158,7 @@ BossBehaviour_TakeMetalBlade:
 	and #%00001000
 	bne .skip
 	ldy <zBossType
-	lda Table_BossTakeDamageMetalBlade,y
-	sta <$00
+	mMOV Table_BossTakeDamageMetalBlade,y, <$00
 	beq .skip
 	bpl .dmg
 	jmp BossBehaviour_MaxBossLife
@@ -1275,9 +1167,7 @@ BossBehaviour_TakeMetalBlade:
 	mMOV #$01, <$02
 	inc <zBossVar2
 	sec
-	lda aObjLife + 1
-	sbc <$00
-	sta aObjLife + 1
+	mSUB aObjLife + 1, <$00
 	beq .dead
 	bcs .alive
 .dead
@@ -1289,9 +1179,7 @@ BossBehaviour_TakeMetalBlade:
 	mMOV #$B2, aObjVYlo,x
 	mMOV #$01, aObjVX,x
 	mMOV #$87, aObjVXlo,x
-	lda aObjFlags,x
-	and #%11110000
-	sta aObjFlags,x
+	mAND aObjFlags,x, #%11110000
 	mPLAYTRACK #$2D
 	mMOV #$02, <$02
 .end
@@ -1310,7 +1198,7 @@ BossBehaviour_MaxBossLife:
 	lsr aObjFlags,x
 	clc
 	rts
-	
+
 ;A911
 ;武器毎のボスに当てた時のルーチン下位
 Table_BossTakeDamagelo:

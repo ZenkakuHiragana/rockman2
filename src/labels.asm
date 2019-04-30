@@ -299,6 +299,8 @@ aPPULaserData = $3C2    ;PPU書き込みデータ
 
 aPPUShutterAttrhi = $3C2;PPUシャッター書き込み時の属性テーブル位置上位
 aPPUShutterAttrlo = $3C8;PPUシャッター書き込み時の属性テーブル位置下位
+aPPUShutterMask = $3CE  ;PPUシャッター書き込み 属性テーブルへのマスク
+aPPUShutterMask2 = $3D4 ;PPUシャッター書き込み 属性テーブルへのマスク(bit反転)
 
 ;--------------------------------------------------------------
 aPPUHScrhi = $300       ;横スクロールNT書き込み上位
@@ -485,7 +487,7 @@ aWeaponCollision = $590 ;武器の当たり判定
 aWeaponPlatformW = $5A0 ;武器の足場判定広さ
 aWeaponPlatformY = $5A3 ;武器の足場判定Y位置
 
-aTimeStopper = $5A6     ;なんですかこれは
+aTimeStopper = $5A6     ;タイムストッパーのダメージを与える間隔カウンタ
 
 aBossTiwnWait = $5A7    ;ボスが弾け飛ぶまでのフレーム。らしい。
 aBossVar1 = $5A7
@@ -493,10 +495,10 @@ aBossPtrhi = $5A7       ;ワイリーステージのボスがポインタとし�
 aBossInvincible = $5A8  ;ボスの無敵時間
 
 aBossPtrlo = $5A9
-aBossVar2 = $5A9         ;なんだっけこれは
+aBossVar2 = $5A9        ;ワイリーステージのボスで使われる
 
 aBossDeath = $5AA       ;ボスティウンフラグ
-aBossVar3 = $5AB
+aBossVar3 = $5AB        ;ワイリーマシンとエイリアンで使用
 
 
 aObjVX = $600           ;オブジェクトの速度X上位

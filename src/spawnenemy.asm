@@ -423,17 +423,3 @@ Table_InitialVY:
 
 ;DA3F ...?
 	.db $00, $20
-
-;20 40 DA
-GetEnemyPointer:
-	ldx #$0F
-.loop
-	lda aObjFlags10,x
-	bpl .ok
-	dex
-	bpl .loop
-	sec
-	rts
-.ok
-	clc
-	rts

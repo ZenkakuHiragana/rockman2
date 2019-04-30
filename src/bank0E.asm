@@ -39,6 +39,7 @@ Reset_Continue;
 	sta $BFFF
 	lsr a
 	sta $BFFF
+
 	lda #$1F
 	sta $DFFF
 	lsr a
@@ -49,10 +50,9 @@ Reset_Continue;
 	sta $DFFF
 	lsr a
 	sta $DFFF
-	lda #$03
-	sta <zLives
-	lda #$00
-	sta <zETanks
+
+	mMOV #$03, <zLives
+	mSTZ <zETanks
 .restart
 ;	jsr BeginTitleScreen
 ;	lda <zRestartTitle ;タイトル画面をもう一度やるなら1
@@ -60,8 +60,7 @@ Reset_Continue;
 	lda <zClearFlags
 	cmp #$FF
 	bne StartStageSelect
-	lda #$08
-	sta <zStage
+	mMOV #$08, <zStage
 	bne StartStage_All
 ;8072
 ;ステージセレクト処理の後ステージ開始
@@ -254,26 +253,19 @@ PlaceBossRushCapsule:
 	lda #$7E
 	ldx #$0E
 	jsr CreateEnemyHere_Middle
-	lda #$3B
-	sta aObjY10 + $0E
-	lda #$80
-	sta aObjX10 + $0E
+	mMOV #$3B, aObjY10 + $0E
+	mMOV #$80, aObjX10 + $0E
 .eight
-	lda #$00
-	sta <zObjIndex
-	sta <$02
-	lda <zBossRushProg
-	sta <$03
+	mSTZ <zObjIndex, <$02
+	mMOV <zBossRushProg, <$03
 .loop
 	lsr <$03
 	bcs .skip
 	lda #$7C
 	ldx <$02
 	jsr CreateEnemyHere_Middle
-	lda Table_BossRushCapsuleY,y
-	sta aObjY10,y
-	lda Table_BossRushCapsuleX,y
-	sta aObjX10,y
+	mMOV Table_BossRushCapsuleY,y, aObjY10,y
+	mMOV Table_BossRushCapsuleX,y, aObjX10,y
 .skip
 	inc <$02
 	lda <$02
@@ -371,14 +363,14 @@ Rockman_Warp_to_Land:
 	mMOV #$40, <zMoveVec
 	mMOV #$FF, aObjVY
 	mJSR_NORTS SpawnEnemiesAll
-	
+
 ;8278
 ;スクロール方向$37 - 1 = 0, 1, 2, 3 → 左右上下
 ;スクロール先画面番号$38
 DoScroll:
 	;bmi .done
 	jsr Scroll_GoForward
-	
+
 	ldx <zStage
 	lda <zRoom
 	cmp Table_BossRoom,x
@@ -394,12 +386,9 @@ ItemInterrupt:
 	lda <zItemInterrupt
 	sbc #$76
 	tay
-	lda #$00
-	sta <zItemInterrupt
-	lda Table_ItemInterruptlo,y
-	sta <zPtrlo
-	lda Table_ItemInterrupthi,y
-	sta <zPtrhi
+	mSTZ <zItemInterrupt
+	mMOV Table_ItemInterruptlo,y, <zPtrlo
+	mMOV Table_ItemInterrupthi,y, <zPtrhi
 	jmp [zPtr]
 
 ;82EC
@@ -413,8 +402,7 @@ Item_RecoverLifeStart:
 	lda aObjLife
 	cmp #$1C
 	bcs .done
-	lda #$07
-	sta <zStopFlag
+	mMOV #%00000111, <zStopFlag
 .loop
 	ldx <zEquipment
 	lda aObjLife
@@ -450,8 +438,7 @@ Item_RecoverEnergyStart:
 	lda <zEnergyArray - 1,x
 	cmp #$1C
 	beq Item_RecoverEnd_Done
-	lda #$07
-	sta <zStopFlag
+	mMOV #%00000111, <zStopFlag
 .loop
 	ldx <zEquipment
 	lda <zEnergyArray - 1,x
@@ -470,11 +457,8 @@ Item_RecoverEnergyStart:
 	jmp .loop
 ;8361
 Item_RecoverEnd:
-	lda #$00
-	sta <$FD
-	sta <zStopFlag
-	lda #$03
-	sta <zStatus
+	mSTZ <$FD, <zStopFlag
+	mMOV #$03, <zStatus
 	jsr SetRockmanAnimation
 Item_RecoverEnd_Done:
 	rts
@@ -502,16 +486,13 @@ Item_GetExLife:
 ;838B
 Item_TeleporterIn:
 	jsr Item_IntoCapsule
-	lda #$00
-	sta <$FD
+	mSTZ <$FD
 	ldx <zBossRushStage
-	lda .teleporter_patterntable - 1,x
-	sta <$FE
+	mMOV .teleporter_patterntable - 1,x, <$FE
 	dex
 	stx <zStage
 	jsr Item_DrawEnemyPattern
-	lda #$0C
-	sta <zStage
+	mMOV #$0C, <zStage
 	ldx #$05
 	lda <zBossRushStage
 	cmp #$04
@@ -524,14 +505,11 @@ Item_TeleporterIn:
 	inc <zScrollNumber
 	inc <zScrollLeft
 	inc <zScrollRight
-	lda #$20
-	sta aObjX
-	lda #$B4
-	sta aObjY
+	mMOV #$20, aObjX
+	mMOV #$B4, aObjY
 	jsr Item_OutofCapsule
 	mPLAYTRACK #$0B
-	lda <zBossRushStage
-	sta <zBossType
+	mMOV <zBossRushStage, <zBossType
 	dec <zBossType
 	mJSR_NORTS SpawnBoss_BossRushBegin
 ;83D7
@@ -544,8 +522,7 @@ Item_TeleporterIn:
 ;カプセルに入った時のアニメーション処理
 Item_IntoCapsule:
 	mPLAYTRACK #$30
-	lda #$0B
-	sta <zStatus
+	mMOV #$0B, <zStatus
 	jsr SetRockmanAnimation
 	jsr EraseEnemiesByScroll
 .loop
@@ -556,18 +533,14 @@ Item_IntoCapsule:
 	jsr FrameAdvance1C
 	jmp .loop
 .done
-	lda #%00000000
-	sta aObjFlags
+	mSTZ aObjFlags
 	mJSR_NORTS SpriteSetup
 
 ;8407
 ;カプセルから出てきた時のアニメーション処理
 Item_OutofCapsule:
-	lda #%11000000
-	sta aObjFlags
-	lda #$00
-	sta <zShootPoseTimer
-	sta <zStatus
+	mMOV #%11000000, aObjFlags
+	mSTZ <zShootPoseTimer, <zStatus
 	mJSR_NORTS SetRockmanAnimation
 
 ;8416
@@ -584,23 +557,15 @@ Item_DrawEnemyPattern:
 Item_TeleporterOut:
 	jsr Item_IntoCapsule
 	ldx <zBossType
-	lda <zBossRushProg
-	ora StageBitTable,x
-	sta <zBossRushProg
+	mORA <zBossRushProg, StageBitTable,x
 	cmp #$FF
 	bne .remaining
-	lda #$00
-	sta <$FD
-	lda #$14
-	sta <$FE
+	mSTZ <$FD
+	mMOV #$14, <$FE
 	jsr Item_DrawEnemyPattern
 	lda #$28
 	jsr DrawRoom
-	lda #$28
-	sta <zRoom
-	sta aObjRoom
-	sta <zScrollLeft
-	sta <zScrollRight
+	mMOV #$28, <zRoom, aObjRoom, <zScrollLeft, <zScrollRight
 	bne .done
 .remaining
 	dec <zRoom
@@ -611,15 +576,11 @@ Item_TeleporterOut:
 .done
 	ldx #$08
 	jsr Item_SetBossRushBG
-	lda #$00
-	sta <zBossBehaviour
+	mSTZ <zBossBehaviour
 	ldx <zBossType
 	clc
-	lda Table_BossRushCapsuleY,x
-	adc #$07
-	sta aObjY
-	lda Table_BossRushCapsuleX,x
-	sta aObjX
+	mADD Table_BossRushCapsuleY,x, #$07, aObjY
+	mMOV Table_BossRushCapsuleX,x, aObjX
 	jsr Item_OutofCapsule
 	mPLAYTRACK #$09
 	mJSR_NORTS PlaceBossRushCapsule
@@ -650,22 +611,14 @@ Item_TeleporterWily:
 	jsr Item_IntoCapsule
 	lda #$29
 	jsr DrawRoom
-	lda #$29
-	sta <zRoom
-	sta aObjRoom
-	sta <zScrollLeft
-	sta <zScrollRight
-	lda #$00
-	sta <$FD
-	lda #$15
-	sta <$FE
+	mMOV #$29, <zRoom, aObjRoom, <zScrollLeft, <zScrollRight
+	mSTZ <$FD
+	mMOV #$15, <$FE
 	jsr Item_DrawEnemyPattern
 	lda #$2A
 	jsr DrawRoom
-	lda #$B4
-	sta aObjY
-	lda #$28
-	sta aObjX
+	mMOV #$B4, aObjY
+	mMOV #$28, aObjX
 	jsr Item_OutofCapsule
 	mPLAYTRACK #$0B
 	mJSR_NORTS SpawnBoss
@@ -752,18 +705,15 @@ Scroll_GoForward:
 	and #$07
 	bne .skip_open
 	mPLAYTRACK #$34
-	lda <zRoom
-	sta <$09
-	lda #$F0
-	sta <$08
+	mMOV <zRoom, <$09
+	mMOV #$F0, <$08
 	lda <$FD
 	asl a
 	adc <zShutterHeight
 	sta <$0A
 	jsr SetPPUPos
 	jsr SetPPUPos_Attr
-	lda #$80
-	sta <zPPUShutterFlag
+	mMOV #$80, <zPPUShutterFlag
 	inc <zPPULaser
 .skip_open
 	jsr FrameAdvance1C
@@ -792,9 +742,7 @@ Scroll_GoForward:
 	ldy #$10
 	jsr DrawRoom
 ;シャッター閉じる処理
-	lda #$00
-	sta <$FD
-	sta <$FE
+	mSTZ <$FD, <$FE
 .loop_close
 	lda <zScrollFlag
 	bpl .done
@@ -813,10 +761,8 @@ Scroll_GoForward:
 	and #$07
 	bne .skip_close
 	mPLAYTRACK #$34
-	lda <zRoom
-	sta <$09
-	lda #$00
-	sta <$08
+	mMOV <zRoom, <$09
+	mSTZ <$08
 	lda <$FD
 	asl a
 	adc <zShutterHeight
@@ -835,8 +781,7 @@ Scroll_GoForward:
 	bne .loop_close
 	mPLAYTRACK #$FE
 .done
-	lda #$40
-	sta <zMoveVec
+	mMOV #$40, <zMoveVec
 	mJSR_NORTS SpawnEnemyByScroll
 
 ;9045
@@ -912,7 +857,7 @@ DrawRoom:
 	inc <zRoom
 .carry_nt
 	sta <zHScroll
-	
+
 	dec <$FD
 	bne .loop
 	pla
@@ -936,16 +881,10 @@ DoScroll_Loop:
 	tya
 	pha
 	clc
-	lda <zHScroll
-	adc #$04
-	sta <zHScroll
+	mADD <zHScroll, #$04
 	clc
-	lda aObjXlo
-	adc #$C0
-	sta aObjXlo
-	lda aObjX
-	adc #$00
-	sta aObjX
+	mADD aObjXlo, #$C0
+	mADD aObjX
 	lda <zEquipment
 	cmp #$01
 	bne .skipatomic
@@ -972,8 +911,7 @@ PaletteChange_RightScroll:
 .bubble
 	ldy .ptr,x
 	beq .skip
-	lda .size,x
-	sta <$FD
+	mMOV .size,x, <$FD
 	lda .begin,x
 	tax
 .loop
@@ -1080,14 +1018,10 @@ PaletteChange_RightScroll:
 ;91FA
 ;アトミックファイヤーオブジェクトの位置修正
 FixAtomicFireObject:
-	lda aObjX
-	sta aObjX + 2
-	lda aObjRoom
-	sta aObjRoom + 2
-	lda aObjY
-	sta aObjY + 2
-	lda #$00
-	sta aObjWait + 2
+	mMOV aObjX, aObjX + 2
+	mMOV aObjRoom, aObjRoom + 2
+	mMOV aObjY, aObjY + 2
+	mSTZ aObjWait + 2
 	rts
 
 ;9212
@@ -1146,11 +1080,8 @@ EraseEnemiesByScroll:
 	sta aObjFlags + 2
 	ldx #$0F
 .loop_order
-	lda #$FF
-	sta aEnemyOrder10,x
-	sta aItemOrder10,x
-	lda #$00
-	sta aPlatformWidth10,x
+	mMOV #$FF, aEnemyOrder10,x, aItemOrder10,x
+	mSTZ aPlatformWidth10,x
 	dex
 	bpl .loop_order
 	rts
@@ -1162,21 +1093,17 @@ DoEnemyObjects:
 	lda aObjX
 	sbc <zHScroll
 	sta <zRScreenX
-	
+
 	ldx #$10
 	stx <zObjIndex
 .loop_normal
 	lda aObjFlags,x
 	bpl .return
 	sec
-	lda aObjX,x
-	sbc <zHScroll
-	sta <zEScreenX
-	lda aObjRoom,x
-	sbc <zRoom
-	sta <zEScreenRoom
+	mSUB aObjX,x, <zHScroll, <zEScreenX
+	mSUB aObjRoom,x, <zRoom, <zEScreenRoom
 	ldy aObjAnim,x
-	
+
 	lda <zStopFlag
 	and #$01
 	beq .do_normal
@@ -1236,7 +1163,7 @@ DoEnemyObjects:
 	_enemyptrhi 68, 69, 6A, 6B, 6C, 6D, 6E, 6F
 	_enemyptrhi 70, 71, 72, 73, 74, 75, 76, 77
 	_enemyptrhi 78, 79, 7A, 7B, 7C, 7D, 7E, 7F
-	
+
 .stoppingindex
 	.incbin "src/bin/obj/StoppingBehaviourIndex.bin"
 .stoppingaddrlo
@@ -1273,4 +1200,3 @@ DoEnemyObjects:
 ;	.db HIGH(EnemyBehaviour_Stopping6)
 
 	.include "src/obj/behaviour_normal.asm"
-
