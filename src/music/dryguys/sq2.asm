@@ -1,145 +1,136 @@
 
+    TEMPO 25
     TONE 2
     VOL 9
     KEY O4 - 1
-    TEMPO 12
     ENV 1, 3, 1
-    n1
-    TEMPO 6 + 1
-    n1 5
-    TEMPO 6
-    n1
-    n1 5
-    n1
-    TEMPO 13
-    n1
-    TEMPO 6 + 1
-    n1 5
-    TEMPO 6
-    n1
-    n1 5
-    n1
-    TEMPO 25
+    n3
+    n2 5
+    n2
+    n2 5
+    n2
+    n3
+    n2 5
+    n2
+    n2 5
+    n2
     ENV 8, 1
-    n1 5
-    n1 5
-    n1 5
+    n4 5
+    n4 5
+    n4 5
 
-    TEMPO 12
     ENV 1, 3, 1
-    n1
-    TEMPO 6 + 1
-    n1 2
-    TEMPO 6
-    n1
-    n1 2
-    n1
-    TEMPO 13
-    n1
-    TEMPO 6 + 1
-    n1 2
-    TEMPO 6
-    n1
-    n1 2
-    n1
-    TEMPO 25
+    n3
+    n2 2
+    n2
+    n2 2
+    n2
+    n3
+    n2 2
+    n2
+    n2 2
+    n2
     ENV 8, 1
-    n1 4
-    n1 4
-    n1 4
+    n4 4
+    n4 4
+    n4 4
 
-    TEMPO 12
     ENV 1, 3, 1
-    n1
-    TEMPO 6 + 1
-    n1 5
-    TEMPO 6
-    n1
-    n1 5
-    n1
-    TEMPO 13
-    n1
-    TEMPO 6 + 1
-    n1 5
-    TEMPO 6
-    n1
-    n1 5
-    n1
-    TEMPO 25
+    n3
+    n2 5
+    n2
+    n2 5
+    n2
+    n3
+    n2 5
+    n2
+    n2 5
+    n2
     ENV 8, 1
-    n1 5
-    n1 5
-    n1 5
+    n4 5
+    n4 5
+    n4 5
 
-    TEMPO 12
     ENV 1, 3, 1
-    n1
-    TEMPO 6 + 1
-    n1 2
-    TEMPO 6
-    n1
-    n1 2
-    n1
-    TEMPO 13
-    n1
-    TEMPO 6 + 1
-    n1 2
-    TEMPO 6
-    n1
-    n1 2
-    n1
-    TEMPO 25
+    n3
+    n2 2
+    n2
+    n2 2
+    n2
+    n3
+    n2 2
+    n2
+    n2 2
+    n2
     ENV 8, 1
-    n1 2
-    n1 2
-    n1 1
+    n4 2
+    n4 2
+    n4 1
 
     KEY O4
 .sq2A
-    TEMPO 12
     ENV 1, 4, 1
-    n1
-    TEMPO 6 + 1
-    n1 8
-    TEMPO 6
-    n1
-    n1 8
-    n1
-    TEMPO 13
-    n1
-    TEMPO 6 + 1
-    n1 8
-    TEMPO 6
-    n1
-    n1 8
-    n1
-    TEMPO 25
+    n3
+    n2 8
+    n2
+    n2 8
+    n2
+    n3
+    n2 8
+    n2
+    n2 8
+    n2
     ENV 8, 1
-    n1 8
-    n1 8
-    n1 8
+    n4 8
+    n4 8
+    n4 8
 
-    TEMPO 12
     ENV 1, 4, 1
-    n1
-    TEMPO 6 + 1
-    n1 6
-    TEMPO 6
-    n1
-    n1 6
-    n1
-    TEMPO 13
-    n1
-    TEMPO 6 + 1
-    n1 6
-    TEMPO 6
-    n1
-    n1 6
-    n1
-    TEMPO 25
+    n3
+    n2 6
+    n2
+    n2 6
+    n2
+    n3
+    n2 6
+    n2
+    n2 6
+    n2
     ENV 8, 1
-    n1 6
-    n1 6
-    n1 6
+    n4 6
+    n4 6
+    n4 6
+
+    ENV 1, 4, 1
+    n3
+    n2 8
+    n2
+    n2 8
+    n2
+    n3
+    n2 8
+    n2
+    n2 8
+    n2
+    ENV 8, 1
+    n4 8
+    n4 8
+    n4 8
+
+    ENV 1, 4, 1
+    n3
+    n2 7
+    n2
+    n2 7
+    n2
+    n3
+    n2 7
+    n2
+    n2 7
+    n2
+    ENV 8, 1
+    n4 6
+    n4 6
+    n4 6
     LOOP 1, .sq2A
     END

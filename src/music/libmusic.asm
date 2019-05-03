@@ -67,52 +67,75 @@ END .macro
 	.endm
 
 TIE .macro
-	.db $20 + \1
+	.if \10 = 0
+	.db $19
+	.else
+	.db $18 + \1
+	.endif
 	.endm
 
 SHORT .macro
-	.db $30
+	.db $0A
+	.endm
+
+PITCH0 .macro
+	.db $0B
+	.endm
+
+VOLUP .macro
+	.db $0C
+	.endm
+
+VOLDOWN .macro
+	.db $0D
 	.endm
 
 n .macro
-	.db (\1 << 5) + \2 + $40
+	.db (\1 << 5) + \2 + $20
 	.endm
 n0 .macro
+	.if \10 = 0
+	.db $20
+	.else
+	.db $20 + \1
+	.endif
+	.endm
+n1 .macro
 	.if \10 = 0
 	.db $40
 	.else
 	.db $40 + \1
 	.endif
 	.endm
-n1 .macro
+n2 .macro
 	.if \10 = 0
 	.db $60
 	.else
 	.db $60 + \1
 	.endif
 	.endm
-n2 .macro
+n3 .macro
 	.if \10 = 0
 	.db $80
 	.else
 	.db $80 + \1
 	.endif
 	.endm
-n3 .macro
+n4 .macro
 	.if \10 = 0
 	.db $A0
 	.else
 	.db $A0 + \1
 	.endif
 	.endm
-n4 .macro
+n5 .macro
 	.if \10 = 0
 	.db $C0
 	.else
 	.db $C0 + \1
 	.endif
 	.endm
-n5 .macro
+n6 .macro
 	.if \10 = 0
 	.db $E0
 	.else
