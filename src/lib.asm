@@ -212,7 +212,7 @@ mNEGC .macro
 	sta \1
 	.endif
 	.endm
-	
+
 mNEG .macro
 	lda \1
 	eor #$FF
@@ -241,6 +241,72 @@ mNEGhi .macro
 	.else
 	sta \1
 	.endif
+	.endm
+
+mMULTIOP .macro
+	.if \?1
+	\1
+	.endif
+	.if \?2
+	\2
+	.endif
+	.if \?3
+	\3
+	.endif
+	.if \?4
+	\4
+	.endif
+	.if \?5
+	\5
+	.endif
+	.if \?6
+	\6
+	.endif
+	.if \?7
+	\7
+	.endif
+	.if \?8
+	\8
+	.endif
+	.if \?9
+	\9
+	.endif
+	.endm
+
+mBEQ .macro
+	beq .skip\@
+	mMULTIOP \1, \2, \3, \4, \5, \6, \7, \8, \9
+.skip\@
+	.endm
+
+mBNE .macro
+	bne .skip\@
+	mMULTIOP \1, \2, \3, \4, \5, \6, \7, \8, \9
+.skip\@
+	.endm
+
+mBCC .macro
+	bcc .skip\@
+	mMULTIOP \1, \2, \3, \4, \5, \6, \7, \8, \9
+.skip\@
+	.endm
+
+mBCS .macro
+	bcs .skip\@
+	mMULTIOP \1, \2, \3, \4, \5, \6, \7, \8, \9
+.skip\@
+	.endm
+
+mBPL .macro
+	bpl .skip\@
+	mMULTIOP \1, \2, \3, \4, \5, \6, \7, \8, \9
+.skip\@
+	.endm
+
+mBMI .macro
+	bmi .skip\@
+	mMULTIOP \1, \2, \3, \4, \5, \6, \7, \8, \9
+.skip\@
 	.endm
 
 _collisionx .macro

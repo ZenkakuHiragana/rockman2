@@ -1,9 +1,7 @@
 
     .beginregion "Dry Guys"
 DRY_GUYS:
-    TRACK .sq1, .sq2, .tri, .noi, .mod
-.mod
-    .dw $0000, $0080, $2201, $8000
+    TRACK .sq1, .sq2, .tri, .noi, BPM(150)
 .tri
     .include "src/music/dryguys/tri.asm"
 .sq2

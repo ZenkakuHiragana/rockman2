@@ -109,7 +109,7 @@
 	bne .other
 	ldy #$A0
 .other
-	jsr $8003
+	jsr SOUND_STARTPLAY
 	dec <zSoundQueue
 	bne .loop
 .noqueue

@@ -444,6 +444,9 @@ aNOIVolModVolume = $57B ;ノイズ音量モジュレーションでの現在の�
 aModDefine = $57C       ;モジュレーション定義へのポインタ下位
 aModDefinehi = $57D     ;モジュレーション定義へのポインタ上位
 
+aTempo = $57C           ;共有テンポ値下位
+aTempohi = $57D         ;共有テンポ値上位
+
 a57E = $57E
 a57F = $57F
 

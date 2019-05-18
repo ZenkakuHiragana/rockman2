@@ -9,6 +9,7 @@ O6 = $3B
 O7 = $47
 O8 = $53
 
+BPM .func (\1) * 256 / 75
 TRACK .macro
 	.db $0F
 	.db LOW(\1), HIGH(\1)
@@ -19,7 +20,7 @@ TRACK .macro
 	.endm
 
 TEMPO .macro
-	.db 0, \1
+	;.db 0, \1
 	.endm
 
 PITCH .macro
@@ -48,13 +49,16 @@ KEY .macro
 
 DOT .macro
 	.db 6
+	.if \?1
+	\1
+	.endif
 	.endm
 
 ENV .macro
-	.if \30 = 0
-	.db 7, \1 + $80, \2 << 4
-	.else
+	.if \?3
 	.db 7, \1, \2 << 4
+	.else
+	.db 7, \1 + $80, \2 << 4
 	.endif
 	.endm
 
@@ -67,15 +71,18 @@ END .macro
 	.endm
 
 TIE .macro
-	.if \10 = 0
-	.db $19
-	.else
+	.if \?1
 	.db $18 + \1
+	.else
+	.db $19
 	.endif
 	.endm
 
 SHORT .macro
 	.db $0A
+	.if \?1
+	\1
+	.endif
 	.endm
 
 PITCH0 .macro
@@ -85,61 +92,84 @@ PITCH0 .macro
 VOLUP .macro
 	.db $0C
 	.endm
+TOMHIGH .macro
+	VOLUP
+	.endm
 
 VOLDOWN .macro
 	.db $0D
+	.endm
+TOMLOW .macro
+	VOLDOWN
+	.endm
+
+BEND .macro
+	.db $00
+	\1
+	\2
+	.endm
+
+BENDSPEED .macro
+	.db $0E, \1
+	.endm
+
+SLUR .macro
+	.db $0F
+	.if \?1
+	\1
+	.endif
 	.endm
 
 n .macro
 	.db (\1 << 5) + \2 + $20
 	.endm
 n0 .macro
-	.if \10 = 0
-	.db $20
-	.else
+	.if \?1
 	.db $20 + \1
+	.else
+	.db $20
 	.endif
 	.endm
 n1 .macro
-	.if \10 = 0
-	.db $40
-	.else
+	.if \?1
 	.db $40 + \1
+	.else
+	.db $40
 	.endif
 	.endm
 n2 .macro
-	.if \10 = 0
-	.db $60
-	.else
+	.if \?1
 	.db $60 + \1
+	.else
+	.db $60
 	.endif
 	.endm
 n3 .macro
-	.if \10 = 0
-	.db $80
-	.else
+	.if \?1
 	.db $80 + \1
+	.else
+	.db $80
 	.endif
 	.endm
 n4 .macro
-	.if \10 = 0
-	.db $A0
-	.else
+	.if \?1
 	.db $A0 + \1
+	.else
+	.db $A0
 	.endif
 	.endm
 n5 .macro
-	.if \10 = 0
-	.db $C0
-	.else
+	.if \?1
 	.db $C0 + \1
+	.else
+	.db $C0
 	.endif
 	.endm
 n6 .macro
-	.if \10 = 0
-	.db $E0
-	.else
+	.if \?1
 	.db $E0 + \1
+	.else
+	.db $E0
 	.endif
 	.endm
 

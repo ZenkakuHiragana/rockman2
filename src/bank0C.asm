@@ -1,4 +1,11 @@
 
+SOUND_HDR_ALWAYS = 1
+SOUND_POMPOKO_VELOCITY = $0040
+SOUND_POMPOKO_LENGTH = 5
+SOUND_POMPOKO_INIT_HIGH = $806A
+SOUND_POMPOKO_INIT_LOW = $80A0
+SOUND_DECREMENT_COUNTER = $80
+
 	mBEGIN #$0C, #$8000
 
 	jmp Sound_ProcessTracks
@@ -6,25 +13,74 @@
 ;8003
 ;20 51 C0で予約された曲を鳴らし始める処理
 SOUND_STARTPLAY: ;A = 曲番号
+	.ifdef SOUND_HDR_ALWAYS
+	ldx #%00000111
+	stx $4001
+	stx $4005
+	.endif
 	cmp #$FC
+	bcc .other
 	bne .notFC
-	jmp Bank0C_StartFC ;A = #$FC
+;8129
+;#FCを実行 曲を早くする
+	inc <zSoundSpeed
+	rts
 .notFC
 	cmp #$FD
 	bne .notFD
-	jmp Bank0C_StartFD ;A = #$FD
+;812D
+;#FDを実行 曲をフェードアウト/インする
+	sty <zSoundFade
+	lda #$01
+	sta <zSoundFadeProg
+	and <zSoundCounter
+	sta <zSoundCounter
+	rts
 .notFD
+	ldx #$01
+	stx <zNMILock
+	dex
+	stx <zSoundBase
 	cmp #$FE
-	bne .notFE
-	mMOV #$01, <zNMILock
-	mSTZ <zSoundBase
-	jmp Bank0C_StartFE ;A = #$FE
-.notFE
-	cmp #$FF
-	bne .other
-	mMOV #$01, <zNMILock
-	mSTZ <zSoundBase
-	jmp Bank0C_StartFF ;A = #$FF
+	bne .startFF
+;813A
+;#FEを実行 効果音を止める
+.LoopCounter = zSoundVar1
+.FreqRegPtr = zSoundVar2 ;周波数レジスタへのポインタ
+	mAND <zSoundAttr, #$0F
+	mMOV #$04, <.LoopCounter
+	mMOV #$02, <.FreqRegPtr
+.loop_sfx
+	lda <zSFXChannel
+	lsr a
+	bcc .skip
+	jsr Sound_ClearLFOs
+	jsr Sound_RestoreModulation
+.skip
+	jsr Sound_GotoNextTrack
+	clc
+	mADD <.FreqRegPtr, #$04 ;{zSoundVar2|2, 6, A, E}
+	dec <.LoopCounter
+	bne .loop_sfx
+	mSTZ <zSFXChannel, <zSFXChannel_Copy, <zNMILock
+	rts
+;818C
+;#FFを実行 曲を止める
+.startFF
+.LoopCounter = zSoundVar1
+	mAND <zSoundAttr, #$F0
+	mMOV #$04, <.LoopCounter
+	mSTZ <zSoundFade, <zSoundSpeed
+.loop
+	ldx <zSoundBase
+	sta aSQ1Ptr,x
+	sta aSQ1Ptrhi,x ;曲ポインタ = 0
+	jsr Sound_GotoNextTrack_Music
+	lda #$00
+	dec <.LoopCounter
+	bne .loop
+	sta <zNMILock
+	rts
 .other ;A < #$FC
 	asl a
 	tax
@@ -40,22 +96,22 @@ SOUND_STARTPLAY: ;A = 曲番号
 .TestStrength = zSoundVar1 ;曲の上書き優先順位保存用変数
 	mAND <zSoundAttr, #$0F, <.TestStrength
 	cpx <.TestStrength ;X = 曲定義先頭の1バイト
-	bcc .end
+	bcc .rts
 ;現在の優先度00-0F ≦ 鳴らそうとする曲の優先度X の時鳴らす
 	stx <.TestStrength
 	lda <zSoundAttr
 	and #$F0
 	ora <.TestStrength
 	sta <zSoundAttr ;優先度を更新
-	mMOV #$01, <zNMILock
-	mSTZ <zSoundBase, <zSoundSpeed, <zSoundFade
+	rol <zNMILock ;zNMILock = 1
+	mSTZ <zSoundBase, <zSoundFade, <zSoundSpeed
 ;8067, 曲セットアップのチャンネルごとのループ開始
 .LoopCounter = zSoundVar1
 	mMOV #$04, <.LoopCounter
 	clc
 .loop_init
-	mADD <zTrackPtr, #$01
-	mADD <zTrackPtrhi ;ヘッダの曲開始ポインタの参照先を1つ進める
+	mADD <zTrackPtr, #$01 ;ヘッダの曲開始ポインタの参照先を1つ進める
+	mBCC inc <zTrackPtrhi
 	ldx <zSoundBase ;x = {zSoundBase|0, 1F, 2E, 3D}
 	ldy #$00
 .loop_init_trackptr ;トラックごとの曲ポインタを初期化
@@ -75,22 +131,20 @@ SOUND_STARTPLAY: ;A = 曲番号
 
 	lda <zSFXChannel
 	lsr a
-	bcs .skip_for_sfx ;現在のトラックが効果音再生中なら飛ぶ
-	jsr Sound_ClearLFOs
-.skip_for_sfx
+	mBCS jsr Sound_ClearLFOs ;現在のトラックが効果音再生中でないなら呼ぶ
 	jsr Sound_GotoNextTrack ;ループを進める
-	sec ;ループ2回め以降はポインタを2つ進める
+	sec ;ループ2回目以降はポインタを2つ進める
 	dec <.LoopCounter
 	bne .loop_init
 
 .end_init ;この時、zTrackPtrはノイズ開始アドレスを指している
-	ldy #$02 ;+2バイト → MOD定義
-	mMOV [zTrackPtr],y, aModDefine
+	ldy #$02 ;+2バイト → テンポ値
+	mMOV [zTrackPtr],y, aTempo
 	iny
-	mMOV [zTrackPtr],y, aModDefinehi
+	mMOV [zTrackPtr],y, aTempohi
 	jsr Sound_RestoreSFXReservation
 	lsr <zNMILock
-.end
+.rts
 	rts
 
 ;80BB
@@ -155,46 +209,6 @@ Bank0C_StartSFX:
 .end
 	rts
 
-;8129
-;#FCを実行 曲を早くする
-Bank0C_StartFC:
-	iny
-	sty <zSoundSpeed
-	rts
-
-;812D
-;#FDを実行 曲をフェードアウト/インする
-Bank0C_StartFD:
-	sty <zSoundFade
-	lda #$01
-	sta <zSoundFadeProg
-	and <zSoundCounter
-	sta <zSoundCounter
-	rts
-
-;813A
-;#FEを実行 効果音を止める
-Bank0C_StartFE:
-.LoopCounter = zSoundVar1
-.FreqRegPtr = zSoundVar2 ;周波数レジスタへのポインタ
-	mAND <zSoundAttr, #$0F
-	mMOV #$04, <.LoopCounter
-	mMOV #$02, <.FreqRegPtr
-.loop_sfx
-	lda <zSFXChannel
-	lsr a
-	bcc .skip
-	jsr Sound_ClearLFOs
-	jsr Sound_RestoreModulation
-.skip
-	jsr Sound_GotoNextTrack
-	clc
-	mADD <.FreqRegPtr, #$04 ;{zSoundVar2|2, 6, A, E}
-	dec <.LoopCounter
-	bne .loop_sfx
-	mSTZ <zSFXChannel, <zSFXChannel_Copy, <zNMILock
-	rts
-
 ;816C
 ;処理中のチャンネルが音を鳴らしている時
 ;もしくは曲で使用される時、モジュレーション定義をリセット
@@ -218,24 +232,6 @@ Sound_RestoreModulation:
 	bne Sound_CopyModulation
 	rts
 
-;818C
-;#FFを実行 曲を止める
-Bank0C_StartFF:
-.LoopCounter = zSoundVar1
-	mAND <zSoundAttr, #$F0
-	mMOV #$04, <.LoopCounter
-	mSTZ <zSoundSpeed, <zSoundFade
-.loop
-	ldx <zSoundBase
-	sta aSQ1Ptr,x
-	sta aSQ1Ptrhi,x ;曲ポインタ = 0
-	jsr Sound_GotoNextTrack_Music
-	lda #$00
-	dec <.LoopCounter
-	bne .loop
-	sta <zNMILock
-	rts
-
 ;81B2
 ;音の変調関係を0にする
 Sound_ClearLFOs:
@@ -255,49 +251,28 @@ Sound_ClearLFOs:
 ;81C4
 ;モジュレーション定義をコピーする
 Sound_CopyModulation:
-	lda <zSoundVar1
-	pha
-	lda <zSoundVar2
-	pha
-.ModPtr = zSoundVar1
-.ModPtrhi = zSoundVar2
-	mMOV aModDefine, <.ModPtr
-	mMOV aModDefinehi, <.ModPtrhi
-	lda <zSoundBase
 	clc
+	lda <zSoundBase
 	adc #$06
 	tax
 	lda aSQ1Ptr,x ;A = aSQ1Mod
 	and #$1F ;現在のモジュレーション定義番号にアクセス
-	beq .skip
-	tay ;MOD ≠ 0の時、Y = モジュレーション番号
-	lda #$00
-.loop_mod
-	clc
-	adc #$04
-	dey
-	bne .loop_mod
-.skip
+	asl a
+	asl a
 	tay ;Y = 4 * MOD番号
 	txa ;A = zSoundBase + 6
-	clc
-	adc #$0E ;A = zSoundBase + 6 + E = zSoundBase + 14
-	tax ;X = zSoundBase + 14
+	adc #$0E ;A = zSoundBase + 6 + E
+	tax ;X = zSoundBase + #$14
+	sec
 	lda #$04 ;ループ変数
 .loop_copy ;モジュレーション定義の内容を格納
 	pha
-	mMOV [.ModPtr],y, aSQ1Ptr,x ;aModDefine1, 2, 3, 4
+	mMOV Sound_Modulations,y, aSQ1Ptr,x ;aModDefine1, 2, 3, 4
 	iny ;{y|4 * MOD ≦ y < 4 * MOD + 4}
 	inx ;{x|14, 15, 16, 17}
 	pla
-	sec
 	sbc #$01
 	bne .loop_copy ;4バイトコピー
-;一時変数の復元
-	pla
-	sta <zSoundVar2
-	pla
-	sta <zSoundVar1
 	rts
 
 ;8207
@@ -357,22 +332,18 @@ Sound_ProcessTracks:
 
 	lda <zSFXChannel_Copy
 	lsr a
-	bcc .nosfx
-	jsr Sound_ProcessSFX ;処理中のトラックは効果音を鳴らしている
-.nosfx
+	mBCC jsr Sound_ProcessSFX ;処理中のトラックは効果音を鳴らしている
 	lda <zMusicPause
 	lsr a
-	bcc .continue
-	jmp .skip_track ;曲が一時停止している
-.continue
+	mBCC jmp .skip_track ;曲が一時停止している
 	ldy #$00
 	lda [zSoundBase],y ;$500
 	iny
 	ora [zSoundBase],y ;$501
 	beq .skip_track
 ;処理中のトラックは曲で使われている
+	;clc
 	ldy #$0E
-	clc
 	mADD [zSoundBase],y, #$01 ;$50E, 音量env用カウンタ += 1
 	jsr Sound_ProcessMusic
 	jmp .done
@@ -390,8 +361,7 @@ Sound_ProcessTracks:
 .done
 	lsr <zSFXChannel_Copy
 	bcc .advanceSFX
-;効果音の予約状況を保持
-	mORA <zSFXChannel_Copy, #$80
+	mORA <zSFXChannel_Copy, #$80 ;効果音の予約状況を保持
 .advanceSFX
 ;処理するトラックを1つ進める
 	dec <zProcessChannel
@@ -441,9 +411,7 @@ Sound_ManipulateModulations:
 	lda [zSoundBase],y ;$50C, 02と03命令から音量レジスタへ入れる値
 	ldy #$02
 	cpy <zProcessChannel
-	beq .istri_mask ;三角波以外を処理中なら、
-	and #$0F ;音量成分のみを抽出(bit6, bit7は音色)
-.istri_mask
+	mBEQ and #$0F ;三角波以外のとき、音量成分を抽出(bit6-7は音色)
 	sta <.Volume
 	lda <zSoundFade
 	and #$7F
@@ -486,7 +454,7 @@ Sound_ManipulateModulations:
 	beq .noenv
 ;三角波以外を処理中、音量エンベロープの適用
 	ldy #$0D
-	lda [zSoundBase],y ;$50D, 07命令の第一引数
+	lda [zSoundBase],y ;$50D, 07命令のXX
 	tax
 	and #$7F ;A = 音量エンベロープ 変化のフレーム数
 	beq .noenv
@@ -552,9 +520,8 @@ Sound_ManipulateVolumeMod:
 	beq .endvolmod
 	ldy #$1D
 	cmp [zSoundBase],y ;$51D, 音量MOD用カウンタ
-	beq .changemod
-	jmp .nochangemod
-.changemod
+	bne .nochangemod
+
 	mSTZ [zSoundBase],y ;$51D, 音量MOD用カウンタ
 	ldy #$17
 	lda [zSoundBase],y ;$517, MOD定義ZZ, 音量MOD変化量
@@ -611,9 +578,7 @@ Sound_ManipulatePitchEnvelope:
 	ldx #$00
 	lda [zSoundBase],y ;$509, $510, ピッチエンベロープ変化値(曲, SFX), 命令$01のXX
 	beq .endpitchenv
-	bpl .pitchdown
-	dex
-.pitchdown
+	mBPL dex
 ;X = #$00 (下降), #$FF(上昇), ピッチエンベロープ変化値上位
 	iny
 	clc
@@ -624,26 +589,62 @@ Sound_ManipulatePitchEnvelope:
 	adc [zSoundBase],y ;$50B, $512, 音高レジスタ値上位(曲, SFX)
 	sta [zSoundBase],y ;レジスタ値 += ピッチエンベロープ変化値
 .endpitchenv
+
 	lda <.RegPtr
-	bmi .playingsfx
+	bmi .issfx
+;曲を再生中、音下げるやつのチェック
+.Ref = zSoundVar1
+.Refhi = zSoundVar2
+.BendSpeed = zSoundPtr
+	ldy #$04
+	lda [zSoundBase],y ;$504, 音下げるやつの目標値下位
+	beq .nobend
+;音下げるやつ
+	sta <.Ref
+	iny
+	lda [zSoundBase],y ;$505, 音下げるやつの目標値上位
+	tax
+	and #$07
+	sta <.Refhi
+	txa
+	lsr a
+	lsr a
+	ldy <.Refhi
+	mBEQ lsr a
+	sta <.BendSpeed
+
+	clc
+	ldy #$0A
+	mSUB [zSoundBase],y, <.BendSpeed ;$50A, 音高レジスタ値下位
+	tax
+	iny
+	mSUB [zSoundBase],y, #$00 ;$50B, 音高レジスタ値上位
+
+	cmp <.Refhi
+	mBEQ bcs .nobend
+	txa
+	cmp <.Ref
+	mBEQ bcs .nobend
+	mMOV <.Refhi, [zSoundBase],y ;$50B, 音高レジスタ値上位
+	dey
+	mMOV <.Ref, [zSoundBase],y ;$50A, 音高レジスタ値下位
+	ldy #$04
+	mSTZ [zSoundBase],y ;$504,  音下げるやつの目標値下位
+.nobend
+
 	lda <zSFXChannel_Copy
 	lsr a
-	bcc .playingsfx
-	rts ;効果音が再生中でないとき、終了
-.playingsfx
+	mBCC rts ;曲の処理中で効果音が再生中のとき、終了
+.issfx
 ;ピッチMODの適用
 	ldy #$14
 	lda [zSoundBase],y ;$514, MOD定義のWW
 	and #$7F
-	bne .pitchmod
-	jmp .nopitchmod
-.pitchmod
+	mBNE jmp .nopitchmod
 	ldy #$18
 	cmp [zSoundBase],y ;$518, ピッチMOD用カウンタ
-	beq .dopitchmod
-	jmp .nopitchmod
+	bne .nopitchmod
 ;8436
-.dopitchmod
 	mSTZ [zSoundBase],y ;$518, ピッチMOD用カウンタ
 	tax ;X = 0
 	ldy #$15
@@ -690,11 +691,11 @@ Sound_ManipulatePitchEnvelope:
 	bpl .positivepitchmod
 	and #%01111111
 	sta [zSoundBase],y ;$519 = 0XXX XXXX
-	jmp .nopitchmod
+	bpl .nopitchmod
 .positivepitchmod
 	ora #%10000000
 	sta [zSoundBase],y ;$519 = 1XXX XXXX
-	jmp .nopitchmod
+	bmi .nopitchmod
 ;84A3
 .inversepitchmod
 	mAND [zSoundBase],y, #%01111111 ;$514, MOD定義のWW
@@ -713,38 +714,66 @@ Sound_ManipulatePitchEnvelope:
 	ldy <.RegPtr
 	adc [zSoundBase],y ;$50B, $512, 音高レジスタ値上位(曲, SFX)
 	tay ;Y = $50B, $512 + $51B
+
 ;X, Y = ピッチMOD適用後の音高レジスタ値下位, 上位
-	lda #$01
-	cmp <zProcessChannel
+	lda <zProcessChannel
+	cmp #$01
 	bne .isnotnoi
 ;ノイズを処理中
+.NoiseFreq = zSoundPtr ;ノイズの音色 = Z000 0000
 	mMOV #$0F, $4015
 	txa ;A = ピッチMOD適用後の音高レジスタ値下位
 	and #$0F
 	tax ;A = 0000 XXXX
 	inc <.RegPtr ;$.RegPtr = #$0C, #$13
 	ldy <.RegPtr
-.NoiseFreq = zSoundPtr ;ノイズの音色 = Z000 0000
 	mAND [zSoundBase],y, #$80, <.NoiseFreq
 	txa
 	ora <.NoiseFreq
 	tax ;X = Z000 XXXX, Z = 音色, XXXX = 音量
 	ldy #$00
+	beq .isnottri
 .isnotnoi
+
+	cmp #$02
+	bne .isnottri
+;三角波を処理中、三角波ぽんぽこ処理
+;$50D, 07命令のXX → ぽんぽこ用レジスタ値上位, bit7: ぽんぽこフラグ
+;$50E, 音量env用カウンタ → ぽんぽこ用カウンタ
+;$50F, 音量envでの現在の音量 → ぽんぽこ用レジスタ値下位
+	sty <zSoundPtr
+	ldy #$0D
+	lda [zSoundBase],y ;$50D, ぽんぽこ用レジスタ値上位, bit7: ぽんぽこフラグ
+	bpl .skip_tri
+	iny
+	lda [zSoundBase],y ;$50E, ぽんぽこ用カウンタ
+	cmp #SOUND_POMPOKO_LENGTH
+	bcc .continue_pompoko
+	dey
+	sta [zSoundBase],y ;$50D, ぽんぽこフラグクリア
+.continue_pompoko
+	ldy #$0F
+	clc
+	mADD [zSoundBase],y, #LOW(SOUND_POMPOKO_VELOCITY) ;$50F, ぽんぽこ用レジスタ値下位
+	tax
+	ldy #$0D
+	mADD [zSoundBase],y, #HIGH(SOUND_POMPOKO_VELOCITY), [zSoundBase],y, <zSoundPtr
+.skip_tri
+	ldy <zSoundPtr
+.isnottri
 	txa ;A = ピッチMOD適用後の音高レジスタ値下位
 	ldx <zSoundIndex
 	inx
 	inx
 	sta $4000,x
-	tya
+	tya ;A = ピッチMOD適用後の音高レジスタ値上位
 	ldy #$1C
 	cmp [zSoundBase],y ;$51C, 二度書き防止用退避変数
-	bne .writemod
-	rts
-.writemod
+	beq .rts
 	sta [zSoundBase],y ;$51C, 二度書き防止用退避変数
 	ora #$08
 	sta $4001,x
+.rts
 	rts
 
 ;84FD
@@ -788,9 +817,8 @@ Sound_InitializeModulation:
 	iny
 	dex
 	bne .loop
-	lda #$FF
 	ldy #$1C
-	sta [zSoundBase],y ;$51C, 二度書き防止用退避変数
+	mMOV #$FF, [zSoundBase],y ;$51C, 二度書き防止用退避変数
 	rts
 
 ;8548
@@ -965,9 +993,7 @@ Sound_ProcessSFXCommand05:
 Sound_ProcessSFXCommand06:
 	sec
 	mSUB <zSFXPtr, #$01
-	bcs .borrow_sfx
-	dec <zSFXPtrhi
-.borrow_sfx
+	mBCS dec <zSFXPtrhi
 	mAND <zSoundAttr, #$0F
 	mSTZ <zSFXChannel
 	mAND <zSFXChannel_Copy, #$FE
@@ -1002,90 +1028,58 @@ Sound_AdvanceByteSFX:
 	ldy #$00
 	lda [zSFXPtr],y
 	inc <zSFXPtr
-	bne .carry_sfx
-	inc <zSFXPtrhi
-.carry_sfx
+	mBNE inc <zSFXPtrhi
 	tax
 	rts
 
 ;86B4
 ;曲の処理
 Sound_ProcessMusic:
-	lda <zSoundSpeed
-	beq .normalspeed
-.loop ;zSoundSpeed > 0の時、曲処理をzSoundSpeed回行い倍速にする
-	pha
-	jsr .normalspeed
-	pla
-	sec
-	sbc #$01
-	bne .loop
-.rts
-	rts
-.normalspeed
-;倍速を考慮しない曲の処理
-	ldy #$05
-	lda [zSoundBase],y ;$505, 連符フラグ
-	bpl .notriplet
-;三連符フラグが立っている
-	lda <zSoundCounter
-	lsr a
-	bcc .notriplet
-	jsr .notriplet ;三連符の時、2フレームに1回曲処理を2回行う
-.notriplet
-	ldy #$02
-	lda [zSoundBase],y ;$502, 音長下位
-	tax
-	and #$F0
-	iny
-	ora [zSoundBase],y ;$503, 音長上位
-	beq .advancemusic
+	ldy #$03
+	lda [zSoundBase],y ;$503, 音長上位
+	beq Sound_AdvanceMusic_Loop
 ;音長カウンタの整数部分 > 0
+.Tempo = zSoundPtr
+.Tempohi = zSoundPtrhi
+	clc
+	mADD aTempo, <zSoundSpeed, <.Tempo
+	mADD aTempohi, #$00, <.Tempohi
 	dey
-	txa
-	sec
-	sbc #$10
-	sta [zSoundBase],y ;$502, 音長下位 -= #$10
-	and #$F0
-	tax
+	clc
+	mADD [zSoundBase],y, <.Tempo ;$502, 音長下位
 	iny
-	mSUB [zSoundBase],y ;$503, 音長上位
-	txa
-	ora [zSoundBase],y
-	beq .advancemusic
+	ror a
+	eor #$80
+	asl a
+	mSUB [zSoundBase],y, <.Tempohi ;$503, 音長上位
+	beq Sound_AdvanceMusic_Loop
+	bcc Sound_AdvanceMusic_Loop
 ;音長カウンタの整数部分 > 0のとき、鳴り続ける
 	ldy #$0A
 	lda [zSoundBase],y ;音高レジスタ値下位
 	iny
 	ora [zSoundBase],y ;音高レジスタ値上位
-	beq .rts
+	beq Sound_AdvanceMusic_Note.rts
 	jmp Sound_ManipulateModulations
 
 ;86FE
-;曲ポインタを進める
-.advancemusic
-	ldy #$05
-	mAND [zSoundBase],y, #$7F ;$505, 連符フラグと繰り返し回数
-;8706
-;連符やタイの指定の後でここに戻る
+;曲ポインタを進める, タイの指定の後でここに戻る
 Sound_AdvanceMusic_Loop:
 	jsr Sound_FetchByteMusic
 	and #$F0
-	bne .isnote
-	jmp Sound_ProcessMusicCommand
-.isnote
+	mBNE jmp Sound_ProcessMusicCommand
 	txa
 	and #$F8
 	cmp #$18
-	bne .isnot20
+	bne .isnottie
 ;タイ指定
-	txa ;X = A = #$2*
+	txa ;X = A = #$18 + T
 	and #$07 ;0 ≦ A ≦ 7, タイの個数
 	pha
 	jsr Sound_AdvanceMusic_Loop
 	pla ;0 ≦ A ≦ 7
 	jmp Sound_WriteTieRepetition
-.isnot20
+.isnottie
 ;音符/休符
 	txa
 	rol a
@@ -1094,8 +1088,11 @@ Sound_AdvanceMusic_Loop:
 	rol a
 	and #$07
 	tay ;Y = A = 0000 0YYY = 音長
-	lda Table_SoundLengthNormal,y
-	jsr Sound_ProcessNote
+	lda Table_SoundLengthNormal - 1,y
+	ldy #$03
+	clc
+	adc [zSoundBase],y
+	sta [zSoundBase],y
 ;8734
 Sound_AdvanceMusic_Note:
 	ldy #$06
@@ -1103,42 +1100,44 @@ Sound_AdvanceMusic_Note:
 	and #$E0 ;A = タイの数
 	beq .notie
 ;新しい音符はタイで繋がれている
+.NewTie = zSoundPtr
 	sec
 	sbc #$20
-	sta <zSoundPtr ;タイの数を1減らす
+	sta <.NewTie ;タイの数を1減らす
 	lda [zSoundBase],y
 	and #$1F
-	ora <zSoundPtr
+	ora <.NewTie
 	sta [zSoundBase],y ;新しいタイの数を書き込み
 	lda <zSFXChannel_Copy
 	lsr a
 	bcc .isnotsfx
+.rts .public
 	rts
 .isnotsfx
 	jmp Sound_InitializeModulation_Continue
 .notie
 	txa
 	and #$1F
-	bne .isnotrest
-;休符
-	tax
-	jmp .set
-.isnotrest
+	beq .mute
 ;音符
 	ldy #$01
 	cpy <zProcessChannel
-	bne .isnotnoi
-;ノイズの時
+	bne .play
+.mute ;休符かノイズの時
 	ldx #$00
 	beq .set
-.isnotnoi
+.play
 	asl a
-	ldy #$07
-	clc
-	adc [zSoundBase],y ;$507, 周波数テーブルへのベースポインタ下位
+	;clc
+	adc #LOW(Table_SoundFrequency - SOUND_FREQTABLE_OFFSET)
 	sta <zSoundPtr
-	iny
-	mADD [zSoundBase],y, #$00, <zSoundPtrhi ;$508, 周波数テーブルへのベースポインタ上位
+	lda #$00
+	adc #HIGH(Table_SoundFrequency - SOUND_FREQTABLE_OFFSET)
+	sta <zSoundPtrhi
+	;clc
+	ldy #$07
+	mADD <zSoundPtr, [zSoundBase],y ;$507, 周波数テーブルへのベースポインタ下位
+	mBCC inc <zSoundPtrhi
 	ldy #$01
 	lda [zSoundPtr],y ;A = 周波数レジスタ値上位
 	tax ;X = 周波数レジスタ値上位
@@ -1153,14 +1152,10 @@ Sound_AdvanceMusic_Note:
 	ldy #$0D
 	mMOV [zSoundBase],y, <zSoundPtr ;$50D, 音量エンベロープの速さ(07 XX Y0のXX)
 	asl a
-	beq .noenv
-	jsr Sound_MusicCommand07.SetEnvelope
-.noenv
+	mBEQ jsr Sound_MusicCommand07.SetEnvelope
 	lda <zSFXChannel_Copy
 	lsr a
-	bcc .nosfx
-	rts
-.nosfx
+	mBCC rts
 	mMOV #$0C, <zSoundPtr
 	jsr Sound_InitializeModulation
 	jmp Sound_MuteCurrentTrack
@@ -1198,14 +1193,15 @@ Sound_ProcessMusicCommand:
 	.dw Sound_MusicCommand0B
 	.dw Sound_MusicCommand0C
 	.dw Sound_MusicCommand0D
+	.dw Sound_MusicCommand0E
+	.dw Sound_MusicCommand0F
 
-;87D7
-;命令00, テンポ指定
+;* 命令00, 音符の初めの方の音程を少し下げるやつ
+;00 目標音符, 開始音符
 Sound_MusicCommand00:
 	jsr Sound_FetchByteMusic
-	ldy #$04 ;$504, テンポ
-.write .public
-	sta [zSoundBase],y
+	jsr Sound_AdvanceMusic_Note
+	jsr Sound_CopyFreqValue
 	jmp Sound_AdvanceMusic_Loop
 
 ;87E1
@@ -1213,7 +1209,9 @@ Sound_MusicCommand00:
 Sound_MusicCommand01:
 	jsr Sound_FetchByteMusic
 	ldy #$09 ;$509, ピッチenv
-	bne Sound_MusicCommand00.write
+.write .public
+	sta [zSoundBase],y
+	jmp Sound_AdvanceMusic_Loop
 
 ;87EB
 ;命令02, 音色指定
@@ -1247,14 +1245,12 @@ Sound_MusicCommand03:
 Sound_MusicCommand04:
 	jsr Sound_FetchByteMusic
 	beq .jump
-	ldy #$05
-	mAND [zSoundBase],y, #$7F, <zSoundPtr ;$505, 連符フラグとループ回数
+	ldy #$08
+	mMOV [zSoundBase],y, <zSoundPtr ;$508, ループ回数
 	cpx <zSoundPtr
 	beq .nojump
-	inc <zSoundPtr
-	lda [zSoundBase],y
-	and #$80
-	ora <zSoundPtr
+	clc
+	adc #$01
 	sta [zSoundBase],y
 .jump
 	jsr Sound_FetchByteMusic
@@ -1265,34 +1261,25 @@ Sound_MusicCommand04:
 	sta [zSoundBase],y ;$500, 曲ポインタ下位
 	iny ;$501, 曲ポインタ上位
 	txa
-	bne Sound_MusicCommand00.write
+	bne Sound_MusicCommand01.write
 .nojump
-	mAND [zSoundBase],y, #$80 ;$505, 連符フラグとループ回数
-	ldy #$00
+	mSTZ [zSoundBase],y ;$508, ループ回数
 	clc
+	ldy #$00
 	mADD [zSoundBase],y, #$02
 	iny
 	lda [zSoundBase],y
 .write .public
 	adc #$00 ;曲ポインタ += 2
-	bcc Sound_MusicCommand00.write
+	bcc Sound_MusicCommand01.write
 
 ;885D
 ;命令05, キー値指定
 Sound_MusicCommand05:
 	jsr Sound_FetchByteMusic
-	ldx #LOW(Table_SoundFrequency)
-	ldy #HIGH(Table_SoundFrequency)
-	stx <zSoundPtr
-	sty <zSoundPtrhi
 	asl a
-	ldy #$07
-	clc
-	adc <zSoundPtr
-	sta [zSoundBase],y ;$507, 周波数テーブルへのベースポインタ下位
-	lda <zSoundPtrhi
-	iny ;$508, 周波数テーブルへのベースポインタ上位
-	bne Sound_MusicCommand04.write
+	ldy #$07 ;$507, 周波数テーブルへのベースポインタ下位
+	bcc Sound_MusicCommand01.write
 
 ;887A
 ;命令06, 付点
@@ -1304,8 +1291,11 @@ Sound_MusicCommand06:
 	rol a
 	and #$07
 	tay
-	lda Table_SoundLengthDot,y
-	jsr Sound_ProcessNote
+	lda Table_SoundLengthDot - 2,y
+	ldy #$03
+	clc
+	adc [zSoundBase],y
+	sta [zSoundBase],y
 	jmp Sound_AdvanceMusic_Note
 
 ;888D
@@ -1321,9 +1311,7 @@ Sound_MusicCommand07:
 	pla
 	sta <zSoundPtr
 	asl a
-	beq .noenv
-	jsr Sound_MusicCommand07.SetEnvelope
-.noenv
+	mBEQ jsr Sound_MusicCommand07.SetEnvelope
 	jmp Sound_AdvanceMusic_Loop
 ;88A9
 .SetEnvelope .public
@@ -1353,31 +1341,20 @@ Sound_MusicCommand08:
 	sta [zSoundBase],y
 	lda <zSFXChannel_Copy
 	lsr a
-	bcs .sfx
-	jsr Sound_MusicCommand08_SetModulation
-.sfx
+	mBCS jsr Sound_MusicCommand08_SetModulation
 	jmp Sound_AdvanceMusic_Loop
 ;88E1
 Sound_MusicCommand08_SetModulation:
 	txa
 	asl a
 	asl a
-	adc aModDefine
-	sta <zSoundPtr
-	lda #$00
 	tax
-	adc aModDefinehi
-	sta <zSoundPtrhi
 	ldy #$14
 .jumpwrite
-	lda [zSoundPtr,x]
-	sta [zSoundBase],y
+	mMOV Sound_Modulations,x, [zSoundBase],y
+	inx
 	iny
 	cpy #$18
-	beq .rts
-	inc <zSoundPtr
-	bne .jumpwrite
-	inc <zSoundPtrhi
 	bne .jumpwrite
 .rts .public
 	rts
@@ -1402,35 +1379,107 @@ Sound_MusicCommand09:
 
 ;* 命令0A, 連符指定子の処理
 Sound_ProcessTriplet:
-	ldy #$05
-	lda [zSoundBase],y ;$505, 連符フラグと繰り返し回数
-	ora #$80
-.write .public
+	jsr Sound_FetchByteMusic
+	rol a
+	rol a
+	rol a
+	rol a
+	and #$07
+	tay
+	lda Table_SoundLengthTriplet - 1,y
+	ldy #$03
+	clc
+	adc [zSoundBase],y
 	sta [zSoundBase],y
-	jmp Sound_AdvanceMusic_Loop
+	jmp Sound_AdvanceMusic_Note
 
 ;* 命令0B, ピッチエンベロープを0に戻す
 Sound_MusicCommand0B:
 	ldy #$09 ;$509, ピッチenv
 	lda #$00
-	beq Sound_ProcessTriplet.write
+.write .public
+	sta [zSoundBase],y
+	jmp Sound_AdvanceMusic_Loop
 
 ;* 命令0C, 音量を1上げる
+;(TRI)ハイタム
 Sound_MusicCommand0C:
+	ldx #LOW(SOUND_POMPOKO_INIT_HIGH)
+	lda #HIGH(SOUND_POMPOKO_INIT_HIGH)
+	ldy <zProcessChannel
+	cpy #$02
+	beq .tri
 	ldy #$0C
 	clc
 	lda [zSoundBase],y ;$50C, 音量レジスタへの値
 	adc #$01
-	bcc Sound_ProcessTriplet.write
+	bcc Sound_MusicCommand0B.write
+.tri .public
+	ldy #$0D
+	sta [zSoundBase],y
+	iny
+	mSTZ [zSoundBase],y
+	iny
+	txa
+	bne Sound_MusicCommand0B.write
 
 ;* 命令0D, 音量を1下げる
+;(TRI)ロータム
 Sound_MusicCommand0D:
+	ldx #LOW(SOUND_POMPOKO_INIT_LOW)
+	lda #HIGH(SOUND_POMPOKO_INIT_LOW)
+	ldy <zProcessChannel
+	cpy #$02
+	beq Sound_MusicCommand0C.tri
 	ldy #$0C
 	sec
 	lda [zSoundBase],y ;$50C, 音量レジスタへの値
 	sbc #$01
-	bcs Sound_ProcessTriplet.write
+	bcs Sound_MusicCommand0B.write
 
+;* 命令0E, 音下げるやつの変化速度を指定する
+Sound_MusicCommand0E:
+	jsr Sound_FetchByteMusic
+	asl a
+	asl a
+	asl a
+	ldy #$05
+	bne Sound_MusicCommand0B.write
+
+;* 命令0F, 次の音へスラーをつなげる
+Sound_MusicCommand0F:
+	ldy #$0A
+	lda [zSoundBase],y ;$50A, 音高レジスタ値下位
+	pha
+	iny
+	lda [zSoundBase],y ;$50B, 音高レジスタ値上位
+	pha
+	jsr Sound_AdvanceMusic_Loop
+	jsr Sound_CopyFreqValue
+	ldy #$0B
+	pla
+	sta [zSoundBase],y ;$50B, 音高レジスタ値上位
+	dey
+	pla
+	sta [zSoundBase],y ;$50A, 音高レジスタ値下位
+	rts
+
+;周波数レジスタ値を音下げるやつの方にコピーする
+Sound_CopyFreqValue:
+	ldy #$0A
+	lda [zSoundBase],y ;$50A, 音高レジスタ値下位
+	tax
+	iny
+	mMOV [zSoundBase],y, <zSoundPtr ;$50B, 音高レジスタ値上位
+	ldy #$05
+	lda [zSoundBase],y ;$505, 音下げるやつの目標値上位
+	and #$F8
+	ora <zSoundPtr
+	sta [zSoundBase],y
+	txa
+	dey
+	sta [zSoundBase],y ;$504, 音下げるやつの目標値下位
+	rts
 
 ;8935
 ;曲ポインタを進めて1バイトを得る
@@ -1449,55 +1498,34 @@ Sound_FetchByteMusic:
 	txa
 	rts ;X = A = 取得した値
 
-;8954
-;音長の計算
-Sound_ProcessNote:
-.mul1 = zSoundPtr
-.mul2 = zSoundPtrhi
-.res1 = zSoundVar1
-.res2 = zSoundVar2
-	sta <.mul1
-	ldy #$04
-	lda [zSoundBase],y ;$504, テンポ
-	ldy #$00
-	sty <.mul2
-	sty <.res1
-	sty <.res2
-.loop
-	lsr a
-	tay
-	bcc .skip
-	clc
-	mADD <.res1, <.mul1
-	mADD <.res2, <.mul2
-.skip
-	asl <.mul1
-	rol <.mul2
-	tya
-	bne .loop
-
-	ldy #$02
-	clc
-	mADD [zSoundBase],y, <.res1 ;$502, 音長下位
-	iny
-	mADD [zSoundBase],y, <.res2
-	rts
-
 ;8975
 ;音長テーブル, 通常
 Table_SoundLengthNormal:
-	.db $00, $01, $02, $04, $08, $10, $20, $40
+	;.db $FF
+	.db $03, $06, $0C, $18, $30, $60, $C0
+
+;音長テーブル, 連符
+Table_SoundLengthTriplet:
+	;.db $FF
+	.db $02, $04, $08, $10, $20, $40, $80
 
 ;897D
 ;音長テーブル, 付点
 Table_SoundLengthDot:
-	.db $00, $FF, $03, $06, $0C, $18, $30, $60
+	;.db $FF
+	.db $09, $12, $24, $48, $90
+	;.db $FF
+
 
 ;8985
 ;周波数テーブル
+SOUND_FREQTABLE_OFFSET = 2 * 9
+	.list
 Table_SoundFrequency:
-	.dw $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000
-	.dw $0000, $07F2, $07D6, $0714, $06AE, $064E, $05F3, $0594
+	.nolist
+	; .dw $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000
+	; .dw $0000
+	.dw $07F2, $07D6, $0714, $06AE, $064E, $05F3, $0594
 	.dw $054D, $0501, $04BB, $0475, $0436, $03F9, $03BF, $038A
 	.dw $0357, $0327, $02FA, $02CF, $02A7, $0281, $025D, $023B
 	.dw $021A, $01FC, $01E0, $01C5, $01AB, $0193, $017D, $0167
@@ -1509,14 +1537,8 @@ Table_SoundFrequency:
 	.dw $0021, $001F, $001E, $001C, $001A, $0019, $0017, $0016
 	.dw $0015, $0014, $0012, $0011, $0010, $000F, $000F, $000E
 
-;8A45
-;空き領域
-	; .db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
-	.list
-	.db $FF
-	.nolist
-
 ;8A50
 ;曲定義テーブル
-	.org $8A50
+	.list
 Table_TrackStartPointers:
+	.nolist

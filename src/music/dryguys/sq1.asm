@@ -1,5 +1,5 @@
 
-    TEMPO 25
+    TEMPO 200
     TONE 1
     VOL 10
     KEY O4
@@ -60,8 +60,7 @@
 .sq1B
     n3 1 + 12 + 12
     n3 8 + 12
-    DOT
-    n5
+    DOT n5
     SHORT
     n3
     SHORT
@@ -69,28 +68,26 @@
     SHORT
     n1 6 + 12
     n1 7 + 12
-    DOT
-    n2 8 + 12
+    DOT n2 8 + 12
     n3 6 + 12
     n3 4 + 12
 
     n1 5 + 12
-    MOD 1
+    MOD 2
     TIE 2
     n3 6 + 12
     n2 6 + 12
     n1 6 + 12
     MOD 0
     n3 1 + 12
-    MOD 1
+    MOD 2
     n4 3 + 12
     MOD 0
     n3 4 + 12
     n3 3 + 12
     n3 1 + 12
-    MOD 1
-    DOT
-    n4 11
+    MOD 2
+    DOT n4 11
     MOD 0
 
     n3 8
@@ -100,10 +97,9 @@
     n2
     n2 4 + 12
     n2
-    DOT
-    n3 8 + 12
+    DOT n3 8 + 12
     n2
-    MOD 1
+    MOD 2
     n5 6 + 12
     MOD 0
     n3 4 + 12
@@ -247,8 +243,7 @@
     n3 6 + 12
     n3 8 + 12
     n3 6 + 12
-    DOT
-    n4 4 + 12
+    DOT n4 4 + 12
     n3
     n3 3 + 12
     n2
@@ -257,15 +252,13 @@
     TIE
     n5 1 + 12
     n3 1 + 12
-    DOT
-    n2
+    DOT n2
     n1 1 + 12
 
     n1 11
     TIE
     n5 10
-    DOT
-    n2 10
+    DOT n2 10
     n3
 
     n2
@@ -294,8 +287,7 @@
     n2 3 + 12
     n2 1 + 12
 
-    DOT
-    n3 10
+    DOT n3 10
     n2 3
     n2 7
     n2 10
@@ -352,6 +344,5 @@
     n2 1 + 12
     n2 3 + 12
     n2 1 + 12
-    DOT
-    n3
+    DOT n3
     LOOP 0, .sq1_loop_start

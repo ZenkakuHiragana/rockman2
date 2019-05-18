@@ -1,5 +1,5 @@
 
-    TEMPO 25
+    TEMPO 200
     VOL 9
     ENV 1, 2
 .noi_intro
@@ -35,6 +35,5 @@
 .noiB
     n1 1
     LOOP 17, .noiB
-    DOT
-    n3 1
+    DOT n3 1
     LOOP 0, .noi_loop_start

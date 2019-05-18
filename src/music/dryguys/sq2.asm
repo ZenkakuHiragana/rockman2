@@ -1,5 +1,5 @@
 
-    TEMPO 25
+    TEMPO 200
     TONE 2
     VOL 9
     KEY O4 - 1
@@ -260,6 +260,5 @@
     n4 3 + 12 + 12 - 2
     n4 11 + 12 - 2
     n4 11 + 12 - 2
-    DOT
-    n5 11 + 12 - 2
+    DOT n5 11 + 12 - 2
     LOOP 0, .sq2_loop_start
