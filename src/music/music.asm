@@ -1,6 +1,7 @@
 
 ;曲の定義
 	mBEGIN #$0C, Table_TrackStartPointers
+	.dw FLORENT_LBELLE
 	.dw PHARMACEUTICAL_LAB
 	.dw DRY_GUYS
 	.dw DEATHTRAP_MIRAGE
@@ -15,6 +16,7 @@ Sound_Modulations:
 	.include "src/music/modulations.asm"
 Sound_MusicData:
     .include "src/music/garden/header.asm"
+    .include "src/music/florent/header.asm"
     .include "src/music/dryguys/header.asm"
     .include "src/music/deathtrapmirage/header.asm"
 	; .include "src/music/etudeforghosts.asm"

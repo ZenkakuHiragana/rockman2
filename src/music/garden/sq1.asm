@@ -4,7 +4,7 @@
     VOL 15
     KEY O2
     ENV 3, 2
-    MOD 2
+    MOD 3
     BENDSPEED 2
     DOT n3 1
     DOT n3 7
@@ -41,7 +41,9 @@
     DOT n4 3 + 12
     DOT n4 4 + 12
     n4 11 + 12
+    MOD 1
     DOT n3 10 + 12
+    MOD 3
     DOT n3 4 + 12 + 12
     TIE
     n5 3 + 12 + 12
@@ -60,7 +62,9 @@
     DOT n4 3 + 12
     DOT n4 4 + 12
     n4 11 + 12
+    MOD 1
     DOT n3 10 + 12
+    MOD 3
     DOT n3 4 + 12 + 12
     TIE
     n5 3 + 12 + 12
@@ -88,7 +92,9 @@
     n2 4 + 12
     n2 1 + 12
     n2 8
+    MOD 1
     DOT n5 7
+    MOD 3
 
     n2 4
     n2 8
@@ -113,7 +119,9 @@
     n4 8 + 12
 .sq1B
     n2 9
+    MOD 1
     n2 10
+    MOD 3
     n2 11
     n2 12
     DOT n3 1 + 12

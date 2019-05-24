@@ -73,20 +73,20 @@
     n3 4 + 12
 
     n1 5 + 12
-    MOD 2
+    MOD 3
     TIE 2
     n3 6 + 12
     n2 6 + 12
     n1 6 + 12
     MOD 0
     n3 1 + 12
-    MOD 2
+    MOD 3
     n4 3 + 12
     MOD 0
     n3 4 + 12
     n3 3 + 12
     n3 1 + 12
-    MOD 2
+    MOD 3
     DOT n4 11
     MOD 0
 
@@ -99,7 +99,7 @@
     n2
     DOT n3 8 + 12
     n2
-    MOD 2
+    MOD 3
     n5 6 + 12
     MOD 0
     n3 4 + 12
