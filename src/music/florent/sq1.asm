@@ -3,7 +3,6 @@
     VOL 12
     KEY O4
     MOD 3
-    BENDSPEED 1
 .sq1_loop_start
     ENV 1, 5, 1
     n2 1 + 12
@@ -152,7 +151,7 @@
     n4 6 + 12 + 12
     n4 3 + 12 + 12
     n4 4 + 12 + 12
-    BEND n2 3 + 12 + 12, DOT n2 2 + 12 + 12
+    BEND n2 3 + 12 + 12, DOT n2 1 + 12 + 12
     DOT n2 1 + 12 + 12
     n2 8 + 12
     n3 11 + 12
