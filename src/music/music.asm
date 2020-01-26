@@ -1,26 +1,31 @@
 
 ;曲の定義
 	mBEGIN #$0C, Table_TrackStartPointers
-	.dw FLORENT_LBELLE
-	.dw PHARMACEUTICAL_LAB
-	.dw DRY_GUYS
+	; .dw PHARMACEUTICAL_LAB
+	.dw WEBSPIDER
+	.dw ACID
 	.dw DEATHTRAP_MIRAGE
+	.dw DRY_GUYS
 	; .dw ETUDEFORGHOSTS
+	.dw FLORENT_LBELLE
 	; .dw FROZENHOTEL
 	; .dw HEARTACHE
 	.dw SBOMB1_1
 	; .dw SBOMB1_5
 	; .dw SBOMB1_6
 
+	.org $8AD0 ; WORKAROUND!!
 Sound_Modulations:
 	.include "src/music/modulations.asm"
 Sound_MusicData:
-    .include "src/music/garden/header.asm"
-    .include "src/music/florent/header.asm"
-    .include "src/music/dryguys/header.asm"
+	.include "src/music/webspider/header.asm"
+	.include "src/music/acid/header.asm"
     .include "src/music/deathtrapmirage/header.asm"
+    .include "src/music/dryguys/header.asm"
 	; .include "src/music/etudeforghosts.asm"
+    .include "src/music/florent/header.asm"
 	; .include "src/music/frozenhotel.asm"
+    .include "src/music/garden/header.asm"
 	; .include "src/music/heartache.asm"
 	.include "src/music/sbomb1_area1.asm"
 	; .include "src/music/sbomb1_area5.asm"

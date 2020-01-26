@@ -105,8 +105,8 @@ TOMLOW .macro
 
 BEND .macro
 	.db $00
-	\1
-	\2
+	\1 ; Note destination
+	\2 ; Note start
 	.endm
 
 BENDSPEED .macro

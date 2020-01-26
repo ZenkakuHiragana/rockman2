@@ -1539,6 +1539,7 @@ Table_SoundFrequency:
 
 ;8A50
 ;曲定義テーブル
+	.org $8A50 ; WORKAROUND!!
 	.list
 Table_TrackStartPointers:
 	.nolist
