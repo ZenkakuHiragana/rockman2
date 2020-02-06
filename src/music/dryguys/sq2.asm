@@ -1,5 +1,4 @@
 
-    TEMPO 200
     TONE 2
     VOL 9
     KEY O4 - 1

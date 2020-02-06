@@ -1,5 +1,4 @@
 
-    TEMPO 200
     VOL 9
     ENV 1, 2
 .noi_intro

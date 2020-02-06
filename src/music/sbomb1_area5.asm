@@ -5,7 +5,6 @@ MODULATION_5:
 	.dw $0000, $0080
 	.dw $2102, $0080
 TRI_5:
-	TEMPO 6
 	VOL 0
 	KEY O3 + 6
 	n4
@@ -424,7 +423,6 @@ TRI_5:
 	LOOP 0,.loop
 
 NOI_5:
-	TEMPO 6
 	VOL 12
 	ENV 2,5
 	n4
@@ -482,7 +480,6 @@ NOI_5:
 	END
 
 SQ1_5:
-	TEMPO 6
 	TONE 1
 	VOL 13
 	KEY O5 -3
@@ -608,7 +605,6 @@ SQ1_5:
 	ENV 1,2,1
 	LOOP 0,.loop
 SQ2_5:
-	TEMPO 6
 	TONE 1
 	VOL 9
 	KEY O5 -1
@@ -644,7 +640,6 @@ SQ2_5:
 	LOOP 7,.1
 	LOOP 0,.loop
 ;SQ2_5: ;和音ピロピロパターン
-;	TEMPO 2
 ;	TONE 0
 ;	VOL 15
 ;	KEY O5 -3

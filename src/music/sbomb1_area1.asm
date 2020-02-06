@@ -2,7 +2,6 @@
 SBOMB1_1:
 	TRACK SQ1_1, SQ2_1, TRI_1, NOI_1, BPM(60)
 TRI_1:
-	TEMPO 8
 	VOL -8
 	KEY O3 - 3
 	LOOP 0, .intro
@@ -423,7 +422,6 @@ TRI_1:
 	LOOP 0,.continue
 
 SQ1_1:
-	TEMPO 8
 	TONE 2
 	VOL 12
 	KEY O4 -3
@@ -723,7 +721,6 @@ SQ1_1:
 	ENV 2,1
 	LOOP 0,.loop
 SQ2_1:
-	TEMPO 8
 	TONE 2
 	VOL 12
 	KEY O4 -3
@@ -982,7 +979,6 @@ SQ2_1:
 	VOL 8
 	LOOP 0,.loop
 NOI_1:
-	TEMPO 8
 	VOL 15
 	ENV 1,2
 	n5

@@ -1066,9 +1066,8 @@ Sound_ProcessMusic:
 ;曲ポインタを進める, タイの指定の後でここに戻る
 Sound_AdvanceMusic_Loop:
 	jsr Sound_FetchByteMusic
-	and #$F0
-	mBNE jmp Sound_ProcessMusicCommand
-	txa
+	cmp #$18
+	mBCS jmp Sound_ProcessMusicCommand
 	and #$F8
 	cmp #$18
 	bne .isnottie
@@ -1195,13 +1194,15 @@ Sound_ProcessMusicCommand:
 	.dw Sound_MusicCommand0D
 	.dw Sound_MusicCommand0E
 	.dw Sound_MusicCommand0F
+	.dw Sound_MusicCommand10
 
-;* 命令00, 音符の初めの方の音程を少し下げるやつ
+;* 命令00, テンポ変更
 ;00 目標音符, 開始音符
 Sound_MusicCommand00:
 	jsr Sound_FetchByteMusic
-	jsr Sound_AdvanceMusic_Note
-	jsr Sound_CopyFreqValue
+	sta aTempo
+	jsr Sound_FetchByteMusic
+	sta aTempohi
 	jmp Sound_AdvanceMusic_Loop
 
 ;87E1
@@ -1463,6 +1464,13 @@ Sound_MusicCommand0F:
 	pla
 	sta [zSoundBase],y ;$50A, 音高レジスタ値下位
 	rts
+;* 命令10, 音符の初めの方の音程を少し下げるやつ
+;00 目標音符, 開始音符
+Sound_MusicCommand10:
+	jsr Sound_FetchByteMusic
+	jsr Sound_AdvanceMusic_Note
+	jsr Sound_CopyFreqValue
+	jmp Sound_AdvanceMusic_Loop
 
 ;周波数レジスタ値を音下げるやつの方にコピーする
 Sound_CopyFreqValue:

@@ -1,23 +1,28 @@
 
 ;曲の定義
 	mBEGIN #$0C, Table_TrackStartPointers
-	; .dw PHARMACEUTICAL_LAB
-	.dw WEBSPIDER
-	.dw ACID
-	.dw DEATHTRAP_MIRAGE
-	.dw DRY_GUYS
+	.dw PORKYS_PORKIES ; FLASH MAN
+	.dw WEBSPIDER ; WOOD MAN
+	.dw DRY_GUYS ; CRASH MAN
+	.dw DEATHTRAP_MIRAGE ; HEAT MAN
+	.dw PHARMACEUTICAL_LAB ; AIR MAN
+	.dw FLORENT_LBELLE ; METAL MAN
+	.dw SBOMB1_1 ; QUICK MAN
+	.dw ACID ; BUBBLE MAN
+	.dw PORKYS_PORKIES ; FLASH MAN
+	.dw PORKYS_PORKIES ; FLASH MAN
+	.dw PORKYS_PORKIES ; FLASH MAN
 	; .dw ETUDEFORGHOSTS
-	.dw FLORENT_LBELLE
 	; .dw FROZENHOTEL
 	; .dw HEARTACHE
-	.dw SBOMB1_1
 	; .dw SBOMB1_5
 	; .dw SBOMB1_6
 
-	.org $8AD0 ; WORKAROUND!!
+	.org $8AD4 ; WORKAROUND!!
 Sound_Modulations:
 	.include "src/music/modulations.asm"
 Sound_MusicData:
+	.include "src/music/porkysporkies/header.asm"
 	.include "src/music/webspider/header.asm"
 	.include "src/music/acid/header.asm"
     .include "src/music/deathtrapmirage/header.asm"

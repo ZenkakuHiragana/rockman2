@@ -1,5 +1,4 @@
 
-    TEMPO 180
     VOL 15
     ENV 2, 3
 .intro

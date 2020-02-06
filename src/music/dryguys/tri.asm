@@ -1,5 +1,4 @@
 
-	TEMPO 200
 	KEY O4
 .tri_loop_start
 	VOLRAW 25

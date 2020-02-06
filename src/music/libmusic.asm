@@ -20,7 +20,8 @@ TRACK .macro
 	.endm
 
 TEMPO .macro
-	;.db 0, \1
+	.db 0
+	.dw \1 ;usage: TEMPO BPM(NewTempo)
 	.endm
 
 PITCH .macro
@@ -104,7 +105,7 @@ TOMLOW .macro
 	.endm
 
 BEND .macro
-	.db $00
+	.db $10
 	\1 ; Note destination
 	\2 ; Note start
 	.endm

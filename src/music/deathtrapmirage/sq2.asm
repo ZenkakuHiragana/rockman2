@@ -1,5 +1,4 @@
 
-    TEMPO 180
     TONE 1
     VOL 15
     KEY O3 + 9

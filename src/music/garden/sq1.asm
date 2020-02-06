@@ -1,5 +1,4 @@
 
-    TEMPO 192
     TONE 2
     VOL 15
     KEY O2

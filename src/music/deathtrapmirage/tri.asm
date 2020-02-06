@@ -1,5 +1,4 @@
 
-	TEMPO 180
 	VOLRAW 67
 	KEY O3 + 4
     DOT	n4 -1 + 12
