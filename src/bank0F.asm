@@ -56,7 +56,7 @@ ChangeBank:
 ;20 51 C0
 PlayTrack:
 	ldy <zSoundQueue
-	cpy #$10
+	cpy #(aSoundQueueEnd - aSoundQueue + 1)
 	bcs .skip_playtrack
 	sta aSoundQueue,y
 	inc <zSoundQueue

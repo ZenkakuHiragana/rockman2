@@ -7,14 +7,13 @@
 	.dw DEATHTRAP_MIRAGE ; HEAT MAN
 	.dw PHARMACEUTICAL_LAB ; AIR MAN
 	.dw FLORENT_LBELLE ; METAL MAN
-	.dw SBOMB1_1 ; QUICK MAN
+	.dw FLORENT_LBELLE ; QUICK MAN
 	.dw ACID ; BUBBLE MAN
-	.dw PORKYS_PORKIES ; FLASH MAN
-	.dw PORKYS_PORKIES ; FLASH MAN
-	.dw PORKYS_PORKIES ; FLASH MAN
-	; .dw ETUDEFORGHOSTS
-	; .dw FROZENHOTEL
-	; .dw HEARTACHE
+	; .dw ETUDEFORGHOSTS ; WILY 1
+	.dw PORKYS_PORKIES ; WILY 1
+	.dw PORKYS_PORKIES ; WILY 2
+	; .dw HEARTACHE ; BOSS
+	; .dw SBOMB1_1
 	; .dw SBOMB1_5
 	; .dw SBOMB1_6
 
@@ -27,12 +26,12 @@ Sound_MusicData:
 	.include "src/music/acid/header.asm"
     .include "src/music/deathtrapmirage/header.asm"
     .include "src/music/dryguys/header.asm"
-	; .include "src/music/etudeforghosts.asm"
+	; .include "src/music/etudeforghosts/header.asm"
     .include "src/music/florent/header.asm"
 	; .include "src/music/frozenhotel.asm"
     .include "src/music/garden/header.asm"
 	; .include "src/music/heartache.asm"
-	.include "src/music/sbomb1_area1.asm"
+	; .include "src/music/sbomb1_area1.asm"
 	; .include "src/music/sbomb1_area5.asm"
 	; .include "src/music/sbomb1_area6.asm"
 
@@ -64,14 +63,16 @@ Sound_MusicData:
 	;$511,      効果音用音量レジスタ値
 	;$512,      効果音用音高レジスタ値下位
 	;$513,      効果音用音高レジスタ値上位
-	;$514,      MOD WW, bit7: ピッチMODが変位0に向かうフラグ
-	;$515,      MOD XX
-	;$516,      MOD YY
-	;$517,      MOD ZZ
+	;$514,      MOD WW, bit7: ピッチMODが変位0に向かうフラグ, bit6-0: ピッチMOD変化周期
+	;$515,      MOD XX, bit7-5: ピッチMOD変化量, bit4-0: ピッチMOD変化の最大回数
+	;$516,      MOD YY, bit7: 音量MOD変化方向(0: 上がる, 1:下がる), bit6-0: 音量MOD変化周期
+	;$517,      MOD ZZ, bit7: ピッチMOD変化量変化量の符号, bit6-4: 未使用, bit3-0: 音量MOD変化量
 	;$518,      ピッチMOD用時刻カウンタ
-	;$519,      ピッチMOD上下動情報, bit7: 増減方向, bit6-0: 変位の回数カウンタ
+	;$519,      ピッチMOD上下動情報, bit7: 増減方向, bit6-0: 変位の回数カウンタ(bit6-5は未使用にできる)
 	;$51A,      ピッチMOD変位量下位
-	;$51B,      ピッチMOD変位量上位
+	;$51B,      ピッチMOD変位量上位 -> 未使用
 	;$51C,      二度書き防止フラグ
 	;$51D,      音量MOD用カウンタ
 	;$51E,      音量MOD用現在の音量
+	;$51F,		サブルーチンのスタック下位
+	;$520,		サブルーチンのスタック上位

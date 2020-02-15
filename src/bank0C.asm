@@ -525,6 +525,12 @@ Sound_ManipulateVolumeMod:
 	mSTZ [zSoundBase],y ;$51D, 音量MOD用カウンタ
 	ldy #$17
 	lda [zSoundBase],y ;$517, MOD定義ZZ, 音量MOD変化量
+	bpl .positive
+	ora #%11110000
+	bmi .vol_diff
+.positive
+	and #$0F
+.vol_diff
 	ldy #$1E
 	clc
 	adc [zSoundBase],y ;$51E, 音量MODの現在の音量
@@ -640,13 +646,14 @@ Sound_ManipulatePitchEnvelope:
 	ldy #$14
 	lda [zSoundBase],y ;$514, MOD定義のWW
 	and #$7F
-	mBNE jmp .nopitchmod
+	beq .nopitchmod
+	sec
 	ldy #$18
-	cmp [zSoundBase],y ;$518, ピッチMOD用カウンタ
+	sbc [zSoundBase],y ;$518, ピッチMOD用カウンタ
 	bne .nopitchmod
 ;8436
-	mSTZ [zSoundBase],y ;$518, ピッチMOD用カウンタ
-	tax ;X = 0
+	sta [zSoundBase],y ;$518, ピッチMOD用カウンタ
+	tax
 	ldy #$15
 	lda [zSoundBase],y ;$515, MOD定義のXX
 	rol a
@@ -658,18 +665,30 @@ Sound_ManipulatePitchEnvelope:
 	sta <.PitchDiff
 	ldy #$19
 	lda [zSoundBase],y ;$519, ピッチMOD用上下動情報
-	asl a
-	bcc .negatepitch
+	bpl .negatepitch
+	sec
 	mSUB #$00, <.PitchDiff, <.PitchDiff ;$.PitchDiff = -$.PitchDiff
-	dex ;X = #$FF
+	dex
 .negatepitch
 	clc
 	ldy #$1A
 	mADD [zSoundBase],y, <.PitchDiff ;$51A, ピッチMOD変動下位
-	iny
-	txa ;A = X = #$00, #$FF, ピッチMOD変化量上位
-	adc [zSoundBase],y
-	sta [zSoundBase],y ;$51B, ピッチMOD変動上位
+	stx <zSoundPtr
+	ldx #$00
+	ldy #$17
+	lda [zSoundBase],y ;$517, MOD定義のZZ
+	mBPL dex
+	txa
+	adc <zSoundPtr
+	tax ;X = #$00, #$FF
+	lda [zSoundBase],y ;$517, MOD定義のZZ
+	asl a
+	clc
+	inx ;X = #$01, #$00
+	mBNE sec
+	ror a
+	sta [zSoundBase],y ;$517, MOD定義のZZ
+
 	ldy #$15
 .MaxPitchCount = zSoundPtr ;ピッチの最大変位回数
 	mAND [zSoundBase],y, #$1F, <.MaxPitchCount
@@ -677,28 +696,24 @@ Sound_ManipulatePitchEnvelope:
 	clc
 	mADD [zSoundBase],y, #$01 ;$519, ピッチMOD用上下動情報 += 1
 	and #$7F
-	cmp <zSoundPtr
+	cmp <.MaxPitchCount
 	bne .nopitchmod
 ;ピッチMODの変化方向を反転させる
 	mAND [zSoundBase],y, #%10000000 ;$519, ピッチMOD用上下動情報
 	ldy #$14
 	lda [zSoundBase],y ;$514, MOD定義のWW
-	asl a
-	bcs .inversepitchmod
-	mORA [zSoundBase],y, #%10000000 ;$514, MOD定義のWW
-	ldy #$19
-	lda [zSoundBase],y ;$519, ピッチMOD用上下動情報
-	bpl .positivepitchmod
-	and #%01111111
-	sta [zSoundBase],y ;$519 = 0XXX XXXX
-	bpl .nopitchmod
-.positivepitchmod
+	bmi .inversepitchmod
 	ora #%10000000
-	sta [zSoundBase],y ;$519 = 1XXX XXXX
-	bmi .nopitchmod
-;84A3
+	bmi .inversepitchmod_write
 .inversepitchmod
-	mAND [zSoundBase],y, #%01111111 ;$514, MOD定義のWW
+	and #%01111111
+.inversepitchmod_write
+	sta [zSoundBase],y ;$514, MOD定義のWW
+	bpl .nopitchmod
+	ldy #$19
+	lda [zSoundBase],y
+	eor #%10000000 ;$519, ピッチMOD用上下動情報
+	sta [zSoundBase],y ;$519, $514
 .nopitchmod
 	mAND <.RegPtr, #$7F ;$.RegPtr = #$09, #$10
 	inc <.RegPtr ;$.RegPtr = #$0A, #$11
@@ -707,13 +722,18 @@ Sound_ManipulatePitchEnvelope:
 	ldy <.RegPtr
 	clc
 	adc [zSoundBase],y ;$50A, $511, 音高レジスタ値下位(曲, SFX)
-	tax ;X = $50A, $511 + $51A
-	ldy #$1B
-	lda [zSoundBase],y ;$51B, ピッチMOD変動上位
+	pha ;Stack = $50A, $511 + $51A
+	ldx #$00
+	ldy #$17
+	lda [zSoundBase],y ;$517, MOD定義のZZ
+	mBPL dex ;X = #$00, #$FF
+	txa
 	inc <.RegPtr ;$.RegPtr = #$0B, #$12
 	ldy <.RegPtr
 	adc [zSoundBase],y ;$50B, $512, 音高レジスタ値上位(曲, SFX)
 	tay ;Y = $50B, $512 + $51B
+	pla
+	tax ;X = $50A, $511 + $51A
 
 ;X, Y = ピッチMOD適用後の音高レジスタ値下位, 上位
 	lda <zProcessChannel
@@ -833,24 +853,6 @@ Sound_InitializeModulation_Continue:
 	sta [zSoundBase],y ;$51C, 二度書き防止用退避変数
 	rts
 
-;8556
-Sound_ExecuteCommand:
-	txa
-	asl a
-	tay
-	iny
-	pla
-	sta <zSoundPtr
-	pla
-	sta <zSoundPtrhi
-	lda [zSoundPtr],y
-	tax
-	iny
-	lda [zSoundPtr],y
-	sta <zSoundPtrhi
-	stx <zSoundPtr
-	jmp [zSoundPtr]
-
 ;856D
 Sound_ProcessSFX:
 .Volume = zSoundPtr
@@ -904,14 +906,33 @@ Sound_AdvanceSFX:
 
 ;85C2
 Sound_ProcessSFXCommand:
-	jsr Sound_ExecuteCommand
-	.dw Sound_ProcessSFXCommand00
-	.dw Sound_ProcessSFXCommand01
-	.dw Sound_ProcessSFXCommand02
-	.dw Sound_ProcessSFXCommand03
-	.dw Sound_ProcessSFXCommand04
-	.dw Sound_ProcessSFXCommand05
-	.dw Sound_ProcessSFXCommand06
+	lda Sound_SFXCommandListlo,x
+	ldy Sound_SFXCommandListhi,x
+	bmi Sound_ProcessMusicCommand.write
+Sound_ProcessMusicCommand:
+	lda Sound_MusicCommandListlo,x
+	ldy Sound_MusicCommandListhi,x
+.write .public
+	sta <zSoundPtr
+	sty <zSoundPtrhi
+	jmp [zSoundPtr]
+
+Sound_SFXCommandListlo:
+	.db LOW(Sound_ProcessSFXCommand00)
+	.db LOW(Sound_ProcessSFXCommand01)
+	.db LOW(Sound_ProcessSFXCommand02)
+	.db LOW(Sound_ProcessSFXCommand03)
+	.db LOW(Sound_ProcessSFXCommand04)
+	.db LOW(Sound_ProcessSFXCommand05)
+	.db LOW(Sound_ProcessSFXCommand06)
+Sound_SFXCommandListhi:
+	.db HIGH(Sound_ProcessSFXCommand00)
+	.db HIGH(Sound_ProcessSFXCommand01)
+	.db HIGH(Sound_ProcessSFXCommand02)
+	.db HIGH(Sound_ProcessSFXCommand03)
+	.db HIGH(Sound_ProcessSFXCommand04)
+	.db HIGH(Sound_ProcessSFXCommand05)
+	.db HIGH(Sound_ProcessSFXCommand06)
 
 ;85D3
 Sound_ProcessSFXCommand00:
@@ -1176,25 +1197,42 @@ Sound_WriteTieRepetition: ;0 ≦ A ≦ 7, タイの個数
 
 ;87C0
 ;曲の音符以外の命令処理
-Sound_ProcessMusicCommand:
-	jsr Sound_ExecuteCommand
-	.dw Sound_MusicCommand00
-	.dw Sound_MusicCommand01
-	.dw Sound_MusicCommand02
-	.dw Sound_MusicCommand03
-	.dw Sound_MusicCommand04
-	.dw Sound_MusicCommand05
-	.dw Sound_MusicCommand06
-	.dw Sound_MusicCommand07
-	.dw Sound_MusicCommand08
-	.dw Sound_MusicCommand09
-	.dw Sound_ProcessTriplet
-	.dw Sound_MusicCommand0B
-	.dw Sound_MusicCommand0C
-	.dw Sound_MusicCommand0D
-	.dw Sound_MusicCommand0E
-	.dw Sound_MusicCommand0F
-	.dw Sound_MusicCommand10
+Sound_MusicCommandListlo:
+	.db LOW(Sound_MusicCommand00)
+	.db LOW(Sound_MusicCommand01)
+	.db LOW(Sound_MusicCommand02)
+	.db LOW(Sound_MusicCommand03)
+	.db LOW(Sound_MusicCommand04)
+	.db LOW(Sound_MusicCommand05)
+	.db LOW(Sound_MusicCommand06)
+	.db LOW(Sound_MusicCommand07)
+	.db LOW(Sound_MusicCommand08)
+	.db LOW(Sound_MusicCommand09)
+	.db LOW(Sound_ProcessTriplet)
+	.db LOW(Sound_MusicCommand0B)
+	.db LOW(Sound_MusicCommand0C)
+	.db LOW(Sound_MusicCommand0D)
+	.db LOW(Sound_MusicCommand0E)
+	.db LOW(Sound_MusicCommand0F)
+	.db LOW(Sound_MusicCommand10)
+Sound_MusicCommandListhi:
+	.db HIGH(Sound_MusicCommand00)
+	.db HIGH(Sound_MusicCommand01)
+	.db HIGH(Sound_MusicCommand02)
+	.db HIGH(Sound_MusicCommand03)
+	.db HIGH(Sound_MusicCommand04)
+	.db HIGH(Sound_MusicCommand05)
+	.db HIGH(Sound_MusicCommand06)
+	.db HIGH(Sound_MusicCommand07)
+	.db HIGH(Sound_MusicCommand08)
+	.db HIGH(Sound_MusicCommand09)
+	.db HIGH(Sound_ProcessTriplet)
+	.db HIGH(Sound_MusicCommand0B)
+	.db HIGH(Sound_MusicCommand0C)
+	.db HIGH(Sound_MusicCommand0D)
+	.db HIGH(Sound_MusicCommand0E)
+	.db HIGH(Sound_MusicCommand0F)
+	.db HIGH(Sound_MusicCommand10)
 
 ;* 命令00, テンポ変更
 ;00 目標音符, 開始音符

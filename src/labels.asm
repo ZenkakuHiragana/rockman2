@@ -450,7 +450,8 @@ aTempohi = $57D         ;共有テンポ値上位
 a57E = $57E
 a57F = $57F
 
-aSoundQueue = $580      ;処理する曲のリスト
+aSoundQueue = $580      ;処理する曲のリスト ($580 → $586)
+aSoundQueueEnd = $58F   ;処理する曲のリストの終端位置
 aWeaponCollision = $590 ;武器の当たり判定
 aWeaponPlatformW = $5A0 ;武器の足場判定広さ
 aWeaponPlatformY = $5A3 ;武器の足場判定Y位置
