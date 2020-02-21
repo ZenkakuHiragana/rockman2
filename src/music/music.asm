@@ -1,7 +1,7 @@
 
 ;曲の定義
 	mBEGIN #$0C, Table_TrackStartPointers
-	.dw PORKYS_PORKIES ; FLASH MAN
+	.dw BATTY ; FLASH MAN
 	.dw WEBSPIDER ; WOOD MAN
 	.dw DRY_GUYS ; CRASH MAN
 	.dw DEATHTRAP_MIRAGE ; HEAT MAN
@@ -21,6 +21,7 @@
 Sound_Modulations:
 	.include "src/music/modulations.asm"
 Sound_MusicData:
+	.include "src/music/batty/header.asm"
 	.include "src/music/porkysporkies/header.asm"
 	.include "src/music/webspider/header.asm"
 	.include "src/music/acid/header.asm"
@@ -47,11 +48,11 @@ Sound_MusicData:
 	;$501,      曲ポインタ上位
 	;$502,      音長カウンタ下位
 	;$503,      音長カウンタ上位
-	;$504,      音下げるやつの目標値下位 *テンポ値
-	;$505,      bit7-3: 音下げるやつの変化速度, bit2-0: 音下げるやつの目標値上位 *繰り返し回数
+	;$504,      音下げるやつの目標値下位
+	;$505,      bit7-3: 音下げるやつの変化速度, bit2-0: 音下げるやつの目標値上位
 	;$506,      bit7-5: タイの個数, bit4-0: MOD番号
 	;$507,      周波数テーブルベースポインタ下位
-	;$508,      繰り返し回数 *周波数テーブルベースポインタ上位
+	;$508,      bit7-5: 命令0Bによる繰り返し回数, bit4-0: 命令04による繰り返し回数
 	;$509,      ピッチenv変化量
 	;$50A,      音高レジスタ値下位
 	;$50B,      音高レジスタ値上位
@@ -70,9 +71,8 @@ Sound_MusicData:
 	;$518,      ピッチMOD用時刻カウンタ
 	;$519,      ピッチMOD上下動情報, bit7: 増減方向, bit6-0: 変位の回数カウンタ(bit6-5は未使用にできる)
 	;$51A,      ピッチMOD変位量下位
-	;$51B,      ピッチMOD変位量上位 -> 未使用
-	;$51C,      二度書き防止フラグ
-	;$51D,      音量MOD用カウンタ
-	;$51E,      音量MOD用現在の音量
-	;$51F,		サブルーチンのスタック下位
-	;$520,		サブルーチンのスタック上位
+	;$51B,      二度書き防止フラグ
+	;$51C,      音量MOD用カウンタ
+	;$51D,      音量MOD用現在の音量
+	;$51E,		サブルーチンのスタック下位
+	;$51F,		サブルーチンのスタック上位

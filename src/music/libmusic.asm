@@ -44,6 +44,10 @@ LOOP .macro
 	.db 4, \1, LOW(\2), HIGH(\2)
 	.endm
 
+LOOP2 .macro
+	.db #$0B, \1, LOW(\2), HIGH(\2)
+	.endm
+
 KEY .macro
 	.db 5, \1
 	.endm
@@ -86,8 +90,8 @@ SHORT .macro
 	.endif
 	.endm
 
-PITCH0 .macro
-	.db $0B
+PITCH0 .macro ; alias of PITCH 0, deprecated
+	PITCH 0
 	.endm
 
 VOLUP .macro
@@ -119,6 +123,14 @@ SLUR .macro
 	.if \?1
 	\1
 	.endif
+	.endm
+
+CALL .macro
+	.db #$11, LOW(\1), HIGH(\1)
+	.endm
+
+RETURN .macro
+	.db #$11
 	.endm
 
 n .macro

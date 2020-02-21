@@ -444,13 +444,13 @@ aNOIVolModVolume = $57B ;ノイズ音量モジュレーションでの現在の�
 aModDefine = $57C       ;モジュレーション定義へのポインタ下位
 aModDefinehi = $57D     ;モジュレーション定義へのポインタ上位
 
-aTempo = $57C           ;共有テンポ値下位
-aTempohi = $57D         ;共有テンポ値上位
+aTempo = $580           ;共有テンポ値下位
+aTempohi = $581         ;共有テンポ値上位
 
 a57E = $57E
 a57F = $57F
 
-aSoundQueue = $580      ;処理する曲のリスト ($580 → $586)
+aSoundQueue = $582      ;処理する曲のリスト ($580 → $586)
 aSoundQueueEnd = $58F   ;処理する曲のリストの終端位置
 aWeaponCollision = $590 ;武器の当たり判定
 aWeaponPlatformW = $5A0 ;武器の足場判定広さ
