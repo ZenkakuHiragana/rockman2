@@ -42,7 +42,7 @@
     ENV 1, 2
     n3 1
     n3 1
-    n4 9
+    n4 7
 
 .noiA
     CALL .noi_sub2

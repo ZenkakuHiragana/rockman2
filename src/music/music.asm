@@ -1,6 +1,10 @@
 
 ;曲の定義
 	mBEGIN #$0C, Table_TrackStartPointers
+	.list
+	.incbin "rockman2.prg", $30A50, $86
+	.nolist
+	mBEGIN #$0C, Table_TrackStartPointers
 	.dw BATTY ; FLASH MAN
 	.dw WEBSPIDER ; WOOD MAN
 	.dw DRY_GUYS ; CRASH MAN
@@ -17,7 +21,7 @@
 	; .dw SBOMB1_5
 	; .dw SBOMB1_6
 
-	.org $8AD4 ; WORKAROUND!!
+	mBEGIN #$0C, Table_TrackStartPointers + $86
 Sound_Modulations:
 	.include "src/music/modulations.asm"
 Sound_MusicData:

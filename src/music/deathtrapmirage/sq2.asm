@@ -161,14 +161,14 @@
     LOOP 2, .sq2_vol_fade2
 
     n3 3 + 12
-    PITCH -2
+    PITCH -4
     KEY O3
     VOL 15
     ENV 0, 0
     n4 10
 
     TONE 0
-    PITCH0
+    PITCH 0
     ENV 9, 1
     DOT n4 6 + 12
     n2 5 + 12
@@ -197,9 +197,9 @@
 
     VOL 12
     TIE
-    PITCH -9
+    PITCH -18
     n2 2
-    PITCH0
+    PITCH 0
     n3 3
     n2
     n2 3
@@ -217,9 +217,9 @@
 
     LOOP 0, .sq2_B
 .sq2_B1
-    PITCH -2
+    PITCH -4
     n4 10
-    PITCH0
+    PITCH 0
     TONE 0
     VOL 12
     ENV 9, 1
@@ -255,37 +255,37 @@
     VOL 15
     ENV 0, 0
     LOOP 1, .sq2_B1
-    PITCH -9
+    PITCH -18
     n2 10
     n2 10
     n2 10
     n2 10
-    PITCH0
+    PITCH 0
     ENV 9, 1
 
     LOOP 0, .sq2_C
 .sq2_C1
     n2 9
     n2 10
-    PITCH -9
+    PITCH -18
     TONE 2
     VOL 15
     ENV 0, 0
     n2 10
-    PITCH0
+    PITCH 0
     TONE 0
     VOL 12
     ENV 9, 1
     n2 10
-    PITCH -4
+    PITCH -8
     TONE 2
     VOL 15
     ENV 0, 0
     n3 10
-    PITCH -9
+    PITCH -18
     n2 10
     n2 10
-    PITCH0
+    PITCH 0
     ENV 9, 1
 .sq2_C
     TONE 1
@@ -318,28 +318,28 @@
     n2 10
     n2 3
     LOOP 1, .sq2_C1
-    PITCH -9
+    PITCH -18
     TONE 2
     VOL 15
     ENV 0, 0
     n2 10
     n2 10
-    PITCH -4
+    PITCH -8
     n3 10
-    PITCH -2
+    PITCH -4
     n4 10
 
     LOOP 0, .sq2_D
 .sq2_D1
     n2 3
     n2 10
-    PITCH -2
+    PITCH -4
     TONE 2
     VOL 15
     ENV 0, 0
     n4 10
 .sq2_D
-    PITCH0
+    PITCH 0
     TONE 1
     ENV 9, 1
     n3 10 + 12
@@ -373,34 +373,34 @@
     n2 9
     n2 10
     LOOP 1, .sq2_D1
-    PITCH -9
+    PITCH -18
     TONE 2
     VOL 15
     ENV 0, 0
     n2 10
     n2 10
-    PITCH -4
+    PITCH -8
     n3 10
     n3 10
 
-    PITCH -2
+    PITCH -4
     n5 10
     n5 10
 
     n5 10
-    PITCH -4
+    PITCH -8
     n3 10
     n3 10
     n3 10
     n3 10
 
 .sq2_E
-    PITCH -2
+    PITCH -4
     n4 10
     n4 10
     LOOP 2, .sq2_E
 
-    PITCH0
+    PITCH 0
     TONE 2
     VOL 12
     KEY O4
@@ -415,20 +415,20 @@
 
     LOOP 0, .sq2_F
 .sq2_F1
-    PITCH -4
+    PITCH -8
     VOL 15
     KEY O3
     ENV 0, 0
     n3 10
     n3 10
     n3 10
-    PITCH -2
-    n4 10
     PITCH -4
+    n4 10
+    PITCH -8
     n3 10
     n3 10
     n3 10
-    PITCH0
+    PITCH 0
     KEY O4
     ENV 9, 1
 .sq2_F

@@ -1,6 +1,6 @@
 
 	KEY O4 - 5
-	PITCH 30
+	PITCH 60
 	VOLRAW $81
 .triIntro
 	n3 5 + 5
@@ -30,7 +30,7 @@
 	
 	LOOP 0, .triA2
 .triA1
-	PITCH0
+	PITCH 0
 	TOMLOW
 	SHORT n2 8 + 5
 	TOMLOW
@@ -44,14 +44,14 @@
 	n3 4 + 5
 	n3 3 + 5
 .tri_loop
-	PITCH 30
+	PITCH 60
 .triA2
 	n3 5 + 5
 	n3 5 + 5
 	n2 12 + 5
 	n3 5 + 5
 	n2 12 + 5
-	PITCH0
+	PITCH 0
 	n2 3 + 5
 	TOMLOW
 	n2 3 + 5
@@ -61,14 +61,14 @@
 	n2 1 + 5
 	n3 3 + 5
 	n3 1 + 5
-	PITCH 30
+	PITCH 60
 	
 	n3 5 + 5
 	n3 5 + 5
 	n2 12 + 5
 	n3 5 + 5
 	n2 12 + 5
-	PITCH0
+	PITCH 0
 	n2 4 + 5
 	TOMLOW
 	n2 4 + 5
@@ -78,14 +78,14 @@
 	n2 3 + 5
 	n3 4 + 5
 	n3 3 + 5
-	PITCH 30
+	PITCH 60
 	
 	n3 5 + 5
 	n3 5 + 5
 	n2 12 + 5
 	n3 5 + 5
 	n2 12 + 5
-	PITCH0
+	PITCH 0
 	n2 5 + 5
 	TOMLOW
 	n2 5 + 5
@@ -95,7 +95,7 @@
 	n2 4 + 5
 	n3 5 + 5
 	n3 4 + 5
-	PITCH 30
+	PITCH 60
 	
 	n3 5 + 5
 	n3 5 + 5
@@ -106,12 +106,12 @@
 
 	n4
 	TIE
-	PITCH0
+	PITCH 0
 	n2 8 + 5
-	PITCH 30
+	PITCH 60
 	DOT n3 8 + 5
 
-	PITCH0
+	PITCH 0
 	LOOP 0, .triB2
 .triB1
 	TOMLOW

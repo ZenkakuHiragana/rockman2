@@ -103,9 +103,9 @@
     DOT n3 8 + 12
     n2 4 + 12
     n3 1 + 12
-    PITCH 40
+    PITCH 80
     n3 1 + 12 + 12
-    PITCH0
+    PITCH 0
 
     TOMLOW
     n2 6 + 12

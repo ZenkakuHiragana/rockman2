@@ -65,11 +65,11 @@
     n3 10
 .tri_miniloop_A
     n2 -1 + 12
-    PITCH 1
+    PITCH 2
     n2 2 + 12
     n2 2 + 12
     n2
-    PITCH0
+    PITCH 0
     n2 2 + 12
     n2
     n2 -1 + 12
@@ -82,11 +82,11 @@
     n3 2 + 12
 
     n2 -1 + 12
-    PITCH 1
+    PITCH 2
     n2 2 + 12
     n2 2 + 12
     n2
-    PITCH0
+    PITCH 0
     n2 2 + 12
     n2
     n2 -1 + 12
@@ -135,13 +135,13 @@
     n4 -1 + 12
     n4 -1 + 12
     n3 -1 + 12
-    PITCH 16
+    PITCH 32
     n2 7 + 12 + 12
     n2
     VOLRAW 67
     n4 7 + 12 + 12
 
-    PITCH0
+    PITCH 0
     KEY O3
     LOOP 0, .tri_miniloop_B
 .tri_miniloop_B1
@@ -153,16 +153,16 @@
 .tri_miniloop_B
 .d = 2
     n3 3 + 12
-    PITCH 21
+    PITCH 42
     n3 3 + 12 + 12
-    PITCH0
+    PITCH 0
     n3 3
-    PITCH0
+    PITCH 0
     TIE
     n3 3 + 12 + 12
-    PITCH 13
+    PITCH 26
     n3 3 + 12 + 12
-    PITCH0
+    PITCH 0
     TIE 2
     n1 1
     DOT n2 3
@@ -182,16 +182,16 @@
     n3 8
 
     n3 3 + 12
-    PITCH 21
+    PITCH 42
     n3 3 + 12 + 12
-    PITCH0
+    PITCH 0
     n3 3
-    PITCH0
+    PITCH 0
     TIE
     n3 3 + 12 + 12
-    PITCH 13
+    PITCH 26
     n3 3 + 12 + 12
-    PITCH0
+    PITCH 0
     n1 1
     DOT n2 3
     n1 1
@@ -205,15 +205,15 @@
     n3 3
     LOOP 3, .tri_miniloop_B1
 
-    PITCH 20
+    PITCH 40
     KEY O5
     n2 11
     n2 11
-    PITCH 16
+    PITCH 32
     n4 11
     n4 11
 
-    PITCH0
+    PITCH 0
     KEY O3
     LOOP 0, .tri_miniloop_C
 .tri_miniloop_C1
@@ -255,7 +255,7 @@
     LOOP 3, .tri_miniloop_C1
 
     n3 9
-    PITCH 14
+    PITCH 28
     KEY O5
     n2 9
     n2 9
@@ -265,7 +265,7 @@
     n2 9
     n2 9
     n2 9
-    PITCH0
+    PITCH 0
 	VOLRAW 67
 	KEY O3 + 4
     LOOP 0, .tri_loop_start

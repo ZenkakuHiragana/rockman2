@@ -42,18 +42,18 @@
     n2 8 + 12
     LOOP 1, .sq1_A1
 
-    PITCH -2
+    PITCH -4
     KEY O3 + 9
     ENV 0, 0
     n4 1
     n4 1
     n4 1
     TIE
-    PITCH0
+    PITCH 0
     n2 6 + 12 + 12
-    PITCH 37
+    PITCH 74
     DOT n3 6 + 12 + 12
-    PITCH0
+    PITCH 0
 
 .sq1_loop_start
     TONE 2
@@ -85,9 +85,9 @@
     n6
     VOL 15
     ENV 0, 0
-    PITCH -2
+    PITCH -4
     n4 10
-    PITCH0
+    PITCH 0
     ENV 9, 1
 
     BENDSPEED 2
@@ -114,9 +114,9 @@
     n6
     VOL 15
     ENV 0, 0
-    PITCH -2
+    PITCH -4
     n4 10
-    PITCH0
+    PITCH 0
     ENV 9, 1
 
     BENDSPEED 9
@@ -155,19 +155,19 @@
     VOL 15
     n3 6 + 12
     n3 5 + 12
-    PITCH 86
+    PITCH 127
     n2 1 + 12
-    PITCH 71
+    PITCH 127
     n2 1 + 12
     PITCH0
     n3 5 + 12
     n2 6 + 12
-    PITCH 91
+    PITCH 127
     n2 12
-    PITCH 76
+    PITCH 127
     n2 12
     n2 12
-    PITCH0
+    PITCH 0
     TONE 2
     KEY O4
     n2 6 + 12
@@ -353,15 +353,15 @@
     n3 1 + 12 + 12
 
     n3 3 + 12
-    PITCH -4
+    PITCH -8
     TONE 2
     KEY O3
     ENV 0, 0
     n3 10
     n3 10
-    PITCH -2
-    n4 10
     PITCH -4
+    n4 10
+    PITCH -8
     n3 10
     n3 10
     n3 10
@@ -369,14 +369,14 @@
     n3 10
     n3 10
     n3 10
-    PITCH -2
-    n4 10
     PITCH -4
+    n4 10
+    PITCH -8
     n3 10
     n3 10
     n3 10
 
-    PITCH0
+    PITCH 0
     ENV 9, 1
     KEY O4
     n3 11
@@ -398,20 +398,20 @@
     n3 1 + 12
 
     n3 10
-    PITCH -4
+    PITCH -8
     TONE 2
     KEY O3
     ENV 0, 0
     n3 10
     n3 10
-    PITCH -2
-    n4 10
     PITCH -4
+    n4 10
+    PITCH -8
     n3 10
     n3 10
     n3 10
 
-    PITCH0
+    PITCH 0
     ENV 9, 1
     LOOP 1, .sq1_D1
     TONE 0

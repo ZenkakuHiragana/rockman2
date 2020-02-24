@@ -22,13 +22,13 @@
     n2 2
     n2 2
 
-    PITCH -2
+    PITCH -4
     ENV 0, 0
     MOD 4
     n4 10
     n4 10
     n4 10
-    PITCH0
+    PITCH 0
     ENV 1, 2
     MOD 0
     n2 7
@@ -100,11 +100,11 @@
     n2 12
     n2 12
     n2 2
-    PITCH -2
+    PITCH -4
     ENV 0, 0
     MOD 4
     n4 10
-    PITCH0
+    PITCH 0
     ENV 1, 2
     MOD 0
     LOOP 2, .noi_loop_start
@@ -144,11 +144,11 @@
 
     LOOP 0, .noi_miniloop_B
 .noi_miniloop_B1
-    PITCH -2
+    PITCH -4
     ENV 0, 0
     MOD 4
     n4 10
-    PITCH0
+    PITCH 0
     ENV 1, 2
     MOD 0
 .noi_miniloop_B
@@ -182,14 +182,14 @@
     n2 12
     n2 2
     LOOP 1, .noi_miniloop_B1
-    PITCH -2
+    PITCH -4
     ENV 0, 0
     MOD 4
     n2 10
     n2 10
     n2 10
     n2 10
-    PITCH0
+    PITCH 0
     ENV 1, 2
     MOD 0
 
@@ -197,21 +197,21 @@
 .noi_miniloop_C1
     n2 2
     n2 2
-    PITCH -2
+    PITCH -4
     ENV 0, 0
     MOD 4
     n2 10
-    PITCH0
+    PITCH 0
     ENV 1, 2
     MOD 0
     n2 2
-    PITCH -2
+    PITCH -4
     ENV 0, 0
     MOD 4
     n3 10
     n2 10
     n2 10
-    PITCH0
+    PITCH 0
     ENV 1, 2
     MOD 0
 .noi_miniloop_C
@@ -241,14 +241,14 @@
     n2 12
     n2 2
     LOOP 1, .noi_miniloop_C1
-    PITCH -2
+    PITCH -4
     ENV 0, 0
     MOD 4
     n2 10
     n2 10
     n3 10
     n4 10
-    PITCH0
+    PITCH 0
     ENV 1, 2
     MOD 0
 
@@ -256,11 +256,11 @@
 .noi_miniloop_D1
     n2 12
     n2 2
-    PITCH -2
+    PITCH -4
     ENV 0, 0
     MOD 4
     n4 10
-    PITCH0
+    PITCH 0
     ENV 1, 2
     MOD 0
 .noi_miniloop_D
@@ -292,7 +292,7 @@
     n2 2
     n2 7
     LOOP 1, .noi_miniloop_D1
-    PITCH -2
+    PITCH -4
     ENV 0, 0
     MOD 4
     n2 10
@@ -314,7 +314,7 @@
     n4 10
     LOOP 2, .noi_miniloop_E
 
-    PITCH0
+    PITCH 0
     ENV 1, 2
     MOD 0
     n3 7
@@ -331,7 +331,7 @@
     n3 10
     n3 10
     n3 10
-    PITCH0
+    PITCH 0
     ENV 1, 2
     MOD 0
 .noi_miniloop_F
@@ -370,7 +370,7 @@
     n2 2
 
     n3 12
-    PITCH -2
+    PITCH -4
     ENV 0, 0
     MOD 4
     n3 10
@@ -381,7 +381,7 @@
     n3 10
 
     LOOP 3, .noi_miniloop_F1
-    PITCH0
+    PITCH 0
     ENV 1, 2
     MOD 0
     n3 2

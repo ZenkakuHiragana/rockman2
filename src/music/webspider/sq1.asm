@@ -65,9 +65,9 @@
     n3 4
     TIE
     DOT n3 4 + 12 + 12
-    PITCH 1
+    PITCH 2
     DOT n3 4 + 12 + 12
-    PITCH0
+    PITCH 0
     TIE
     n5 5
     n3 5
@@ -118,9 +118,9 @@
     n3 4
     TIE
     DOT n3 4 + 12 + 12
-    PITCH 1
+    PITCH 2
     DOT n3 4 + 12 + 12
-    PITCH0
+    PITCH 0
     TIE
     n5 5
     n3 5
@@ -134,9 +134,9 @@
     KEY O2
     TIE
     n2 8
-    PITCH 48
+    PITCH 96
     DOT n3 8
-    PITCH0
+    PITCH 0
     KEY O4
 
 
@@ -161,14 +161,14 @@
     DOT n4 9 + 12
     TIE 4
     n5 9
-    PITCH 1
+    PITCH 2
     n5 9
-    PITCH0
+    PITCH 0
     n4 9
 
-    PITCH -1
+    PITCH -2
     n5 9
-    PITCH0
+    PITCH 0
     n6 9
 
     TONE 0

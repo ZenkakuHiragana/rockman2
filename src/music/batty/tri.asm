@@ -74,7 +74,10 @@
 	PITCH 0
 
 .tri_loop
-	DOT n5
+	n5
+	TOMHIGH
+	n3 1
+	n3
 	VOLRAW $20
 	LOOP 0, .triB1
 .triB
