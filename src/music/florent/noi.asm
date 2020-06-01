@@ -17,18 +17,9 @@
     n4 14
     DOT n5 14
 
+.noiA
     n4 14
-    n4 14
-    n4 14
-    n4 14
-    n4 14
-    n4 14
-    n4 14
-    n4 14
-    n4 14
-    n4 14
-    n4 14
-    n4 14
+    LOOP 11, .noiA
 
     n6
     n6
@@ -46,16 +37,9 @@
     ENV 8, 1
     BEND n5 3, n5 10
     ENV 1, 2
+.noiB
     n4 14
-    n4 14
-    n4 14
-    n4 14
-    n4 14
-    n4 14
-    n4 14
-    n4 14
-    n4 14
-    n4 14
+    LOOP 9, .noiB
     n5 14
 
     n2
@@ -72,14 +56,9 @@
     ENV 8, 1
     BEND n5 3, n5 10
     ENV 1, 2
+.noiC
     n4 14
-    n4 14
-    n4 14
-    n4 14
-    n4 14
-    n4 14
-    n4 14
-    n4 14
+    LOOP 7, .noiC
     n3 14
     n6 14
     DOT n4

@@ -133,7 +133,7 @@
 	n2 6
 	n5 8
 	n5 4
-	MOD 5
+	MOD MOD_4d2t1f
 	n6 1
 	MOD 0
 	LOOP 0, .tri_loop

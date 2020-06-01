@@ -46,7 +46,7 @@
     n3 1 + 12 + 2
     TIE 1
     n3 4 + 12 + 2
-    MOD 3
+    MOD MOD_1d2t1f
     n5 4 + 12 + 2
     MOD 0
     n3

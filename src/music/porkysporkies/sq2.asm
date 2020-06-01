@@ -117,7 +117,7 @@
     VOL 9
     TIE 4
     n2 8
-    MOD 5
+    MOD MOD_4d2t1f
     n3 8
     MOD 0
     n2 8
@@ -129,7 +129,7 @@
     KEY O2
     n3 4
     KEY O4 - 1
-    MOD 5
+    MOD MOD_4d2t1f
     n4 4 + 1
     MOD 0
     n2 4 + 1
@@ -246,7 +246,7 @@
 
     n3
     ENV 0, 0
-    MOD 5
+    MOD MOD_4d2t1f
     n4 4
     MOD 0
     n2 4
@@ -288,7 +288,7 @@
     VOL 3
     n3 3 + 12
     VOL 9
-    MOD 5
+    MOD MOD_4d2t1f
     TIE 2
     DOT n3 4 + 12
     VOL 3

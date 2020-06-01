@@ -24,7 +24,7 @@
 
     PITCH -4
     ENV 0, 0
-    MOD 4
+    MOD MOD_DEATHTRAP
     n4 10
     n4 10
     n4 10
@@ -102,7 +102,7 @@
     n2 2
     PITCH -4
     ENV 0, 0
-    MOD 4
+    MOD MOD_DEATHTRAP
     n4 10
     PITCH 0
     ENV 1, 2
@@ -146,7 +146,7 @@
 .noi_miniloop_B1
     PITCH -4
     ENV 0, 0
-    MOD 4
+    MOD MOD_DEATHTRAP
     n4 10
     PITCH 0
     ENV 1, 2
@@ -184,7 +184,7 @@
     LOOP 1, .noi_miniloop_B1
     PITCH -4
     ENV 0, 0
-    MOD 4
+    MOD MOD_DEATHTRAP
     n2 10
     n2 10
     n2 10
@@ -199,7 +199,7 @@
     n2 2
     PITCH -4
     ENV 0, 0
-    MOD 4
+    MOD MOD_DEATHTRAP
     n2 10
     PITCH 0
     ENV 1, 2
@@ -207,7 +207,7 @@
     n2 2
     PITCH -4
     ENV 0, 0
-    MOD 4
+    MOD MOD_DEATHTRAP
     n3 10
     n2 10
     n2 10
@@ -243,7 +243,7 @@
     LOOP 1, .noi_miniloop_C1
     PITCH -4
     ENV 0, 0
-    MOD 4
+    MOD MOD_DEATHTRAP
     n2 10
     n2 10
     n3 10
@@ -258,7 +258,7 @@
     n2 2
     PITCH -4
     ENV 0, 0
-    MOD 4
+    MOD MOD_DEATHTRAP
     n4 10
     PITCH 0
     ENV 1, 2
@@ -294,7 +294,7 @@
     LOOP 1, .noi_miniloop_D1
     PITCH -4
     ENV 0, 0
-    MOD 4
+    MOD MOD_DEATHTRAP
     n2 10
     n2 10
     n3 10
@@ -372,7 +372,7 @@
     n3 12
     PITCH -4
     ENV 0, 0
-    MOD 4
+    MOD MOD_DEATHTRAP
     n3 10
     n3 10
     n4 10

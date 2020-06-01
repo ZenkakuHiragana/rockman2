@@ -2,7 +2,7 @@
     TONE 2
     VOL 12
     KEY O4
-    MOD 3
+    MOD MOD_1d2t1f
 .sq1_loop_start
     ENV 1, 5, 1
     n2 1 + 12

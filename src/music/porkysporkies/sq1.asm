@@ -97,7 +97,7 @@
     VOL 12
     TIE 2
     n3 4
-    MOD 5
+    MOD MOD_4d2t1f
     n3 4
     MOD 0
     VOL 6
@@ -117,7 +117,7 @@
     VOL 12
     TIE 2
     n3 8
-    MOD 5
+    MOD MOD_4d2t1f
     n3 8
     MOD 0
     VOL 6
@@ -129,7 +129,7 @@
     n3 1
     KEY O4
 
-    MOD 5
+    MOD MOD_4d2t1f
     n4 8
     MOD 0
     n2 1 + 12
@@ -149,7 +149,7 @@
     n2
     TIE
     n3 3 + 12
-    MOD 5
+    MOD MOD_4d2t1f
     n5 3 + 12
     MOD 0
 
@@ -171,7 +171,7 @@
     n2
     TIE
     n3 4 + 12
-    MOD 5
+    MOD MOD_4d2t1f
     n5 4 + 12
 
     n3
@@ -193,7 +193,7 @@
     n2
     TIE
     n3 3 + 12
-    MOD 5
+    MOD MOD_4d2t1f
     n5 3 + 12
     MOD 0
 
@@ -215,7 +215,7 @@
     n2
     TIE
     n3 1 + 12
-    MOD 5
+    MOD MOD_4d2t1f
     n5 1 + 12
     MOD 0
 
@@ -262,7 +262,7 @@
     VOL 12
     TIE
     n3 9 + 12
-    MOD 5
+    MOD MOD_4d2t1f
     n5 9 + 12
     MOD 0
 
@@ -282,7 +282,7 @@
     n2
     TIE
     n3 8 + 12
-    MOD 5
+    MOD MOD_4d2t1f
     n5 8 + 12
     MOD 0
 
@@ -302,7 +302,7 @@
     n2
     TIE
     n3 6 + 12
-    MOD 5
+    MOD MOD_4d2t1f
     n5 6 + 12
     MOD 0
 
@@ -319,7 +319,7 @@
     n2
     TIE
     n4 8 + 12
-    MOD 5
+    MOD MOD_4d2t1f
     DOT n5 8 + 12
 
     n3
@@ -369,7 +369,7 @@
     DOT n4 8 + 12
     VOL 4
     n3 8 + 12
-    MOD 5
+    MOD MOD_4d2t1f
     n6 8 + 12
     MOD 0
     LOOP 0, .sq1_loop

@@ -1,5 +1,6 @@
 
 SBOMB1_5:
+.mod = 1
 	TRACK SQ1_5, SQ2_5, TRI_5, NOI_5, MODULATION_5
 MODULATION_5:
 	.dw $0000, $0080
@@ -484,7 +485,7 @@ SQ1_5:
 	VOL 13
 	KEY O5 -3
 	ENV 1,2,1
-	MOD 1
+	MOD MOD_1d1t1f
 	n2
 	n3 6
 	n2 3
@@ -609,7 +610,7 @@ SQ2_5:
 	VOL 9
 	KEY O5 -1
 	ENV 1,3,1
-	MOD 1
+	MOD MOD_1d1t1f
 	n4
 .loop
 	n2
@@ -644,7 +645,7 @@ SQ2_5:
 ;	VOL 15
 ;	KEY O5 -3
 ;	ENV 3,1
-;	MOD 1
+;	MOD MOD_1d1t1f
 ;	DOT
 ;	n5
 ;.loop

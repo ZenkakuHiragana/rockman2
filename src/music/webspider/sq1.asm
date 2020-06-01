@@ -42,7 +42,7 @@
 
     TONE 1
     VOL 15
-    MOD 1
+    MOD MOD_1d1t1f
     LOOP 0, .sq1A2
 .sq1A1
     TIE
@@ -95,7 +95,7 @@
 
     TONE 1
     VOL 15
-    MOD 1
+    MOD MOD_1d1t1f
     LOOP 0, .sq1B2
 .sq1B1
     TIE
@@ -155,7 +155,7 @@
     n6 9 + 12
 
     TONE 1
-    MOD 1
+    MOD MOD_1d1t1f
     ENV 28, 1
     DOT n4 9
     DOT n4 9 + 12
