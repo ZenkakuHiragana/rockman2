@@ -1,4 +1,19 @@
 
+.sq2_guitar_hit
+    TONE 1
+    VOL 15
+    KEY O4
+    ENV 8, 1
+.sq2_guitar_hit_loop
+    n0 6 + 12
+    n0 6 + 12 + 12
+    VOLDOWN
+    LOOP 7, .sq2_guitar_hit_loop
+    TONE 0
+    VOL 14
+    KEY O3
+    MOD MOD_3d1t1f
+    LOOP 0, .sq2_guitar_continue
 .sq2_guitar
     TONE 0
     VOL 14
@@ -6,7 +21,10 @@
     ENV 8, 1
     MOD MOD_3d1t1f
 
-    DOT n4 6 + 12
+    TIE
+    n4 6 + 12
+.sq2_guitar_continue
+    n3 6 + 12
     n4 9
     n4 11
     n3 12
@@ -16,7 +34,7 @@
     n3 4 + 12
     RETURN
 .sq2_start
-    CALL .sq2_guitar
+    CALL .sq2_guitar_hit
     DOT n4 6 + 12
     n4 9
     n4 11
@@ -25,18 +43,19 @@
     n5 1 + 12
 
     MOD 0
-    LOOP 0, .sq2_loop
-.sq2A2
+.sq2_loop
+    CALL .track_block1a_hit
+    CALL .track_block1c
+    CALL .track_block1b
+    CALL .track_block3b
     CALL .track_block1a
     CALL .track_block1c
     CALL .track_block1b
     CALL .track_block3c
-.sq2_loop
     CALL .track_block1a
     CALL .track_block1c
     CALL .track_block1b
     CALL .track_block3b
-    LOOP 1, .sq2A2
     
     TONE 1
     VOL 10
@@ -101,7 +120,7 @@
     BEND n3 6 + 12, n3 6 + 12 - 3
     BEND n6 11 + 12, n6 11 + 12 - 3
 
-    CALL .sq2_guitar
+    CALL .sq2_guitar_hit
     n3 9
     n3 6
     n3

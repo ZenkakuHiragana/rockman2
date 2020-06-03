@@ -1306,16 +1306,12 @@ Sound_MusicCommand0B:
 .LoopCounterMain = zSoundVar1
 .LoopCounterSub = zSoundVar2
 	jsr Sound_LoadLoopCounters
-	ldy #$08
-	lsr a
-	ror a
-	ror a
-	ror a
 	beq Sound_MusicCommand04.jump
+	ldy #$08
 	cmp <.LoopCounterSub
-	bcs .nojump
+	bcc .nojump
 	lda <.LoopCounterSub
-	adc #$20
+	adc #%00100000 - 1
 	bcc Sound_MusicCommand04.cmd0B_jump
 .nojump
 	lda [zSoundBase],y ;$508, ループ回数
