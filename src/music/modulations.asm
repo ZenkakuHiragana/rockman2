@@ -9,7 +9,9 @@ MOD_1d1t3f = 3
     .dw $2103, $0080 ;スパボン6面の弱いビブラート
 MOD_1d2t1f = 4
     .dw $2201, $0080 ;弱いビブラート
-MOD_4d2t1f = 5
+MOD_3d1t1f = 5
+    .dw $A101, $0080 ;エグゼ6ボス戦のギターの音
+MOD_4d2t1f = 6
     .dw $8201, $0080 ;ポーキーのポーキーのビブラート
-MOD_DEATHTRAP = 6
+MOD_DEATHTRAP = 7
     .dw $4304, $0080 ;Deathtrap Mirageのブーン

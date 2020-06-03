@@ -1,32 +1,46 @@
 
 .noi_sub1
+    TOMLOW
     n2 5
     n2 1
     n2 1
     n2 1
+    TOMHIGH
     n2 5
     n2 1
+    TOMHIGH
     n2 5
     n2 1
+    TOMLOW
     n2 7
     n2 1
+    TOMHIGH
     n2 7
+    TOMHIGH
     n2 7
+    TOMHIGH
     n2 7
     n2 1
+    TOMHIGH
     n2 7
     n2 1
 .noi_sub3
     ENV 3, 1
+    TOMHIGH
     n4 4
     RETURN
 .noi_sub2
+    TOMLOW
     n3 5
     n3 1
+    TOMHIGH
     n3 7
+    TOMHIGH
     n3 7
+    TOMLOW
     n3 5
     n3 1
+    TOMHIGH
     n3 7
     n3 1
     RETURN
@@ -42,6 +56,7 @@
     ENV 1, 2
     n3 1
     n3 1
+	TOMHIGH
     n4 7
 
 .noiA

@@ -1377,35 +1377,32 @@ Sound_MusicCommand05:
 	
 
 ;* 命令0C, 音量を1上げる
-;(TRI)ハイタム
+;(TRI, NOI)ハイタム
 Sound_MusicCommand0C:
 	ldx #LOW(SOUND_POMPOKO_INIT_HIGH)
 	lda #HIGH(SOUND_POMPOKO_INIT_HIGH)
 	ldy <zProcessChannel
-	cpy #$02
-	beq .tri
+	cpy #$03
+	bcc .tri
 	ldy #$0C
 	clc
 	lda [zSoundBase],y ;$50C, 音量レジスタへの値
 	adc #$01
 	bcc Sound_MusicCommand03.write_tri
 .tri .public
-	ldy #$0D
-	sta [zSoundBase],y
-	iny
-	mSTZ [zSoundBase],y
-	iny
-	txa
-	bne Sound_MusicCommand03.write_tri
+	sta $54D
+	mSTZ $54E
+	stx $54F
+	jmp Sound_AdvanceMusic_Loop
 
 ;* 命令0D, 音量を1下げる
-;(TRI)ロータム
+;(TRI, NOI)ロータム
 Sound_MusicCommand0D:
 	ldx #LOW(SOUND_POMPOKO_INIT_LOW)
 	lda #HIGH(SOUND_POMPOKO_INIT_LOW)
 	ldy <zProcessChannel
-	cpy #$02
-	beq Sound_MusicCommand0C.tri
+	cpy #$03
+	bcc Sound_MusicCommand0C.tri
 	ldy #$0C
 	sec
 	lda [zSoundBase],y ;$50C, 音量レジスタへの値

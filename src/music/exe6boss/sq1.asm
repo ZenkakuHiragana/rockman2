@@ -1,63 +1,13 @@
 
-.sq1_intro_sub_loop
-    n2 9 + 2
-    n2 9 + 12 + 2
-    n2 9 + 2
-    n2 8 + 12 + 2
-    n2 9 + 2
-    n2 9 + 12 + 2
-    n2 9 + 2
-    n2 8 + 12 + 2
-    n2 9 + 2
-    n2 6 + 12 + 2
-    n2 4 + 12 + 2
-    n2 1 + 12 + 2
-    n2 9 + 2
-    n2 6 + 2
-    n2 4 + 2
-    n2 1 + 2
-    n2 1
-.sq1_intro_sub
-    KEY O3 + 5
-    n2 1
-    n2 4
-    n2 1 + 12 - 5
-    n2 4 + 12 - 5
-    n2 6 + 12 - 5
-    n2 9 + 12 - 5
-    KEY O5 - 2
-    n2 1 + 2
-    n2 4 + 2
-    n2 6 + 2
-    n2 9 + 2
-    n2 1 + 12 + 2
-    n2 4 + 12 + 2
-    n2 2 + 12 + 2
-    n2 1 + 12 + 2
-    n2 11 + 2
-    LOOP 1, .sq1_intro_sub_loop
-    RETURN
 .sq1_start
     TONE 1
     VOL 15
-    ENV 3, 8
-    CALL .sq1_intro_sub
-    n2 6 + 2
-    n3 2 + 12 + 2
-    n2 6 + 2
-    n3 2 + 12 + 2
-    n2 6 + 2
-    n2 2 + 12 + 2
-    n2 6 + 2
-    n3 4 + 12 + 2
-    n2 7 + 2
-    n3 4 + 12 + 2
-    n2 7 + 2
-    n2 4 + 12 + 2
-    n2 7 + 2
-
+    CALL .track_block1a
+    CALL .track_block2
+    CALL .track_block1b
+    CALL .track_block3a
     LOOP 0, .sq1_loop
-.sq1A2
+.sq1A
     TIE
     n3 7 + 4
     MOD 3
@@ -71,6 +21,8 @@
     n4 4 + 4
     MOD 0
     ENV 0, 0
+    n2 2 + 4
+    n2 4 + 4
 .sq1_loop
     TONE 2
     ENV 0, 0
@@ -101,7 +53,7 @@
     MOD 3
     n4 1 + 12 + 4
     MOD 0
-    LOOP 1, .sq1A2
+    LOOP 1, .sq1A
 
     TIE
     n3 5 + 12 + 4
@@ -111,13 +63,14 @@
     TIE 2
     n4 4 + 12 + 4
     MOD 3
-    DOT n5 4 + 12 + 4
+    n5 4 + 12 + 4
     ENV 1, 1
-    n4 4 + 12 + 4
+    DOT n4 4 + 12 + 4
     MOD 0
     ENV 0, 0
 
     TONE 0
+    MOD MOD_3d1t1f
     TIE
     n3 1 + 4
     PITCH 8
@@ -135,6 +88,7 @@
 
     TONE 2
     ENV 3, 1
+    MOD 0
     DOT n4 3 + 12 - 3
     TIE
     n5 4 + 12 - 3
@@ -239,29 +193,82 @@
     n4 6
     MOD 0
     
-    TONE 0
-    ENV 3, 2
+    VOL 10
     KEY O4
-    n3 6
-    n6 8
-    DOT n4 6
-    n5
-    n3 6
-    n6 11
+    ENV 3, 5
+    n2 9
+    n2 6
+
+    n2
+    n2 4
+    n2 8
+    n2 11
+.sq1B
+    n2 3 + 12
+    n2 11
+    n2 8
+    n2 4
+    LOOP 2, .sq1B
+
+    n2
+    n2 8
+    n2 9
+    n2 1 + 12
+    n2 6 + 12
+    n2 1 + 12
+    n2 9
+    n2 6
+    n2 8 + 12
+    n2 1 + 12
+    n2 9
+    n2 6
+    n2 9 + 12
+    n2 1 + 12
+    n2 9
+    n2 6
+
+    n2 11
+    n2
+    n2 11 + 12
+    n2 8 + 12
+    n2 4 + 12
+    n2 8 + 12
+    n2 4 + 12
+    n2 11
+    n2 8
+    n2 11
+    n2 8
+    n2 6
+    n2 4
+    n2 8
+    n2 11
+    n2 2 + 12
 
     TONE 2
-    CALL .sq1_intro_sub
-    KEY O4
+    VOL 15
+    CALL .track_block1a
+    CALL .track_block2
+    CALL .track_block1a
+    KEY O3 + 9
     ENV 3, 1
-    DOT n4 3 + 12
-    n4 6
-    n4 8
-    n3 9
-    ENV 3, 8
-    LOOP 1, .sq1_dummy
-.sq1_dummy
-    CALL .sq1_intro_sub
-    n2 9 + 2
+.sq1C1
+    SHORT n1 6 + 12 + 5
+    SHORT n2 6 + 12
+    LOOP 5, .sq1C1
+.sq1C2
+    SHORT n1 9  + 5
+    SHORT n2 9
+    LOOP 3, .sq1C2
+.sq1C3
+    SHORT n1 11 + 5
+    SHORT n2 11
+    LOOP 3, .sq1C3
+.sq1C4
+    SHORT n1 12 + 5
+    SHORT n2 12
+    LOOP 1, .sq1C4
+
+    CALL .track_block1a
     n2 9 + 12 + 2
     n2 9 + 2
     n2 8 + 12 + 2
@@ -270,7 +277,7 @@
     n2 9 + 2
     n2 11 + 12 + 2
     n2 9 + 2
-    n2 6 + 12 + 2
+    n2 9 + 12 + 2
     n2 4 + 12 + 2
     n2 1 + 12 + 2
     n2 9 + 2
