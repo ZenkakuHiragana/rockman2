@@ -1312,6 +1312,7 @@ Sound_MusicCommand0B:
 	beq .nojump
 	bcc .nojump
 	lda <.LoopCounterSub
+	ora <.LoopCounterMain
 	adc #%00100000 - 1
 	bcc Sound_MusicCommand04.cmd0B_jump
 .nojump
