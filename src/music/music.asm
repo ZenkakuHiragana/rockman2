@@ -5,6 +5,8 @@
 	.incbin "rockman2.prg", $30A50, $86
 	.nolist
 	mBEGIN #$0C, Table_TrackStartPointers
+	.dw PUSH_IT_TO_THE_LIMIT
+	.dw GATE_OF_STEINER
 	.dw EXE6BOSS ; FLASH MAN
 	.dw WEBSPIDER ; WOOD MAN
 	.dw DRY_GUYS ; CRASH MAN
@@ -24,6 +26,8 @@
 Sound_Modulations:
 	.include "src/music/modulations.asm"
 Sound_MusicData:
+	.include "src/music/scarface/header.asm"
+	.include "src/music/gateofsteiner/header.asm"
 	.include "src/music/exe6boss/header.asm"
 	.include "src/music/batty/header.asm"
 	.include "src/music/porkysporkies/header.asm"
