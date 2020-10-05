@@ -45,7 +45,7 @@ LOOP .macro
 	.endm
 
 LOOP2 .macro
-	.db #$0B, \1, LOW(\2), HIGH(\2)
+	.db #$0B, \1 << 5, LOW(\2), HIGH(\2)
 	.endm
 
 KEY .macro
