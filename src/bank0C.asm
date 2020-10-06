@@ -461,6 +461,7 @@ Sound_ManipulateModulations:
 	iny
 	cmp [zSoundBase],y ;$50E, 音量エンベロープ用カウンタ
 	beq .wait
+	bcc .wait
 	iny
 	lda [zSoundBase],y ;$50F, 音量エンベロープでの現在の音量
 	and #$0F
