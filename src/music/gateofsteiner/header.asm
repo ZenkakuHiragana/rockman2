@@ -1,11 +1,11 @@
 
     .beginregion "Gate of Steiner"
 GATE_OF_STEINER:
-    TRACK .sq1, .sq2, .tri, 0, BPM(76)
-.tri
-    .include "src/music/gateofsteiner/tri.asm"
+    TRACK .sq1_start, .sq2_start, .tri_start, 0, BPM(77)
 .sq2
     .include "src/music/gateofsteiner/sq2.asm"
+.tri
+    .include "src/music/gateofsteiner/tri.asm"
 .sq1
     .include "src/music/gateofsteiner/sq1.asm"
 .noi
