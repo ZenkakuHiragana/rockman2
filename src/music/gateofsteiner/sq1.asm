@@ -355,8 +355,94 @@
 
 .sq1_part6
 	TONE 2
+	VOL 13
 	KEY O5 - 5
 	ENV 7,3
+	
+	DOT n3 1 + 12 + 5
+	n0
+	DOT n3 11 + 5
+	n0
+	n3 4 + 12 + 5
+	DOT n3 1 + 12 + 5
+	n0
+	DOT n3 11 + 5
+	n0
+	n2 8 + 5
+	n2 9 + 5
+	DOT n3 11 + 5
+	n0
+	n3 9 + 5
+	n0
+	n2 8 + 5
+	n2 9 + 5
+	n2 4 + 12 + 5
+	DOT n3 8 + 5
+	n0
+	n4 9 + 5
+	n2
+
+	DOT n3 1 + 12 + 5
+	DOT n3 11 + 5
+	n0
+	n3 4 + 12 + 5
+	DOT n3 6 + 12 + 5
+	n3 4 + 12 + 5
+	n2 9 + 12 + 5
+	n2 8 + 12 + 5
+	n4 1 + 12 + 5
+
+	TONE 1
+	KEY O4 - 5
+	DOT n3 4 + 12 + 5
+	n3 2 + 12 + 5
+	DOT n3 1 + 12 + 5
+	n3 11 + 5
+	n2 8 + 5
+	n3 4 + 5
+
+	LOOP 0, .sq1_part7_1
+.sq1_part7
 	CALL .sq1_part3_s1
 	CALL .sq1_part3_s2
-	END
+	DOT n3 4 + 5
+	n3 2 + 5
+	DOT n3 1 + 5
+	n4 -1 + 5
+	n2
+.sq1_part7_1
+	TONE 1
+	KEY O4 - 5
+	VOL 15
+	ENV 4,1
+	CALL .sq1_part3_s1
+	CALL .sq1_part3_s3
+	TIE 2
+	n4 11 + 12 + 5
+	n3 11 + 12 + 5
+	DOT n2 11 + 12 + 5
+	n0 3 + 12 + 5
+	n0 6 + 12 + 5
+	TIE
+	n4 10 + 12 + 5
+	n2 10 + 12 + 5
+	n2 6 + 5
+	n2 10 + 5
+	n2 4 + 12 + 5
+	LOOP 1, .sq1_part7
+
+.sq1_final
+	TONE 2
+	KEY O5 - 5
+	VOL 9
+	ENV 12, 1
+	n5 11 + 12 + 5
+	n0 1 + 12 + 5
+	n0 4 + 12 + 5
+	TIE
+	DOT n4 10 + 12 + 5
+	DOT n2 10 + 12 + 5
+	TONE 1
+	KEY O4
+	n6 1
+	LOOP 0, .sq1_start

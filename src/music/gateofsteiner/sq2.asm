@@ -79,6 +79,48 @@
     DOT n3 10
     RETURN
 
+.sq2_part3_s1
+    DOT n3 6 + 12
+    DOT n3 6 + 12
+    n3 11 + 12
+    DOT n3 9 + 12
+    DOT n3 8 + 12
+    n3
+    DOT n3 4 + 12
+    DOT n3 4 + 12
+    n3 8 + 12
+    DOT n3 4 + 12
+    n4 4 + 12
+    n2
+    RETURN
+.sq2_part3_s2
+    DOT n3 6 + 12
+    DOT n3 6 + 12
+    n3 11 + 12
+    DOT n3 7 + 12
+    n4 7 + 12
+    n4
+    n4 9
+    n2
+    n4 8
+    n2
+    n2 8
+    n3 4
+    RETURN
+.sq2_part3_s3
+    n3 6 + 12
+    n2 9 + 12
+    n3 11 + 12
+    n3 1 + 12 + 12
+    DOT n3 11 + 12
+    n2 9 + 12
+    n2 2 + 12
+    n3 6 + 12 + 12
+    n3 4 + 12 + 12
+    n5 6 + 12 + 12
+    DOT n4 4 + 12 + 12
+    RETURN
+
 .sq2_start
     n1
 .sq2_loop
@@ -106,45 +148,13 @@
 
     LOOP 0, .sq2_part3
 .sq2_part3_1
-    DOT n3 6 + 12
-    DOT n3 6 + 12
-    n3 11 + 12
-    DOT n3 7 + 12
-    n4 7 + 12
-    n4
-    n4 9
-    n2
-    n4 8
-    n2
-    n2 8
-    n3 4
+    CALL .sq2_part3_s2
 .sq2_part3
     TONE 2
     ENV 6,1
-    DOT n3 6 + 12
-    DOT n3 6 + 12
-    n3 11 + 12
-    DOT n3 9 + 12
-    DOT n3 8 + 12
-    n3
-    DOT n3 4 + 12
-    DOT n3 4 + 12
-    n3 8 + 12
-    DOT n3 4 + 12
-    n4 4 + 12
-    n2
+    CALL .sq2_part3_s1
     LOOP 1, .sq2_part3_1
-    n3 6 + 12
-    n2 9 + 12
-    n3 11 + 12
-    n3 1 + 12 + 12
-    DOT n3 11 + 12
-    n2 9 + 12
-    n2 2 + 12
-    n3 6 + 12 + 12
-    n3 4 + 12 + 12
-    n5 6 + 12 + 12
-    DOT n4 4 + 12 + 12
+    CALL .sq2_part3_s3
     n4 6 + 12
     n3
 
@@ -239,4 +249,76 @@
     DOT n3 4 + 12
 
 .sq2_part6
-    END
+    VOL 10
+    ENV 5,1
+    n0 1 + 12
+    n0 6 + 12
+    n5 9 + 12
+    n2 4 + 12
+    TIE
+    n3 11 + 12
+    n0 11 + 12
+    TIE 2
+    n4 1 + 12 + 12
+    n2 1 + 12 + 12
+    n0 1 + 12 + 12
+    n2 1 + 12
+    TIE
+    DOT n4 8 + 12
+    DOT n2 8 + 12
+    n2 6 + 12
+    n3 11 + 12
+    TIE
+    n3 6 + 12
+    n0 6 + 12
+    n2 8 + 12
+    n2 9 + 12
+    n2 8 + 12
+
+    DOT n3 2 + 12
+    TIE 2
+    n4 9 + 12
+    n2 9 + 12
+    n0 9 + 12
+    DOT n3 4 + 12
+    DOT n3 11 + 12
+    n3 1 + 12 + 12
+
+    n2 6 + 12
+    n3 1 + 12
+    n3 11
+    n2 9
+    n3 4
+    n2 1
+    KEY O2
+    TIE
+    DOT n4 1
+    n2 1
+
+.sq2_part7
+    TONE 2
+    KEY O3
+    ENV 6,1
+    CALL .sq2_part3_s1
+    CALL .sq2_part3_s3
+    n3
+    CALL .sq2_part3_s1
+    CALL .sq2_part3_s2
+    CALL .sq2_part3_s1
+    CALL .sq2_part3_s3
+    n3
+    TONE 1
+    VOL 12
+	ENV 4,1
+    n3 6 + 12 + 12
+    n2 1 + 12 + 12
+    TIE
+    n4 6 + 12
+    n2 6 + 12
+
+    TONE 1
+    VOL 6
+    ENV 12,1
+    n5 6 + 12 + 12
+    n6 6
+    LOOP 0, .sq2_start

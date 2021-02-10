@@ -42,7 +42,7 @@ Sound_MusicData:
 	.include "src/music/heartache.asm"
 	; .include "src/music/sbomb1_area1.asm"
 	; .include "src/music/sbomb1_area5.asm"
-	.include "src/music/sbomb1_area6.asm"
+	; .include "src/music/sbomb1_area6.asm"
 
 	mBEGINRAW $1F, Reset_Start
 	sei
