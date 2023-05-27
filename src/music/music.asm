@@ -5,6 +5,7 @@
 	.incbin "rockman2.prg", $30A50, $86
 	.nolist
 	mBEGIN #$0C, Table_TrackStartPointers
+	.dw STONE_COLD
 	.dw IGNEOUS_ROCK
 	; .dw EXE6BOSS ; FLASH MAN
 	; .dw WEBSPIDER ; WOOD MAN
@@ -26,6 +27,7 @@ Sound_Modulations:
 	.include "src/music/modulations.asm"
 Sound_MusicData:
 	; .include "src/music/alone/header.asm"
+	.include "src/music/stonecold/header.asm"
 	.include "src/music/igneous/header.asm"
 	; .include "src/music/gateofsteiner/header.asm"
 	; .include "src/music/exe6boss/header.asm"

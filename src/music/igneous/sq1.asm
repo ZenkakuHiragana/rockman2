@@ -290,10 +290,11 @@
     n2 3 + 10
     n2 3 + 10
 
-    TONE 2
-    VOL 8
-    ENV 2, 1, 1
-    KEY O5
+    TONE 1
+    VOL 9
+    ENV 1, 1, 1
+    KEY O4
+    MOD MOD_1d1t2f
     DOT n5 10
     n3 9
     n3 10
@@ -339,4 +340,5 @@
     VOL 11
     ENV 12, 1
     KEY O3 - 3
+    MOD 0
     LOOP 0, .sq1_loop
