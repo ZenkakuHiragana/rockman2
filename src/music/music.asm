@@ -5,20 +5,19 @@
 	.incbin "rockman2.prg", $30A50, $86
 	.nolist
 	mBEGIN #$0C, Table_TrackStartPointers
-	.dw GATE_OF_STEINER
-	.dw PUSH_IT_TO_THE_LIMIT
-	.dw EXE6BOSS ; FLASH MAN
-	.dw WEBSPIDER ; WOOD MAN
-	.dw DRY_GUYS ; CRASH MAN
-	.dw DEATHTRAP_MIRAGE ; HEAT MAN
-	.dw PHARMACEUTICAL_LAB ; AIR MAN
-	.dw BATTY ; METAL MAN
-	.dw FLORENT_LBELLE ; QUICK MAN
-	.dw ACID ; BUBBLE MAN
-	.dw ETUDEFORGHOSTS ; WILY 1
-	.dw PORKYS_PORKIES ; WILY 2
-	.dw HEARTACHE ; BOSS
-	.dw PHARMACEUTICAL_LAB
+	.dw IGNEOUS_ROCK
+	; .dw EXE6BOSS ; FLASH MAN
+	; .dw WEBSPIDER ; WOOD MAN
+	; .dw DRY_GUYS ; CRASH MAN
+	; .dw DEATHTRAP_MIRAGE ; HEAT MAN
+	; .dw PHARMACEUTICAL_LAB ; AIR MAN
+	; .dw BATTY ; METAL MAN
+	; .dw FLORENT_LBELLE ; QUICK MAN
+	; .dw ACID ; BUBBLE MAN
+	; .dw ETUDEFORGHOSTS ; WILY 1
+	; .dw PORKYS_PORKIES ; WILY 2
+	; .dw HEARTACHE ; BOSS
+	; .dw PHARMACEUTICAL_LAB
 	; .dw SBOMB1_5
 	; .dw SBOMB1_6
 
@@ -26,20 +25,21 @@
 Sound_Modulations:
 	.include "src/music/modulations.asm"
 Sound_MusicData:
-	.include "src/music/scarface/header.asm"
-	.include "src/music/gateofsteiner/header.asm"
-	.include "src/music/exe6boss/header.asm"
-	.include "src/music/batty/header.asm"
-	.include "src/music/porkysporkies/header.asm"
-	.include "src/music/webspider/header.asm"
-	.include "src/music/acid/header.asm"
-    .include "src/music/deathtrapmirage/header.asm"
-    .include "src/music/dryguys/header.asm"
-	.include "src/music/etudeforghosts/header.asm"
-    .include "src/music/florent/header.asm"
+	; .include "src/music/alone/header.asm"
+	.include "src/music/igneous/header.asm"
+	; .include "src/music/gateofsteiner/header.asm"
+	; .include "src/music/exe6boss/header.asm"
+	; .include "src/music/batty/header.asm"
+	; .include "src/music/porkysporkies/header.asm"
+	; .include "src/music/webspider/header.asm"
+	; .include "src/music/acid/header.asm"
+    ; .include "src/music/deathtrapmirage/header.asm"
+    ; .include "src/music/dryguys/header.asm"
+	; .include "src/music/etudeforghosts/header.asm"
+    ; .include "src/music/florent/header.asm"
 	; .include "src/music/frozenhotel.asm"
-    .include "src/music/garden/header.asm"
-	.include "src/music/heartache.asm"
+    ; .include "src/music/garden/header.asm"
+	; .include "src/music/heartache.asm"
 	; .include "src/music/sbomb1_area1.asm"
 	; .include "src/music/sbomb1_area5.asm"
 	; .include "src/music/sbomb1_area6.asm"

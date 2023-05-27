@@ -99,6 +99,9 @@ VOLUP .macro
 	.endm
 TOMHIGH .macro
 	VOLUP
+	.if \?1
+	\1
+	.endif
 	.endm
 
 VOLDOWN .macro
@@ -106,6 +109,9 @@ VOLDOWN .macro
 	.endm
 TOMLOW .macro
 	VOLDOWN
+	.if \?1
+	\1
+	.endif
 	.endm
 
 BEND .macro
