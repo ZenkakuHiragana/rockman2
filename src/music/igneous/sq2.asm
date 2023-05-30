@@ -250,7 +250,7 @@
     n3 5
     LOOP2 1, .sq2C0
 
-    KEY O1A
+    KEY O3 - 3
     VOL 14
     CALL .sq2C1
     KEY O1A + 7

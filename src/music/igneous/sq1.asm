@@ -14,6 +14,7 @@
     LOOP 3, .sq1_intro
 
     KEY O4
+    ENV 18, 1
     BENDSPEED 1
     TIE
     BEND n5 10, n5 8
@@ -223,10 +224,12 @@
     n4 3 + 12
     n4 5 + 12
     TONE 1
+    ENV 1, 3, 1
     n5 10 + 12
     n5 12 + 12
     n5 1 + 12 + 12
     n5 3 + 12 + 12
+    ENV 24, 1
     TIE 2
     BEND n5 5 + 12 + 12, n5 3 + 12 + 12
     MOD MOD_1d1t2f
