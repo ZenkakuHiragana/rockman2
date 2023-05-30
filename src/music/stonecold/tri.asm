@@ -4,11 +4,7 @@
     n2 10
     n3 10 + 12
     n3 10
-    TIE
-    n2 10
-    PITCH -32
-    n2 10
-    PITCH 0
+    n3 10
     RETURN
 .tri_base2
     n2 10
@@ -188,5 +184,32 @@
     n2 8
     n2 8
     n3 8 + 12
-    LOOP 1, .triB3
+    LOOP 2, .triB3
+    KEY O3
+    CALL .tri_base
+    KEY O3 - 2
+    CALL .tri_base
+    KEY O3 + 5
+    CALL .tri_base
+    KEY O3
+    n2 5 + 12
+    n2 5 + 12
+    n3 5 + 12 + 12
+    n2 1 + 12
+    n2 1 + 12
+    n3 1 + 12 + 12
+.triB4
+    CALL .tri_base
+    KEY O3 - 2
+    CALL .tri_base
+    KEY O3 - 3
+    CALL .tri_base
+    n2 9
+    n2 9
+    n3 9 + 12
+    n2 8
+    n2 8
+    n3 8 + 12
+    KEY O3
+    LOOP 1, .triB4
     END
