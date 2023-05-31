@@ -160,8 +160,7 @@ Bank0C_StartSFX:
 	and #$0F
 	ora <.TestStrength
 	sta <zSoundAttr ;優先度を更新
-	clc
-	mADD <zTrackPtr, #$02, <zSFXPtr
+	mADD <zTrackPtr, #$01, <zSFXPtr ; zSFXPtr = zTrackPtr + 2 (w/ carry)
 	lda #$00
 	tax
 	adc <zTrackPtrhi
@@ -306,7 +305,7 @@ Sound_ResetFreqRegisters:
 	rts
 .noise ;ノイズなら、音声再生制御レジスタをいじる
 	mMOV #%00000111, $4015 ;ノイズとDPCMは再生しない
-Sound_ResetFreqRegisters_end:
+.rts .public
 	rts
 
 ;8235
@@ -314,10 +313,9 @@ Sound_ResetFreqRegisters_end:
 Sound_ProcessTracks:
 	inc <zSoundCounter
 	lda <zNMILock
-	bne Sound_ResetFreqRegisters_end
-	tax
-	stx <zSoundIndex
-	stx <zSoundBase
+	bne Sound_ResetFreqRegisters.rts
+	sta <zSoundIndex
+	sta <zSoundBase
 	ldy #$05
 	sty <zSoundBasehi ;[zSoundBase] = $0500
 	dey
@@ -326,7 +324,6 @@ Sound_ProcessTracks:
 	clc
 	ldy #$18
 	mADD [zSoundBase],y, #$01 ;$518, ピッチMOD用カウンタ += 1
-	clc
 	ldy #$1C
 	mADD [zSoundBase],y, #$01 ;$51C, 音量MOD用カウンタ += 1
 
@@ -335,7 +332,7 @@ Sound_ProcessTracks:
 	mBCC jsr Sound_ProcessSFX ;処理中のトラックは効果音を鳴らしている
 	lda <zMusicPause
 	lsr a
-	mBCC jmp .skip_track ;曲が一時停止している
+	bcs .skip_track ;曲が一時停止している
 	ldy #$00
 	lda [zSoundBase],y ;$500
 	iny
@@ -526,20 +523,23 @@ Sound_ManipulateVolumeMod:
 	mSTZ [zSoundBase],y ;$51C, 音量MOD用カウンタ
 	ldy #$17
 	lda [zSoundBase],y ;$517, MOD定義ZZ, 音量MOD変化量
-	bpl .positive
-	ora #%11110000
-	bmi .vol_diff
-.positive
-	and #$0F
-.vol_diff
-	ldy #$1D
+	asl a
+	php
+	lsr a
+	and #%00001111
+	plp
 	clc
+	bpl .positive
+	eor #%11111111
+	adc #$01
+.positive
+	ldy #$1D
 	adc [zSoundBase],y ;$51D, 音量MODの現在の音量
 	beq .zero
 	bpl .isplaying
 .zero
 	mMOV #$01, [zSoundBase],y ;$51D, 音量MODの現在の音量
-	jmp .switch
+	bne .switch
 .isplaying
 	sta [zSoundBase],y ;$51D += $517, 音量MODによる音量変化
 	cmp #$10
@@ -548,8 +548,7 @@ Sound_ManipulateVolumeMod:
 .switch
 ;音量MODの変化後が0もしくは#$10になったら変化方向を逆転
 	ldy #$17
-	sec
-	mSUB #$00, [zSoundBase],y, [zSoundBase],y ;$517, MOD定義ZZ = -$517
+	mEOR [zSoundBase],y, #%01000000 ;$517, MOD定義ZZ = -$517
 .nochangemod
 	ldy #$1D
 	lda [zSoundBase],y ;$51D, 音量MODの現在の音量
@@ -1066,7 +1065,6 @@ Sound_ProcessMusic:
 	mADD aTempo, <zSoundSpeed, <.Tempo
 	mADD aTempohi, #$00, <.Tempohi
 	dey
-	clc
 	mADD [zSoundBase],y, <.Tempo ;$502, 音長下位
 	iny
 	ror a

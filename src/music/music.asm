@@ -77,7 +77,7 @@ Sound_MusicData:
 	;$514,      MOD WW, bit7: ピッチMODが変位0に向かうフラグ, bit6-0: ピッチMOD変化周期
 	;$515,      MOD XX, bit7-5: ピッチMOD変化量, bit4-0: ピッチMOD変化の最大回数
 	;$516,      MOD YY, bit7: 音量MOD変化方向(0: 上がる, 1:下がる), bit6-0: 音量MOD変化周期
-	;$517,      MOD ZZ, bit7: ピッチMOD変化量変化量の符号, bit6-4: 未使用, bit3-0: 音量MOD変化量
+	;$517,      MOD ZZ, bit7: ピッチMOD変化量の符号, bit6: 音量MOD現在の符号 bit5-4: 未使用, bit3-0: 音量MOD変化量
 	;$518,      ピッチMOD用時刻カウンタ
 	;$519,      ピッチMOD上下動情報, bit7: 増減方向, bit6-0: 変位の回数カウンタ(bit6-5は未使用にできる)
 	;$51A,      ピッチMOD変位量下位

@@ -201,7 +201,7 @@ zSoundFadeProg = $E9    ;曲のフェードアウト段階
 
 zSoundCounter = $EA     ;音関係用フレームカウンタ
 zSoundIndex = $EB       ;チャンネルベースポインタ[$(4000+$EB)]
-zSoundBase = $EC        ;チャンネルベースポインタ[($EC).y]
+zSoundBase = $EC        ;チャンネルベースポインタ[($EC),y]
 zSoundBasehi = $ED      ;
 zProcessChannel = $EE   ;現在処理中のチャンネル。4, 3, 2, 1 = SQ1, S2, TRI, NOI
 zSFXChannel_Copy = $EF  ;$EF = $E1
