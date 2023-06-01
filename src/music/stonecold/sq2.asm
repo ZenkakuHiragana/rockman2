@@ -436,6 +436,8 @@
     KEY O3
     MOD 0
 ; end of the track
+    .ifndef STONE_COLD_LOOP
     END
+    .endif
 ;
     LOOP 0, .sq2A1

@@ -1,5 +1,6 @@
 
     .beginregion "Stone Cold"
+STONE_COLD_LOOP:
 STONE_COLD:
     TRACK .sq1_start, .sq2_start, .tri_start, .noi_start, BPM(135)
 .sq1

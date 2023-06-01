@@ -345,6 +345,7 @@
     KEY O3 - 3
     MOD 0
 ; end of the track
+    .ifndef IGNEOUS_ROCK_LOOP
     LOOP 0, .sq1_end
 .sq1_end2
     CALL .sq2_intro1
@@ -364,5 +365,6 @@
     n2 3 + 10
     DOT n6 3 + 10
     END
+    .endif
 ;
     LOOP 0, .sq1_loop

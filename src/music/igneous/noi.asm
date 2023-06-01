@@ -465,6 +465,7 @@
 
     CALL .noiD1
 ; end of the track
+    .ifndef IGNEOUS_ROCK_LOOP
     CALL .noi_intro1
     CALL .noi_intro2
     CALL .noi_intro3
@@ -486,5 +487,6 @@
     TOMLOW  n1 15
     TOMHIGH n4 5
     END
+    .endif
 ;
     LOOP 0, .noi_start

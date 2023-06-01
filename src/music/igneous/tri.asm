@@ -587,6 +587,7 @@
     n2 5
     n3 5
 ; end of the track
+    .ifndef IGNEOUS_ROCK_LOOP
 .tri_end
     CALL .tri_intro
 
@@ -621,5 +622,6 @@
     n2 1
     n1 1
     END
+    .endif
 ;
     LOOP 0, .tri_start

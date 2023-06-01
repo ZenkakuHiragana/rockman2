@@ -205,8 +205,10 @@
     n1 10
     LOOP 6, .noiD7
 ; end of the track
+    .ifndef STONE_COLD_LOOP
     ENV 8, 1
     TOMLOW n6 5
     END
+    .endif
 ;
     LOOP 0, .noi_loop

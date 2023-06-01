@@ -389,8 +389,9 @@
     n2 5 + 12
     n2 5 + 12
 ; end of the track
+    .ifndef STONE_COLD_LOOP
     n1 1
     END
+    .endif
 ;
     LOOP 0, .tri_intro3
-    END
