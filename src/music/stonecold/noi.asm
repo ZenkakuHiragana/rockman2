@@ -204,5 +204,9 @@
 .noiD7
     n1 10
     LOOP 6, .noiD7
-    LOOP 0, .noi_loop
+; end of the track
+    ENV 8, 1
+    TOMLOW n6 5
     END
+;
+    LOOP 0, .noi_loop

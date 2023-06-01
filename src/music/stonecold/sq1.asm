@@ -570,4 +570,7 @@
     n2 8
     n2 8
     ENV 6, 5
+; end of the track
+    END
+;
     LOOP 0, .sq1_intro3

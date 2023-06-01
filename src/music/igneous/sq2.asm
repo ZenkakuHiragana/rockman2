@@ -403,4 +403,25 @@
     CALL .sq2_intro1
     KEY O1A + 7
     VOL 9
+; end of the track
+    LOOP 0, .sq2_end
+.sq2_end2
+    CALL .sq2_intro1
+.sq2_end
+    CALL .sq2_intro2
+    n2 3 + 10
+    n2 3 + 10
+    CALL .sq2_intro3
+    LOOP 1, .sq2_end2
+    n2 1
+    n2 1
+    n3 3 + 10
+    n2 1
+    n2 1
+    n2 3 + 10
+    TIE
+    n2 3 + 10
+    DOT n6 3 + 10
+    END
+;
     LOOP 0, .sq2_loop

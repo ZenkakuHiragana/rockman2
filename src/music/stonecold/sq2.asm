@@ -435,4 +435,7 @@
     VOL 9
     KEY O3
     MOD 0
+; end of the track
+    END
+;
     LOOP 0, .sq2A1

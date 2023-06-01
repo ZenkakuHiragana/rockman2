@@ -388,5 +388,9 @@
     n2 5 + 12
     n2 5 + 12
     n2 5 + 12
+; end of the track
+    n1 1
+    END
+;
     LOOP 0, .tri_intro3
     END

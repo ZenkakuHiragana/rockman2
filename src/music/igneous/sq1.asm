@@ -344,4 +344,25 @@
     ENV 12, 1
     KEY O3 - 3
     MOD 0
+; end of the track
+    LOOP 0, .sq1_end
+.sq1_end2
+    CALL .sq2_intro1
+.sq1_end
+    CALL .sq2_intro2
+    n2 3 + 10
+    n2 3 + 10
+    CALL .sq2_intro3
+    LOOP 1, .sq1_end2
+    n2 1
+    n2 1
+    n3 3 + 10
+    n2 1
+    n2 1
+    n2 3 + 10
+    TIE
+    n2 3 + 10
+    DOT n6 3 + 10
+    END
+;
     LOOP 0, .sq1_loop

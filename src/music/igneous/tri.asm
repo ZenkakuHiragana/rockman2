@@ -586,4 +586,40 @@
     n2 5
     n2 5
     n3 5
+; end of the track
+.tri_end
+    CALL .tri_intro
+
+    n2 10
+    n2 10
+    n2 10
+    n2 10
+    n2 9
+    n2 9
+    n2 9
+    n2 9
+    n2 8
+    n2 8
+    n2 8
+    n2 8
+    n2 8
+    n2 8
+    n2 4
+    n2 4
+    LOOP 1, .tri_end
+    n3 10
+    n2 10
+    n2 10
+    n3 10
+    n2 9
+    VOLRAW -1
+    TIE
+    n2 10
+    n6 10
+    n5
+    KEY O1A
+    n2 1
+    n1 1
+    END
+;
     LOOP 0, .tri_start

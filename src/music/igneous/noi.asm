@@ -84,7 +84,6 @@
     SHORT n2 15
     TOMHIGH n2 5
     RETURN
-
 .noiC3
     TOMLOW  n4 5
     TOMHIGH n4 3
@@ -126,6 +125,49 @@
     TOMLOW  n2 15
     TOMLOW  n2 15
     TOMLOW  n2 15
+    RETURN
+.noiD1
+    TOMLOW
+    TIE
+    n3 3
+    TOMLOW  n3 3
+    TOMHIGH n2 5
+    n3
+    TOMLOW  n2 15
+    n3 1
+    TOMLOW  n2 15
+    n2
+    TOMHIGH n2 5
+    DOT n3
+.noiD1_loop
+    TIE
+    n3 3
+    TOMLOW  n3 3
+    TOMHIGH n2 5
+    n3
+    TOMLOW  n2 15
+    n3 1
+    TOMLOW  n2 15
+    n2
+    TOMHIGH n2 5
+    DOT n3
+    LOOP2 1, .noiD1_loop
+
+    TOMLOW
+    TIE
+    n3 3
+    TOMLOW  n3 3
+    TOMHIGH n2 5
+    n3
+    TOMLOW  n2 15
+    n3 1
+    TOMLOW  n2 15
+    n2
+    TOMHIGH n2 5
+    n2
+    TOMHIGH n2 5
+    TOMHIGH n2 5
+    LOOP 1, .noiD1
     RETURN
 .noi_start
     VOL 8
@@ -422,49 +464,27 @@
     LOOP2 2, .noiD3
 
     CALL .noiD1
-    LOOP 0, .noi_start
-    END
-    
-.noiD1
-    TOMLOW
-    TIE
-    n3 3
-    TOMLOW  n3 3
-    TOMHIGH n2 5
-    n3
-    TOMLOW  n2 15
-    n3 1
-    TOMLOW  n2 15
-    n2
-    TOMHIGH n2 5
-    DOT n3
-.noiD1_loop
-    TIE
-    n3 3
-    TOMLOW  n3 3
-    TOMHIGH n2 5
-    n3
-    TOMLOW  n2 15
-    n3 1
-    TOMLOW  n2 15
-    n2
-    TOMHIGH n2 5
-    DOT n3
-    LOOP2 1, .noiD1_loop
+; end of the track
+    CALL .noi_intro1
+    CALL .noi_intro2
+    CALL .noi_intro3
+    CALL .noi_intro1
+    CALL .noi_intro2
+    CALL .noi_intro3
 
-    TOMLOW
-    TIE
-    n3 3
-    TOMLOW  n3 3
     TOMHIGH n2 5
-    n3
+    TOMHIGH n2 5
+    TOMHIGH n2 5
     TOMLOW  n2 15
-    n3 1
-    TOMLOW  n2 15
-    n2
     TOMHIGH n2 5
-    n2
+    n2 14
+    n2 15
     TOMHIGH n2 5
-    TOMHIGH n2 5
-    LOOP 1, .noiD1
-    RETURN
+    n6
+    n5
+    TOMLOW  n1 15
+    TOMLOW  n1 15
+    TOMHIGH n4 5
+    END
+;
+    LOOP 0, .noi_start
