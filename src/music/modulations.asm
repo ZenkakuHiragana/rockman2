@@ -20,4 +20,4 @@ MOD_2d2t2f = 8
 MOD_3d3t1f = 9
     .dw $6301, $0080 ;Scarfaceのボーカルがビブラートしてる時のMOD
 MOD_STONECOLD = 10
-    .dw $0000, $FF81 ;Stone Coldの音量モジュレーション
+    .dw $0000, $0F01 ;Stone Coldの音量モジュレーション
