@@ -901,55 +901,55 @@ DoScroll_Loop:
 	rts
 
 ;9115
-PaletteChange_RightScroll:
-	ldx <zStage
-	cpx #$03
-	bne .bubble
-	ldy <zScrollNumber
-	cpy #$04
-	beq .skip
-.bubble
-	ldy .ptr,x
-	beq .skip
-	mMOV .size,x, <$FD
-	lda .begin,x
-	tax
-.loop
-	lda .data,x
-	sta aPalette,y
+; PaletteChange_RightScroll:
+; 	ldx <zStage
+; 	cpx #$03
+; 	bne .bubble
+; 	ldy <zScrollNumber
+; 	cpy #$04
+; 	beq .skip
+; .bubble
+; 	ldy .ptr,x
+; 	beq .skip
+; 	mMOV .size,x, <$FD
+; 	lda .begin,x
+; 	tax
+; .loop
+; 	lda .data,x
+; 	sta aPalette,y
 ;	sta aPaletteAnimBuf,y
 ;	sta aPaletteAnimBuf + $10,y
 ;	sta aPaletteAnimBuf + $20,y
 ;	sta aPaletteAnimBuf + $30,y
-	dex
-	dey
-	dec <$FD
-	bne .loop
-.skip
-	rts
+; 	dex
+; 	dey
+; 	dec <$FD
+; 	bne .loop
+; .skip
+; 	rts
 ;9148
 ;右スクロール時のパレット変更・書き込み位置
-.ptr
-	.db $00, $0B, $00, $0B, $00, $00, $00, $0F
-	.db $00, $00, $03, $00, $00, $0B
+; .ptr
+; 	.db $00, $0B, $00, $0B, $00, $00, $00, $0F
+; 	.db $00, $00, $03, $00, $00, $0B
 ;9156
 ;右スクロール時のパレット変更・データ開始位置
-.begin
-	.db $00, $02, $00, $05, $00, $00, $00, $0C
-	.db $00, $00, $0F, $00, $00, $12
+; .begin
+; 	.db $00, $02, $00, $05, $00, $00, $00, $0C
+; 	.db $00, $00, $0F, $00, $00, $12
 ;9164
 ;右スクロール時のパレット変更・書き込みサイズ
-.size
-	.db $00, $03, $00, $03, $00, $00, $00, $07
-	.db $00, $00, $03, $00, $00, $03
+; .size
+; 	.db $00, $03, $00, $03, $00, $00, $00, $07
+; 	.db $00, $00, $03, $00, $00, $03
 ;9172
 ;右スクロール時のパレット変更・書き込むデータ
-.data
-	.db $2B, $1B, $0B ;エアーマンステージ(未使用)
-	.db $21, $01, $0F ;バブルマンステージ(ボス前の網模様壁)
-	.db $39, $18, $01, $0F, $39, $18, $0F ;クラッシュマンステージ(星空)
-	.db $27, $37, $30 ;W3(ガッツタンク用)
-	.db $0F, $0F, $0F ;W6(エイリアン戦前背景暗転)
+; .data
+; 	.db $2B, $1B, $0B ;エアーマンステージ(未使用)
+; 	.db $21, $01, $0F ;バブルマンステージ(ボス前の網模様壁)
+; 	.db $39, $18, $01, $0F, $39, $18, $0F ;クラッシュマンステージ(星空)
+; 	.db $27, $37, $30 ;W3(ガッツタンク用)
+; 	.db $0F, $0F, $0F ;W6(エイリアン戦前背景暗転)
 
 ;9185
 ;上下スクロールの実行処理

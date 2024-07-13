@@ -360,63 +360,63 @@ BossDeadInit:
 	rts
 
 ;20 9E C2
-Unknown_C29E
-	mSTZ <$FD
-	mMOV #$02, aPaletteAnim
-	mMOV #$04, aPaletteAnimWait
-	mMOV #$BB, <$FD
-.loop_wait2
-	jsr Unknown_C386
-	dec <$FD
-	bne .loop_wait2
-	mSTZ aPaletteAnimWait, aPaletteAnim
-	ldx #$02
-.loop2
-	mMOV C29E_Palette,x, aPalette + 1,x ;第一BGパレット → C29E_Palette
-	dex
-	bpl .loop2
-	mMOV #$86, <$FF
-	mSTZ <$FE
-.loop
-	mCHANGEBANK #$09
-	lda <$FD
-	lsr a
-	tax
-	mMOV Unknown_C324,x, aPPULinearhi
-	mMOV Unknown_C33B,x, aPPULinearlo
-	lda <$FD
-	and #$01
-	beq .begin_ppu
-	mORA aPPULinearlo, #%00100000, aPPULinearlo
-.begin_ppu
-	ldy #$20
-.loop_ppu
-	mMOV [$FE],y, aPPULinearData,y
-	dey
-	bpl .loop_ppu
-	mMOV #$20, <zPPULinear
-	clc
-	mADD <$FE, #$20
-	mADD <$FF
-	jsr Unknown_C386
-	inc <$FD
-	lda <$FD
-	cmp #$2E
-	bne .loop
-	mCHANGEBANK #$0E, 1
+; Unknown_C29E
+; 	mSTZ <$FD
+; 	mMOV #$02, aPaletteAnim
+; 	mMOV #$04, aPaletteAnimWait
+; 	mMOV #$BB, <$FD
+; .loop_wait2
+; 	jsr Unknown_C386
+; 	dec <$FD
+; 	bne .loop_wait2
+; 	mSTZ aPaletteAnimWait, aPaletteAnim
+; 	ldx #$02
+; .loop2
+; 	mMOV C29E_Palette,x, aPalette + 1,x ;第一BGパレット → C29E_Palette
+; 	dex
+; 	bpl .loop2
+; 	mMOV #$86, <$FF
+; 	mSTZ <$FE
+; .loop
+; 	mCHANGEBANK #$09
+; 	lda <$FD
+; 	lsr a
+; 	tax
+; 	mMOV Unknown_C324,x, aPPULinearhi
+; 	mMOV Unknown_C33B,x, aPPULinearlo
+; 	lda <$FD
+; 	and #$01
+; 	beq .begin_ppu
+; 	mORA aPPULinearlo, #%00100000, aPPULinearlo
+; .begin_ppu
+; 	ldy #$20
+; .loop_ppu
+; 	mMOV [$FE],y, aPPULinearData,y
+; 	dey
+; 	bpl .loop_ppu
+; 	mMOV #$20, <zPPULinear
+; 	clc
+; 	mADD <$FE, #$20
+; 	mADD <$FF
+; 	jsr Unknown_C386
+; 	inc <$FD
+; 	lda <$FD
+; 	cmp #$2E
+; 	bne .loop
+; 	mCHANGEBANK #$0E, 1
 
 ;C321
-C29E_Palette:
-	.db $28, $18, $2C
+; C29E_Palette:
+; 	.db $28, $18, $2C
 
-Unknown_C324:
-	.db $10, $1A, $1A, $1B, $1B, $1B, $1B, $1C
-	.db $1C, $1C, $1C, $1D, $1D, $1D, $1D, $1E
-	.db $1E, $1E, $1E, $1F, $1F, $1F, $1F
-Unknown_C33B:
-	.db $00, $80, $C0, $00, $40, $80, $C0, $00
-	.db $40, $80, $C0, $00, $40, $80, $C0, $00
-	.db $40, $80, $C0, $00, $40, $80, $C0
+; Unknown_C324:
+; 	.db $10, $1A, $1A, $1B, $1B, $1B, $1B, $1C
+; 	.db $1C, $1C, $1C, $1D, $1D, $1D, $1D, $1E
+; 	.db $1E, $1E, $1E, $1F, $1F, $1F, $1F
+; Unknown_C33B:
+; 	.db $00, $80, $C0, $00, $40, $80, $C0, $00
+; 	.db $40, $80, $C0, $00, $40, $80, $C0, $00
+; 	.db $40, $80, $C0, $00, $40, $80, $C0
 
 ;C352
 MainRoutine_WhileDeath:
@@ -446,14 +446,14 @@ ___MainRoutine_WhileDeath:
 	.endif
 
 ;C386
-Unknown_C386:
-	ldx #$1F
-	lda #$00
-.loop
-	sta aObjWait,x
-	dex
-	bpl .loop
-	jmp ___MainRoutine_WhileDeath
+; Unknown_C386:
+; 	ldx #$1F
+; 	lda #$00
+; .loop
+; 	sta aObjWait,x
+; 	dex
+; 	bpl .loop
+; 	jmp ___MainRoutine_WhileDeath
 
 ;C393
 SpawnTiwnRound:
@@ -1923,22 +1923,22 @@ PickupMap:
 	bpl .offscreenblock
 
 ;1ECC44
-Table_Terrain:
-	.db $02, $03 ;ヒートマン
-	.db $02, $03 ;エアーマン
-	.db $02, $00 ;ウッドマン
-	.db $04, $03 ;バブルマン
-	.db $00, $03 ;クイックマン
-	.db $02, $07 ;フラッシュマン
-	.db $05, $06 ;メタルマン
-	.db $02, $03 ;クラッシュマン
+; Table_Terrain:
+; 	.db $02, $03 ;ヒートマン
+; 	.db $02, $03 ;エアーマン
+; 	.db $02, $00 ;ウッドマン
+; 	.db $04, $03 ;バブルマン
+; 	.db $00, $03 ;クイックマン
+; 	.db $02, $07 ;フラッシュマン
+; 	.db $05, $06 ;メタルマン
+; 	.db $02, $03 ;クラッシュマン
 
-	.db $02, $00 ;ワイリーステージ1
-	.db $02, $03 ;ワイリーステージ2
-	.db $04, $03 ;ワイリーステージ3
-	.db $02, $03 ;ワイリーステージ4
-	.db $00, $00 ;ワイリーステージ5
-	.db $00, $00 ;ワイリーステージ6
+; 	.db $02, $00 ;ワイリーステージ1
+; 	.db $02, $03 ;ワイリーステージ2
+; 	.db $04, $03 ;ワイリーステージ3
+; 	.db $02, $03 ;ワイリーステージ4
+; 	.db $00, $00 ;ワイリーステージ5
+; 	.db $00, $00 ;ワイリーステージ6
 
 ;20 60 CC
 PickupMap_BossBank:
@@ -2752,9 +2752,9 @@ Reset_JMP:
 ;zPtrに示すアドレスへjsr
 IndirectJSR:
 	jmp [zPtr]
-	.beginregion "EmptySpace"
+	.beginregion "EmptySpace3C000"
 	.org Table_AnimationPointer_Low
-	.endregion "EmptySpace"
+	.endregion "EmptySpace3C000"
 	.include "src/animations.asm"
 
 	.org Reset_Start
