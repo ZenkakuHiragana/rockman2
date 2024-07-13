@@ -57,29 +57,29 @@
 37F-386 vertical scroll attr data 1
 387-38E vertical scroll attr data 2
 
-�n�`����0�`F
-0 �w�i
-1 ��
-2 �͂���
-3 �w�i��
+地形判定0～F
+0 背景
+1 水
+2 はしご
+3 背景裏
 4 
 5 
 6 
 7 
 
-8 ��
-9 �g�Q
-A �R���x�A��
-B �R���x�A�E
-C �X
-D ����ʍs��
-E ����ʍs��
-F �V���b�^�[
+8 壁
+9 トゲ
+A コンベア左
+B コンベア右
+C 氷
+D 一方通行上
+E 一方通行下
+F シャッター
 
-�G80�`FF
-80�`8B �摜�ǂݍ��݃Z�b�g�̓K�p
-8E �X�N���[�������I�u�W�F�N�g
-8F ���ԃ|�C���g�̐ݒ�
-90�`AF ��
-B0�`BF �V���b�^�[�����̐ݒ�
-C0�`FF �X�N���[���ړ���̐ݒ�
+敵80～FF
+80～8B 画像読み込みセットの適用
+8E スクロール制限オブジェクト
+8F 中間ポイントの設定
+90～AF 空き
+B0～BF シャッター高さの設定
+C0～FF スクロール移動先の設定

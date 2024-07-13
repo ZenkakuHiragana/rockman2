@@ -362,7 +362,7 @@ Public Class Form1
         Next
 
         For i As UInteger = 0 To SizeChip32x32 - 1
-            chip(i) = testfile(AddrChip32x32 + i)
+            chip(i) = testfile(AddrChip32x32 + i) And &H7F
         Next
         For i As UInteger = 0 To SizeAttr32x32 - 1
             attr(i) = testfile(AddrAttr32x32 + i)
@@ -463,7 +463,7 @@ Public Class Form1
             testfile(AddrTile16x16 + i) = tile(i)
         Next
         For i As UInteger = 0 To SizeChip32x32 - 1
-            testfile(AddrChip32x32 + i) = chip(i)
+            testfile(AddrChip32x32 + i) = chip(i) And &H7F
         Next
         For i As UInteger = 0 To SizeAttr32x32 - 1
             testfile(AddrAttr32x32 + i) = attr(i)
