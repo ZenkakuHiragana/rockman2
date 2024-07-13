@@ -1675,7 +1675,6 @@ WriteNameTable_GetChip32:
 	sta <$0C
 	lda #HIGH(Stage_Def32x32 >> 2)
 	adc #$00
-	sta <$0D
 	asl <$0C
 	rol a
 	asl <$0C
@@ -1684,11 +1683,9 @@ WriteNameTable_GetChip32:
 	rts
 WriteNameTable_GetTile16:
 	ldy <$04
-	mMOV #HIGH(Stage_Def16x16 >> 2), <$0F
+	mMOV #HIGH(Stage_Def16x16 >> 1), <$0F
 	lda [$0C],y
-	and #$7F
 	asl a
-	rol <$0F
 	asl a
 	rol <$0F
 	sta <$0E ;$0E~$0F: 16x16 chip

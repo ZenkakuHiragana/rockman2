@@ -73,20 +73,20 @@ rockman2.prg
 mono_crash.*
 
 # Build results
-[Dd]ebug/
-[Dd]ebugPublic/
-[Rr]elease/
-[Rr]eleases/
-x64/
-x86/
-[Ww][Ii][Nn]32/
-[Aa][Rr][Mm]/
-[Aa][Rr][Mm]64/
-bld/
-[Bb]in/
-[Oo]bj/
-[Ll]og/
-[Ll]ogs/
+stage/Rock2StageEx/[Dd]ebug/
+stage/Rock2StageEx/[Dd]ebugPublic/
+stage/Rock2StageEx/[Rr]elease/
+stage/Rock2StageEx/[Rr]eleases/
+stage/Rock2StageEx/x64/
+stage/Rock2StageEx/x86/
+stage/Rock2StageEx/[Ww][Ii][Nn]32/
+stage/Rock2StageEx/[Aa][Rr][Mm]/
+stage/Rock2StageEx/[Aa][Rr][Mm]64/
+stage/Rock2StageEx/bld/
+stage/Rock2StageEx/[Bb]in/
+stage/Rock2StageEx/[Oo]bj/
+stage/Rock2StageEx/[Ll]og/
+stage/Rock2StageEx/[Ll]ogs/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/

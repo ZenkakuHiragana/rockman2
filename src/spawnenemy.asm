@@ -351,7 +351,8 @@ CreateEnemy:
 	mMOV Stage_DefEnemiesX - 1,y, aObjX10,x
 	mMOV Stage_DefEnemiesY - 1,y, aObjY10,x
 	lda Stage_DefEnemies - 1,y
-CreateObjectHere:
+	clc
+CreateObjectHere: ; Object is item -> carry set
 	sta aObjAnim10,x
 	tay
 	pha
@@ -372,10 +373,11 @@ CreateObjectHere:
 	sta aObjFrame10,x
 	sta aObjWait10,x
 	sta aObjVar10,x
-	sta aEnemyVar10,x
 	sta aObjXlo10,x
 	sta aObjYlo10,x
 	sta aEnemyFlash10,x
+	bcs InvalidCreateObject
+	sta aEnemyVar10,x
 InvalidCreateObject:
 	rts
 
@@ -394,11 +396,13 @@ CreateItem:
 	bcs InvalidCreateObject
 	tya
 	sta aItemOrder10,x
+	sta aEnemyVar10,x
 	mMOV aItemLife,y, aObjLife10,x
 	mMOV <$02, aObjRoom10,x
 	mMOV Stage_DefItemsX - 1,y, aObjX10,x
 	mMOV Stage_DefItemsY - 1,y, aObjY10,x
 	lda Stage_DefItems - 1,y ;-------------item number
+	sec
 	mJSR_NORTS CreateObjectHere
 
 ;D802

@@ -613,7 +613,7 @@ EN0D:
 .move
 	mJSR_NORTS MoveEnemy
 
-;89E3
+;98E3
 ;アンコウの提灯
 ;処理読んでないや……
 EN0F:
@@ -628,42 +628,34 @@ EN0F:
 .dmg
 	jsr EN0F_ChangePalette
 .nochangepalette
-	lda aObjLife,x
-	sta aObjVar,x
-	lda aObjRoom,x
-	sta aObjVYlo,x
+	mMOV aObjLife,x, aObjVar,x
+	mMOV aObjRoom,x, aObjVYlo,x
 	jsr CheckOffscreenItem
 	lda aObjLife,x
 	bne .alive
-	lda #%10100000
-	sta aObjFlags,x
-	lda #$0F
-	sta aObjAnim,x
+	mMOV #%10100000, aObjFlags,x
+	mMOV #$0F, aObjAnim,x
 	ldx #$01
 .loopdelete
 	stx <$01
 	lda EN0F_ObjList,x
 	jsr FindObject
 	bcs .notfound
-	lda #%00000000
-	sta aObjFlags10,y
-	lda #$FF
-	sta aItemOrder,y
+	mMOV #%00000000, aObjFlags10,y
+	mMOV #$FF, aItemOrder10,y
 .notfound
 	ldx <$01
 	dex
 	bpl .loopdelete
 	ldx <zObjIndex
-	ldy aEnemyVar,x
+	ldy aEnemyVar,x ; = aItemOrder10,x
 	lda #$00
-	sta aItemLife - 1,y
-	sta aItemLife + 1,y
-	sta aItemLife - 2,y
-	sta aItemLife + 2,y
-	lda #$0E
-	sta aObjVXlo,x
-	lda #$06
-	sta aObjVX,x
+	sta aItemLife - 1 - 1,y
+	sta aItemLife - 1 - 2,y
+	sta aItemLife - 1 + 1,y
+	sta aItemLife - 1 + 2,y
+	mMOV #$0E, aObjVXlo,x
+	mMOV #$06, aObjVX,x
 .alive
 	rts
 .1
@@ -733,7 +725,7 @@ EN0F_DestroyEffect:
 	sta aObjY10,y
 	lda <$03
 	sta aObjRoom10,y
-	cmp #$09
+	cmp #$55
 	php
 	lda EN0F_DestroyEffectX - 5,x
 	plp
