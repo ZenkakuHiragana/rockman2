@@ -490,14 +490,15 @@ BossBehaviour_WallCollisionY:
 	mADD aObjX + 1, <.dx, <.x
 	mADD aObjRoom + 1, #$00, <.r
 	jsr PickupMap_BossBank
-	ldy <.res
-	mMOV Table_BossTerrainBlockFlag,y, <.dy
+	mMOV <.res, <.dy
 	sec
 	mSUB aObjX + 1, <.dx, <.x
 	mSUB aObjRoom + 1, #$00, <.r
 	jsr PickupMap_BossBank
-	ldy <.res
-	mORA Table_BossTerrainBlockFlag,y, <.dy, <.res
+	lda <.res
+	ora <.dy
+	and #$08
+	sta <.res
 	beq .nohit_y
 	plp
 	bmi .godown
@@ -557,8 +558,7 @@ BossBehaviour_WallCollisionXY:
 .write_dx
 	sta <.r
 	jsr PickupMap_BossBank
-	ldy <.res
-	mMOV Table_BossTerrainBlockFlag,y, <$03
+	mAND <.res, #$08, <$03
 	beq .nohit_x
 	plp
 	beq .hitleft
@@ -582,8 +582,8 @@ BossBehaviour_WallCollisionXY:
 
 ;A349
 ;壁フラグ
-Table_BossTerrainBlockFlag:
-	.db $00, $01, $00, $01, $00, $01, $01, $01, $01
+; Table_BossTerrainBlockFlag:
+; 	.db $00, $01, $00, $01, $00, $01, $01, $01, $01
 
 ;A352
 ;敵番号Aを生成
