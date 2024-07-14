@@ -1,7 +1,7 @@
 
 ;曲の定義
 	mBEGIN #$0C, Table_TrackStartPointers
-	.dw DRY_GUYS
+	; .dw DRY_GUYS
 	; .dw DEATHTRAP_MIRAGE
 	; .dw ETUDEFORGHOSTS
 	; .dw FROZENHOTEL
@@ -11,7 +11,7 @@
 	; .dw SBOMB1_6
 
 	mBEGIN #$0C, #$8AD6
-    .include "src/music/dryguys/header.asm"
+    ; .include "src/music/dryguys/header.asm"
     ; .include "src/music/deathtrapmirage/header.asm"
 	; .include "src/music/etudeforghosts.asm"
 	; .include "src/music/frozenhotel.asm"

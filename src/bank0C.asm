@@ -1568,9 +1568,11 @@ Table_SoundFrequency:
 
 ;8A45
 ;空き領域
-	.db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
+	.db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
+	.db $FF, $FF, $FF, $FF, $FF, $FF, $FF
 
 ;8A50
 ;曲定義テーブル
+	mBEGIN #$0C, #$8A50
 Table_TrackStartPointers:
-
+	.dw $9487, $9698, $8E1D, $A191, $9E48, $8AD6, $9A42, $90C8
