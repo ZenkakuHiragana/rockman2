@@ -7,10 +7,79 @@
 	stx <.offset ;τDMA元の書き込み位置
 	stx <$0D
 	stx <$0C
-	
+
+;スプライトセットアップ(標準時)
+.standard
+	lda <zFrameCounter
+	lsr a
+	bcs .oddframe
+;スプライトセットアップ標準/偶数フレーム（Obj[00->1F]->ゲージ）
+	stx <zObjIndex ;X = 00
+	dec <$0C ;X = FF
+.loopobj
+	jsr AnimateObjects ;Obj[00->0F] スプライト描画
+	bcs .done
+	inc <zObjIndex
+	ldx <zObjIndex
+	cpx #$10
+	bne .loopobj
+.loopenemy
+	jsr AnimateEnemies ;Obj[10->1F] スプライト描画
+	bcs .done
+	inc <zObjIndex
+	ldx <zObjIndex
+	cpx #$20
+	bne .loopenemy
+	mMOV <.offset, <$0C
+	jsr DrawBar ;体力バー描画
+	jmp .done
+;スプライトセットアップ標準/奇数フレーム（ゲージ->Obj[1F->00]）
+.oddframe
+	jsr DrawBar
+	mMOV <.offset, <$0D
+	ldx #$1F
+	stx <zObjIndex
+.loopenemyodd
+	jsr AnimateEnemies
+	bcs .done
+	dec <zObjIndex
+	ldx <zObjIndex
+	cpx #$0F
+	bne .loopenemyodd
+.loopobjodd
+	.list
+	jsr AnimateObjects
+	.nolist
+	bcs .done
+	dec <zObjIndex
+	ldx <zObjIndex
+	bpl .loopobjodd
+	mMOV <.offset, <$0C
+
+.done
+;エアーマンステージではスプライトが背面に回る→rts
+;Sprites[$0D->$0C]を背面に回す
+	lda <zStage
+	cmp #$01
+	bne .advanceanim
+	ldx <$0D
+.loop
+	cpx <$0C
+	beq .advanceanim
+	lda aSpriteAttr,x
+	ora #%00100000
+	sta aSpriteAttr,x
+	inx
+	inx
+	inx
+	inx
+	bne .loop
+
 ;スプライトアニメーションを進める
 ;zStopFlag = .... WRBE
 ;W: 武器停止 R: ロックマン停止 B: ボス停止 E: ザコ停止
+.advanceanim
+	mCHANGEBANK #$0A
 	ldx #$1F
 .loop_anim
 	lda aObjFlags,x
@@ -61,75 +130,7 @@
 	sta aObjFrame,x
 .skip_anim
 	dex
-	bpl .loop_anim ;X = FF
-
-;スプライトセットアップ(標準時)
-.standard
-	lda <zFrameCounter
-	lsr a
-	bcs .oddframe
-;スプライトセットアップ標準/偶数フレーム（Obj[00->1F]->ゲージ）
-	stx <$0C
-	inx
-	stx <zObjIndex
-.loopobj
-	jsr AnimateObjects ;Obj[00->0F] スプライト描画
-	bcs .overflow
-	inc <zObjIndex
-	ldx <zObjIndex
-	cpx #$10
-	bne .loopobj
-.loopenemy
-	jsr AnimateEnemies ;Obj[10->1F] スプライト描画
-	bcs .overflow
-	inc <zObjIndex
-	ldx <zObjIndex
-	cpx #$20
-	bne .loopenemy
-	mMOV <.offset, <$0C
-	jsr DrawBar ;体力バー描画
-.overflow
-	jmp .done
-;スプライトセットアップ標準/奇数フレーム（ゲージ->Obj[1F->00]）
-.oddframe
-	jsr DrawBar
-	mMOV <.offset, <$0D
-	ldx #$1F
-	stx <zObjIndex
-.loopenemyodd
-	jsr AnimateEnemies
-	bcs .done
-	dec <zObjIndex
-	ldx <zObjIndex
-	cpx #$0F
-	bne .loopenemyodd
-.loopobjodd
-	jsr AnimateObjects
-	bcs .done
-	dec <zObjIndex
-	ldx <zObjIndex
-	bpl .loopobjodd
-	mMOV <.offset, <$0C
-
-.done
-;エアーマンステージではスプライトが背面に回る→rts
-;Sprites[$0D->$0C]を背面に回す
-	lda <zStage
-	cmp #$01
-	bne .notairman
-	ldx <$0D
-.loop
-	cpx <$0C
-	beq .notairman
-	lda aSpriteAttr,x
-	ora #%00100000
-	sta aSpriteAttr,x
-	inx
-	inx
-	inx
-	inx
-	bne .loop
-.notairman
+	bpl .loop_anim
 	mCHANGEBANK #$0E, 1
 
 ;20 F6 CE
