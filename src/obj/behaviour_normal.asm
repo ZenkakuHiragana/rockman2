@@ -961,7 +961,7 @@ EN13:
 ;9C90
 ;レーザー出現
 EN14:
-	sec
+	rts
 	lda aObjRoom,x
 	sbc #$03
 	tay
