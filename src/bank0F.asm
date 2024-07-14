@@ -1240,9 +1240,7 @@ WriteNameTableByScroll:
 	sty <$05 ;$05: 16x16 LT LB RT RB
 
 ;横スクロール
-	.list
 	lda <.xscroll
-	.nolist
 	sta <zPPUHScr
 	bne .do_h
 	jmp .skip_xscroll
@@ -1654,6 +1652,9 @@ WriteNameTableByScroll:
 ;スクロール位置の補正
 WriteNameTable_GetOrigin:
 
+;画面位置に対応する画面定義へのポインタを返す
+;$09 = 画面位置 = YYYY XXXX
+;=> $0A~$0B = 画面定義へのポインタ
 WriteNameTable_GetMapPtr:
 	ldy <$09
 	mSTZ <$0A
@@ -1666,6 +1667,11 @@ WriteNameTable_GetMapPtr:
 	adc #HIGH(Stage_DefRoom)
 	sta <$0B ;$0A~$0B: room ptr
 	rts
+;32x32チップ定義へのポインタを返す
+;$03 = オフセット, #$00～#$3F
+;$0A~$0B = 画面定義へのポインタ
+;=> $0C~$0D = 32x32チップ定義へのポインタ
+;=> y = 32x32タイル番号
 WriteNameTable_GetChip32:
 	ldy <$03
 	clc
@@ -1681,6 +1687,12 @@ WriteNameTable_GetChip32:
 	rol a
 	sta <$0D ;$0C~$0D: 32x32 chip
 	rts
+;16x16タイル定義へのポインタを返す
+;$04 = オフセット, 0～3
+;    0  2
+;    1  3
+;$0C~$0D = 32x32チップ定義へのポインタ
+;=> $0E~$0F = 16x16タイル定義へのポインタ
 WriteNameTable_GetTile16:
 	ldy <$04
 	mMOV #HIGH(Stage_Def16x16 >> 1), <$0F
@@ -1698,6 +1710,36 @@ WriteNameTableByScroll_AnyBank:
 	jsr WriteNameTableByScroll
 	pla
 	mJSR_NORTS ChangeBank
+
+;武器メニューを閉じる時のネームテーブル書き込み
+WriteNameTable_WeaponMenu:
+	lda <zStage
+	and #$07
+	jsr ChangeBank
+	jsr WriteNameTable_GetMapPtr
+	jsr WriteNameTable_GetChip32
+	mMOV Stage_Def32Pal,y, aPPUSqrAttrData
+	mMOV #$0F, <$00
+	mMOV #$03, <$04
+.loop_16
+	jsr WriteNameTable_GetTile16
+	ldy #$03
+.loop_8
+	ldx <$00
+	lda .ppu_map,x
+	dex
+	stx <$00
+	tax
+	lda [$0E],y
+	sta aPPUSqrData,x
+	dey
+	bpl .loop_8
+	dec <$04
+	bpl .loop_16
+	mCHANGEBANK #$0D, 1
+.ppu_map
+	.db $00, $04, $01, $05, $08, $0C, $09, $0D
+	.db $02, $06, $03, $07, $0A, $0E, $0B, $0F
 
 ;その画面位置にスクロール可能かを調べる
 ;X 画面位置

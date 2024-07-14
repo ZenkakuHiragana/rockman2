@@ -1,4 +1,5 @@
 
+	.beginregion "Weapon Menu"
 ;90EC
 ;武器選択画面表示の処理開始
 ;___Bank0D_BeginWeaponMenu:
@@ -21,7 +22,7 @@
 	pha
 	ldx #$11
 .loop_backup_palette
-	lda aPalette -2,x
+	lda aPalette - 2,x
 	sta aPaletteBackup,x
 	dex
 	bpl .loop_backup_palette
@@ -79,37 +80,53 @@
 	clc
 	lda <zHScroll
 	adc #$80
-	and #$E0
-	ora #$04
+	and #%11100000
 	sta <$52 ;-----------------------------------------------
 	lda <zRoom
 	adc #$00
 	sta <$53 ;-----------------------------------------------
+	lda <zVScroll
+	lsr a
+	lsr a
+	lsr a
+	and #%00011110
+	adc #$06
+	cmp #$20
+	bcc .add_voffset
+	adc #$02
+	pha
+	lda <$53
+	adc #$10
+	sta <$53
+	pla
+.add_voffset
+	and #%00011100
+	ora <$52
+	sta <$52
 	ldx #$00
 .loop_drawmenu_open
 	stx <$FD
-	clc
-	lda <$52
-	adc .table_menubg_writepos,x
-	sta <$08
-	lda <$53
-	adc #$00
-	sta <$09
+	jsr .write_ppuaddr_loop
 	lda #$00
 	sta <zPPUSqr
 	jsr SetPPUSquareInfo
-	.ifndef ___OPTIMIZE
-	ldx <$FD
-	lda .table_menubg_map,x
-	asl a
-	asl a
-	asl a
-	asl a
-	tax
-	.else
 	ldy <$FD
 	ldx .table_menubg_map,y
-	.endif
+	cpx #$08
+	beq .add_drawmenu_offset
+	cpx #$1C
+	beq .add_drawmenu_offset
+	cpx #$30
+	bne .skip_drawmenu_offset
+.add_drawmenu_offset
+	lda <$52
+	and #%00011100
+	cmp #$0C
+	bne .skip_drawmenu_offset
+	txa
+	adc #$08 - 1
+	tax
+.skip_drawmenu_offset
 	ldy #$00
 .loop_drawmenuppu_open
 	lda .table_menubg_tile,x
@@ -121,9 +138,8 @@
 	ldx <zStage
 	lda .table_menubg_attr,x
 	sta aPPUSqrAttrData
-	lda #$01
-	sta <zPPUSqr
-	ldy #$99
+	inc <zPPUSqr
+	ldy #$9A
 	ldx #$00
 	jsr Unknown_C75D ;---------------
 	jsr FrameAdvance1A
@@ -132,7 +148,7 @@
 	cpx #$0F
 	bne .loop_drawmenu_open
 	stx <$FD
-	ldy #$99
+	ldy #$9A
 	ldx #$00
 	jsr Unknown_C75D
 	lda #$00
@@ -255,6 +271,9 @@
 ;E缶使用
 	lda <zETanks
 	beq .skip
+	lda aObjLife
+	cmp #$1C
+	beq .skip
 	dec <zETanks
 .loop_etank
 	lda aObjLife
@@ -291,28 +310,20 @@
 	ldx #$00
 .loop_endmenu
 	stx <$FD
-	clc
-	lda <$52
-	adc .table_menubg_writepos,x
-	sta <$08
-	lda <$53
-	adc #$00
-	sta <$09
-	lda <$08
-	lsr <$09
-	ror a
-	lsr <$09
-	ror a
-	sta <$08
-	and #$3F
-	sta <zNTPointer
-	clc
-	lda <$09
-	adc #$85
-	sta <$09
+	jsr .write_ppuaddr_loop
 	lda #$00
 	sta <zPPUSqr
-	jsr WriteNameTableByScroll_AnyBank
+	jsr SetPPUSquareInfo
+
+	ldx <$FD
+	; mMOV <$53, <$09
+	lda <$08
+	lsr a
+	lsr a
+	sta <$03
+	jsr WriteNameTable_WeaponMenu
+	inc <zPPUSqr
+
 	lda <$FD
 	cmp #$08
 	bcs .loadrockmangraphs
@@ -324,14 +335,12 @@
 	ldy .table_weapongraphs_ptr,x
 	.endif
 	cpx #$09
-	bcc .isweapon
-	ldx #$00
-	beq .loadweapongraphs
-.isweapon
+	bcs .isnotweapon
 	ldx #$05
 	bne .loadweapongraphs
 .loadrockmangraphs
 	ldy #$90
+.isnotweapon
 	ldx #$00
 .loadweapongraphs
 	jsr Unknown_C75D
@@ -395,6 +404,31 @@
 	lda #$30
 	mJSR_NORTS PlayTrack
 
+;ループ中のPPU書き込み開始位置の指定
+.write_ppuaddr_loop
+	clc
+	lda <$52 ;A = XXXY YY00
+	tay
+	adc .table_menubg_writepos_x,x
+	and #%11100000
+	sta <$08
+	lda <$53
+	adc #$00
+	sta <$09
+	tya
+	and #%00011100
+	adc .table_menubg_writepos_y,x
+	cmp #%00100000
+	and #%00011100
+	ora <$08
+	sta <$08
+	bcc .add_voffset_loop
+	lda <$09
+	adc #$10 - 1
+	sta <$09
+.add_voffset_loop
+	rts
+
 ;9393
 .table_gutstank_palette
 	.db $27, $11, $16
@@ -403,6 +437,8 @@
 ;武器選択メニューのスプライト表示処理
 .showsprites
 .basex = $08
+.basey = $05
+.shrinky = $06
 .x = $01
 .y = $02
 	jsr ClearSprites
@@ -411,6 +447,25 @@
 	sec
 	sbc <zHScroll
 	sta <.basex
+	lda <$52
+	and #$1C
+	cmp #$0C
+	lda #$00
+	ror a
+	sta <.shrinky ; = ($52 & #$1C) ≧ #$0C
+	lda <zVScroll
+	cmp #$D0
+	bcc .add_basey
+	sbc #$10
+.add_basey
+	eor #$1F
+	and #$1F
+	cmp #$10
+	bcc .skip_basey
+	sbc #$20
+.skip_basey
+	sta <.basey
+
 	ldy #$00
 .loop_next ;$962C($00≦Y＜$14) →NEXTを描く
 	lda .table_next,y
@@ -556,7 +611,18 @@
 .is2nd_showbars
 	ldx #$04
 .basesprites2 ;$964C($04≦X＜$17) 1UPの顔と:を描く
-	lda .table_1upicon,x
+	bit <.shrinky
+	bpl .skip_basesprites2
+	txa
+	and #$03
+	bne .skip_basesprites2
+	lda #$F5
+	bne .shrink_basesprites2
+.skip_basesprites2
+	lda #$00
+.shrink_basesprites2
+	clc
+	adc .table_1upicon,x
 	sta aSprite,y
 	iny
 	inx
@@ -636,16 +702,40 @@
 	sta aSprite + $14,y
 .movex
 	ldx #$00
-.loop_movex
+.loop_movexy
 	clc
 	lda aSprite + 3,x
 	adc <.basex
 	sta aSprite + 3,x
+	lda aSprite + 0,x
+	cmp #$F8
+	bcs .skip_movey
+	bit <.shrinky
+	bpl .skip_shrinky
+	ldy aSprite + 1,x ;1UP表示は別に調整
+	cpy #$8D
+	beq .skip_shrinky
+	cpy #$8E
+	beq .skip_shrinky
+	cpy #$1E
+	beq .skip_shrinky
+	sbc #$10
+	lsr a
+	lsr a
+	lsr a
+	lsr a
+	eor #$FF
+	adc aSprite + 0,x
+	clc
+.skip_shrinky
+	adc <.basey
+	sta aSprite + 0,x
+.skip_movey
 	inx
 	inx
 	inx
 	inx
-	bne .loop_movex
+	bne .loop_movexy
 	rts
 ;9519
 ;なんだろこれ
@@ -703,74 +793,44 @@
 ;9570
 ;武器メニューBG部分のマップ定義
 .table_menubg_map
-	.ifndef ___OPTIMIZE
-	.db 0, 1, 2
-	.db 3, 4, 5
-	.db 3, 4, 5
-	.db 3, 4, 5
-	.db 6, 7, 8
-	.else
-	.db $00, $10, $20
-	.db $30, $40, $50
-	.db $30, $40, $50
-	.db $30, $40, $50
-	.db $60, $70, $80
-	.endif
+	.db $00, $28, $14
+	.db $04, $2C, $18
+	.db $04, $2C, $18
+	.db $04, $2C, $18
+	.db $08, $30, $1C
 ;957F
 ;武器メニューのBG部分の書き込み位置
-.table_menubg_writepos
-	.db $00, $20, $40
-	.db $04, $24, $44
-	.db $08, $28, $48
-	.db $0C, $2C, $4C
-	.db $10, $30, $50
+.table_menubg_writepos_x
+	.db $00 & $E0, $20 & $E0, $40 & $E0
+	.db $04 & $E0, $24 & $E0, $44 & $E0
+	.db $08 & $E0, $28 & $E0, $48 & $E0
+	.db $0C & $E0, $2C & $E0, $4C & $E0
+	.db $10 & $E0, $30 & $E0, $50 & $E0
+.table_menubg_writepos_y
+	.db $00 & $1C, $20 & $1C, $40 & $1C
+	.db $04 & $1C, $24 & $1C, $44 & $1C
+	.db $08 & $1C, $28 & $1C, $48 & $1C
+	.db $0C & $1C, $2C & $1C, $4C & $1C
+	.db $10 & $1C, $30 & $1C, $50 & $1C
 ;958E
 ;武器メニューBG部分のタイル定義
 .table_menubg_tile
-	.db $40, $40, $40, $40
-	.db $40, $41, $41, $41
-	.db $40, $41, $41, $41
-	.db $40, $41, $41, $41
-	
-	.db $40, $40, $40, $40
-	.db $41, $41, $41, $41
-	.db $41, $41, $41, $41
-	.db $41, $41, $41, $41
-	
-	.db $40, $40, $40, $40
-	.db $41, $41, $41, $40
-	.db $41, $41, $41, $40
-	.db $41, $41, $41, $40
-	
-	.db $40, $41, $41, $41
-	.db $40, $41, $41, $41
-	.db $40, $41, $41, $41
-	.db $40, $41, $41, $41
-	
-	.db $41, $41, $41, $41
-	.db $41, $41, $41, $41
-	.db $41, $41, $41, $41
-	.db $41, $41, $41, $41
-	
-	.db $41, $41, $41, $40
-	.db $41, $41, $41, $40
-	.db $41, $41, $41, $40
-	.db $41, $41, $41, $40
-	
-	.db $40, $41, $41, $41
-	.db $40, $41, $41, $41
-	.db $40, $41, $41, $41
-	.db $40, $40, $40, $40
-	
-	.db $41, $41, $41, $41
-	.db $41, $41, $41, $41
-	.db $41, $41, $41, $41
-	.db $40, $40, $40, $40
-	
-	.db $41, $41, $41, $40
-	.db $41, $41, $41, $40
-	.db $41, $41, $41, $40
-	.db $40, $40, $40, $40
+	.db $02, $02, $02, $02 ; 左上
+	.db $02, $03, $03, $03 ; 左
+	.db $02, $03, $03, $03 ; 左下
+	.db $02, $03, $03, $03
+	.db $02, $03, $03, $03
+	.db $02, $02, $02, $02 ; 右上
+	.db $03, $03, $03, $02 ; 右
+	.db $03, $03, $03, $02 ; 右下
+	.db $03, $03, $03, $02
+	.db $03, $03, $03, $02
+	.db $02, $02, $02, $02 ; 上
+	.db $03, $03, $03, $03 ; 中央
+	.db $03, $03, $03, $03 ; 下
+	.db $03, $03, $03, $03
+	.db $03, $03, $03, $03
+	.db $02, $02, $02, $02
 ;961E
 ;ステージごとの武器メニューの属性テーブル
 .table_menubg_attr
@@ -785,7 +845,9 @@
 ;9640
 ;武器の頭文字 P, H, A, W, B, Q, F, M, C, 1, 2, 3
 .table_weapon_letters
-	.db $1F, $9F, $9B, $99, $9D, $9C, $9A, $9E, $10, $15, $16, $17
+	.db $1F
+	.db $9F, $9B, $99, $9D, $9C, $9A, $9E, $10
+	.db $15, $16, $17
 ;964C
 ;E缶のEと、1UP頭と:
 .table_1upicon
@@ -796,7 +858,7 @@
 ;9664
 ;武器グラフィックへのアドレス上位
 .table_weapongraphs_ptr
-	.db $98, $9A, $99, $9C, $98, $98, $9A, $98, $9B, $9B, $9B, $9B
+	.db $98, $9A, $99, $9C, $98, $98, $9A, $98, $9B, $AF, $AF, $AF
 ;9670
 ;カーソル移動可能フラグ
 .table_cursor_allowflag
@@ -805,4 +867,4 @@
 
 
 ;9678
-
+	.endregion "Weapon Menu"
