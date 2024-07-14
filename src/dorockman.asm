@@ -457,7 +457,7 @@ DoRockman08_OnLand:
 		inx
 .skip_walk
 	stx <zStatus
-	rts
+	bne DoRockman_CheckJump
 
 ;85D3
 ;ロックマン状態#5歩行中
