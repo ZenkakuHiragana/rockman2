@@ -49,6 +49,7 @@ hack2.lst
 *.nes
 
 rockman2.prg
+*.ips
 
 # dotnet new gitignore
 ## Ignore Visual Studio temporary files, build results, and
