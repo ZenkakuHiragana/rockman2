@@ -1184,9 +1184,7 @@ Table_ShutterAttrMask:
 ;$0E~$0F 16x16タイル定義へのポインタ
 ;$10 縦スクロール始点
 ;$11 縦スクロール時、$09をバックアップ
-	.list
 WriteNameTableByScroll:
-	.nolist
 .xscroll = $00
 .yscroll = $01
 .f = $02
@@ -1426,10 +1424,8 @@ WriteNameTableByScroll:
 	sta <$04
 	pla
 	sta <$03
-	.list
 .skip_xscroll
 ;縦スクロール
-	.nolist
 	lda <.yscroll
 	sta <zPPUVScr
 	bne .do_yscroll
@@ -1644,9 +1640,7 @@ WriteNameTableByScroll:
 	and #$07
 	sta <$03
 	bpl .loop_attr_y
-	.list
 .end_scroll
-	.nolist
 	mCHANGEBANK #$0E, 1
 
 ;スクロール位置の補正
@@ -2259,26 +2253,21 @@ RockmanTakeDamage:
 ;20 94 EE
 MoveItem:
 	lda #$01
-	bne MoveEnemy_Start
+	.db $2C
 ;20 98 EE
 MoveEnemy:
 	lda #$00
-MoveEnemy_Start:
 	sta <zObjItemFlag
 ;20 CD EE
 MoveObjectForWeapon:
 ;縦移動
 	sec
-	lda aObjYlo,x
-	sbc aObjVYlo,x
-	sta aObjYlo,x
-	lda aObjY,x
-	sbc aObjVY,x
+	mSUB aObjYlo,x, aObjVYlo,x
+	mSUB aObjY,x, aObjVY,x
 	ldy aObjVY,x
-	sta aObjY,x
 	bmi .godown_movey
 	bcs .continue_y
-	sbc #$0F
+	sbc #$10 - 1
 	sta aObjY,x
 	lda aObjRoom,x
 	sbc #$10
@@ -2286,10 +2275,10 @@ MoveObjectForWeapon:
 .godown_movey
 	cmp #$F0
 	bcc .continue_y
-	adc #$0F
+	adc #$10 - 1
 	sta aObjY,x
 	lda aObjRoom,x
-	adc #$0F
+	adc #$10 - 1
 .movey
 	sta aObjRoom,x
 .continue_y
@@ -2306,142 +2295,131 @@ MoveObjectForWeapon:
 	asl a
 	bmi .right
 	sec
-	lda aObjXlo,x
-	sbc aObjVXlo,x
-	sta aObjXlo,x
-	lda aObjX,x
-	sbc aObjVX,x
-	sta aObjX,x
+	mSUB aObjXlo,x, aObjVXlo,x
+	mSUB aObjX,x, aObjVX,x
 	bcs .borrow_x
 	dec aObjRoom,x
 .borrow_x
 	jmp .done
 .right
 	clc
-	lda aObjXlo,x
-	adc aObjVXlo,x
-	sta aObjXlo,x
-	lda aObjX,x
-	adc aObjVX,x
-	sta aObjX,x
+	mADD aObjXlo,x, aObjVXlo,x
+	mADD aObjX,x, aObjVX,x
 	bcc .done
 	inc aObjRoom,x
 .done
 	cpx #$10
 	bcc .weapon
-	jmp CheckOffscreenEnemy_Moving
+	jmp CheckOffscreenEnemy.jump
 .weapon
-	jmp CheckOffscreenEnemy_CheckOffscreen
+	jmp CheckOffscreenEnemy.do
 
 ;20 8D EF
 CheckOffscreenItem:
 	lda #$01
-	bne CheckOffscreenEnemy_Start
+	.db $2C
 ;20 91 EF
 CheckOffscreenEnemy:
 	lda #$00
-CheckOffscreenEnemy_Start:
 	sta <zObjItemFlag
-CheckOffscreenEnemy_Moving:
+.jump .public
 	lda aObjFlags,x
 	and #%00000011
-	beq CheckOffscreenEnemy_CheckOffscreen
+	beq .do
 	lsr a
 	php
 	bcc .checkdmg
 	jsr RockmanTakeDamage
 .checkdmg
 	plp
-	beq CheckOffscreenEnemy_CheckOffscreen
+	beq .do
 	jsr EnemyTakeDamage
-	bcc CheckOffscreenEnemy_CheckOffscreen
+	bcc .do
 ;撃破時
-CheckOffscreenEnemy_Break:
+.break .public
 	jsr CreateItemFromEnemy
 	mMOV #$06, aObjAnim,x
 	mMOV #%10000000, aObjFlags,x
 	mSTZ aObjWait,x, aObjFrame,x
-	jmp PostSafeRemoveEnemy
-CheckOffscreenEnemy_CheckOffscreen: ;画面外判定
-	lda aObjFlags,x
-	asl a
-	sta <$02
-	lda aObjVY,x
-	asl a
-	ror <$02
-	sec
-	lda aObjRoom,x
-	sbc <zRoom
-	sta <$00
-	and #$EE
-	bne SafeRemoveEnemy
-	lda <$00
-	and #$11
-	sta <$00
-	tay
-	lsr a
-	lsr a
-	lsr a
-	lsr a
-	sta <$00
-	tya
-	and #$01
-	tay
-;横の画面外判定
-	sec
-	lda aObjX,x
-	sbc <zHScroll
-	dey
-	bcs .borrow_x
-	bmi SafeRemoveEnemy
-	bpl .cont_x
-.borrow_x
-	bpl SafeRemoveEnemy
-.cont_x
-;	bit <$02
-;	bvc .inv_x
-;	clc
-;	eor #$FF
-;	adc #$01
-;.inv_x
-;	cmp #SpawnEnemyBoundaryX
-;	bcc SafeRemoveEnemy
-;縦の画面外判定
-	sec
-	lda aObjY,x
-	sbc <zVScroll
-	dec <$00
-	bcs .borrow_y
-	bmi SafeRemoveEnemy
-	bpl .cont_y
-.borrow_y
-	bpl SafeRemoveEnemy
-.cont_y
-;	ldy <$02
-;	bpl .inv_y
-;	clc
-;	eor #$FF
-;.inv_y
-;	cmp #SpawnEnemyBoundaryY
-;	bcc SafeRemoveEnemy
-	clc
-	rts
+	beq PostSafeRemoveEnemy
+.do .public ;画面外判定
+.x = $08
+.r = $09
+.y = $0A
+	mMOV aObjX,x, <.x
+	mMOV aObjRoom,x, <.r
+	mMOV aObjY,x, <.y
+	jsr CheckOffscreenPoint
+	bcc PostSafeRemoveEnemy.rts
 ;画面外に出たオブジェクトを消去する
 SafeRemoveEnemy:
 	lsr aObjFlags,x
 PostSafeRemoveEnemy:
 	cpx #$10
-	bcc .weapons
+	bcc .isweapon
 	lda <zObjItemFlag
 	bne .isitem
 	sta aEnemyOrder,x
-.weapons
+.isweapon
 	sec
+.rts .public
 	rts
 .isitem
 	ldy aItemOrder,x
 	mSTZ aItemOrder,x
 	mMOV aObjLife,x, aItemLife - 1,y
+	sec
+	rts
+
+;画面外判定を行う 画面外ならキャリーフラグON
+;$08: X座標, $09: 画面位置, $0A: Y座標
+CheckOffscreenPoint:
+.tmp = $0B ;縦の相対画面位置 = 0 or 1
+.x = $08
+.r = $09
+.y = $0A
+	sec
+	lda <.r
+	sbc <zRoom
+	tay
+	and #%11101110
+	bne .is_offscreen
+	tya
+	and #%00010001
+	tay
+	lsr a
+	lsr a
+	lsr a
+	lsr a
+	sta <.tmp ;縦の相対画面位置 = 0 or 1
+	tya
+	and #$01
+	tay ;横の相対画面位置 = 0 or 1
+;横の画面外判定
+	sec
+	lda <.x
+	sbc <zHScroll
+	dey
+	bcs .borrow_x
+	bmi .is_offscreen
+	bpl .continue_x
+.borrow_x
+	bpl .is_offscreen
+.continue_x
+;縦の画面外判定
+	sec
+	lda <.y
+	sbc <zVScroll
+	dec <.tmp
+	bcs .borrow_y
+	bmi .is_offscreen
+	bpl .continue_y
+.borrow_y
+	bpl .is_offscreen
+.continue_y
+	clc
+	rts
+.is_offscreen
 	sec
 	rts
 
@@ -2491,9 +2469,7 @@ WallCollisionY:
 .r = $09
 .y = $0A
 .r2 = $07 ;画面位置バックアップ用
-	.list
 	ldy aObjRoom,x
-	.nolist
 	lda aObjVY,x
 	bpl .up
 	clc

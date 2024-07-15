@@ -255,7 +255,7 @@ ResetScrollPosition1A:
 	sta <zHScroll
 	sta <zRoom
 	sta <zVScroll
-	sta <zVScrolllo
+	; sta <zVScrolllo
 	sta <zVScrollApparentlo
 	sta <zVScrollApparenthi
 	sta <zHScrollApparentlo

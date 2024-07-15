@@ -165,12 +165,9 @@ Metalman_ChangeVector:
 	mMOV #$30, aPaletteSpr
 	ldx #$00
 	ldy #$00
-	lda <zConveyorRVec
-	eor #$40
-	sta <zConveyorRVec
-	lda <zConveyorLVec
-	eor #$40
-	sta <zConveyorLVec
+	lda <zConveyorVec
+	eor #%01100000
+	sta <zConveyorVec
 	beq .loop_palette
 	inx
 .loop_palette

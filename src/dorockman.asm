@@ -11,8 +11,8 @@
 ;84EE
 ;ロックマン状態別の処理
 ;DoRockman:
-	mMOV aObjX, <zPrevX
-	mMOV aObjY, <zPrevY
+	mMOV aObjX, <zMoveAmountX
+	mMOV aObjY, <zMoveAmountY
 	lda <zStopFlag
 	and #$04
 	beq .do
@@ -24,21 +24,15 @@
 	mMOV Table_DoRockmanhi,x, <zPtrhi
 	jsr IndirectJSR
 	sec ;ロックマンの実際の移動量X
-	lda aObjX
-	sbc <zPrevX
-	sta <zPrevX
+	mSUB aObjX, <zMoveAmountX, <zMoveAmountX
 	sec ;ロックマンの実際の移動量Y
-	lda aObjY
-	sbc <zPrevY
-	sta <zPrevY
+	mSUB aObjY, <zMoveAmountY, <zMoveAmountY
 	sec ;ロックマンの画面内のX座標
-	lda aObjX
-	sbc <zHScroll
-	sta <zRScreenX
+	mSUB aObjX, <zHScroll, <zRScreenX
 	ldx #$00
 	lda aObjFlags
 	pha
-	jsr CheckOffscreenEnemy_CheckOffscreen
+	jsr CheckOffscreenEnemy.do
 	pla
 	sta aObjFlags
 	txa
@@ -54,11 +48,9 @@
 DoRockman_DoScroll:
 .nth = $00 ;ネームテーブル書き込み予約判定(横スクロール)
 .ntv = $01 ;ネームテーブル書き込み予約判定(縦スクロール)
-.f = $02 ;スクロール方向フラグ: L... ...U(U: 上, L: 左)
-.dx = $03 ;移動差X
-.dy = $04 ;移動差Y
-.sh = $05 ;スクロール値変更前X
-.sv = $06 ;スクロール値変更前Y
+.f   = $02 ;スクロール方向フラグ: L... ...U(U: 上, L: 左)
+.dx  = $03 ;移動差X
+.dy  = $04 ;移動差Y
 .scroll_max = $08 ;スクロール可能な最大量
 	txa
 	ldx #(.dy - .nth) ;一時変数の初期化
@@ -67,11 +59,12 @@ DoRockman_DoScroll:
 	dex
 	bpl .loop_init
 	
+	ldx <zRoom
+	stx <zRoomPrev
 	lda <zScrollClipFlag ;スクロール制限中は画面を強制移動 .... ..XY
 	beq .skip_scrollclip
 	lsr a
 	ldy <zScrollClipRoom
-	ldx <zRoom
 	bcc .skip_scrollclip_y
 ;縦スクロール制限
 	lda <zVScroll
@@ -81,10 +74,10 @@ DoRockman_DoScroll:
 .continue_scrollclip_y
 	tya
 	and #$F0
-	sta <.sv
+	sta <zVScrollPrev
 	txa
 	and #$F0
-	sbc <.sv
+	sbc <zVScrollPrev
 	bcs .scrollclip_up
 ;下方向にスクロール制限
 	inc <.dy
@@ -105,11 +98,11 @@ DoRockman_DoScroll:
 .continue_scrollclip_x
 	tya
 	and #$0F
-	sta <.sh
+	sta <zHScrollPrev
 	sec
 	txa
 	and #$0F
-	sbc <.sh
+	sbc <zHScrollPrev
 	bcs .scrollclip_left
 ;右方向にスクロール制限
 	inc <.dx
@@ -120,7 +113,7 @@ DoRockman_DoScroll:
 .skip_scrollclip
 	
 ;横スクロール
-	mMOV <zHScroll, <.sh
+	mMOV <zHScroll, <zHScrollPrev
 	lda <.dx
 	beq .noclip_x
 	bpl .scroll_right_do ;<.dx == #$01
@@ -130,7 +123,7 @@ DoRockman_DoScroll:
 .noclip_x
 ;スクロール量の決定
 	clc
-	lda <zPrevX ;|ロックマンの実際の移動量X| < #$80
+	lda <zMoveAmountX ;|ロックマンの実際の移動量X| < #$80
 	bpl .inv_dx
 	eor #$FF
 	sec
@@ -205,7 +198,7 @@ DoRockman_DoScroll:
 	lda #$FF
 .merge_h ;ネームテーブル書き込み予約の判定
 	clc
-	eor <.sh
+	eor <zHScrollPrev
 	and #$07
 	adc <.dx
 	lsr a
@@ -215,7 +208,7 @@ DoRockman_DoScroll:
 .skip_horizontal
 	
 ;縦スクロール
-	mMOV <zVScroll, <.sv
+	mMOV <zVScroll, <zVScrollPrev
 	lda <.dy
 	beq .noclip_y
 	bpl .scroll_down_do ;<.dy == #$01
@@ -226,7 +219,7 @@ DoRockman_DoScroll:
 .noclip_y
 ;スクロール量の決定
 	clc
-	lda <zPrevY ;|ロックマンの実際の移動量Y| < #$80
+	lda <zMoveAmountY ;|ロックマンの実際の移動量Y| < #$80
 	bpl .inv_dy
 	eor #$FF
 	sec
@@ -325,7 +318,7 @@ DoRockman_DoScroll:
 	lda #$FF
 .merge_v ;ネームテーブル書き込み予約の判定
 	clc
-	eor <.sv
+	eor <zVScrollPrev
 	and #$07
 	adc <.dy
 	lsr a
@@ -848,7 +841,7 @@ DoRockman_SetVX:
 	sta <zMoveVec
 DoRockman_SetVX_WithoutSlip:
 	lda <zWindFlag
-	and #$0F
+	and #$7F
 	beq .skipwind
 ;88A3
 ;風の補正
@@ -1475,20 +1468,25 @@ DoRockman_WallCheckY:
 	ldx #$01
 .loop2
 	lda <zBGAttr,x
-	cmp #$0F
+	cmp #$0F ;0x0F = シャッター判定ならスキップ
 	bcs .skip
-	cmp #$0A
+	cmp #$0A ;0x0A = 左コンベア未満の値 = トゲか壁ならスキップ
 	bcc .skip
 	sbc #$0A
-	tay
+	tay ;Y = 0, 1, 2 = 左コンベア、右コンベア、氷
 	lda Table_ConveyorFlag,y
 	sta <zWindFlag
 	bmi .slip
-	tay
-	lda zConveyorVec - 1,y
+	and zConveyorVec ;A = マスク AND コンベア方向（.RL. ....）
+	dey
+	bpl .adjust ;左コンベアが右方向の時、ビット位置調整
+	asl a
+.adjust
 	sta <zWindVec
-	mMOV #$01, <zWindhi
-	mMOV #$00, <zWindlo
+	ldy #$01
+	sty <zWindhi
+	dey
+	sty <zWindlo
 .slip
 	lda #$01
 	bne .done
@@ -1497,7 +1495,7 @@ DoRockman_WallCheckY:
 	bne .spike
 	ldy <zInvincible
 	bne .spike
-	mSTZ <zStatus
+	sty <zStatus
 	jmp DieRockman
 .spike
 	dex
@@ -1528,7 +1526,7 @@ Table_WallCheckY_dr:
 	.db HIGH(Const_WallCheckY2)
 ;8CF1
 Table_ConveyorFlag:
-	.db $02, $01, $80
+	.db $20, $40, $80
 
 ;8CF4
 ;アイテム、敵リフトの着地判定
@@ -1578,9 +1576,7 @@ DoRockman_CheckLift:
 ;8D1F
 ;敵リフト判定開始
 .enemylift
-	.list
 	sec
-	.nolist
 	lda aObjX10,x
 	sbc <zHScroll
 	sta <$0C

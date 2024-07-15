@@ -1,11 +1,11 @@
 
 ;20 55 D6
 ;SpawnEnemyByScroll
-.seek = $00
-.seek_r = $01
-.room = $02
-.num = $03
-.spawn_y = $07
+.seek    = $00 ;敵リストシーク位置
+.seek_r  = $01 ;画面位置シーク位置（左上 + (0, 0)～(1, 1)）
+.room    = $02 ;現在探索対象の画面位置 = YYYY XXXX
+.num     = $03 ;探索すべき敵・アイテムの数
+.spawn_y = $0A ;生成物のY座標
 	lda <zStage
 	and #$07
 	jsr ChangeBank
@@ -14,26 +14,17 @@
 	ldy #$00
 .loop_room_item
 	sty <.seek_r
-	lda <$20
 	clc
-	adc SpawnEnemy_RoomList,y
-	sta <.room
+	mADD <zRoom, SpawnEnemy_RoomList,y, <.room ; = zRoom + 00/01/10/11
 	tax
 	
 	lda Stage_DefMap16,x
-	tax
+	tax ;現在探索対象の画面番号 = 00～3F
 	asl a
 	bmi .skip_room_item
 	lda Stage_DefItemsAmount,x
 	beq .skip_room_item
-	sta <.num
-	
-	tya
-	and #$01
-	sta <$05
-	tya
-	and #$02
-	sta <$04
+	sta <.num ; = 探索対象の画面に存在するアイテムの数
 	
 	ldy Stage_DefItemsPtr,x
 .loop_seek_item
@@ -47,7 +38,7 @@
 	bcs .skip_seek_item
 	
 ;アイテムが出現する
-.spawn_item
+	ldy <.seek
 	jsr CreateItem
 .skip_seek_item
 	ldy <.seek
@@ -64,10 +55,8 @@
 	ldy #$00
 .loop_room
 	sty <.seek_r
-	lda <$20
 	clc
-	adc SpawnEnemy_RoomList,y
-	sta <.room
+	mADD <zRoom, SpawnEnemy_RoomList,y, <.room
 	tax
 	
 	lda Stage_DefMap16,x
@@ -78,24 +67,19 @@
 	beq .skip_room
 	sta <.num
 	
-	tya
-	and #$01
-	sta <$05
-	tya
-	and #$02
-	sta <$04
-	
 	ldy Stage_DefEnemiesPtr,x
 .loop_seek
 	sty <.seek
 	
 	mMOV Stage_DefEnemiesY - 1,y, <.spawn_y
 	lda Stage_DefEnemiesX - 1,y
+	.list
 	jsr SpawnEnemy_CheckOffscreen
+	.nolist
 	bcs .skip_seek
 	
 ;敵が出現する
-.spawn
+	ldy <.seek
 	lda Stage_DefEnemies - 1,y
 	bpl .sendchr
 	jsr SpawnEnemy_SendCommand
@@ -169,66 +153,56 @@
 	beq .rts
 
 ;オブジェクト生成判定 Cフラグが立つ時生成中止
+;A = 生成物のX座標
 SpawnEnemy_CheckOffscreen:
-.spawnflag = $06
-.spawn_y = $07
+.room      = $02 ;生成物の画面位置
+.hscroll   = $04 ;横スクロール値退避
+.vscroll   = $05 ;縦スクロール値退避
+.roomstash = $06 ;画面位置退避
+.spawn_y   = $0A ;生成物のY座標 -> 画面外判定関数ルーチンへ
+.x         = $08 ;引数x -+
+.r         = $09 ;引数r  |- 画面外判定関数ルーチン
+.y         = $0A ;引数y -+
+	sta <.x
 	ldx #$00
-	stx <.spawnflag
-	ldx <zPrevX
-	cpx aObjX
-	beq .spawnflag_set
-;横の画面外判定
-	sec
-	sbc <zHScroll
-	bit <zMoveVec
-	bvc .inv_x
-	eor #$FF
-.inv_x
-	ldx <$05
-	bcc .borrow_x
-	bne .skip_seek
-	beq .cont_x
-.borrow_x
-	beq .skip_seek
-.cont_x
-	cmp #SpawnEnemyBoundaryX
-	bcc .skip_seek
-	cmp #SpawnEnemyBoundaryX + 8
-	bcs .spawnflag_set
-	inc <.spawnflag
-.spawnflag_set
+	lda <zHScroll
+	cmp <zHScrollPrev
+	beq .check_hscroll
+	inx
+.check_hscroll
+	lda <zVScroll
+	cmp <zVScrollPrev
+	beq .check_vscroll
+	inx
+.check_vscroll
+	txa
+	beq .skip_seek ;全くスクロールしていない時、判定をスキップ
 
-;縦の画面外判定
-	sec
-	lda <zPrevY
-	sbc aObjY
-	ora <.spawnflag
-	beq .skip_seek
-	sec
-	lda <.spawn_y
-	sbc <zVScroll
-	ldx aObjVY
-	bpl .inv_y
-	eor #$FF
-.inv_y
-	ldx <$04
-	bcc .borrow_y
-	bne .skip_seek
-	beq .cont_y
-.borrow_y
-	beq .skip_seek
-.cont_y
-	cmp #SpawnEnemyBoundaryY
-	bcc .skip_seek
-	ldx <.spawnflag
-	bne .spawn
-	cmp #SpawnEnemyBoundaryY + 8
-	bcs .skip_seek
-.spawn
+	mMOV <.room, <.r
+	jsr CheckOffscreenPoint
+	bcs .rts ;今のスクロール値で画面外なら生成中止
+
+	;スクロール値退避
+	mMOV <zHScroll, <.hscroll
+	mMOV <zVScroll, <.vscroll
+	mMOV <zRoom, <.roomstash
+
+	;スクロール前の値をセット
+	mMOV <zHScrollPrev, <zHScroll
+	mMOV <zVScrollPrev, <zVScroll
+	mMOV <zRoomPrev, <zRoom
+	jsr CheckOffscreenPoint
+
+	;復元
+	mMOV <.hscroll, <zHScroll
+	mMOV <.vscroll, <zVScroll
+	mMOV <.roomstash, <zRoom
+	bcc .skip_seek ;スクロール前も画面内なら生成中止
 	clc
 	rts
 .skip_seek
 	sec
+.rts
 	rts
 
 ;敵画像読み込みセットの設定

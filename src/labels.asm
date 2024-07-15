@@ -21,15 +21,16 @@ zPtr = $08              ;汎用ポインタ
 zPtrlo = $08            ;汎用ポインタ下位
 zPtrhi = $09            ;汎用ポインタ上位
 
+;原作での割り当て
 zScrollLeft = $14       ;横スクロール左端
 zScrollRight = $15      ;横スクロール右端
-
 zNTPrevlo = $16         ;マップ書き込みアドレス・戻る方下位
 zNTPrevhi = $17         ;マップ書き込みアドレス・戻る方上位
 zNTNextlo = $18         ;マップ書き込みアドレス・進む方下位
 zNTNexthi = $19         ;マップ書き込みアドレス・進む方上位
 zNTPointer = $1A        ;マップ読み込み位置
 
+;再割り当て済み
 zPPUObjhi = $14         ;敵画像書き込み位置上位
 zPPUObjlo = $15         ;敵画像書き込み位置下位
 zPPUObjPtr = $16        ;敵画像読み込みセット番号
@@ -44,13 +45,14 @@ zFrameCounter = $1C     ;フレームカウンタ
 
 zIsLag = $1D            ;メインルーチン終了時に0 処理落ちフラグ
 
-zHScrolllo = $1E        ;横スクロール値下位
-zHScroll = $1F          ;横スクロール値
+zHScrollPrev = $1E      ;スクロール処理前の横スクロール値
+zHScroll     = $1F      ;横スクロール値
 
 zRoom = $20             ;画面番号
 
-zVScrolllo = $21        ;縦スクロール値下位
-zVScroll = $22          ;縦スクロール値
+zVScrollPrev = $21      ;スクロール処理前の縦スクロール値
+zVScrolllo   = $21      ;縦スクロール値下位（カットシーン等で使用）
+zVScroll     = $22      ;縦スクロール値
 
 zKeyDown = $23          ;キー押下状態
 zKeyDown2P = $24        ;キー押下状態・2P
@@ -67,8 +69,8 @@ zObjIndex = $2B         ;オブジェクトインデックス
 
 zStatus = $2C           ;ロックマンの状態値
 
-zPrevX = $2D            ;ロックマンの移動処理前X座標
-zPrevY = $2E            ;ロックマンの移動処理前Y座標
+zMoveAmountX = $2D      ;現在のフレームでロックマンの移動量X
+zMoveAmountY = $2E      ;現在のフレームでロックマンの移動量Y
 zEScreenX = $2D         ;敵の画面内X座標(他に用途あり)
 zEScreenRoom = $2E      ;$440,x - $20
 zRScreenX = $2F         ;ロックマンの画面内X座標(他に用途あり)
@@ -107,9 +109,9 @@ zMoveVec = $42
 zPaletteIndex = $43     ;パレット番号
 zPaletteTimer = $44     ;パレットアニメーションのタイマー
 
-zConveyorVec = $45
-zConveyorRVec = $45     ;コンベア右の流れる向き
-zConveyorLVec = $46     ;コンベア左の流れる向き
+zConveyorVec = $45      ;コンベアの流れる向き（右方向フラグ） .RL. ....
+
+zRoomPrev = $46         ;スクロール前の画面位置
 
 zPPULinear = $47        ;PPU線形書き込みサイズ予約
 

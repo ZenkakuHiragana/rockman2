@@ -109,7 +109,7 @@ StartStage_NoEnergyRegen:
 ;80AB
 ;死亡時のコンティニュー位置
 StartStage_Continue:
-	mMOV #$40, <zConveyorRVec
+	mMOV #%01000000, <zConveyorVec
 	mMOV #%00010000, <z2000, $2000
 	mMOV #%00000110, <z2001
 	jsr LoadStageGraphics
@@ -117,14 +117,13 @@ StartStage_Continue:
 	jsr ChangeBodyColor
 	jsr SetContinuePoint
 	lda #$00
-	sta <zConveyorLVec
 	sta <zStopFlag
 	sta <zEquipment
 	sta <zGravityhi
 	sta <zHScroll
-	sta <zHScrolllo
+	; sta <zHScrolllo
 	sta <zVScroll
-;	sta <zVScrolllo
+	; sta <zVScrolllo
 	sta <zVScrollApparentlo
 	sta <zVScrollApparenthi
 	sta <zHScrollApparentlo
@@ -203,9 +202,7 @@ MainLoop:
 	jsr OpenSubMenu
 .submenu
 	jsr CountBlockableObjects
-	.list
 	jsr DoRockman
-	.nolist
 	jsr WeaponObjectProcess
 	jsr SpawnEnemyByScroll
 	jsr DoBossBehaviour
