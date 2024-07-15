@@ -206,7 +206,7 @@
 	lda #$01
 	sta <zRoom
 	.ifndef ___DISABLE_INTRO_PIPI
-		jsr SelectStage_LoadPipiGraphics ;ピピの画像を読み込む専用ルーチン
+	jsr SelectStage_LoadPipiGraphics ;ピピの画像を読み込む専用ルーチン
 	.endif
 	lda #$18
 	sta <$FD

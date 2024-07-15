@@ -112,6 +112,7 @@ SelectBoss_MoveIntroStar:
 .loop
 	sty <$04
 	stx <$05
+	.ifndef ___DISABLE_INTRO_PIPI
 	lda aObjFlags
 	beq .skip
 	mMOV #$80, <$00
@@ -120,6 +121,7 @@ SelectBoss_MoveIntroStar:
 	bne .skip
 	inc <$00
 .skip
+	.endif
 	ldx <$03
 	mMOV .table_introstar_num,x, <$01
 	clc
@@ -145,10 +147,14 @@ SelectBoss_MoveIntroStar:
 	iny
 	mMOV <$00, aSprite,y
 	iny
+	.ifndef ___DISABLE_INTRO_PIPI
 	lda aObjFlags
 	beq .ispipi
 	lda #$40 ;ピピまみれの場合、左右反転して右向きにする
 .ispipi
+	.else
+	lda #$00
+	.endif
 	sta aSprite,y
 	iny
 	clc
