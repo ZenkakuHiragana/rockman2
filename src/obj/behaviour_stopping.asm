@@ -12,6 +12,9 @@ EnemyBehaviour_Stopping1:
 	sec
 	lda aObjY,x
 	sbc #$04
+	bcs .skip_offsety
+	sbc #$10 - 1
+.skip_offsety
 	sta aPlatformY,x
 	rts
 
@@ -27,6 +30,9 @@ EnemyBehaviour_Stopping2:
 	sec
 	lda aObjY,x
 	sbc #$08
+	bcs .skip_offsety
+	sbc #$10 - 1
+.skip_offsety
 	sta aPlatformY,x
 	rts
 
@@ -42,6 +48,9 @@ EnemyBehaviour_Stopping3:
 	sec
 	lda aObjY,x
 	sbc #$08
+	bcs .skip_offsety
+	sbc #$10 - 1
+.skip_offsety
 	sta aPlatformY,x
 	rts
 

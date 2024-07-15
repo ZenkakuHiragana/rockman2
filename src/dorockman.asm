@@ -1578,7 +1578,9 @@ DoRockman_CheckLift:
 ;8D1F
 ;敵リフト判定開始
 .enemylift
+	.list
 	sec
+	.nolist
 	lda aObjX10,x
 	sbc <zHScroll
 	sta <$0C
@@ -1619,7 +1621,7 @@ DoRockman_CheckLift:
 	bcs .borrow_enemylift
 	sbc #$10 - 1
 	sta aObjY
-	lda aObjRoom,x
+	lda aObjRoom10,x
 	sbc #$10
 	lsr a
 	lsr a

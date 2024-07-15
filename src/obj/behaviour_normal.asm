@@ -884,6 +884,9 @@ EN12:
 	sec
 	lda aObjY,x
 	sbc #$04
+	bcs .skip_offsety
+	sbc #$10 - 1
+.skip_offsety
 	sta aPlatformY,x
 	rts
 ;9B25
@@ -955,6 +958,9 @@ EN13:
 	sec
 	lda aObjY,x
 	sbc #$08
+	bcs .skip_offsety
+	sbc #$10 - 1
+.skip_offsety
 	sta aPlatformY,x
 	rts
 
@@ -3040,10 +3046,13 @@ EN3E:
 	bcs .skip
 	txa
 	sta aEnemyVar10,y
+	mMOV aObjRoom,x, aObjRoom10,y
 	sec
-	lda aObjY,x
-	sbc #$14
+	mSUB aObjY,x, #$14, aObjY10,y
+	bcs .skip
+	sbc #$10 - 1
 	sta aObjY10,y
+	mSUB aObjRoom,x, #$10, aObjRoom10,y
 .skip
 	lda aObjVar,x
 	bne .move
@@ -3053,26 +3062,23 @@ EN3E:
 	clc
 	adc #$01
 	sta aEnemyVar,x
-	lda .vylo,y
-	sta aObjVYlo,x
-	lda .vy,y
-	sta aObjVY,x
-	lda .vxlo,y
-	sta aObjVXlo,x
-	lda .vector,y
-	sta aObjFlags,x
-	lda #$2A
-	sta aObjVar,x
+	mMOV .vylo,y,   aObjVYlo,x
+	mMOV .vy,y,     aObjVY,x
+	mMOV .vxlo,y,   aObjVXlo,x
+	mMOV .vector,y, aObjFlags,x
+	mMOV #$2A,      aObjVar,x
 .move
 	dec aObjVar,x
 	jsr MoveEnemy
 	bcc .del
-	lda #$00
-	sta aPlatformWidth,x
+	mSTZ aPlatformWidth,x
 .del
 	sec
 	lda aObjY,x
 	sbc #$08
+	bcs .skip_offsety
+	sbc #$10 - 1
+.skip_offsety
 	sta aPlatformY,x
 	rts
 .vylo
@@ -4379,6 +4385,9 @@ EN63:
 	sec
 	lda aObjY,x
 	sbc #$18
+	bcs .skip_offsety
+	sbc #$10 - 1
+.skip_offsety
 	sta aPlatformY,x
 	lda <zStopFlag
 	bne .stopping
@@ -4389,6 +4398,9 @@ EN63:
 	sec
 	lda aObjY,x
 	sbc #$08
+	bcs .skip_offsety2
+	sbc #$10 - 1
+.skip_offsety2
 	sta aPlatformY,x
 	lda <zStopFlag
 	bne .stopping
