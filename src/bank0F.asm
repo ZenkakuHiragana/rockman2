@@ -845,34 +845,41 @@ LoadGraphicsSet:
 	;rts
 
 Table_GraphicsSetNum:
-	.db $02, $02, $02, $06, $0E, $04, $09
+	.db $02, $02, $02, $0D, $0E, $04
 Table_GraphicsBeginPointer:
-	.db $00, $02, $04, $06, $0C, $1A, $1E
+	.db LOW(Table_GraphicsBank.0 - Table_GraphicsBank)
+	.db LOW(Table_GraphicsBank.1 - Table_GraphicsBank)
+	.db LOW(Table_GraphicsBank.2 - Table_GraphicsBank)
+	.db LOW(Table_GraphicsBank.3 - Table_GraphicsBank)
+	.db LOW(Table_GraphicsBank.4 - Table_GraphicsBank)
+	.db LOW(Table_GraphicsBank.5 - Table_GraphicsBank)
 Table_GraphicsBank:
+.0 .public
 	.db $05, $08
+.1 .public
 	.db $06, $09
+.2 .public
 	.db $06, $09
-	.db $00, $09, $08, $09, $08, $09
+.3 .public
+	.db $00, $00, $00, $07, $07, $00, $02, $02, $09, $08, $09, $08, $09
+.4 .public
 	.db $03, $03, $04, $04, $06, $04, $05, $05, $05, $07, $07, $02, $08, $07
+.5 .public
 	.db $05, $08, $09, $08
-	.db $00, $00, $00, $07, $07, $00, $02, $02, $09
 Table_GraphicsPosition:
 	.db $90, $88
 	.db $90, $90
 	.db $90, $A0
-	.db $98, $AC, $80, $AC, $84, $9F
-	.db $99, $9C, $9D, $9B, $B2, $97, $93, $96, $9C, $9D, $9F, $95
-	.db $A4, $B2
+	.db $99, $AF, $AD, $9F, $99, $AE, $96, $94, $AC, $80, $AC, $84, $9F
+	.db $99, $9C, $9D, $9B, $B2, $97, $93, $96, $9C, $9D, $9F, $95, $A4, $B2
 	.db $90, $88, $9F, $8C
-	.db $99, $AF, $AD, $9F, $99, $AE, $96, $94, $AC
 Table_GraphicsAmount:
 	.db $10, $10
 	.db $10, $10
 	.db $10, $10
-	.db $0E, $02, $04, $02, $04, $06
+	.db $03, $05, $01, $01, $01, $01, $01, $01, $02, $04, $02, $04, $06
 	.db $02, $01, $01, $01, $02, $01, $01, $02, $01, $01, $01, $02, $0C, $02
 	.db $10, $03, $01, $0C
-	.db $03, $05, $01, $01, $01, $01, $01, $01, $02
 
 ;20 09 C7
 ;[$08],yから0x20バイト分をPPU書き込み予約 Aにバンク

@@ -672,10 +672,11 @@ Opening_Skipped:
 	jmp BeginTitleScreenSkipped
 
 ;A840
-;$08~$09で示したマップアドレスからマップを読み込む
+;Aで示したマップアドレスからマップを読み込む
 WriteMapAddressOffScreen1A:
 	sec
-	mSUB <zRoom, #$02
+	sbc #$02
+	sta <zRoom
 	mMOV #$D8, <zHScroll
 	mSTZ <zVScroll
 	mMOV #$20, <$FD
@@ -886,18 +887,34 @@ Password_ScrollRight:
 	rts
 
 ;A9AC
-;$08~$09で指定したマップアドレスからマップを読み込む
+;Aで指定したマップアドレスからマップを読み込む
 WriteMapAddressOnScreen1A:
-	mSTZ <zPPUSqr, <zNTPointer
+.target = $FF
+.hscroll = $FE
+.counter = $FD
+.roomstash = $FC
+	sta <.target
+	mMOV #$18, <.hscroll
+	mMOV #$20, <.counter
+	mMOV <zRoom, <.roomstash
 .loop
-	mMOV <$FD, <$08
-	mMOV <$FE, <$09
+	ldy #$01
+	sty <$00
+	dey
+	sty <$01
+	stx <$02
+	mMOV <.hscroll, <zHScroll
+	mMOV <.target, <zRoom
 	jsr WriteNameTableByScroll_AnyBank
-	inc <$FD
-	inc <zNTPointer
+	mSTZ <zHScroll
+	mMOV <.roomstash, <zRoom
+	clc
+	mADD <.hscroll, #$08
+	bcc .carry_nt
+	inc <.target
+.carry_nt
 	jsr FrameAdvance1A
-	lda <$FD
-	and #$3F
+	dec <.counter
 	bne .loop
 	rts
 

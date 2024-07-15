@@ -7,12 +7,9 @@
 	lda <zStage
 	pha
 	mMOV #$05, <zStage
-	mMOVW $8E00, <zPtr
+	lda #$F2
 	jsr WriteMapAddressOffScreen1A
-	mMOV #$40, <zPtrlo
-	.ifndef ___OPTIMIZE
-	lda #$8E
-	.endif
+	lda #$F3
 	jsr WriteMapAddressOffScreen1A
 	mMOV #$21, $2006
 	mMOV #$CC, $2006
@@ -40,7 +37,7 @@
 	bne .loop_word
 	jsr FadeoutPalette_BG2_Spr
 	jsr Password_ScrollRight
-	mMOVW $8E80, <$FD
+	lda #$F0
 	jsr WriteMapAddressOnScreen1A
 	mPLAYTRACK #$10
 .start_3

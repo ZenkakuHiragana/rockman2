@@ -4,14 +4,12 @@
 ___Bank0D_BeginGetEquipment:
 	lda #$03
 	jsr LoadGraphicsSet
-	lda #$06
-	jsr LoadGraphicsSet
 	lda <zStage
 	pha
 	mMOV #$05, <zStage
-	mMOV #$F0, <zRoom
+	lda #$F0
 	jsr WriteMapAddressOffScreen1A
-	mMOV #$F1, <zRoom
+	lda #$F1
 	jsr WriteMapAddressOffScreen1A
 	pla
 	sta <zStage
