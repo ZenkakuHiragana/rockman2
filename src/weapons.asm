@@ -1339,11 +1339,9 @@ CheckWallXY:
 .x = $08
 .r = $09
 .y = $0A
-.r2 = $07 ; 縦地形判定用画面位置バックアップ
 	lda aObjFlags,x
-	and #%01000000
-	bne .right
-	sec
+	asl a
+	bmi .right
 	mSUB aObjX,x, <.dx, <.x
 	lda aObjRoom,x
 	sbc #$00
@@ -1355,7 +1353,6 @@ CheckWallXY:
 	adc #$00
 .write
 	sta <.r
-	sta <.r2
 	sec
 	lda aObjY,x
 	sbc #$08
@@ -1370,29 +1367,26 @@ CheckWallXY:
 	lda <.result
 	and #$08
 	pha
+	mMOV aObjX,x, <.x
+	mMOV aObjRoom,x, <.r
 	lda aObjVY,x
 	bpl .goup
 	clc
-	lda aObjY,x
-	adc <.dydown
-	sta <.y
+	mADD aObjY,x, <.dydown, <.y
 	cmp #$F0
 	bcc .checkterrain
 	adc #$10 - 1
 	sta <.y
-	mADD <.r2, #$10, <.r
+	mADD <.r, #$10
 	jmp .checkterrain
 .goup
 	sec
-	lda aObjY,x
-	sbc <.dyup
-	sta <.y
+	mSUB aObjY,x, <.dyup, <.y
 	bcs .checkterrain
 	sbc #$10 - 1
 	sta <.y
-	mSUB <.r2, #$10, <.r
+	mSUB <.r, #$10
 .checkterrain
-	mMOV aObjX,x, <.x
 	jsr PickupBlock
 	ldx <zObjIndex
 	mAND <.result, #$08
