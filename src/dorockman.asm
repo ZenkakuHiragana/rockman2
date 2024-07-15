@@ -925,13 +925,9 @@ Table_RockmanVXlo:
 	
 ;8922
 ;ロックマン横移動
+DoRockman_BodyMoveX_OffscreenClip = $0C
 DoRockman_BodyMoveX:
 	mSTZ <$00
-	lda aObjVXlo
-	ora aObjVX
-	bne .do
-	jmp .nohit_left
-.do
 	bit <zMoveVec
 	bvc .left
 ;右へ移動
@@ -945,6 +941,17 @@ DoRockman_BodyMoveX:
 	bcc .carry_right
 	inc aObjRoom
 .carry_right
+;画面外判定
+	sbc <zHScroll
+	sbc #($0100 - DoRockman_BodyMoveX_OffscreenClip)
+	bcc .skip_offscreen_right
+	eor #$FF
+	adc #$00
+	adc aObjX
+	sta aObjX
+	bcs .skip_offscreen_right
+	dec aObjRoom
+.skip_offscreen_right
 ;右の地形判定
 	clc
 	lda aObjX
@@ -981,6 +988,17 @@ DoRockman_BodyMoveX:
 	bcs .borrow_left
 	dec aObjRoom
 .borrow_left
+;画面外判定
+	sbc <zHScroll
+	sbc #DoRockman_BodyMoveX_OffscreenClip
+	bcs .skip_offscreen_left
+	eor #$FF
+	adc #$00
+	adc aObjX
+	sta aObjX
+	bcc .skip_offscreen_left
+	inc aObjRoom
+.skip_offscreen_left
 	sec
 	lda aObjX
 	sbc #$08
