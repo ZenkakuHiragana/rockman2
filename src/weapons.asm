@@ -1060,15 +1060,15 @@ DoItem1:
 	sec
 	lda aObjY,x
 	sbc #$04
+	bcs .skip_offsety
+	sbc #$10 - 1
+.skip_offsety
 	sta aWeaponPlatformY - 2,x
 	lda #$14
 	sta aWeaponPlatformW - 2,x
-	lda #$0B
-	sta <$01
-	lda #$1D
-	sta <$02
-	lda #$04
-	sta <$03
+	mMOV #$0B, <$01
+	mMOV #$1D, <$02
+	mMOV #$04, <$03
 	jsr CheckWallXY
 	lda <$00
 	beq .done
@@ -1174,6 +1174,9 @@ DoItem2:
 	sec
 	lda aObjY,x
 	sbc #$04
+	bcs .skip_offsety
+	sbc #$10 - 1
+.skip_offsety
 	sta aWeaponPlatformY - 2,x
 	lda #$18
 	sta aWeaponPlatformW - 2,x
@@ -1244,15 +1247,15 @@ DoItem3:
 	sec
 	lda aObjY,x
 	sbc #$08
+	bcs .skip_offsety
+	sbc #$10 - 1
+.skip_offsety
 	sta aWeaponPlatformY - 2,x
 	lda #$14
 	sta aWeaponPlatformW - 2,x
-	lda #$0C
-	sta <$01
-	lda #$21
-	sta <$02
-	lda #$08
-	sta <$03
+	mMOV #$0C, <$01
+	mMOV #$21, <$02
+	mMOV #$08, <$03
 	jsr CheckWallXY
 	lda aObjVar,x
 	and #$0F
@@ -1326,72 +1329,79 @@ DoItem3:
 ;E3EA
 ;縦横地形判定らしい
 ;$01: 横判定範囲, $02: 下判定範囲 $03: 上判定範囲
-;$00: 縦判定結果, $03: 横判定結果 ... 壁なら1, 他は0
+;$00: 縦判定結果, $03: 横判定結果 ... 壁なら8, 他は0
 CheckWallXY:
+.result = $00
+.result_x = $03
+.dx = $01
+.dyup = $02
+.dydown = $03
+.x = $08
+.r = $09
+.y = $0A
+.r2 = $07 ; 縦地形判定用画面位置バックアップ
 	lda aObjFlags,x
 	and #%01000000
 	bne .right
 	sec
-	lda aObjX,x
-	sbc <$01
-	sta <$08
+	mSUB aObjX,x, <.dx, <.x
 	lda aObjRoom,x
 	sbc #$00
 	jmp .write
 .right
 	clc
-	lda aObjX,x
-	adc <$01
-	sta <$08
+	mADD aObjX,x, <.dx, <.x
 	lda aObjRoom,x
 	adc #$00
 .write
-	sta <$09
+	sta <.r
+	sta <.r2
 	sec
 	lda aObjY,x
 	sbc #$08
-	sta <$0A
-	lda #$00
-	sbc #$00
-	sta <$0B
+	sta <.y
+	bcs .skip_offsety
+	sbc #$10 - 1
+	sta <.y
+	mSUB <.r, #$10
+.skip_offsety
 	jsr PickupBlock
 	ldx <zObjIndex
-	ldy <$00
-	lda .terrain,y
+	lda <.result
+	and #$08
 	pha
 	lda aObjVY,x
 	bpl .goup
 	clc
 	lda aObjY,x
-	adc <$03
-	sta <$0A
-	lda #$00
-	adc #$00
+	adc <.dydown
+	sta <.y
+	cmp #$F0
+	bcc .checkterrain
+	adc #$10 - 1
+	sta <.y
+	mADD <.r2, #$10, <.r
 	jmp .checkterrain
 .goup
 	sec
 	lda aObjY,x
-	sbc <$02
-	sta <$0A
-	lda #$00
-	sbc #$00
+	sbc <.dyup
+	sta <.y
+	bcs .checkterrain
+	sbc #$10 - 1
+	sta <.y
+	mSUB <.r2, #$10, <.r
 .checkterrain
-	sta <$0B
-	lda aObjX,x
-	sta <$08
-	lda aObjRoom,x
-	sta <$09
+	mMOV aObjX,x, <.x
 	jsr PickupBlock
 	ldx <zObjIndex
-	ldy <$00
-	lda .terrain,y
-	sta <$00
+	mAND <.result, #$08
 	pla
-	sta <$03
+	sta <.result_x
 	rts
 ;E465
-.terrain
-	.db $00, $01, $00, $01, $00, $01, $01, $01, $01
+; .terrain
+; 	.db $00, $01, $00, $01, $00, $01, $01, $01, $01
 
 ;E46E
 DoLeafShield_Disabled:

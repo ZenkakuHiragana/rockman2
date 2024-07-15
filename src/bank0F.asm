@@ -2488,60 +2488,77 @@ WallCollisionY:
 .dx = $01
 .dy = $02
 .x = $08
-.xhi = $09
+.r = $09
 .y = $0A
-.yhi = $0B
-	mSTZ <.yhi
+.r2 = $07 ;画面位置バックアップ用
+	.list
+	ldy aObjRoom,x
+	.nolist
 	lda aObjVY,x
-	php
 	bpl .up
 	clc
-	lda aObjY,x
-	adc <.dy
-	jmp .write
+	mADD aObjY,x, <.dy, <.y
+	cmp #$F0
+	bcc .merge_y
+	adc #$10 - 1
+	sta <.y
+	tya
+	adc #$10
+	tay
+.skip_addy
+	jmp .merge_y
 .up
 	sec
-	lda aObjY,x
-	sbc <.dy
-.write
+	mSUB aObjY,x, <.dy, <.y
+	bcs .merge_y
+	sbc #$10 - 1
 	sta <.y
+	tya
+	sbc #$10
+	tay
+.merge_y
+	sty <.r2
 	clc
 	mADD aObjX,x, <.dx, <.x
-	mADD aObjRoom,x, #$00, <.xhi
-	cpx #$0F
-	bcs .isenemy_right
-	jsr PickupBlock
-	jmp .result_right
-.isenemy_right
+	bcc .skip_addx
+	iny
+.skip_addx
+	sty <.r
 	jsr PickupMap
-.result_right
 	lda <.result
 	and #$08
 	sta <$02
 	ldx <zObjIndex
+	ldy <.r2
 	sec
 	mSUB aObjX,x, <.dx, <.x
-	mSUB aObjRoom,x, #$00, <.xhi
-	cpx #$0F
-	bcs .isenemy_left
-	jsr PickupBlock
-	jmp .result_left
-.isenemy_left
+	bcs .skip_subx
+	dey
+.skip_subx
+	sty <.r
 	jsr PickupMap
-.result_left
 	ldx <zObjIndex
 	lda <.result
 	and #$08
 	ora <$02
 	sta <.result
 	beq .inair
-	plp
+	lda aObjVY,x
 	bmi .down
 	lda <.y
 	and #$0F
 	eor #$0F
 	sec
 	adc aObjY,x
+	sta aObjY,x
+	cmp #$F0
+	bcc .carry_sety_up
+	adc #$10 - 1
+	sta aObjY,x
+	lda <.r2
+	adc #$10
+	sta aObjRoom,x
+.carry_sety_up
 	jmp .write_pos
 .down
 	lda aObjY,x
@@ -2558,9 +2575,7 @@ WallCollisionY:
 	beq .nogravity
 	mMOVW $FFC0, aObjVYlo,x, aObjVY,x
 .nogravity
-	rts
 .inair
-	plp
 	rts
 
 ;20 AD F0

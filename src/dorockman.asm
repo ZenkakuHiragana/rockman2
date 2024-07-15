@@ -1422,6 +1422,8 @@ DoRockman_BodyMoveY_CheckWallDown:
 	lda aObjY
 	pha
 	lda <$0A
+	clc
+	adc <zVScroll
 	and #$0F
 	sta aObjY
 	pla
@@ -1532,14 +1534,21 @@ Table_ConveyorFlag:
 ;アイテム、敵リフトの着地判定
 DoRockman_CheckLift:
 .x = $08
-.r = $09
+.r = $01
 .y = $0A
+	lda <zOffscreen
+	bne .done_all
 	sec
 	lda aObjX
 	sbc <zHScroll
 	sta <.x
-	clc
+	sec
 	lda aObjY
+	sbc <zVScroll
+	bcs .skip_offsety
+	sbc #$10 - 1
+.skip_offsety
+	clc
 	adc #$0C
 	sta <.y
 	lda <zEquipment
@@ -1548,7 +1557,8 @@ DoRockman_CheckLift:
 	ldx #$02
 .loop_item
 	lda aWeaponPlatformW,x
-	bne .itemlift
+	beq .done_item
+	jmp .itemlift
 .done_item
 	dex
 	bpl .loop_item
@@ -1562,13 +1572,12 @@ DoRockman_CheckLift:
 .done_enemy
 	dex
 	bpl .loop_enemy
+.done_all
 	clc
 	rts
 ;8D1F
 ;敵リフト判定開始
 .enemylift
-	lda <zOffscreen
-	bne .done_enemy
 	sec
 	lda aObjX10,x
 	sbc <zHScroll
@@ -1582,10 +1591,18 @@ DoRockman_CheckLift:
 	cmp aPlatformWidth10,x
 	bcs .done_enemy
 	lda aObjY10,x
+	sbc <zVScroll
+	bcs .borrow_enemyy
+	sbc #$10 - 1
+.borrow_enemyy
 	cmp <.y
 	bcc .done_enemy
 	lda aPlatformY10,x
-	cmp <$0A
+	sbc <zVScroll
+	bcs .borrow_enemypy
+	sbc #$10 - 1
+.borrow_enemypy
+	cmp <.y
 	beq .cont_enemy
 	bcs .done_enemy
 .cont_enemy
@@ -1600,8 +1617,14 @@ DoRockman_CheckLift:
 	sbc #$0C
 	sta aObjY
 	bcs .borrow_enemylift
-	lda <.r
-	sbc #$0F
+	sbc #$10 - 1
+	sta aObjY
+	lda aObjRoom,x
+	sbc #$10
+	lsr a
+	lsr a
+	lsr a
+	lsr a
 	sta <.r
 .borrow_enemylift
 	mSTZ aObjYlo, aObjVYlo
@@ -1617,8 +1640,6 @@ DoRockman_CheckLift:
 ;8D86
 ;アイテム系足場判定開始
 .itemlift
-	lda <zOffscreen
-	bne .skip_item
 	sec
 	lda aObjX + 2,x
 	sbc <zHScroll
@@ -1632,10 +1653,18 @@ DoRockman_CheckLift:
 	cmp aWeaponPlatformW,x
 	bcs .skip_item
 	lda aObjY + 2,x
+	sbc <zVScroll
+	bcs .borrow_itemy
+	sbc #$10 - 1
+.borrow_itemy
 	cmp <.y
 	bcc .skip_item
 	lda aWeaponPlatformY,x
-	cmp <$0A
+	sbc <zVScroll
+	bcs .borrow_itempy
+	sbc #$10 - 1
+.borrow_itempy
+	cmp <.y
 	beq .cont_item
 	bcs .skip_item
 .cont_item
@@ -1652,8 +1681,14 @@ DoRockman_CheckLift:
 	sbc #$0C
 	sta aObjY
 	bcs .borrow_itemlift
-	lda <.r
-	sbc #$0F
+	sbc #$10 - 1
+	sta aObjY
+	lda aObjRoom + 2,x
+	sbc #$10
+	lsr a
+	lsr a
+	lsr a
+	lsr a
 	sta <.r
 .borrow_itemlift
 	mSTZ aObjYlo, aObjVYlo
