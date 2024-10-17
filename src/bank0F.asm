@@ -2348,8 +2348,8 @@ CheckOffscreenEnemy:
 	jsr EnemyTakeDamage
 	bcc .do
 ;撃破時
-.break .public
 	jsr CreateItemFromEnemy
+.break .public ;ブロッキーの破片の消滅時にここへ飛ぶ
 	mMOV #$06, aObjAnim,x
 	mMOV #%10000000, aObjFlags,x
 	mSTZ aObjWait,x, aObjFrame,x
