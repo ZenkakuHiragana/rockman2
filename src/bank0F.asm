@@ -1902,6 +1902,7 @@ PickupMap:
 	jsr ChangeBank
 
 	mSTZ <.ptr
+.offscreen_continue
 	ldx <.Y
 	ldy <.R
 	lda Stage_DefMap16,y
@@ -1960,7 +1961,11 @@ PickupMap:
 	mCHANGEBANK #$0E, 1
 .skip
 	and #$3F
-	bpl .offscreenblock
+	bne .offscreenblock
+	clc
+	mADD <.R, #$10
+	mSTZ <.Y
+	beq .offscreen_continue
 
 ;1ECC44
 ; Table_Terrain:
