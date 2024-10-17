@@ -148,12 +148,8 @@ Metalman4:
 Metalman_ChangeVector:
 	mMOV #$0F, aPaletteSpr
 	clc
-	lda aBossVar1
-	adc #$01
-	sta aBossVar1
-	lda aBossVar2
-	adc #$00
-	sta aBossVar2
+	mADD aBossVar1, #$01
+	mADD aBossVar2, #$00
 	beq Metalman_Move
 	lda aBossVar1
 	cmp #$77
@@ -168,6 +164,7 @@ Metalman_ChangeVector:
 	lda <zConveyorVec
 	eor #%01100000
 	sta <zConveyorVec
+	and #%00100000
 	beq .loop_palette
 	inx
 .loop_palette
@@ -178,9 +175,29 @@ Metalman_ChangeVector:
 	iny
 	cpy #$03
 	bne .loop_palette
+
 ;8C90
 ;メタルマンの移動処理と当たり判定処理
 Metalman_Move:
+	ldy #$02
+	lda <zPaletteIndex
+	cmp #$03
+	beq .set_palette
+.loop_unsetpalette
+	mORA aPaletteOverride + 5,y, #$80
+	dey
+	bpl .loop_unsetpalette
+	bmi .move
+.set_palette
+	lda aPaletteOverride + 5,y
+	and #$7F
+	cmp #$7F
+	beq .skip_setpalette
+	sta aPaletteOverride + 5,y
+.skip_setpalette
+	dey
+	bpl .set_palette
+.move
 	lda aBossInvincible
 	beq .1
 	jsr BossBehaviour_Move
