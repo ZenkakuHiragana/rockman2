@@ -51,105 +51,112 @@ DoRockman_DoScroll:
 .f   = $02 ;スクロール方向フラグ: L... ...U(U: 上, L: 左)
 .dx  = $03 ;移動差X
 .dy  = $04 ;移動差Y
+.clipped = $05 ;スクロール制限によるスクロールが実際に発生したか
+.screeny = $06 ;ロックマンの画面内Y座標
 .scroll_max = $08 ;スクロール可能な最大量
 	txa
-	ldx #(.dy - .nth) ;一時変数の初期化
-.loop_init
-	sta <.nth,x
-	dex
-	bpl .loop_init
+	sta <.nth
+	sta <.ntv
+	sta <.f
+	sta <.dx
+	sta <.dy
+	sta <.clipped
 	
 	ldx <zRoom
 	stx <zRoomPrev
-	lda <zScrollClipFlag ;スクロール制限中は画面を強制移動 .... ..XY
+	ldy <zScrollClipRoom
+	cpy aObjRoom
+	bne .skip_scrollclip
+;縦スクロール制限
+	lda <zScrollClipFlag ;スクロール制限中は画面を強制移動 .... XXYY
 	beq .skip_scrollclip
 	lsr a
-	ldy <zScrollClipRoom
+	bit aObjX
+	bmi .scrollclip_y_rightside
+	lsr a
+.scrollclip_y_rightside
 	bcc .skip_scrollclip_y
-;縦スクロール制限
+	mMOV #$40, <.clipped
 	lda <zVScroll
-	bne .continue_scrollclip_y
-	lda #%00000010
-	bpl .end_scrollclip_y
-.continue_scrollclip_y
+	beq .skip_scrollclip
 	tya
 	and #$F0
 	sta <zVScrollPrev
 	txa
 	and #$F0
-	sbc <zVScrollPrev
+	cmp <zVScrollPrev ;目標画面位置 ≦ 現在の画面位置 ならキャリーフラグON
 	bcs .scrollclip_up
-;下方向にスクロール制限
-	inc <.dy
+	inc <.dy   ;下方向にスクロール制限
 	.db $2C
-.scrollclip_up
-;上方向にスクロール制限
-	dec <.dy
+.scrollclip_up ;.dy = ±1
+	dec <.dy   ;上方向にスクロール制限
 	bne .skip_scrollclip
 .skip_scrollclip_y
+
 ;横スクロール制限
 	lda <zHScroll
-	bne .continue_scrollclip_x
-	lda #%00000001
-.end_scrollclip_y
-	and <zScrollClipFlag
-	sta <zScrollClipFlag
+	beq .skip_scrollclip
+	lda <zScrollClipFlag ;スクロール制限中は画面を強制移動 .... XXYY
+	lsr a
+	lsr a
+	lsr a
+	bit aObjY
+	bmi .scrollclip_x_lowerside
+	lsr a
+.scrollclip_x_lowerside
+	ror <.clipped ;スクロール制限によるスクロールが実際に発生したか = X.Y. ....
 	bpl .skip_scrollclip
-.continue_scrollclip_x
 	tya
 	and #$0F
 	sta <zHScrollPrev
-	sec
 	txa
 	and #$0F
-	sbc <zHScrollPrev
+	cmp <zHScrollPrev ;目標画面位置 ≦ 現在の画面位置 ならキャリーフラグON
 	bcs .scrollclip_left
-;右方向にスクロール制限
-	inc <.dx
+	inc <.dx     ;右方向にスクロール制限
 	.db $2C
-.scrollclip_left
-;左方向にスクロール制限
-	dec <.dx
+.scrollclip_left ;.dx = ±1
+	dec <.dx     ;左方向にスクロール制限
 .skip_scrollclip
 	
 ;横スクロール
 	mMOV <zHScroll, <zHScrollPrev
-	lda <.dx
-	beq .noclip_x
-	bpl .scroll_right_do ;<.dx == #$01
-	lda #$01 ;<.dx = #$FF
-	sta <.dx ;<.dx = #$01
-	bpl .scroll_left_do
-.noclip_x
-;スクロール量の決定
+	lda <.dx          ;横スクロール制限によるスクロール量 = ±1
+	; asl a
 	clc
-	lda <zMoveAmountX ;|ロックマンの実際の移動量X| < #$80
+	adc <zMoveAmountX ;ロックマンの移動によるスクロール量
+	tax               ;X = スクロール制限 + ロックマンの移動による符号付きスクロール量
+	clc
 	bpl .inv_dx
-	eor #$FF
 	sec
+	eor #$FF
 .inv_dx
-	php
 	adc #$01
-	cmp #.scroll_max ;スクロール最大量の制限
-	bcc .limit_dx
+	cmp #.scroll_max ;A = abs(横スクロール量)
+	bcc .limit_dx    ;スクロール最大量の制限
 	lda #.scroll_max
 .limit_dx
-	sta <.dx
-	
-	lda <zRScreenX
-	ldy #$00 ;ChangeBank_GetScrollableの引数
-	ldx <zRoom
-	plp
+	sta <.dx   ;最終的なスクロール量の決定
+	txa        ;X = スクロール制限 + ロックマンの移動による符号付きスクロール量
+	asl a      ;符号bitをキャリーフラグへ送る
+	ldy #$00   ;ChangeBank_GetScrollableの引数
+	ldx <zRoom ;ChangeBank_GetScrollableの引数
+	bit <.clipped
+	bpl .noclip_x
+	bcs .scroll_left_force
+	bcc .scroll_right_force
+.noclip_x
 	bcs .scroll_left
 ;右スクロール
+	lda <zRScreenX
 	cmp #Scroll_RightBound ;画面内X座標が規定値より右ならスクロール可能
 	beq .scroll_left
 	bcc .scroll_left
 	sbc #Scroll_RightBound
 	cmp <.dx
-	bcs .changedx_r ;右寄りにいる時は規定のスクロール量
-	sta <.dx        ;画面左側から境界へ侵入した時、その差分にする
-.changedx_r
+	bcs .scroll_right_force ;右寄りにいる時は規定のスクロール量
+	sta <.dx                ;画面左側から境界へ侵入した時、その差分にする
+.scroll_right_force
 	inx ;現在の画面の1つ右
 	jsr ChangeBank_GetScrollable ;スクロール可能なら
 	tya
@@ -169,14 +176,15 @@ DoRockman_DoScroll:
 	
 ;左スクロール
 .scroll_left
+	lda <zRScreenX
 	sbc #Scroll_LeftBound
 	bcs .skip_horizontal
 	eor #$FF ;A = -A
 	adc #$01
 	cmp <.dx
-	bcs .changedx_l
-	sta <.dx
-.changedx_l
+	bcs .scroll_left_force ;左寄りにいる時は規定のスクロール量
+	sta <.dx               ;画面右側から境界へ侵入した時、その差分にする
+.scroll_left_force
 	dex ;現在の画面の1つ左
 	jsr ChangeBank_GetScrollable
 	tya
@@ -186,8 +194,7 @@ DoRockman_DoScroll:
 	bcs .scroll_left_do
 	sta <.dx
 .scroll_left_do
-	sec
-	ror <.f ;左スクロールフラグの設定
+	mMOV #%10000000, <.f ;左スクロールフラグの設定
 	sec
 	lda <zHScroll ;スクロール値の変更
 	sbc <.dx
@@ -209,88 +216,85 @@ DoRockman_DoScroll:
 	
 ;縦スクロール
 	mMOV <zVScroll, <zVScrollPrev
-	lda <.dy
-	beq .noclip_y
-	bpl .scroll_down_do ;<.dy == #$01
-	lda #$01 ;<.dy = #$FF
-	sta <.dy ;<.dy = #$01
-	bpl .scroll_up_do
-;	.beginregion "scrollup"
-.noclip_y
-;スクロール量の決定
+	lda <.dy          ;縦スクロール制限によるスクロール量 = ±1
+	; asl a
 	clc
-	lda <zMoveAmountY ;|ロックマンの実際の移動量Y| < #$80
+	adc <zMoveAmountY ;ロックマンの移動によるスクロール量
+	tax               ;X = スクロール制限 + ロックマンの移動による符号付きスクロール量
+	clc
 	bpl .inv_dy
-	eor #$FF
 	sec
+	eor #$FF
 .inv_dy
-	php
 	adc #$01
 	cmp #.scroll_max ;スクロール最大量の制限
 	bcc .limit_dy
 	lda #.scroll_max
 .limit_dy
-	sta <.dy
-	
+	sta <.dy   ;最終的なスクロール量の決定
 	sec
 	lda aObjY
 	sbc <zVScroll
 	bcs .borrow_y
-	sbc #$0F
-.borrow_y ;A = ロックマンの画面内のY座標
-	ldy #$01 ;ChangeBank_GetScrollableの引数
-	ldx <zRoom
-	plp
+	sbc #$10 - 1
+.borrow_y 
+	sta <.screeny ; = ロックマンの画面内のY座標
+	txa           ;X = スクロール制限 + ロックマンの移動による符号付きスクロール量
+	asl a         ;符号bitをキャリーフラグへ送る
+	ldy #$01      ;ChangeBank_GetScrollableの引数
+	ldx <zRoom    ;ChangeBank_GetScrollableの引数
+	bit <.clipped
+	bvc .noclip_y
+	bcs .scroll_up_force
+	bcc .scroll_down_force
+.noclip_y
 	bcs .scroll_up
 ;下スクロール
-	cmp #Scroll_DownBound ;画面内Y座標が規定値より下ならスクロール可能
-	beq .scroll_up
+	lda <.screeny
+	cmp #Scroll_DownBound - 1 ;画面内Y座標が規定値より下ならスクロール可能
 	bcc .scroll_up
 	sbc #Scroll_DownBound
 	cmp <.dy
-	bcs .changedy_d ;下寄りにいる時は規定のスクロール量
+	bcs .scroll_down_force ;下寄りにいる時は規定のスクロール量
 	sta <.dy ;画面上から境界へ侵入した時、その差分にする
-.changedy_d
+.scroll_down_force
 	clc
 	txa
 	adc #$10
 	tax
+	ldy #$01
 	jsr ChangeBank_GetScrollable
 	tya
 	bpl .scroll_down_do
-	lda <zVScroll
-	beq .skip_vertical
-	bmi .skip_vertical
+	mMOV <zVScroll, <.dy
 	bpl .scroll_up_fromdown
 .scroll_down_do
 	clc
-	lda <zVScroll ;スクロール値の変更
-	adc <.dy
-	sta <zVScroll
+	mADD <zVScroll, <.dy ;スクロール値の変更
 	cmp #$F0
 	bcc .cross_page_down
-	adc #$0F
+	adc #$10 - 1
 	sta <zVScroll
-	lda <zRoom
-	adc #$0F
-	sta <zRoom
+	mADD <zRoom, #$10 - 1
 .cross_page_down
 	lda #$00 ;ネームテーブル書き込み予約の判定
 	beq .merge_v
 ;上スクロール
 .scroll_up
+	lda <.screeny
 	sbc #Scroll_UpBound
 	bcs .skip_vertical
 	eor #$FF ;A = -A
 	adc #$01
 	cmp <.dy
-	bcs .changedy_u
+	bcs .scroll_up_force
 	sta <.dy
-.changedy_u
+.scroll_up_force
 	sec
 	txa
 	sbc #$10
 	tax
+	ldy #$01
 	jsr ChangeBank_GetScrollable
 	tya
 	bpl .scroll_up_do
@@ -299,21 +303,15 @@ DoRockman_DoScroll:
 	bcs .scroll_up_do
 .scroll_up_fromdown
 	sta <.dy
-;	.endregion "scrollup"
 .scroll_up_do
 	sec
 	inc <.f ;上スクロールフラグの設定
-	lda <zVScroll
-	sbc <.dy
-	sta <zVScroll
-	cmp #$F0
-	bcc .cross_page_up
-	sbc #$10
+	mSUB <zVScroll, <.dy
+	bcs .cross_page_up
+	sbc #$10 - 1
 	sta <zVScroll
 	sec
-	lda <zRoom
-	sbc #$10
-	sta <zRoom
+	mSUB <zRoom, #$10
 .cross_page_up
 	lda #$FF
 .merge_v ;ネームテーブル書き込み予約の判定

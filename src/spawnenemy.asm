@@ -233,11 +233,12 @@ SpawnEnemy_SendCommand:
 .3
 	cmp #$0E ;敵番号8E: スクロール制限の開始
 	bne .4
-	lda Stage_DefEnemiesY - 1,y
-	lsr a
+	mAND Stage_DefEnemiesY - 1,y, #$03, <zScrollClipFlag
 	lda Stage_DefEnemiesX - 1,y
-	rol a
 	and #$03
+	asl a
+	asl a
+	ora <zScrollClipFlag
 	sta <zScrollClipFlag
 	mMOV <.room, <zScrollClipRoom
 	rts
