@@ -90,12 +90,11 @@ DoRockman_DoScroll:
 	.db $2C
 .scrollclip_up ;.dy = ±1
 	dec <.dy   ;上方向にスクロール制限
-	bne .skip_scrollclip
+	jmp .skip_scrollclip
 .skip_scrollclip_y
 
 ;横スクロール制限
-	lda <zHScroll
-	beq .skip_scrollclip
+	asl <.clipped
 	lda <zScrollClipFlag ;スクロール制限中は画面を強制移動 .... XXYY
 	lsr a
 	lsr a
@@ -106,6 +105,8 @@ DoRockman_DoScroll:
 .scrollclip_x_lowerside
 	ror <.clipped ;スクロール制限によるスクロールが実際に発生したか = X.Y. ....
 	bpl .skip_scrollclip
+	lda <zHScroll
+	beq .skip_scrollclip
 	tya
 	and #$0F
 	sta <zHScrollPrev
@@ -122,7 +123,12 @@ DoRockman_DoScroll:
 ;横スクロール
 	mMOV <zHScroll, <zHScrollPrev
 	lda <.dx          ;横スクロール制限によるスクロール量 = ±1
-	; asl a
+	bne .noscrollclip_h
+	bit <.clipped
+	bpl .noscrollclip_h
+	tax
+	beq .limit_dx
+.noscrollclip_h
 	clc
 	adc <zMoveAmountX ;ロックマンの移動によるスクロール量
 	tax               ;X = スクロール制限 + ロックマンの移動による符号付きスクロール量
@@ -217,6 +223,12 @@ DoRockman_DoScroll:
 ;縦スクロール
 	mMOV <zVScroll, <zVScrollPrev
 	lda <.dy          ;縦スクロール制限によるスクロール量 = ±1
+	bne .noscrollclip_v
+	bit <.clipped
+	bvc .noscrollclip_v
+	tax
+	beq .limit_dy
+.noscrollclip_v
 	; asl a
 	clc
 	adc <zMoveAmountY ;ロックマンの移動によるスクロール量
@@ -241,10 +253,20 @@ DoRockman_DoScroll:
 	sta <.screeny ; = ロックマンの画面内のY座標
 	txa           ;X = スクロール制限 + ロックマンの移動による符号付きスクロール量
 	asl a         ;符号bitをキャリーフラグへ送る
-	ldy #$01      ;ChangeBank_GetScrollableの引数
-	ldx <zRoom    ;ChangeBank_GetScrollableの引数
 	bit <.clipped
 	bvc .noclip_y
+;Y方向スクロール制限が発生している場合
+	lda <zVScroll
+	bcs .inv_vscroll
+	eor #$FF
+	adc #$00
+.inv_vscroll
+	cmp <.dy
+	bcs .clamped_scrollclip_up ;スクロール量 = min(縦スクロール値, 2)
+	sta <.dy
+.clamped_scrollclip_up
+	txa           ;X = スクロール制限 + ロックマンの移動による符号付きスクロール量
+	asl a         ;符号bitをキャリーフラグへ送る
 	bcs .scroll_up_force
 	bcc .scroll_down_force
 .noclip_y
@@ -259,9 +281,9 @@ DoRockman_DoScroll:
 	sta <.dy ;画面上から境界へ侵入した時、その差分にする
 .scroll_down_force
 	clc
-	txa
+	lda <zRoom
 	adc #$10
-	tax
+	tax        ;ChangeBank_GetScrollableの引数
 	ldy #$01
 	jsr ChangeBank_GetScrollable
 	tya
@@ -291,9 +313,9 @@ DoRockman_DoScroll:
 	sta <.dy
 .scroll_up_force
 	sec
-	txa
+	lda <zRoom
 	sbc #$10
-	tax
+	tax        ;ChangeBank_GetScrollableの引数
 	ldy #$01
 	jsr ChangeBank_GetScrollable
 	tya
@@ -942,6 +964,7 @@ DoRockman_BodyMoveX:
 ;画面外判定
 	sbc <zHScroll
 	sbc #($0100 - DoRockman_BodyMoveX_OffscreenClip)
+	beq .skip_offscreen_right
 	bcc .skip_offscreen_right
 	eor #$FF
 	adc #$00

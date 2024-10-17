@@ -1367,8 +1367,12 @@ EN19:
 	adc #$03
 	sta aObjVX,x
 .done
+	mMOV aObjRoom,x, <zScrollClipRoom
+	mMOV #%00001111, <zScrollClipFlag
 	jsr CheckOffscreenEnemy
 	bcc .rts
+	lda aObjLife,x
+	bne .rts
 	lda #%10000000
 	sta aObjFlags,x
 	lda #$19
@@ -1452,6 +1456,7 @@ EN19:
 .notfound2
 	sta aEnemyOrder,x
 	asl aObjFlags,x
+	mSTZ <zScrollClipFlag
 .skip2
 	lda #$08
 	sta aObjVXlo,x
@@ -1488,7 +1493,17 @@ EN1A:
 	sta aObjWait,x
 .wait
 	dec aObjVar,x
-	mJSR_NORTS CheckOffscreenEnemy
+	jsr CheckOffscreenEnemy
+	lda #%10000000
+	bcc .write
+	lda #$19
+	jsr FindObject
+	bcs .rts
+	lda #%10100000
+.write
+	sta aObjFlags,x
+.rts
+	rts
 
 ;A154
 ;フレンダーの弾
@@ -1512,6 +1527,10 @@ EN1C:
 	lda .table_land,y
 	cmp aObjY,x
 	beq .land
+	bcs .skip_init
+	lda #$00
+	sta aObjY,x
+.skip_init
 	lda aObjFlags,x
 	and #%11011111
 	sta aObjFlags,x
@@ -1619,6 +1638,9 @@ EN1C:
 	sta aObjVX10,y
 .velocity
 	lda #$1A
+	jsr FindObject
+	bcc .skip_spawntail
+	lda #$1A
 	jsr CreateEnemyHere
 	clc
 	lda aObjX10,y
@@ -1628,6 +1650,7 @@ EN1C:
 	lda aObjY10,y
 	sbc #$0C
 	sta aObjY10,y
+.skip_spawntail
 	inc aObjVar,x
 	lda #%10100000
 	sta aObjFlags,x
