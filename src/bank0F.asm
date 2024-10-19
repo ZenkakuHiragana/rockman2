@@ -1789,6 +1789,14 @@ GetScrollTo:
 .end
 	mCHANGEBANK #$0E, 1
 
+;画面位置Y = YYYY XXXXにどの画面定義$00 = 00～3Fがあるかを返す
+GetScreenIndex:
+	lda <zStage
+	and #$07
+	jsr ChangeBank
+	mMOV Stage_DefMap16,y, <$00
+	mCHANGEBANK #$0E, 1
+
 ;20 09 CB
 ;上下スクロール時のパターンテーブル描画に密接に関わる
 Unknown_CB09:

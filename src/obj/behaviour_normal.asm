@@ -802,16 +802,19 @@ EN11:
 EN12:
 	lda #$14
 	sta aPlatformWidth,x
+	ldy aObjRoom,x
+	jsr GetScreenIndex ;$00 = 画面定義番号00～3F
+	ldy <zStage ;クラッシュマンステージならCフラグをクリア
+	cpy #$0B    ;ワイリーステージ4ならCフラグをセット
+	lda <$00
+	bcs .iswilystage
 	sec
-	lda aObjRoom,x
 	sbc #$04
-	ldy <zStage
-	cpy #$07
-	beq .clash
+	bpl .do
+.iswilystage
 	sec
-	lda aObjRoom,x
 	sbc #$1B
-.clash
+.do
 	sta <$00
 	tay
 	lda .begin,y
@@ -876,11 +879,18 @@ EN12:
 	sta aObjVXlo,x
 	lda .vec,y
 	sta aObjFlags,x
+	mMOV aEnemyOrder,x, <$00
 	jsr MoveEnemy
-	bcc .del
-	lda #$00
-	sta aPlatformWidth,x
+	bcc .still_exists
+	mMOV <$00, aEnemyOrder,x
+	mSTZ aPlatformWidth,x
+	lda #%10100000
+	bne .del
+.still_exists
+	lda aObjFlags,x
+	and #%11011111
 .del
+	sta aObjFlags,x
 	sec
 	lda aObjY,x
 	sbc #$04
@@ -4094,8 +4104,10 @@ EN56:
 	lda <zStage
 	cmp #$0A
 	beq .wily3
+	ldy aObjRoom,x
+	jsr GetScreenIndex
 	sec
-	lda aObjRoom,x
+	lda <$00
 	sbc #$0A
 	asl a
 	asl a
