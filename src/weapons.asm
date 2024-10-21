@@ -1016,13 +1016,19 @@ DoTimeStopper:
 	lda #$00
 	sta <zWindhi
 	sta <zWindlo
-	lda #$80
-	sta aObjY,x
+	ldy <zRoom
+	mEOR <zHScroll, #$80, aObjX,x
+	bmi .carry_x
+	iny
+.carry_x
+	mEOR <zVScroll, #$80, aObjY,x
+	bmi .carry_y
+	tya
 	clc
-	adc <zHScroll
-	sta aObjX,x
-	lda aObjRoom
-	adc #$00
+	adc #$10
+	tay
+.carry_y
+	tya
 	sta aObjRoom,x
 	rts
 
