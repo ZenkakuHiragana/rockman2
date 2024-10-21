@@ -1,6 +1,6 @@
 
 ;20 55 D6
-;SpawnEnemyByScroll
+SpawnEnemyByScroll:
 .seek    = $00 ;敵リストシーク位置
 .seek_r  = $01 ;画面位置シーク位置（左上 + (0, 0)～(1, 1)）
 .room    = $02 ;現在探索対象の画面位置 = YYYY XXXX
@@ -73,9 +73,7 @@
 	
 	mMOV Stage_DefEnemiesY - 1,y, <.spawn_y
 	lda Stage_DefEnemiesX - 1,y
-	.list
 	jsr SpawnEnemy_CheckOffscreen
-	.nolist
 	bcs .skip_seek
 	
 ;敵が出現する
@@ -134,6 +132,7 @@
 	stx <zPPUObjPtr
 	dec <zPPUObjPtrEnd
 	bne .rts
+.write_palette .public
 	lda <zStage
 	and #$07
 	jsr ChangeBank
@@ -241,18 +240,20 @@ SpawnEnemy_SendCommand:
 	ora <zScrollClipFlag
 	sta <zScrollClipFlag
 	mMOV <.room, <zScrollClipRoom
+.rts
 	rts
 .4
 	tay ;敵番号80～8B: パターンテーブル転送の適用
 	mSTZ <zPPUObjlo
 	lda Stage_LoadGraphicsPtr,y
 	sta <zPPUObjhi
-	lda Stage_LoadGraphicsOrg,y
-	sta <zPPUObjPtr
+	ldx Stage_LoadGraphicsOrg,y
+	stx <zPPUObjPtr
 	lda Stage_LoadGraphicsNum,y
 	sta <zPPUObjPtrEnd
-.rts
-	rts
+	bne .rts
+	ldy #$FF
+	jmp SpawnEnemyByScroll.write_palette
 
 SpawnEnemy_RoomList:
 	.db $00, $01, $10, $11

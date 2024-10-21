@@ -2239,7 +2239,7 @@ DrawStaffRollText:
 	jmp ChangeBank_ShowEndingRockman_JMP
 
 ;20 55 D6
-SpawnEnemyByScroll:
+;SpawnEnemyByScroll:
 	.include "src/spawnenemy.asm"
 
 ;20 40 DA

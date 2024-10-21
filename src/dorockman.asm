@@ -87,10 +87,10 @@ DoRockman_DoScroll:
 	cmp <zVScrollPrev ;目標画面位置 ≦ 現在の画面位置 ならキャリーフラグON
 	bcs .scrollclip_up
 	inc <.dy   ;下方向にスクロール制限
-	.db $2C
+	bne .skip_scrollclip
 .scrollclip_up ;.dy = ±1
 	dec <.dy   ;上方向にスクロール制限
-	jmp .skip_scrollclip
+	bne .skip_scrollclip
 .skip_scrollclip_y
 
 ;横スクロール制限
@@ -221,6 +221,10 @@ DoRockman_DoScroll:
 .skip_horizontal
 	
 ;縦スクロール
+	lda <zOffscreen
+	beq .onscreen_v
+	jmp .merge_v
+.onscreen_v
 	mMOV <zVScroll, <zVScrollPrev
 	lda <.dy          ;縦スクロール制限によるスクロール量 = ±1
 	bne .noscrollclip_v
