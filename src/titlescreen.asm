@@ -407,8 +407,7 @@ BeginTitleScreenSkipped:
 	lda #$00
 	sta <zScreenMod
 	lda #$0E
-	jmp Write_Reg0_A
-;---------------------------------------CUT
+	jsr Write_Reg0_A
 	lda <zRestartTitle
 	beq .notreset
 	rts
@@ -419,15 +418,9 @@ BeginTitleScreenSkipped:
 	jsr LoadGraphicsSet
 	lda #$05
 	sta <zStage
-	lda #$40
-	sta <zPtrlo
-	lda #$8D
-	sta <zPtrhi
+	lda #$F4
 	jsr WriteMapAddressOffScreen1A
-	lda #$80
-	sta <zPtrlo
-	lda #$8D
-	sta <zPtrhi
+	lda #$F5
 	jsr WriteMapAddressOffScreen1A
 	ldx #$00
 ;START, PASS WORDの文字を書く
@@ -694,10 +687,8 @@ BeginTitleScreenSkipped:
 	sta <zItemFlags
 	lda <.numetanks
 	sta <zETanks
-	lda #$C0
-	sta <$FD
-	lda #$8D
-	sta <$FE
+	jsr FrameAdvance1A
+	lda #$E5
 	jsr WriteMapAddressOnScreen1A
 	lda #$3C
 	sta <$FD
