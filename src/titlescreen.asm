@@ -68,35 +68,12 @@
 	jsr DisableScreen1A
 	mSTZ <zScreenMod
 	mMOV #$07, <zStage
-
-	mMOVW #$8A00, <zPtr
-	mSTZ <zNTPointer, <zPPUSqr
-.loop_openingnt1
-	jsr WriteNameTableByScroll_AnyBank
-	inc <zPtrlo
-	inc <zNTPointer
-	jsr WriteNameTableByScroll_AnyBank
-	jsr WritePPUSquare1A
-	lda <zPtrlo
-	and #$3F
-	bne .loop_openingnt1
-
-	mMOVW #$8A40, <zPtr
-	mSTZ <zNTPointer, <zPPUSqr
-.loop_openingnt2
-	jsr WriteNameTableByScroll_AnyBank
-	clc
-	lda aPPUSqrhi
-	adc #$04
-	sta aPPUSqrhi
-	clc
-	lda aPPUSqrAttrhi
-	adc #$04
-	sta aPPUSqrAttrhi
-	jsr WritePPUSquare1A
-	lda <zPtrlo
-	and #$3F
-	bne .loop_openingnt2
+;タイトル画面ネームテーブル読み込み
+	lda #$F2
+	jsr WriteMapAddressOffScreen1A
+	lda #$F3
+	jsr WriteMapAddressOffScreen1A
+	jsr ResetScrollPosition1A
 
 	ldx #$1F
 	lda #$0F
@@ -347,7 +324,7 @@ Bank0E_Start:
 ;A1D9
 BeginTitleScreenSkipped:
 	jsr Titlelogo_ShowSprites
-	mPLAYTRACK #$00
+	mPLAYTRACK #$0D
 	lda #$0B
 	sta <zTitleScreenWaithi
 	lda #$00
@@ -362,12 +339,8 @@ BeginTitleScreenSkipped:
 	jsr Titlelogo_ShowSprites
 	jsr FrameAdvance1A
 	sec
-	lda <zTitleScreenWaitlo
-	;sbc #$01
-	sta <zTitleScreenWaitlo
-	lda <zTitleScreenWaithi
-	sbc #$00
-	sta <zTitleScreenWaithi
+	mSUB <zTitleScreenWaitlo, #$01
+	mSUB <zTitleScreenWaithi
 	bcs .loop_wait_titlescreen
 	inc <zRestartTitle
 .begingame

@@ -54,9 +54,9 @@ Reset_Continue;
 	mMOV #$03, <zLives
 	mSTZ <zETanks
 .restart
-;	jsr BeginTitleScreen
-;	lda <zRestartTitle ;タイトル画面をもう一度やるなら1
-;	bne .restart
+	jsr BeginTitleScreen
+	lda <zRestartTitle ;タイトル画面をもう一度やるなら1
+	bne .restart
 	lda <zClearFlags
 	cmp #$FF
 	bne StartStageSelect

@@ -42,3 +42,8 @@
 	
 	mBEGIN $09, $8000
 	.incbin "stage/chr/lz77/common.lz77"
+	mBEGIN $09, $9000
+	.incbin "graphs/lz77/wilycastle.lz77"
+	mBEGINRAW $13, $A000
+	.incbin "graphs/opening.chr"
+
