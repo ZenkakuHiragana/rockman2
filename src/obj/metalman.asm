@@ -165,16 +165,11 @@ Metalman_ChangeVector:
 	eor #%01100000
 	sta <zConveyorVec
 	and #%00100000
-	beq .loop_palette
-	inx
-.loop_palette
-	lda Table_MetalmanConveyorPalette,x
-	sta aPaletteOverride + 5,y
-	inx
-	inx
-	iny
-	cpy #$03
-	bne .loop_palette
+	beq .write_palette
+	ldx #$04
+.write_palette
+	txa
+	sta <zPaletteOffset
 
 ;8C90
 ;メタルマンの移動処理と当たり判定処理
