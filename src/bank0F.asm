@@ -1453,17 +1453,21 @@ WriteNameTableByScroll:
 	lda <$09
 	sbc #$10
 	sta <$09
+	clc
 .borrow_nt
 	tya
 	eor #$01
 	tay
-	lsr a
-	bcc .up_dy
+	and #$01
+	beq .up_dy
+	bcc .pagebreak
 	txa
 	eor #$01
 	tax
 	lsr a
 	bcc .up_dy
+.pagebreak
+	sec
 	lda <$03
 	sbc #$01
 	and #$3F
