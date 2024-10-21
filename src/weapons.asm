@@ -1264,7 +1264,6 @@ DoItem3:
 	lda aObjVar,x
 	bpl .skip2
 	inc aObjVar,x
-	bne .skip2
 .skip2
 	lda <$00
 	bne .del
@@ -1354,9 +1353,7 @@ CheckWallXY:
 .write
 	sta <.r
 	sec
-	lda aObjY,x
-	sbc #$08
-	sta <.y
+	mSUB aObjY,x, #$08, <.y
 	bcs .skip_offsety
 	sbc #$10 - 1
 	sta <.y
@@ -1377,7 +1374,7 @@ CheckWallXY:
 	bcc .checkterrain
 	adc #$10 - 1
 	sta <.y
-	mADD <.r, #$10
+	mADD <.r, #$10 - 1
 	jmp .checkterrain
 .goup
 	sec

@@ -979,9 +979,7 @@ DoRockman_BodyMoveX:
 .skip_offscreen_right
 ;右の地形判定
 	clc
-	lda aObjX
-	adc #$08
-	sta <$08
+	mADD aObjX, #$08, <$08
 	lda aObjRoom
 	and #$0F
 	adc #$00
@@ -989,13 +987,9 @@ DoRockman_BodyMoveX:
 	lda <$00
 	beq .nohit_right
 	mSTZ aObjXlo
-	lda <$08
-	and #$0F
-	sta <$00
+	mAND <$08, #$0F, <$00
 	sec
-	lda aObjX
-	sbc <$00
-	sta aObjX
+	mSUB aObjX, <$00
 	bcs .nohit_right
 	dec aObjRoom
 .nohit_right
@@ -1004,12 +998,8 @@ DoRockman_BodyMoveX:
 ;左へ移動
 .left
 	sec
-	lda aObjXlo
-	sbc aObjVXlo
-	sta aObjXlo
-	lda aObjX
-	sbc aObjVX
-	sta aObjX
+	mSUB aObjXlo, aObjVXlo
+	mSUB aObjX, aObjVX
 	bcs .borrow_left
 	dec aObjRoom
 .borrow_left
@@ -1025,9 +1015,7 @@ DoRockman_BodyMoveX:
 	inc aObjRoom
 .skip_offscreen_left
 	sec
-	lda aObjX
-	sbc #$08
-	sta <$08
+	mSUB aObjX, #$08, <$08
 	lda aObjRoom
 	and #$0F
 	sbc #$00
@@ -1056,6 +1044,7 @@ DoRockman_BodyMoveX:
 DoRockman_WallCheckX:
 .n = $02
 .blk = $10
+	and #$0F
 	sta <$03
 	lda #$02
 	sta <.n
@@ -1068,11 +1057,10 @@ DoRockman_WallCheckX:
 	bmi .sbc
 	cmp #$F0
 	bcc .borrow
-	adc #$0F
-	bpl .borrow
+	adc #$10 - 1
 .sbc
 	bcs .borrow
-	sbc #$0F
+	sbc #$10 - 1
 	clc
 .borrow
 	sta <$0A
@@ -1089,6 +1077,7 @@ DoRockman_WallCheckX:
 	asl a
 	asl a
 	asl a
+	clc
 	adc <$03
 	sta <$09
 	jsr PickupBlock
@@ -1366,8 +1355,7 @@ DoRockman_BodyMoveY:
 .down
 	cmp #$F0
 	bcc .skip_scrolly
-	adc #$0F
-	sec
+	adc #$10 - 1
 .skip_scrolly
 	sta aObjY
 	lda <.r
@@ -1440,8 +1428,7 @@ DoRockman_BodyMoveY_CheckWallDown:
 	adc #$0C
 	cmp #$F0
 	bcc .boundary_y
-	adc #$0F
-	sec
+	adc #$10 - 1
 .boundary_y
 	sta <$0A
 	lda <.r
