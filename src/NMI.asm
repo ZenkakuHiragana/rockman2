@@ -164,7 +164,7 @@ WritePalette:
 	sta $2006
 	sta $2006
 	sta $2006
-	sta <z3A ;---------------------------?
+	; sta <z3A ;---------------------------?
 	rts
 	
 ;	.beginregion "PPU_4way_scroll"

@@ -267,6 +267,7 @@ ResetScrollPosition1A:
 	sta <zHScrollApparentlo
 	sta <zHScrollApparenthi
 	sta <zRoomApparent
+	sta <zPaletteOffset
 	sta aPaletteAnim
 	sta aPaletteAnimWait
 	rts

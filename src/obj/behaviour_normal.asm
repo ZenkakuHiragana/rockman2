@@ -698,8 +698,8 @@ EN0F_ChangePalette:
 	lda EN0F_Palette,y
 	sta aPalette + $09,x
 	sta aPalette + $29,x
-	sta aPalette + $39,x
-	sta aPalette + $49,x
+	; sta aPalette + $39,x
+	; sta aPalette + $49,x
 	dey
 	dex
 	bpl .loop_changepalette
@@ -789,9 +789,29 @@ EN10:
 
 ;9A65
 ;アンコウのためのパレット変化
+;Y and 0F > 0のとき:
+;  パレットアニメーション始点 = X and 0F
+;  パレットアニメーション枚数 = Y and 0F
+;  パレットオーバーライドをリセットする
 EN11:
+	lda aObjY,x
+	and #$0F
+	beq .original
+	sta aPaletteAnim
+	lda aObjX,x
+	and #$0F
+	sta <zPaletteOffset
+	ldy #$0F
+	lda #$FF
+.loop
+	sta aPaletteOverride,y
+	dey
+	bpl .loop
+	bmi .end
+.original
 	ldy #$02
 	jsr EN0F_ChangePalette
+.end
 	lda #$FF
 	sta aItemOrder,x
 	lsr aObjFlags,x

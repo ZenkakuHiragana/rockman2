@@ -377,8 +377,8 @@ DoRockman00_Land:
 	mMOV aObjRoom, <$09
 	mMOV aObjY, <$0A
 	jsr PickupMap
-	lda #$04
-	cmp <$00
+	lda <$00
+	cmp #$01
 	bne .skip
 	sta <zWaterLevel
 .skip

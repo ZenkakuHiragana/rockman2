@@ -511,7 +511,9 @@ DoPaletteAnimation:
 	cmp aPaletteAnim
 	bcc .noloop
 	mSTZ <zPaletteIndex
+	clc
 .noloop
+	adc <zPaletteOffset
 	asl a
 	asl a
 	asl a
@@ -540,7 +542,7 @@ DoPaletteAnimation:
 	cpy #$10
 	bne .loop
 
-	inc <z3A ;------------------------
+	; inc <z3A ;------------------------
 	pla
 	jmp ChangeBank
 .isnoanim

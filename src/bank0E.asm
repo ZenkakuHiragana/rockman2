@@ -132,6 +132,7 @@ StartStage_Continue:
 	sta <zOffscreen
 	sta aObjX
 	sta aObjXlo
+	sta <zPaletteOffset
 	sta <zPaletteIndex
 	sta <zPaletteTimer
 	sta <zBossBehaviour

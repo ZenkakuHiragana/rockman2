@@ -90,7 +90,7 @@ zScrollNumber = $38     ;スクロール番号 → スクロール移動先画�
 
 zBubbleCounter = $39    ;水中の泡が出てくるまでのカウンタ
 
-z3A = $3A
+zPaletteOffset = $3A    ;パレットアニメーション始点
 
 zJumpPowerlo = $3B      ;ジャンプ力下位
 zJumpPowerhi = $3C      ;ジャンプ力上位
