@@ -4124,24 +4124,24 @@ EN56:
 	lda <zStage
 	cmp #$0A
 	beq .wily3
-	ldy aObjRoom,x
-	jsr GetScreenIndex
-	sec
-	lda <$00
-	sbc #$0A
-	asl a
-	asl a
-	asl a
-	tay
-	ldx #$00
-.loop
-	lda .palette,y
-	sta aPalette + 8,x
-	iny
-	inx
-	cpx #$08
-	bne .loop
-	rts
+; 	ldy aObjRoom,x
+; 	jsr GetScreenIndex
+; 	sec
+; 	lda <$00
+; 	sbc #$0A
+; 	asl a
+; 	asl a
+; 	asl a
+; 	tay
+; 	ldx #$00
+; .loop
+; 	lda .palette,y
+; 	sta aPalette + 8,x
+; 	iny
+; 	inx
+; 	cpx #$08
+; 	bne .loop
+; 	rts
 .wily3
 	lda #$0F
 	sta aPalette + $0D
@@ -4154,10 +4154,10 @@ EN56:
 	mJSR_NORTS CheckOffscreenEnemy
 .jmp
 	jmp EN65
-.palette
-	.db $0F, $39, $18, $12, $0F, $39, $18, $01
-	.db $0F, $39, $18, $01, $0F, $39, $18, $01
-	.db $0F, $39, $18, $01, $0F, $39, $18, $0F
+; .palette
+; 	.db $0F, $39, $18, $12, $0F, $39, $18, $01
+; 	.db $0F, $39, $18, $01, $0F, $39, $18, $01
+; 	.db $0F, $39, $18, $01, $0F, $39, $18, $0F
 
 ;B641
 ;

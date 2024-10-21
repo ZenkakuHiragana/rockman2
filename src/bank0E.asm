@@ -132,7 +132,6 @@ StartStage_Continue:
 	sta <zOffscreen
 	sta aObjX
 	sta aObjXlo
-	sta <zPaletteOffset
 	sta <zPaletteIndex
 	sta <zPaletteTimer
 	sta <zBossBehaviour
@@ -329,7 +328,7 @@ Rockman_Warp_to_Land:
 	lda aObjY
 	adc #$10
 	sta aObjY
-	cmp #$30
+	cmp <zContinuePointY
 	bcc .skip
 	sta <$0A
 	jsr PickupBlock

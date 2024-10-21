@@ -30,9 +30,11 @@
 0F24-0F2F graphics loading ptr
 0F30-0F3B graphics loading amount
 0F3C-0F47 graphics loading address
-0F48-0FFD graphics loading table
+0F48-0FFB graphics loading table
+0FFC spawn position Y
+0FFD spawn position Y (wily stage)
 0FFE spawn position
-0FFF spawn position(wily stage)
+0FFF spawn position (wily stage)
 
 1000-1FFF enemies graphics
 2000-2FFF stage graphics(compressed)
@@ -88,6 +90,8 @@ Y and 0F > 0のとき:
   X座標の下2bit → 横方向のスクロールを制限する（上半分、下半分）
   Y座標の下2bit → 縦方向のスクロールを制限する（左半分、右半分）
 8F 中間ポイントの設定
+  X座標の下4bit → 復活時パレットアニメーション始点
+  Y座標の下4bit → 復活縦位置（0x10単位で指定）
 90～AF 空き
 B0～BF シャッター高さの設定
 C0～FF スクロール移動先の設定

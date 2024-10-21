@@ -197,6 +197,7 @@ zBossRushProg = $BC     ;ボスラッシュの進行状況
 zNoDamage = $BD         ;当たり判定無効フラグ
 
 zRestartTitle = $BE     ;タイトルスクリーンの時間切れで1
+zContinuePointY = $BE   ;ワープ棒降下時このY座標未満で着地判定をしない
 
 zTitleScreenWaitlo = $C0;タイトル画面の待ち時間
 zTitleScreenWaithi = $C1;タイトル画面の待ち時間
@@ -602,10 +603,10 @@ Stage_LoadGraphicsPtr = $8F20 + 4 + $18
 ;敵画像読み込みセット
 Stage_LoadGraphics = $8F48
 
-;ステージ開始位置定義
-Stage_BeginPoint = $8FE0 - 2
-;ワイリーステージ開始位置定義
-Stage_BeginPointWily = $8FE0 - 1
+Stage_BeginPointY     = $8FE0 - 4 ;ステージ開始時降下Y座標
+Stage_BeginPointYWily = $8FE0 - 3 ;ワイリーステージ開始時降下Y座標
+Stage_BeginPoint      = $8FE0 - 2 ;ステージ開始位置定義
+Stage_BeginPointWily  = $8FE0 - 1 ;ワイリーステージ開始位置定義
 
 ;画像セット定義
 Stage_DefGraphics = $8FE0

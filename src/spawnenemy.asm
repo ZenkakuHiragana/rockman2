@@ -226,8 +226,17 @@ SpawnEnemy_SendCommand:
 .2
 	cmp #$0F ;敵番号8F: 中間ポイントの設定
 	bne .3
-	ldy <.room
-	sty <zContinuePoint
+	mMOV <.room, <zContinuePoint
+	lda Stage_DefEnemiesY - 1,y
+	and #$0F
+	asl a
+	asl a
+	asl a
+	asl a
+	sta <zContinuePointY
+	lda Stage_DefEnemiesX - 1,y
+	and #$0F
+	sta <zPaletteOffset
 	rts
 .3
 	cmp #$0E ;敵番号8E: スクロール制限の開始
@@ -284,7 +293,7 @@ SpawnEnemiesAll:
 	bne .loop_item
 ;敵の出現
 .skip_item
-	sta <$70
+	; sta <$70
 	ldy <zRoom
 	sty <.room
 	ldx Stage_DefMap16,y
