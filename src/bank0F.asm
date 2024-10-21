@@ -614,12 +614,23 @@ LoadStageGraphics:
 	lda <zStage
 	and #$07
 	jsr ChangeBank
-	mMOV #$A0, <.ptrhi
+	lda <zStage
+	and #$08
+	ora #$A0
+	sta <.ptrhi
 	jsr LoadGraphicsLZ77
 ;パレット書き込み
 	ldy #$21
 .loop_palette
-	mMOV Stage_Palette - 2,y, aPalette - 2,y
+	lda <zStage
+	and #$08
+	bne .wily
+	lda Stage_Palette - 2,y
+	bpl .write
+.wily
+	lda Stage_PaletteWily - 2,y
+.write
+	sta aPalette - 2,y
 	dey
 	bpl .loop_palette
 	jsr WritePalette

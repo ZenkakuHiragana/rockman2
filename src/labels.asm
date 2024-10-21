@@ -589,10 +589,10 @@ Stage_Palette = $8DA0 + 2
 ;パレットアニメーション定義
 Stage_PaletteAnim = $8DC0 + 2
 
-Stage_PaletteAnimNumWily = $8E40 + 2
-Stage_PaletteAnimWaitWily = $8E40 + 3
-Stage_PaletteWily = $8E40 + 4
-Stage_PaletteAnimWily = $8E60 + 4
+Stage_PaletteAnimNumWily = $8E60 + 2
+Stage_PaletteAnimWaitWily = $8E60 + 3
+Stage_PaletteWily = $8E60 + 4
+Stage_PaletteAnimWily = $8E80 + 4
 
 ;敵画像読み込みセット読み込み開始位置
 Stage_LoadGraphicsOrg = $8F20 + 4
