@@ -997,8 +997,9 @@ EN13:
 ;9C90
 ;レーザー出現
 EN14:
-	rts
-	lda aObjRoom,x
+	ldy aObjRoom,x
+	jsr GetScreenIndex
+	lda <$00
 	sbc #$03
 	tay
 	lda .lasernum,y
@@ -1032,7 +1033,7 @@ EN14:
 	lsr aObjFlags,x
 	lda #$00
 	sta aEnemyOrder,x
-	rts
+	jmp CheckOffscreenEnemy
 .lasernum
 	.db $02, $03, $04, $00, $00, $00, $00, $00
 	.db $00, $0C, $0A, $05, $05, $02, $05, $04
@@ -1075,15 +1076,33 @@ EN14:
 ;9DCE
 ;レーザー
 EN15:
+	lda aObjRoom,x
+	lsr a
+	lsr a
+	lsr a
+	lsr a
+	sta <$00
+	lda <zRoom
+	lsr a
+	lsr a
+	lsr a
+	lsr a
+	sta <$01
+	lda aObjY,x
+	sbc #$08
+	sbc <zVScroll
+	lda <$00
+	sbc <$01
+	bcs .onscreen
+	lsr aObjFlags,x
+.rts
+	rts
+.onscreen
 	lda aObjVar,x
 	beq .do
 	dec aObjVar,x
-	beq .fire
-	rts
-.fire
-	lda aObjFlags,x
-	and #%11011111
-	sta aObjFlags,x
+	bne .rts
+	mAND aObjFlags,x, #%11011111
 	mPLAYTRACK #$27
 .do
 	lda aObjFlags,x
@@ -1101,26 +1120,21 @@ EN15:
 	cmp aEnemyVar,x
 	bcc .continue
 .stop
-	lda aEnemyVar,x
-	sta aObjX,x
-	lda aObjFlags,x
-	ora #%00100000
-	sta aObjFlags,x
+	mMOV aEnemyVar,x, aObjX,x
+	mORA aObjFlags,x, #%00100000
 	bne .checkhit
 .continue
-	lda aObjRoom,x
-	sta <$09
-	lda aObjX,x
-	sta <$08
-	lda aObjY,x
-	and #$F0
-	sta <$0A
+	lda <zPPULinear
+	bne .checkhit
+	mMOV aObjRoom,x, <$09
+	mMOV aObjX,x, <$08
+	mAND aObjY,x, #$F0, <$0A
 	jsr SetPPUPos
-	ldy #$74
+	ldy #$3A
 	lda aPPULaserlo,x
-	and #$01
-	beq .left
-	ldy #$76
+	lsr a
+	bcc .left
+	iny
 .left
 	tya
 	sta aPPULaserData,x
@@ -1134,6 +1148,9 @@ EN15:
 	sta aObjFlags,x
 .checkhit
 	lda <zInvincible
+	bne .done
+	lda aObjRoom,x
+	cmp aObjRoom
 	bne .done
 	sec
 	lda aObjY,x
@@ -1156,8 +1173,7 @@ EN15:
 	cmp aObjX
 	bcc .done
 .hit
-	lda #$00
-	sta <zStatus
+	mSTZ <zStatus
 	jmp DieRockman
 .done
 	rts

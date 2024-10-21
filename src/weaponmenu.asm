@@ -34,13 +34,9 @@
 	lda <zStage
 	cmp #$04
 	bne .not_quickman_stage
-	lda <zScrollNumber
-	cmp #$03
-	bcc .not_quickman_stage
-	cmp #$0F
+	lda #$15
+	jsr FindObject
 	bcs .not_quickman_stage
-	cmp #$07
-	beq .not_quickman_stage
 	ldx #$0F
 	txa
 .loop_blackout_quickman

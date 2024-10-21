@@ -490,7 +490,7 @@ WritePPULaser:
 	lda aPPULaserData - 1,y
 	sta $2007
 	clc
-	adc #$01
+	adc #$10
 	sta $2007
 	dey
 	bne .loop
