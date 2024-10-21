@@ -2507,7 +2507,7 @@ WallCollisionY:
 	adc #$10 - 1
 	sta <.y
 	tya
-	adc #$10
+	adc #$10 - 1
 	tay
 .skip_addy
 	jmp .merge_y

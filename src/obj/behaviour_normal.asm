@@ -2841,50 +2841,48 @@ EN36:
 EN37:
 	lda aObjVXlo,x
 	bne .do
+	mMOV aObjY,x, aObjVYlo,x
 	lda #$37
 	jsr Spawner_Check
-	bcc .do
-	rts
+	bcs .rts
 .do
-	lda aObjX
-	sta aObjX,x
-	lda aObjRoom
-	sta aObjRoom,x
+	mMOV aObjX, aObjX,x
+	mMOV aObjY, aObjY,x
+	mMOV aObjRoom, aObjRoom,x
 	lda aObjVar,x
 	bne .wait
-	lda #$BB
-	sta aObjVar,x
-	lda #$01
-	sta <$01
+	mMOV #$BB, aObjVar,x
+	mMOV #$01, <$01
 	lda #$38
 	jsr FindObjectsA
 	bcs .wait
-	lda #$02
-	sta <$01
+	mMOV #$02, <$01
 	lda #$3C
 	jsr FindObjectsA
 	bcs .wait
 	lda #$38
 	jsr CreateEnemyHere
 	bcs .wait
+	mMOV <zRoom, aObjRoom10,y
+	mADD <zVScroll, aObjVYlo,x, aObjY10,y
+	bcc .carry
+	adc #$10 - 1
+	sta aObjY10,y
+	mADD <zRoom, #$10, aObjRoom10,y
+.carry
 	ldx #$00
-	lda aObjFlags
-	and #%01000000
-	bne .right
+	bit aObjFlags
+	bvs .right
 	inx
 .right
-	lda .flags,x
-	sta aObjFlags10,y
+	mMOV .flags,x, aObjFlags10,y
 	clc
-	lda <zHScroll
-	adc .d,x
-	sta aObjX10,y
-	lda <zRoom
-	adc #$00
-	sta aObjRoom10,y
+	mADD <zHScroll, .d,x, aObjX10,y
+	mADD aObjRoom10,y, #$00
 .wait
 	ldx <zObjIndex
 	dec aObjVar,x
+.rts
 	rts
 .d
 	.db $F8, $08
@@ -2920,13 +2918,14 @@ EN38:
 	ldy aEnemyVar,x
 	dey
 	clc
-	lda aObjY,x
-	adc #$10
+	mMOV aObjX,x, aObjX10,y
+	mMOV aObjRoom,x, aObjRoom10,y
+	mADD aObjY,x, #$10, aObjY10,y
+	bcc .carry
+	adc #$10 - 1
 	sta aObjY10,y
-	lda aObjX,x
-	sta aObjX10,y
-	lda aObjRoom,x
-	sta aObjRoom10,y
+	mADD aObjRoom10,y, #$10
+.carry
 	lda <$00
 	cmp #$30
 	bcc .near
@@ -2954,8 +2953,10 @@ EN38:
 	bcc .rts
 	ldy aEnemyVar,x
 	dey
-	lda #$00
-	sta aObjFlags10,y
+	lda aObjAnim,y
+	cmp #$3A
+	bne .rts
+	mSTZ aObjFlags10,y
 .rts
 	rts
 
