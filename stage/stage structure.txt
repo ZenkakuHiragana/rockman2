@@ -22,11 +22,11 @@
 0DA0 the number of the palette animation frames
 0DA1 palette animation wait
 0DA2-0DC1 palettes(default)
-0DC2-0E41 palette animation
-0E42 the number of the wily stage's palette animation frames
-0E43 wily stage's palette animation wait
-0E44-0E63 palettes(wily stage)
-0E64-0F23 palette animation(wily stage)
+0DC2-0E61 palette animation
+0E62 the number of the wily stage's palette animation frames
+0E63 wily stage's palette animation wait
+0E64-0E83 palettes(wily stage)
+0E84-0F23 palette animation(wily stage)
 0F24-0F2F graphics loading ptr
 0F30-0F3B graphics loading amount
 0F3C-0F47 graphics loading address

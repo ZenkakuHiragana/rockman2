@@ -91,21 +91,13 @@ StartStage_FillingEnergy:
 ;8091
 ;武器エネルギー回復処理を飛ばしてステージ開始
 StartStage_NoEnergyRegen:
-	ldx #$00
-	lda <zStage
-	and #$08
-	beq .notcastle
-	ldx #$03
-.notcastle
-	stx <zContinuePoint
 	lda #$14
 	ldx #$1F
 .itemloop
 	sta aItemLife,x
 	dex
 	bpl .itemloop
-	lda #$00
-	sta <zBossRushProg
+	mSTZ <zBossRushProg, <zContinuePoint
 ;80AB
 ;死亡時のコンティニュー位置
 StartStage_Continue:

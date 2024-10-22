@@ -72,27 +72,29 @@ Public Class Form1
     Const SizeBG As UInteger = &H1000
     Const SizeRoom As UInteger = &H1000
 
-    Const AddrTile16x16 As UInteger = &H0       '16x16グラ定義
-    Const AddrChip32x32 As UInteger = &H200     '32x32グラ定義
-    Const AddrAttr32x32 As UInteger = &H600     '属性テーブル, 配色
-    Const AddrFlag32x32 As UInteger = &H700     '地形判定フラグ
-    Const AddrMaps16x16 As UInteger = &H900     'マップの配置
-    Const AddrEnemiesX As UInteger = &HA00      '敵配置X
-    Const AddrEnemiesY As UInteger = &HAC0      '敵配置Y
-    Const AddrEnemies As UInteger = &HB80       '敵の種類
-    Const AddrEnemiesPtr As UInteger = &HC40    '画面ごとの敵配置ポインタ
-    Const AddrEnemiesAmount As UInteger = &HC80 '画面ごとの敵配置量
-    Const AddrItemsX As UInteger = &HCC0        'アイテム配置X
-    Const AddrItemsY As UInteger = &HCE0        'アイテム配置Y
-    Const AddrItems As UInteger = &HD00         'アイテムの種類
-    Const AddrItemsPtr As UInteger = &HD20      '画面ごとのアイテム配置ポインタ
-    Const AddrItemsAmount As UInteger = &HD60   '画面ごとのアイテム配置量
-    Const PaletteAnimFrames As UInteger = &HDA0 'パレットアニメーション枚数
-    Const PaletteAnimWait As UInteger = &HDA1   'パレットアニメーション待ち
-    Const PaletteAddr As UInteger = &HDA2       'パレット
-    Const PaletteAnimAddr As UInteger = &HDC2   'パレットアニメーション定義(8x)
-    'Const AddrContinue As UInteger = &HE80      '中間地点定義
-    'F00-FFF free
+    Const AddrTile16x16 As UInteger = &H0           '16x16グラ定義
+    Const AddrChip32x32 As UInteger = &H200         '32x32グラ定義
+    Const AddrAttr32x32 As UInteger = &H600         '属性テーブル, 配色
+    Const AddrFlag32x32 As UInteger = &H700         '地形判定フラグ
+    Const AddrMaps16x16 As UInteger = &H900         'マップの配置
+    Const AddrEnemiesX As UInteger = &HA00          '敵配置X
+    Const AddrEnemiesY As UInteger = &HAC0          '敵配置Y
+    Const AddrEnemies As UInteger = &HB80           '敵の種類
+    Const AddrEnemiesPtr As UInteger = &HC40        '画面ごとの敵配置ポインタ
+    Const AddrEnemiesAmount As UInteger = &HC80     '画面ごとの敵配置量
+    Const AddrItemsX As UInteger = &HCC0            'アイテム配置X
+    Const AddrItemsY As UInteger = &HCE0            'アイテム配置Y
+    Const AddrItems As UInteger = &HD00             'アイテムの種類
+    Const AddrItemsPtr As UInteger = &HD20          '画面ごとのアイテム配置ポインタ
+    Const AddrItemsAmount As UInteger = &HD60       '画面ごとのアイテム配置量
+    Const PaletteAnimFrames As UInteger = &HDA0     'パレットアニメーション枚数
+    Const PaletteAnimWait As UInteger = &HDA1       'パレットアニメーション待ち
+    Const PaletteAddr As UInteger = &HDA2           'パレット
+    Const PaletteAnimAddr As UInteger = &HDC2       'パレットアニメーション定義(0x0A)
+    Const PaletteAnimFramesWily As UInteger = &HE62 'ワイリー用パレットアニメーション枚数
+    Const PaletteAnimWaitWily As UInteger = &HE63   'ワイリー用パレットアニメーション待ち
+    Const PaletteAddrWily As UInteger = &HE64       'ワイリー用パレット
+    Const PaletteAnimAddrWily As UInteger = &HE84   'ワイリー用パレットアニメーション定義(0x0A)
 
     Const AddrBG As UInteger = &H2000       'BG画像位置
     Const AddrRoom As UInteger = &H3000     '画面定義
@@ -103,6 +105,8 @@ Public Class Form1
     Dim testfile(&H4000) As Byte
     ''' <summary>非圧縮の背景画像を格納する配列です。</summary>
     Dim bg(SizeBG) As Byte
+    ''' <summary>非圧縮のワイリーステージ用背景画像を格納する配列です。</summary>
+    Dim bgalt(SizeBG) As Byte
     ''' <summary>16x16タイル定義のバッファを格納する配列です。</summary>
     Dim tile(SizeTile16x16) As Byte
     ''' <summary>32x32タイル定義のバッファを格納する配列です。</summary>
@@ -168,6 +172,10 @@ Public Class Form1
     Dim ChrFilePath As String
     ''' <summary>CHRファイルの最終書き込み日時です。</summary>
     Dim ChrTimeStamp As Date
+    ''' <summary>ワイリーステージ用CHRファイルのパスです。</summary>
+    Dim AltChrFilePath As String
+    ''' <summary>ワイリーステージ用CHRファイルの最終書き込み日時です。</summary>
+    Dim AltChrTimeStamp As Date
     ''' <summary>共有CHRファイルのパスです。</summary>
     Dim CommonChrFilePath As String
     ''' <summary>共有CHRファイルの最終書き込み日時です。</summary>
@@ -178,6 +186,25 @@ Public Class Form1
     Dim ClipScr, Clip32, Clip16 As UInteger
     ''' <summary>Undoデータの記憶</summary>
     Dim UndoBuffer As New ArrayList
+
+    Private Sub LoadPalette()
+        Dim wily As Boolean = WilyToolStripMenuItem.Checked
+        Dim frames As UInteger = If(wily, PaletteAnimFramesWily, PaletteAnimFrames)
+        Dim wait As UInteger = If(wily, PaletteAnimWaitWily, PaletteAnimWait)
+        Dim addr As UInteger = If(wily, PaletteAddrWily, PaletteAddr)
+        Dim anim As UInteger = If(wily, PaletteAnimAddrWily, PaletteAnimAddr)
+        numpalanim = testfile(frames)
+        palwait = testfile(wait)
+        SyncLock palette
+            For i As UInteger = 0 To 16 - 1
+                palette(i) = testfile(addr + i)
+            Next
+        End SyncLock
+
+        For i As UInteger = 0 To SizePaletteAnim - 1
+            palanim(i) = testfile(anim + i)
+        Next
+    End Sub
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         For i As UInteger = 0 To &H4000 - 1
@@ -294,6 +321,7 @@ Public Class Form1
 
             For i As UInteger = 0 To SizeCommonChr
                 bg(i) = b(i)
+                bgalt(i) = b(i)
             Next
         Catch ex As DirectoryNotFoundException
         Catch ex As FileNotFoundException
@@ -322,7 +350,7 @@ Public Class Form1
             Exit Sub
         End If
 
-        If Not TimerStats Is Nothing Then TimerStats.Dispose()
+        If TimerStats IsNot Nothing Then TimerStats.Dispose()
 
         Try
             Dim f As New FileStream(path, FileMode.Open, FileAccess.ReadWrite)
@@ -357,6 +385,23 @@ Public Class Form1
         End Try
         ChrTimeStamp = File.GetLastWriteTime(ChrFilePath)
 
+        AltChrFilePath = IO.Path.GetDirectoryName(path) & "\chr\" & IO.Path.GetFileNameWithoutExtension(path) & "2.chr"
+        Try
+            Dim f As New FileStream(AltChrFilePath, FileMode.Open, FileAccess.ReadWrite)
+            AltChrTimeStamp = File.GetLastWriteTime(AltChrFilePath)
+            Dim b(f.Length - 1) As Byte
+            f.Read(b, 0, f.Length)
+
+            For i As UInteger = SizeCommonChr To f.Length + SizeCommonChr - 1
+                If i > &H1000 Then Exit For
+                bgalt(i) = b(i - SizeCommonChr)
+            Next
+            f.Close()
+        Catch ex As FileNotFoundException
+            'MessageBox.Show("Wily CHR File not found.", "", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+        End Try
+        AltChrTimeStamp = File.GetLastWriteTime(AltChrFilePath)
+
         For i As UInteger = 0 To SizeTile16x16 - 1
             tile(i) = testfile(AddrTile16x16 + i)
         Next
@@ -379,17 +424,7 @@ Public Class Form1
             map(i) = testfile(AddrMaps16x16 + i)
         Next
 
-        numpalanim = testfile(PaletteAnimFrames)
-        palwait = testfile(PaletteAnimWait)
-        SyncLock palette
-            For i As UInteger = 0 To 16 - 1
-                palette(i) = testfile(PaletteAddr + i)
-            Next
-        End SyncLock
-
-        For i As UInteger = 0 To SizePaletteAnim - 1
-            palanim(i) = testfile(PaletteAnimAddr + i)
-        Next
+        LoadPalette()
 
         For i As UInteger = 0 To SizeEnemies
             enemiesx(i) = testfile(AddrEnemiesX + i)
@@ -706,7 +741,9 @@ Public Class Form1
 
         'p = 0～7
         selected = p.X * 8 + p.Y 'selected = 0～31
-        numroom = map((ViewOrigin.Y + quad.Y) * 16 + ViewOrigin.X + quad.X)
+        Dim X As Integer = ViewOrigin.X + quad.X
+        Dim Y As Integer = ViewOrigin.Y + quad.Y
+        numroom = map((Y * &H10 + X) Mod &H100)
         roomptr = numroom * &H40 + selected
 
         '位置情報を取得したら、選択や書き込みなどの処理へ
@@ -737,6 +774,8 @@ Public Class Form1
                     Next
 
                     AddUndo(numroom, UndoData, AddressOf UndoPasteMap)
+                    DrawScr(scr)
+                    scr.Refresh()
                 ElseIf e.Button = MouseButtons.Right Then
                     ClipScr = numroom
                 End If
@@ -808,7 +847,9 @@ Public Class Form1
 
             'p = 0～7
             selected = p.X * 8 + p.Y 'selected = 0～31
-            numroom = map((ViewOrigin.Y + quad.Y) * 16 + ViewOrigin.X + quad.X)
+            Dim X As Integer = ViewOrigin.X + quad.X
+            Dim Y As Integer = ViewOrigin.Y + quad.Y
+            numroom = map((Y * &H10 + X) Mod &H100)
             roomptr = numroom * &H40 + selected
 
             If numroom < &H40 Then
@@ -1029,7 +1070,7 @@ Public Class Form1
         ElseIf e.Button = MouseButtons.Left Then '書き
             If p.Y = 0 Then
                 a = a And &HF
-                write = write << 4
+                write <<= 4
             Else
                 a = a And &HF0
             End If
@@ -1158,7 +1199,9 @@ Public Class Form1
         If e.Button = MouseButtons.Right Then
             ContextViewOrigin = New Point(Math.Floor(e.X / 256), Math.Floor(e.Y / 256))
             ContextOrigin = New Point(e.X Mod 256, e.Y Mod 256)
-            ContextRoom = map((ViewOrigin.Y + Math.Floor(e.Y / 256)) * 16 + ViewOrigin.X + Math.Floor(e.X / 256))
+            Dim X As Integer = ViewOrigin.X + Math.Floor(e.X / 256)
+            Dim Y As Integer = ViewOrigin.Y + Math.Floor(e.Y / 256)
+            ContextRoom = map((Y * &H10 + X) Mod &H100)
         End If
     End Sub
 
@@ -1371,6 +1414,20 @@ Public Class Form1
             DrawP32Focus(pmapSelect)
             pmapSelect.Refresh()
         End If
+    End Sub
+
+    'ワイリーステージ用画像でマップを表示する切り替えボタン
+    Private Sub WilyToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles WilyToolStripMenuItem.Click
+        WilyToolStripMenuItem.Checked = Not WilyToolStripMenuItem.Checked
+        If WilyToolStripMenuItem.Checked Then
+            WilyToolStripMenuItem.BackColor = SystemColors.ActiveCaption
+        Else
+            WilyToolStripMenuItem.BackColor = SystemColors.Control
+        End If
+
+        LoadPalette()
+        DrawAll()
+        RefreshAll()
     End Sub
 
     '地形/オブジェクト切り替えのラジオボタン

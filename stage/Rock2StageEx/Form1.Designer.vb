@@ -1,9 +1,9 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class Form1
     Inherits System.Windows.Forms.Form
 
     'フォームがコンポーネントの一覧をクリーンアップするために dispose をオーバーライドします。
-    <System.Diagnostics.DebuggerNonUserCode()> _
+    <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
@@ -20,7 +20,7 @@ Partial Class Form1
     'メモ: 以下のプロシージャは Windows フォーム デザイナーで必要です。
     'Windows フォーム デザイナーを使用して変更できます。  
     'コード エディターを使って変更しないでください。
-    <System.Diagnostics.DebuggerStepThrough()> _
+    <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Me.scr = New System.Windows.Forms.PictureBox()
@@ -85,6 +85,7 @@ Partial Class Form1
         Me.画面番号の変更ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.bg_chipinfo = New System.ComponentModel.BackgroundWorker()
         Me.bg_tileinfo = New System.ComponentModel.BackgroundWorker()
+        Me.WilyToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         CType(Me.scr, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.MenuStrip1.SuspendLayout()
         Me.TabControl1.SuspendLayout()
@@ -117,10 +118,10 @@ Partial Class Form1
         '
         'MenuStrip1
         '
-        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.Menu_File, Me.Menu_ShowAll, Me.Menu_ShowPartial, Me.UndoToolStripMenuItem})
+        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.Menu_File, Me.Menu_ShowAll, Me.Menu_ShowPartial, Me.UndoToolStripMenuItem, Me.WilyToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
-        Me.MenuStrip1.Size = New System.Drawing.Size(556, 26)
+        Me.MenuStrip1.Size = New System.Drawing.Size(556, 24)
         Me.MenuStrip1.TabIndex = 1
         Me.MenuStrip1.Text = "MenuStrip1"
         '
@@ -128,44 +129,44 @@ Partial Class Form1
         '
         Me.Menu_File.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.Menu_Open, Me.保存SToolStripMenuItem, Me.Menu_Exit})
         Me.Menu_File.Name = "Menu_File"
-        Me.Menu_File.Size = New System.Drawing.Size(85, 22)
+        Me.Menu_File.Size = New System.Drawing.Size(67, 20)
         Me.Menu_File.Text = "ファイル(&F)"
         '
         'Menu_Open
         '
         Me.Menu_Open.Name = "Menu_Open"
-        Me.Menu_Open.Size = New System.Drawing.Size(119, 22)
+        Me.Menu_Open.Size = New System.Drawing.Size(113, 22)
         Me.Menu_Open.Text = "開く(&O)"
         '
         '保存SToolStripMenuItem
         '
         Me.保存SToolStripMenuItem.Name = "保存SToolStripMenuItem"
-        Me.保存SToolStripMenuItem.Size = New System.Drawing.Size(119, 22)
+        Me.保存SToolStripMenuItem.Size = New System.Drawing.Size(113, 22)
         Me.保存SToolStripMenuItem.Text = "保存(&S)"
         '
         'Menu_Exit
         '
         Me.Menu_Exit.Name = "Menu_Exit"
-        Me.Menu_Exit.Size = New System.Drawing.Size(119, 22)
+        Me.Menu_Exit.Size = New System.Drawing.Size(113, 22)
         Me.Menu_Exit.Text = "終了(&X)"
         '
         'Menu_ShowAll
         '
         Me.Menu_ShowAll.Name = "Menu_ShowAll"
-        Me.Menu_ShowAll.Size = New System.Drawing.Size(68, 22)
+        Me.Menu_ShowAll.Size = New System.Drawing.Size(67, 20)
         Me.Menu_ShowAll.Text = "全部表示"
         '
         'Menu_ShowPartial
         '
         Me.Menu_ShowPartial.Name = "Menu_ShowPartial"
-        Me.Menu_ShowPartial.Size = New System.Drawing.Size(68, 22)
+        Me.Menu_ShowPartial.Size = New System.Drawing.Size(67, 20)
         Me.Menu_ShowPartial.Text = "部分表示"
         '
         'UndoToolStripMenuItem
         '
         Me.UndoToolStripMenuItem.Enabled = False
         Me.UndoToolStripMenuItem.Name = "UndoToolStripMenuItem"
-        Me.UndoToolStripMenuItem.Size = New System.Drawing.Size(68, 22)
+        Me.UndoToolStripMenuItem.Size = New System.Drawing.Size(62, 20)
         Me.UndoToolStripMenuItem.Text = "元に戻す"
         '
         'TabControl1
@@ -227,7 +228,7 @@ Partial Class Form1
         Me.Radio_IsEnemy.Font = New System.Drawing.Font("MS UI Gothic", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
         Me.Radio_IsEnemy.Location = New System.Drawing.Point(3, 3)
         Me.Radio_IsEnemy.Name = "Radio_IsEnemy"
-        Me.Radio_IsEnemy.Size = New System.Drawing.Size(42, 20)
+        Me.Radio_IsEnemy.Size = New System.Drawing.Size(41, 20)
         Me.Radio_IsEnemy.TabIndex = 9
         Me.Radio_IsEnemy.TabStop = True
         Me.Radio_IsEnemy.Text = "敵"
@@ -239,7 +240,7 @@ Partial Class Form1
         Me.Radio_IsItem.Font = New System.Drawing.Font("MS UI Gothic", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
         Me.Radio_IsItem.Location = New System.Drawing.Point(3, 29)
         Me.Radio_IsItem.Name = "Radio_IsItem"
-        Me.Radio_IsItem.Size = New System.Drawing.Size(75, 20)
+        Me.Radio_IsItem.Size = New System.Drawing.Size(74, 20)
         Me.Radio_IsItem.TabIndex = 10
         Me.Radio_IsItem.Text = "アイテム"
         Me.Radio_IsItem.UseVisualStyleBackColor = True
@@ -291,7 +292,7 @@ Partial Class Form1
         Me.Radio_EditEnemies.Font = New System.Drawing.Font("MS UI Gothic", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
         Me.Radio_EditEnemies.Location = New System.Drawing.Point(76, 684)
         Me.Radio_EditEnemies.Name = "Radio_EditEnemies"
-        Me.Radio_EditEnemies.Size = New System.Drawing.Size(127, 20)
+        Me.Radio_EditEnemies.Size = New System.Drawing.Size(126, 20)
         Me.Radio_EditEnemies.TabIndex = 4
         Me.Radio_EditEnemies.Text = "オブジェクト配置"
         Me.Radio_EditEnemies.UseVisualStyleBackColor = True
@@ -303,7 +304,7 @@ Partial Class Form1
         Me.Radio_EditTerrain.Font = New System.Drawing.Font("MS UI Gothic", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
         Me.Radio_EditTerrain.Location = New System.Drawing.Point(76, 658)
         Me.Radio_EditTerrain.Name = "Radio_EditTerrain"
-        Me.Radio_EditTerrain.Size = New System.Drawing.Size(58, 20)
+        Me.Radio_EditTerrain.Size = New System.Drawing.Size(57, 20)
         Me.Radio_EditTerrain.TabIndex = 3
         Me.Radio_EditTerrain.TabStop = True
         Me.Radio_EditTerrain.Text = "地形"
@@ -666,24 +667,24 @@ Partial Class Form1
         '
         Me.ContextMenuStripObj.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.オブジェクトの新規作成ToolStripMenuItem, Me.選択したオブジェクトの削除ToolStripMenuItem, Me.画面番号の変更ToolStripMenuItem})
         Me.ContextMenuStripObj.Name = "ContextMenuStrip1"
-        Me.ContextMenuStripObj.Size = New System.Drawing.Size(233, 70)
+        Me.ContextMenuStripObj.Size = New System.Drawing.Size(201, 70)
         '
         'オブジェクトの新規作成ToolStripMenuItem
         '
         Me.オブジェクトの新規作成ToolStripMenuItem.Name = "オブジェクトの新規作成ToolStripMenuItem"
-        Me.オブジェクトの新規作成ToolStripMenuItem.Size = New System.Drawing.Size(232, 22)
+        Me.オブジェクトの新規作成ToolStripMenuItem.Size = New System.Drawing.Size(200, 22)
         Me.オブジェクトの新規作成ToolStripMenuItem.Text = "オブジェクトの新規作成"
         '
         '選択したオブジェクトの削除ToolStripMenuItem
         '
         Me.選択したオブジェクトの削除ToolStripMenuItem.Name = "選択したオブジェクトの削除ToolStripMenuItem"
-        Me.選択したオブジェクトの削除ToolStripMenuItem.Size = New System.Drawing.Size(232, 22)
+        Me.選択したオブジェクトの削除ToolStripMenuItem.Size = New System.Drawing.Size(200, 22)
         Me.選択したオブジェクトの削除ToolStripMenuItem.Text = "選択したオブジェクトの削除"
         '
         '画面番号の変更ToolStripMenuItem
         '
         Me.画面番号の変更ToolStripMenuItem.Name = "画面番号の変更ToolStripMenuItem"
-        Me.画面番号の変更ToolStripMenuItem.Size = New System.Drawing.Size(232, 22)
+        Me.画面番号の変更ToolStripMenuItem.Size = New System.Drawing.Size(200, 22)
         Me.画面番号の変更ToolStripMenuItem.Text = "画面番号の変更"
         '
         'bg_chipinfo
@@ -691,6 +692,13 @@ Partial Class Form1
         '
         'bg_tileinfo
         '
+        '
+        'WilyToolStripMenuItem
+        '
+        Me.WilyToolStripMenuItem.BackColor = System.Drawing.SystemColors.Control
+        Me.WilyToolStripMenuItem.Name = "WilyToolStripMenuItem"
+        Me.WilyToolStripMenuItem.Size = New System.Drawing.Size(77, 20)
+        Me.WilyToolStripMenuItem.Text = "ワイリー！！"
         '
         'Form1
         '
@@ -794,5 +802,5 @@ Partial Class Form1
     Friend WithEvents 保存SToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents LabelViewOrigin As System.Windows.Forms.Label
     Friend WithEvents UndoToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-
+    Friend WithEvents WilyToolStripMenuItem As ToolStripMenuItem
 End Class

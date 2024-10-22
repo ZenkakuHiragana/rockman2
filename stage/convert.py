@@ -1,5 +1,10 @@
 
 from os.path import abspath, dirname, join
+
+path = 'heatman.bin'
+roomdef_seek = range(0x18, 0x2C)
+
+chip_used = set()
 def convert(byte):
     if (byte & 0x3F) >= 0x18:
         return (byte & 0x3F) - 0x08
@@ -12,12 +17,21 @@ def convert(byte):
     else:
         return 0x00
 
-path = 'crashman.bin'
+roomdef_offset = 0x3000
 start_offset = 0x200
-end_offset = 0x5FF
+end_offset = 0x600
 with open(join(dirname(abspath(__file__)), path), 'r+b') as f:
+    for room in roomdef_seek:
+        f.seek(roomdef_offset + room * 0x40)
+        roomdef = f.read(0x40)
+        for byte in roomdef:
+            chip_used.add(byte)
     f.seek(start_offset)
-    data = f.read(end_offset - start_offset + 1)
-    processed = bytearray(convert(byte) for byte in data)
+    data = f.read(end_offset - start_offset)
+    processed = list(data)
+    for i in range(0x100):
+        if i in chip_used:
+            for j in range(4):
+                processed[i * 4 + j] = convert(processed[i * 4 + j])
     f.seek(start_offset)
-    f.write(processed)
+    f.write(bytearray(processed))

@@ -105,7 +105,7 @@ Partial Public Class Form1
     End Sub
 
     Public Function GetAllControls(ByVal top As Control) As Control()
-        Dim buf As ArrayList = New ArrayList
+        Dim buf As New ArrayList
         For Each c As Control In top.Controls
             buf.Add(c)
             buf.AddRange(GetAllControls(c))
@@ -128,9 +128,10 @@ Partial Public Class Form1
     Private Sub DrawCenterLine(ByVal sender As Object, ByRef g As Graphics)
 
         Dim center As New Point(sender.ClientSize.Width / 2, sender.ClientSize.Height / 2)
-        Dim chain As New Pen(Brushes.Gray, 1)
-        chain.DashStyle = Drawing2D.DashStyle.Custom
-        chain.DashPattern = New Single() {16, 2, 4, 2}
+        Dim chain As New Pen(Brushes.Gray, 1) With {
+            .DashStyle = Drawing2D.DashStyle.Custom,
+            .DashPattern = New Single() {16, 2, 4, 2}
+        }
 
         '32x32 line
         For i As UInteger = 1 To 15
@@ -148,8 +149,8 @@ Partial Public Class Form1
 
     Private Function GetPalette(c As Byte)
         c = c And &H3F
-        Dim cr = Color.FromArgb(255, My.Resources.nes(c * 3), _
-                               My.Resources.nes(c * 3 + 1), _
+        Dim cr = Color.FromArgb(255, My.Resources.nes(c * 3),
+                               My.Resources.nes(c * 3 + 1),
                                My.Resources.nes(c * 3 + 2))
         Return New SolidBrush(cr)
     End Function
@@ -157,17 +158,18 @@ Partial Public Class Form1
     Private Sub Draw8Graph(ByRef g As Graphics, ByRef cur As Point, ByVal a As UInteger, ByVal at As UInteger, ByVal mag As UInteger)
         Dim c, seek As UInteger
         Dim bitmask() As Byte = {&H80, &H40, &H20, &H10, &H8, &H4, &H2, &H1}
+        Dim chosenbg() As Byte = If(WilyToolStripMenuItem.Checked, bgalt, bg)
 
         For x As UInteger = 0 To 7
             For y As UInteger = 0 To 7
                 seek = a * 16 + y
-                c = bg(seek) And bitmask(x)
+                c = chosenbg(seek) And bitmask(x)
                 If c <> 0 Then
                     c = 1
                 End If
 
                 seek += 8
-                If bg(seek) And bitmask(x) Then
+                If chosenbg(seek) And bitmask(x) Then
                     c = c Or 2
                 End If
 
@@ -346,9 +348,10 @@ Partial Public Class Form1
             End SyncLock
 
             Dim center As New Point(sender.ClientSize.Width / 2, sender.ClientSize.Height / 2)
-            Dim chain As New Pen(Brushes.Gray, 1)
-            chain.DashStyle = Drawing2D.DashStyle.Custom
-            chain.DashPattern = New Single() {16, 2, 4, 2}
+            Dim chain As New Pen(Brushes.Gray, 1) With {
+                .DashStyle = Drawing2D.DashStyle.Custom,
+                .DashPattern = New Single() {16, 2, 4, 2}
+            }
 
             '32x32 line
             For i As UInteger = 1 To 7

@@ -610,18 +610,18 @@ LoadStageGraphics:
 
 	mCHANGEBANK #$09
 	mMOV #$80, <.ptrhi
-	jsr LoadGraphicsLZ77
+	jsr LoadGraphicsCompressed
 	lda <zStage
 	and #$07
 	jsr ChangeBank
 	mMOV #$A0, <.ptrhi
-	jsr LoadGraphicsLZ77
+	jsr LoadGraphicsCompressed
 	lda <zStage
 	and #$08
 	beq .8boss
-	iny
+	; iny
 	mMOVWB $1300, $2006, $2006
-	jsr LoadGraphicsLZ77.continue
+	jsr LoadGraphicsCompressed.continue
 .8boss
 ;パレット書き込み
 	ldy #$21
@@ -642,59 +642,11 @@ LoadStageGraphics:
 	;rts
 
 ;背景画像読み込み $0A~$0B から
-LoadGraphicsLZ77:
-.buffer = $300
-.bufferptr = $09
-.ptr = $0A
-.ptrhi = $0B
-.op = $0C
-.amount = $0D
-	ldy #$00
-;ワイリーステージ読み込み用（Y保存）
-.continue .public
-	sty <.bufferptr
-.loop_bg
-	lda [.ptr],y
-	cmp #$FF
-	beq .end
-	sta <.op
-	iny
-	bne .skip_incptr_begin
-	inc <.ptrhi
-.skip_incptr_begin
-	and #$3F
-	sta <.amount
-;連続データ書き込み/非圧縮書き込み
-.loop_continuous
-	bit <.op
-	bvc .write_ptr ;使い回し書き込みの時
-	clc
-	lda <.bufferptr
-	sbc [.ptr],y
-	tax
-	lda .buffer,x
-	jmp .write
-.write_ptr
-	lda [.ptr],y
-.write
-	sta $2007
-	ldx <.bufferptr
-	sta .buffer,x
-	lda <.amount ;連続データ書き込みであっても最後にiny
-	beq .incptr
-	lda <.op ;連続データ書き込みの時、inyを省略
-	bpl .skip_incptr
-.incptr
-	iny
-	bne .skip_incptr
-	inc <.ptrhi
-.skip_incptr
-	inc <.bufferptr ;書き込みバッファ位置 + 1
-	dec <.amount
-	bpl .loop_continuous
-	bmi .loop_bg
-.end
-	rts
+;decompresses a group of tiles from PRG-ROM to CHR-RAM
+LoadGraphicsCompressed:
+	.beginregion "TokumaruDecompressor"
+	.include "src/tokumaru_decompressor.asm"
+	.endregion "TokumaruDecompressor"
 
 ;20 CD C4
 SetContinuePoint:
