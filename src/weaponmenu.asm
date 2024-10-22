@@ -854,7 +854,7 @@
 ;9664
 ;武器グラフィックへのアドレス上位
 .table_weapongraphs_ptr
-	.db $98, $9A, $99, $9C, $98, $98, $9A, $98, $9B, $AF, $AF, $AF
+	.db $98, $9A, $99, $9C, $98, $98, $9A, $98, $9B, $BF, $BF, $BF
 ;9670
 ;カーソル移動可能フラグ
 .table_cursor_allowflag

@@ -3,6 +3,7 @@
 	.incbin "stage/heatman.bin"
 	mBEGINRAW $01, $A000
 	.incbin "stage/chr/lz77/heatman.lz77"
+	.incbin "stage/chr/lz77/wily1.lz77"
 	
 	mBEGIN $01, $8000
 	.incbin "stage/airman.bin"

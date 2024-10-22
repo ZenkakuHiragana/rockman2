@@ -614,11 +614,15 @@ LoadStageGraphics:
 	lda <zStage
 	and #$07
 	jsr ChangeBank
+	mMOV #$A0, <.ptrhi
+	jsr LoadGraphicsLZ77
 	lda <zStage
 	and #$08
-	ora #$A0
-	sta <.ptrhi
-	jsr LoadGraphicsLZ77
+	beq .8boss
+	iny
+	mMOVWB $1300, $2006, $2006
+	jsr LoadGraphicsLZ77.continue
+.8boss
 ;パレット書き込み
 	ldy #$21
 .loop_palette
@@ -637,7 +641,7 @@ LoadStageGraphics:
 	mCHANGEBANK #$0E, 1
 	;rts
 
-;背景画像読み込み
+;背景画像読み込み $0A~$0B から
 LoadGraphicsLZ77:
 .buffer = $300
 .bufferptr = $09
@@ -646,6 +650,8 @@ LoadGraphicsLZ77:
 .op = $0C
 .amount = $0D
 	ldy #$00
+;ワイリーステージ読み込み用（Y保存）
+.continue .public
 	sty <.bufferptr
 .loop_bg
 	lda [.ptr],y
@@ -885,7 +891,7 @@ Table_GraphicsPosition:
 	.db $90, $88
 	.db $90, $90
 	.db $90, $A0
-	.db $99, $AF, $AD, $9F, $99, $AE, $96, $94, $AC, $80, $AC, $84, $9F
+	.db $99, $BF, $BD, $9F, $99, $BE, $96, $94, $AC, $80, $AC, $84, $9F
 	.db $99, $9C, $9D, $9B, $B2, $97, $93, $96, $9C, $9D, $9F, $95, $A4, $B2
 	.db $90, $88, $9F, $8C
 Table_GraphicsAmount:
