@@ -1044,7 +1044,6 @@ DoRockman_BodyMoveX:
 DoRockman_WallCheckX:
 .n = $02
 .blk = $10
-	and #$0F
 	sta <$03
 	lda #$02
 	sta <.n
