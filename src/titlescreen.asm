@@ -278,7 +278,7 @@ Bank0E_Start:
 	beq .loop_goup3
 	jmp Opening_Skipped
 .begin_title
-	lda #$50
+	lda #$40
 	sta <$FD
 	lda #$00
 	sta aPPULinearlo

@@ -1,7 +1,11 @@
 
 
-mBEGIN	.macro
-	.bank \1*2
+mBEGIN .macro
+	.if \2 < $A000 | \2 >= $C000
+	.bank \1 * 2
+	.else
+	.bank \1 * 2 + 1
+	.endif
 	.org \2
 	.endm
 

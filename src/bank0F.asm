@@ -548,63 +548,44 @@ DoPaletteAnimation:
 .isnoanim
 	rts
 
-
 ;20 5D C4
 LoadStageGraphics:
 .ptr = $0A
 .ptrlo = $0A
 .ptrhi = $0B
-	mCHANGEBANK #$00
-	lda #$90
-	sta <.ptrhi
-	ldy #$00
-	sty <.ptr
-	sty $2006
-	sty $2006
-;ロックマン画像読み込み
-.loop_rockman
-	mMOV [.ptr],y, $2007
-	iny
-	bne .loop_rockman
-	inc <.ptrhi
-	lda <.ptrhi
-	cmp #$9A
-	bcc .loop_rockman
+	mMOV #$90, <.ptrhi
+	mSTZ <.ptr, $2006, $2006
+	jsr ChangeBank ;A = 00
+	jsr LoadGraphicsCompressed ;ロックマン画像読み込み
 
 ;敵キャラ画像読み込み
 	lda <zStage
 	and #$07
 	jsr ChangeBank
-	ldx #$00
-	stx <.ptr
 	lda <zStage
 	and #$08
-	beq .is8bosses
-	ldx #$10
-.is8bosses
-	lda Stage_DefGraphics,x
-	sta <$00
+	asl a
+	tax ; X = #$00 (8 bosses), #$10 (wily)
+	mMOV Stage_DefGraphics,x, <$00
 	ldy #$00
 .loop_graphics
 	lda <zStage
 	and #$07
 	jsr ChangeBank
 	inx
-	lda Stage_DefGraphics,x
-	sta <$01
+	mMOV Stage_DefGraphics,x, <$01
 	inx
-	lda Stage_DefGraphics,x
-	sta <.ptrhi
+	mMOV Stage_DefGraphics,x, <.ptrhi
 	inx
 	lda Stage_DefGraphics,x
 	jsr ChangeBank
-.loop_gr
+.loop
 	mMOV [.ptr],y, $2007
 	iny
-	bne .loop_gr
+	bne .loop
 	inc <.ptrhi
 	dec <$01
-	bne .loop_gr
+	bne .loop
 	dec <$00
 	bne .loop_graphics
 
@@ -619,7 +600,6 @@ LoadStageGraphics:
 	lda <zStage
 	and #$08
 	beq .8boss
-	; iny
 	mMOVWB $1300, $2006, $2006
 	jsr LoadGraphicsCompressed.continue
 .8boss
@@ -639,7 +619,6 @@ LoadStageGraphics:
 	bpl .loop_palette
 	jsr WritePalette
 	mCHANGEBANK #$0E, 1
-	;rts
 
 ;背景画像読み込み $0A~$0B から
 ;decompresses a group of tiles from PRG-ROM to CHR-RAM
@@ -647,6 +626,16 @@ LoadGraphicsCompressed:
 	.beginregion "TokumaruDecompressor"
 	.include "src/tokumaru_decompressor.asm"
 	.endregion "TokumaruDecompressor"
+
+;バンクXに切り替えて圧縮画像読み込み
+LoadGraphicsCompressedAnyBank:
+	lda <zBank
+	pha
+	txa
+	jsr ChangeBank
+	jsr LoadGraphicsCompressed
+	pla
+	jmp ChangeBank
 
 ;20 CD C4
 SetContinuePoint:
@@ -689,7 +678,7 @@ BeginTitleScreen:
 
 ;20 65 C5
 ;ステージセレクト処理の開始
-ChangeBank_DoStageSelect
+ChangeBank_DoStageSelect:
 	mCHANGEBANK #$0D
 	jsr Bank0D_BeginStageSelect
 	mCHANGEBANK #$0E, 1
@@ -777,24 +766,34 @@ LoadBossBG:
 ;20 28 C6
 ;バンクAに切り替えて、[zPtr]からのテーブルを$400バイトPPUへ書き込み
 ;ネームテーブル書き換え用かな
-LoadScreenData:
-	jsr ChangeBank
-	mSTZ <zPtrlo
-	ldx #$04
-.loop
-	mMOV [zPtr],y, $2007
-	iny
-	bne .loop
-	inc <zPtrhi
-	dex
-	bne .loop
-	mCHANGEBANK #$0D, 1
-	;rts
+; LoadScreenData:
+; 	jsr ChangeBank
+; 	mSTZ <zPtrlo
+; 	ldx #$04
+; .loop
+; 	mMOV [zPtr],y, $2007
+; 	iny
+; 	bne .loop
+; 	inc <zPtrhi
+; 	dex
+; 	bne .loop
+; 	mCHANGEBANK #$0D, 1
 
 ;20 44 C6
 LoadGraphicsSet:
 	sta <$00
 	tax
+	cmp #$04
+	bcs .original
+	mCHANGEBANK Table_CompressedGraphicsBank,x
+	mMOV Table_CompressedGraphics_lo,x, <$0A
+	mMOV Table_CompressedGraphics_hi,x, <$0B
+	mSTZ $2006, $2006
+	jsr LoadGraphicsCompressed
+	mMOVWB $1000, $2006, $2006
+	jsr LoadGraphicsCompressed.continue
+	mCHANGEBANK #$0D, 1
+.original
 	mMOV Table_GraphicsSetNum,x, <$01
 	mMOV Table_GraphicsBeginPointer,x, <$02
 	mSTZ <zPtrlo, $2006, $2006
@@ -817,6 +816,21 @@ LoadGraphicsSet:
 	mCHANGEBANK #$0D, 1
 	;rts
 
+Table_CompressedGraphicsBank:
+	.db BANK(Graphics_StageSelect) / 2
+	.db BANK(Graphics_WilyCastle) / 2
+	.db BANK(Graphics_Opening) / 2
+	.db BANK(Graphics_Password) / 2
+Table_CompressedGraphics_lo:
+	.db LOW(Graphics_StageSelect)
+	.db LOW(Graphics_WilyCastle)
+	.db LOW(Graphics_Opening)
+	.db LOW(Graphics_Password)
+Table_CompressedGraphics_hi:
+	.db HIGH(Graphics_StageSelect)
+	.db HIGH(Graphics_WilyCastle)
+	.db HIGH(Graphics_Opening)
+	.db HIGH(Graphics_Password)
 Table_GraphicsSetNum:
 	.db $02, $02, $02, $0D, $0E, $04
 Table_GraphicsBeginPointer:
@@ -827,15 +841,15 @@ Table_GraphicsBeginPointer:
 	.db LOW(Table_GraphicsBank.4 - Table_GraphicsBank)
 	.db LOW(Table_GraphicsBank.5 - Table_GraphicsBank)
 Table_GraphicsBank:
-.0 .public
+.0 .public ;ステージセレクト
 	.db $05, $08
-.1 .public
+.1 .public ;ワイリー城入場
 	.db $06, $09
-.2 .public
+.2 .public ;オープニング
 	.db $06, $09
-.3 .public
+.3 .public ;パスワード画面
 	.db $00, $00, $00, $07, $07, $00, $02, $02, $09, $08, $09, $08, $09
-.4 .public
+.4 .public ;エンディング
 	.db $03, $03, $04, $04, $06, $04, $05, $05, $05, $07, $07, $02, $08, $07
 .5 .public
 	.db $05, $08, $09, $08
@@ -843,11 +857,11 @@ Table_GraphicsPosition:
 	.db $90, $88
 	.db $90, $90
 	.db $90, $A0
-	.db $99, $BF, $BD, $9F, $99, $BE, $96, $94, $AC, $80, $AC, $84, $9F
+	.db $99, $98, $96, $9F, $99, $97, $96, $94, $AC, $80, $AC, $84, $9F
 	.db $99, $9C, $9D, $9B, $B2, $97, $93, $96, $9C, $9D, $9F, $95, $A4, $B2
 	.db $90, $88, $9F, $8C
 Table_GraphicsAmount:
-	.db $10, $10
+	.db $10, $0C
 	.db $10, $10
 	.db $10, $10
 	.db $03, $05, $01, $01, $01, $01, $01, $01, $02, $04, $02, $04, $06
@@ -893,7 +907,7 @@ WriteTableToPPULinear:
 	mCHANGEBANK #$0D, 1
 
 ;20 5D C7
-Unknown_C75D:
+LoadWeaponMenuGraphics:
 	mMOV <$FD, <zPtrhi
 	lda #$00
 	lsr <zPtrhi

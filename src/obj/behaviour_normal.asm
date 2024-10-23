@@ -3900,51 +3900,46 @@ EN4E:
 ;B421
 ;スナイパージョー
 EN4F:
+	lda aObjVY,x ;画面上から出現すると消えるので対策
+	bmi .do
+	lda aObjY,x
+	sbc <zVScroll
+	cmp #$08
+	bcs .do
+	mMOV #$FF, aObjVY,x
+.do
 	jsr FaceTowards
-	lda #$00
-	sta aObjWait,x
-	lda #$0B
-	sta <$01
-	lda #$0C
-	sta <$02
+	ldy #$0B
+	sty <$01
+	iny
+	sty <$02
 	jsr WallCollisionXY
+	lda aObjVar,x
+	sta aObjWait,x
+	bne .wait
 	lda aObjFrame,x
 	bne .shooting
-	lda #$00
-	sta aObjFrame,x
-	lda aObjVar,x
-	bne .wait
 	inc aObjFrame,x
-	lda #$1F
-	sta aObjVar,x
-	lda aObjFlags,x
-	and #%11110111
-	sta aObjFlags,x
+	mAND aObjFlags,x, #%11110111
+	bne .continue_shooting
 .shooting
-	lda aObjVar,x
-	bne .wait
 	mPLAYTRACK #$25
 	lda #$35
 	jsr CreateEnemyHere
 	bcs .overflow
-	lda #$02
-	sta aObjVX10,y
+	mMOV #$02, aObjVX10,y
 .overflow
 	inc aEnemyVar,x
 	lda aEnemyVar,x
 	cmp #$03
-	bne .continue
-	lda #$00
-	sta aEnemyVar,x
-	sta aObjFrame,x
+	bne .continue_shooting
+	mSTZ aEnemyVar,x, aObjFrame,x
+	mORA aObjFlags,x, #%00001000
 	lda #$7E
-	sta aObjVar,x
-	lda aObjFlags,x
-	ora #%00001000
-	sta aObjFlags,x
-	bne .wait
-.continue
+	bne .end
+.continue_shooting
 	lda #$1F
+.end
 	sta aObjVar,x
 .wait
 	dec aObjVar,x

@@ -137,7 +137,7 @@
 	inc <zPPUSqr
 	ldy #$9A
 	ldx #$00
-	jsr Unknown_C75D ;---------------
+	jsr LoadWeaponMenuGraphics
 	jsr FrameAdvance1A
 	ldx <$FD
 	inx
@@ -146,7 +146,7 @@
 	stx <$FD
 	ldy #$9A
 	ldx #$00
-	jsr Unknown_C75D
+	jsr LoadWeaponMenuGraphics
 	lda #$00
 	sta <$FE
 	sta <$FF
@@ -324,31 +324,26 @@
 	cmp #$08
 	bcs .loadrockmangraphs
 	ldx <zEquipment
-	.ifndef ___OPTIMIZE
-	lda .table_weapongraphs_ptr,x
-	tay
-	.else
 	ldy .table_weapongraphs_ptr,x
-	.endif
 	cpx #$09
 	bcs .isnotweapon
 	ldx #$05
 	bne .loadweapongraphs
 .loadrockmangraphs
-	ldy #$90
+	ldy #$95
 .isnotweapon
 	ldx #$00
 .loadweapongraphs
-	jsr Unknown_C75D
+	jsr LoadWeaponMenuGraphics
 	jsr FrameAdvance1A
 	ldx <$FD
 	inx
 	cpx #$0F
 	bne .loop_endmenu
 	stx <$FD
-	ldy #$90
+	ldy #$95
 	ldx #$00
-	jsr Unknown_C75D
+	jsr LoadWeaponMenuGraphics
 	jsr ChangeBodyColor
 	jsr FrameAdvance1A
 	pla
@@ -735,9 +730,9 @@
 	rts
 ;9519
 ;なんだろこれ
-.unknown9519
-	.db $2C, $3C, $4C, $5C, $6C, $7C, $8C, $9C
-	.db $3C, $4C, $5C, $6C, $7C, $8C, $9C, $AC
+; .unknown9519
+; 	.db $2C, $3C, $4C, $5C, $6C, $7C, $8C, $9C
+; 	.db $3C, $4C, $5C, $6C, $7C, $8C, $9C, $AC
 ;9529
 ;エネルギー残量のバーを表示
 ;$01に量, $02にY位置
@@ -854,7 +849,7 @@
 ;9664
 ;武器グラフィックへのアドレス上位
 .table_weapongraphs_ptr
-	.db $98, $9A, $99, $9C, $98, $98, $9A, $98, $9B, $BF, $BF, $BF
+	.db $98, $9A, $99, $9C, $98, $98, $9A, $98, $9B, $99, $99, $99
 ;9670
 ;カーソル移動可能フラグ
 .table_cursor_allowflag

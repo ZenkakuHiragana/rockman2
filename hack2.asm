@@ -17,6 +17,7 @@
 	.include "src/lib.asm"
 	.include "src/music/libmusic.asm"
 	.include "stage/stage.asm"
+	.include "src/graphics.asm"
 	.include "src/bank09.asm"
 	.include "src/bank0B.asm"
 	.include "src/bank0C.asm"

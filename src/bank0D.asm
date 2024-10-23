@@ -214,12 +214,10 @@ SelectBoss_AnimateBossIntro:
 LoadNameTable843C:
 	lda #$00
 	jsr LoadGraphicsSet
-	mMOV #$20, $2006
-	ldy #$00
-	sty $2006
-	mMOV #$AE, <$09
-	lda #$0B
-	jsr LoadScreenData
+	mMOVWB $2000, $2006, $2006, <$0A
+	mMOV #HIGH(Table_StageSelectNameTable), <$0B
+	ldx #BANK(Table_StageSelectNameTable) / 2
+	jsr LoadGraphicsCompressedAnyBank
 	ldy #$1F
 .loop2
 	lda Table_Unknown863F,y
@@ -612,7 +610,7 @@ Opening_DrawRockman:
 ;オープニングをスキップした場合ここへ飛ぶ
 Opening_Skipped:
 	jsr DisableScreen1A
-	mMOV #$50, <$FD
+	mMOV #$40, <$FD
 	mSTZ aPPULinearlo, <$FE
 	mMOV #$10, aPPULinearhi
 	mMOV #$B0, <$FF
@@ -822,17 +820,16 @@ Password_DrawCursorStones:
 	tax
 	mMOV Table_PasswordCursorColor,x, aPaletteSpr + 6
 	clc
-	mADD aObjWait, #$24, aSprite + $2C + 1
+	mMOV aObjWait, aSprite + $2C + 1
 	ldx #$00
 	ldy #$40
 .loop_stones
 	lda aObjFlags,x
-	bne .hide
-	lda #$F8
-	bne .write
-.hide
-	lda #$3F
-.write
+	bne .show
+	lda #$0E
+	.db $2C
+.show
+	lda #$19
 	sta aSprite + 1,y
 	iny
 	iny
@@ -948,7 +945,7 @@ Password_InitStones:
 	clc
 	mADD Table_PasswordCursorPositionY,x, #$04, aSprite,y
 	iny
-	mMOV #$0F, aSprite,y
+	mMOV #$0E, aSprite,y
 	iny
 	mSTZ aSprite,y
 	iny
