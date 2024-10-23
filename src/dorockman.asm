@@ -1567,17 +1567,14 @@ DoRockman_CheckLift:
 	lda <zOffscreen
 	bne .done_all
 	sec
-	lda aObjX
-	sbc <zHScroll
-	sta <.x
+	mSUB aObjX, <zHScroll, <.x
 	sec
 	lda aObjY
 	sbc <zVScroll
 	bcs .skip_offsety
 	sbc #$10 - 1
 .skip_offsety
-	clc
-	adc #$0C
+	adc #$0C - 1
 	sta <.y
 	lda <zEquipment
 	cmp #$09
@@ -1607,9 +1604,7 @@ DoRockman_CheckLift:
 ;敵リフト判定開始
 .enemylift
 	sec
-	lda aObjX10,x
-	sbc <zHScroll
-	sta <$0C
+	mSUB aObjX10,x, <zHScroll, <$0C
 	sec
 	sbc <.x
 	bcs .inv_x_enemy
@@ -1618,6 +1613,7 @@ DoRockman_CheckLift:
 .inv_x_enemy
 	cmp aPlatformWidth10,x
 	bcs .done_enemy
+	sec
 	lda aObjY10,x
 	sbc <zVScroll
 	bcs .borrow_enemyy
@@ -1669,9 +1665,7 @@ DoRockman_CheckLift:
 ;アイテム系足場判定開始
 .itemlift
 	sec
-	lda aObjX + 2,x
-	sbc <zHScroll
-	sta <$0C
+	mSUB aObjX + 2,x, <zHScroll, <$0C
 	sec
 	sbc <.x
 	bcs .inv_x_item
@@ -1680,6 +1674,7 @@ DoRockman_CheckLift:
 .inv_x_item
 	cmp aWeaponPlatformW,x
 	bcs .skip_item
+	sec
 	lda aObjY + 2,x
 	sbc <zVScroll
 	bcs .borrow_itemy
@@ -1705,9 +1700,7 @@ DoRockman_CheckLift:
 .item3
 ;Y位置を調整、着地させる
 	sec
-	lda aWeaponPlatformY,x
-	sbc #$0C
-	sta aObjY
+	mSUB aWeaponPlatformY,x, #$0C, aObjY
 	bcs .borrow_itemlift
 	sbc #$10 - 1
 	sta aObjY
@@ -1722,9 +1715,7 @@ DoRockman_CheckLift:
 	mSTZ aObjYlo, aObjVYlo
 	mMOV #$FF, aObjVY
 	mMOV #$01, <zWindFlag
-	lda aObjFlags + 2,x
-	and #$40
-	sta <zWindVec
+	mAND aObjFlags + 2,x, #$40, <zWindVec
 	mMOV aObjVXlo + 2,x, <zWindlo
 	mMOV aObjVX + 2,x, <zWindhi
 	sec
