@@ -1,6 +1,8 @@
 
 	mBEGIN $08, $8000
 	.ds $1400
+	mBEGIN $08, $A400
+	.ds $0C00
 	mBEGIN $08, $8000
 Graphics_StageSelect:
 	.incbin "graphs/toku/stageselect-spr.toku"
@@ -9,6 +11,10 @@ Graphics_StageSelect:
 Graphics_WilyCastle:
 	.incbin "graphs/toku/wilycastle-spr.toku"
 	.incbin "graphs/toku/wilycastle-bg.toku"
+	mBEGIN $08, $A400
+Graphics_Ending:
+	.incbin "graphs/toku/ending.toku"
+
 	
 	mBEGIN $09, $8000
 	.ds $2000
