@@ -322,18 +322,13 @@
 
 	lda <$FD
 	cmp #$08
+	lda #$05
+	ldy #$92
 	bcs .loadrockmangraphs
 	ldx <zEquipment
 	ldy .table_weapongraphs_ptr,x
-	cpx #$09
-	bcs .isnotweapon
-	ldx #$05
-	bne .loadweapongraphs
 .loadrockmangraphs
-	ldy #$95
-.isnotweapon
-	ldx #$00
-.loadweapongraphs
+	tax
 	jsr LoadWeaponMenuGraphics
 	jsr FrameAdvance1A
 	ldx <$FD
@@ -341,8 +336,8 @@
 	cpx #$0F
 	bne .loop_endmenu
 	stx <$FD
-	ldy #$95
-	ldx #$00
+	ldy #$92
+	ldx #$05
 	jsr LoadWeaponMenuGraphics
 	jsr ChangeBodyColor
 	jsr FrameAdvance1A

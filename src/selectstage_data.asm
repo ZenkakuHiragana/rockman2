@@ -105,7 +105,7 @@ Table_Unknown8668:
 ;8671
 Table_SelectBoss_BossSprAddrhi:
 	.db $98, $99, $9A, $9B, $9C, $9D
-	.db $90, $91, $92, $93, $97, $90
+	.db $96, $97, $98, $99, $99, $90
 	.db $AA, $AB, $AC, $AD, $AE, $AF
 	.db $9A, $9B, $9C, $9D, $9E, $9F
 	.db $90, $91, $92, $93, $94, $95
@@ -115,7 +115,7 @@ Table_SelectBoss_BossSprAddrhi:
 ;86A1
 Table_SelectBoss_BossSprAddrBank:
 	.db $06, $06, $06, $06, $06, $06
-	.db $05, $05, $05, $05, $05, $00
+	.db $00, $00, $00, $00, $05, $00
 	.db $02, $02, $02, $02, $02, $02
 	.db $07, $07, $07, $07, $07, $07
 	.db $07, $07, $07, $07, $07, $07

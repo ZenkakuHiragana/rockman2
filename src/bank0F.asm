@@ -908,13 +908,10 @@ LoadWeaponMenuGraphics:
 	sta <zPtrlo
 	lda <$FD
 	cmp #$08
-	bcc .jump
 	lda <zPtrhi
-	jmp .jump2
-.jump
-	lda <zPtrhi
+	bcs .jump
 	adc #$09
-.jump2
+.jump
 	sta aPPULinearhi
 	clc
 	tya
