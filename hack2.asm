@@ -25,3 +25,4 @@
 	.include "src/bank0E.asm"
 	.include "src/bank0F.asm"
 	.include "src/music/music.asm"
+	.include "src/patch.asm"
