@@ -425,18 +425,18 @@ Table_EndingFallingX:
 ;B9CC
 ;降ってくるもののアニメーション定義
 Table_EndingFallingAnimation:
-	.db $0C, $0D, $0E, $0D
-	.db $1B, $1C, $1B, $1C
-	.db $2C, $2D, $2E, $2D
-	.db $3B, $3B, $3B, $3B
+	.db $8C, $8D, $8E, $8D
+	.db $92, $93, $92, $93
+	.db $97, $98, $99, $98
+	.db $9E, $9E, $9E, $9E
 
 ;B9DC
 ;降ってくるものの移り変わる方のアニメーション定義
 Table_EndingFallingAnimation2:
-	.db $1B, $1A, $19, $0F
-	.db $2C, $1F, $1E, $1D
-	.db $3C, $3A, $39, $2F
-	.db $3D, $3D, $3D, $3C
+	.db $92, $91, $90, $8F
+	.db $97, $96, $95, $94
+	.db $9D, $9C, $9B, $9A
+	; .db $9E, $9E, $9E, $9E
 
 ;B9EC
 ;降ってくるもののY速度下位

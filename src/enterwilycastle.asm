@@ -22,7 +22,8 @@
 	iny
 	cpy #$10
 	bne .loop_skybg2
-	mMOVWB $2800, $2006, $2006, <$0A
+	mMOVWB $2800, $2006, $2006
+	mMOV #LOW(Table_WilyCastleNameTable), <$0A
 	mMOV #HIGH(Table_WilyCastleNameTable), <$0B
 	ldx #BANK(Table_WilyCastleNameTable) / 2
 	jsr LoadGraphicsCompressedAnyBank

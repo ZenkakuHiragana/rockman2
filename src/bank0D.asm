@@ -214,7 +214,8 @@ SelectBoss_AnimateBossIntro:
 LoadNameTable843C:
 	lda #$00
 	jsr LoadGraphicsSet
-	mMOVWB $2000, $2006, $2006, <$0A
+	mMOVWB $2000, $2006, $2006
+	mMOV #LOW(Table_StageSelectNameTable), <$0A
 	mMOV #HIGH(Table_StageSelectNameTable), <$0B
 	ldx #BANK(Table_StageSelectNameTable) / 2
 	jsr LoadGraphicsCompressedAnyBank

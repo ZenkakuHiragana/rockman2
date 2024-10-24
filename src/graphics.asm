@@ -26,10 +26,8 @@ Graphics_CommonBG:
 Graphics_Password:
 	.incbin "graphs/toku/password-spr.toku"
 	.incbin "graphs/toku/password-bg.toku"
-	mBEGIN $09, $8A00
 Table_StageSelectNameTable:
 	.incbin "src/bin/StageSelectNameTable.toku"
-	mBEGIN $09, $8D00
 Table_WilyCastleNameTable:
 	.incbin "src/bin/WilyCastleNameTable.toku"
 
