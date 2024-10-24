@@ -4488,26 +4488,14 @@ EN64:
 	rts
 .do
 	bne .1
-	lda <zScrollRight
-	sta <zScrollLeft
-	inc <zScrollNumber
-	lda #$07
-	sta aObjLife,x
-	lda #$08
-	sta <zBossType
-	lda #$01
-	sta <zBossBehaviour
-	lda #$17
-	sta aPPULinearhi
-	lda #$E0
-	sta aPPULinearlo
-	lda #$00
-	sta aObjVar + 1
-	sta aObjLife + 1
-	sta aBossPtrlo
-	sta <zBossVar
-	lda #$B8
-	sta aBossPtrhi
+	mMOV aObjRoom, <zScrollClipRoom
+	mMOV #%00001100, <zScrollClipFlag
+	mMOV #$07, aObjLife,x
+	mMOV #$08, <zBossType
+	mMOV #$01, <zBossBehaviour
+	mMOVWB $17C0, aPPULinearhi, aPPULinearlo
+	mSTZ aObjVar + 1, aObjLife + 1, aBossPtrlo, <zBossVar
+	mMOV #$B8, aBossPtrhi
 	lda #$0F
 	ldx #$0F
 .loop_palette
@@ -4516,41 +4504,29 @@ EN64:
 	bpl .loop_palette
 	ldx <zObjIndex
 	inc aObjVar,x
-	lda #$18
-	sta aEnemyVar,x
-	lda #$63
-	sta <$00
+	mMOV #$18, aEnemyVar,x
+	mMOV #$63, <$00
 	ldy #$0F
 .loop_platform
 	jsr FindObjectY
 	bcs .rts1
-	lda #$01
-	sta aObjVX10,y
+	mMOV #$01, aObjVX10,y
 	dey
 	bpl .loop_platform
 .rts1
 	rts
 .1
-	lda #$01
-	sta <zWindFlag
-	lda #$00
-	sta <zWindVec
-	lda #$00
-	sta <zWindlo
-	lda #$01
-	sta <zWindhi
+	mMOV #$01, <zWindFlag, <zWindhi
+	mSTZ <zWindVec, <zWindlo
 	lda aObjVar,x
 	cmp #$01
 	bne .2
 	dec aEnemyVar,x
 	bne .rts2
-	lda #$40
-	sta aEnemyVar,x
+	mMOV #$40, aEnemyVar,x
 	lda #$63
 	jsr CreateEnemyHere
-	lda #$01
-	sta aObjVX10,y
-	sta aObjVar10,y
+	mMOV #$01, aObjVX10,y, aObjVar10,y
 	dec aObjLife,x
 	bne .rts2
 	inc aObjVar,x
@@ -4559,35 +4535,28 @@ EN64:
 	dec aEnemyVar,x
 	bne .rts2
 	ldy aObjLife,x
-	lda .table_wait,y
-	sta aEnemyVar,x
+	mMOV .table_wait,y, aEnemyVar,x
 	bmi .3
-	lda .table_platformy,y
-	sta <$02
+	mMOV .table_platformy,y, <$02
 	lda #$63
 	jsr CreateEnemyHere
-	lda <$02
-	sta aObjY10,y
-	lda #$01
-	sta aObjVX10,y
+	mMOV <$02, aObjY10,y
+	mMOV #$01, aObjVX10,y
 	inc aObjLife,x
 .rts2
 	rts
 .3
-	lda #$63
-	sta <$00
+	mMOV #$63, <$00
 	ldy #$0F
 .loop_stopplatform
 	jsr FindObjectY
 	bcs .endplatform
-	lda #$00
-	sta aObjVX10,y
+	mSTZ aObjVX10,y
 	dey
 	bpl .loop_stopplatform
 .endplatform
 	ldx <zObjIndex
-	lda #$FF
-	sta aObjVar,x
+	mMOV #$FF, aObjVar,x
 	inc <zBossBehaviour
 	lda #$0B
 	mJSR_NORTS PlayTrack
@@ -4599,17 +4568,12 @@ EN64:
 ;B97A
 ;メカドラゴンの羽
 EN65:
-	lda aObjVY + 1
-	sta aObjVY,x
-	lda aObjVYlo + 1
-	sta aObjVYlo,x
+	mMOV aObjVY + 1, aObjVY,x
+	mMOV aObjVYlo + 1, aObjVYlo,x
 EN65_GutsHand:
-	lda aObjVX + 1
-	sta aObjVX,x
-	lda aObjVXlo + 1
-	sta aObjVXlo,x
-	lda aBossVar1
-	sta aObjFlags,x
+	mMOV aObjVX + 1, aObjVX,x
+	mMOV aObjVXlo + 1, aObjVXlo,x
+	mMOV aBossVar1, aObjFlags,x
 	jsr MoveEnemy
 	lda <zBossType
 	cmp #$08
@@ -4617,28 +4581,23 @@ EN65_GutsHand:
 	lda aObjAnim,x
 	cmp #$69
 	beq .wilyobj
-	lda aObjFlags,x
-	ora #%00100011
-	sta aObjFlags,x
+	mORA aObjFlags,x, #%00100011
 	rts
 ;メカドラゴンの時と、ガッツタンクの右手の時
 .wilyobj
-	lda #%10001011
-	sta aObjFlags,x
+	mMOV #%10001011, aObjFlags,x
 	rts
 
 ;B9B7
 ;メカドラゴンの尻尾
 EN66:
-	lda #$00
-	sta aObjFrame,x
+	mSTZ aObjFrame,x
 	lda aBossVar1
 	and #$40
 	beq .skip
 	inc aObjFrame,x
 .skip
-	lda #$00
-	sta aObjWait,x
+	mSTZ aObjWait,x
 	jmp EN65
 
 ;B9CE
@@ -4653,8 +4612,7 @@ EN67:
 	lda aObjY,x
 	cmp #$80
 	bne .wait
-	lda #$00
-	sta aObjVY,x
+	mSTZ aObjVY,x
 	lda aObjFrame,x
 	ora aObjWait,x
 	bne .rts
@@ -4663,9 +4621,7 @@ EN67:
 .rts
 	rts
 .wait
-	lda #$00
-	sta aObjFrame,x
-	sta aObjWait,x
+	mSTZ aObjFrame,x, aObjWait,x
 	rts
 
 ;B9FE
@@ -4673,26 +4629,20 @@ EN67:
 EN69:
 	lda aObjVar,x
 	bne .goup
-	lda #$80
-	sta aObjVYlo,x
-	lda #$FF
-	sta aObjVY,x
+	mMOV #$80, aObjVYlo,x
+	mMOV #$FF, aObjVY,x
 	lda aObjY,x
 	cmp #$7F
 	bcc .jmp
 	bcs .stop
 .goup
-	lda #$80
-	sta aObjVYlo,x
-	lda #$00
-	sta aObjVY,x
+	mMOV #$80, aObjVYlo,x
+	mSTZ aObjVY,x
 	lda aObjY,x
 	cmp #$68
 	bcs .jmp
 .stop
-	lda #$00
-	sta aObjVY,x
-	sta aObjVYlo,x
+	mSTZ aObjVY,x, aObjVYlo,x
 .jmp
 	jmp EN65_GutsHand
 

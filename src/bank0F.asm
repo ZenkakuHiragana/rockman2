@@ -755,10 +755,10 @@ LoadBossBG:
 	pla
 	jsr WritePPUData
 	clc
-	mADD aPPULinearlo, #$20
+	mADD aPPULinearlo, #$40
 	mADD aPPULinearhi
 	clc
-	mADD aBossPtrlo, #$20
+	mADD aBossPtrlo, #$40
 	mADD aBossPtrhi
 	mCHANGEBANK #$0B, 1
 	;rts
@@ -860,12 +860,12 @@ Table_GraphicsAmount:
 ;[$08],yから0x20バイト分をPPU書き込み予約 Aにバンク
 WritePPUData:
 	jsr ChangeBank
-	ldy #$1F
+	ldy #$3F
 .loop
 	mMOV [zPtr],y, aPPULinearData,y
 	dey
 	bpl .loop
-	mMOV #$20, <zPPULinear
+	mMOV #$40, <zPPULinear
 	mCHANGEBANK #$0D, 1
 
 	.ifndef ___DISABLE_INTRO_PIPI

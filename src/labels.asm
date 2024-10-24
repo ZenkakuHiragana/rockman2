@@ -118,7 +118,7 @@ zPPULinear = $47        ;PPU線形書き込みサイズ予約
 zEnemyIndexPrev = $48   ;敵番号・戻る方
 zEnemyIndexNext = $49   ;敵番号・進む方
 
-zScrollClipFlag = $48   ;スクロール制限のフラグ .... ..XY
+zScrollClipFlag = $48   ;スクロール制限のフラグ .... XXYY
 zScrollClipRoom = $49   ;スクロール制限で移動する画面位置
 
 zRand = $4A             ;乱数

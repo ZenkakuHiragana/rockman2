@@ -16,7 +16,7 @@ MechDragon1:
 	jsr LoadBossBG
 	inc <zBossVar
 	lda <zBossVar
-	cmp #$40
+	cmp #$20
 	beq .end_0
 	rts
 .end_0

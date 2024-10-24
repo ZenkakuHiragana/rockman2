@@ -43,7 +43,8 @@ Table_BossBehaviourlo:
 	.db LOW(Flashman)
 	.db LOW(Metalman)
 	.db LOW(Crashman)
-	.db $10, $13, $9B, $6E, $C0, $2A
+	.db LOW(MechDragon)
+	.db $13, $9B, $6E, $C0, $2A
 ;8045
 ;ボスの挙動アドレス上位
 Table_BossBehaviourhi:
@@ -55,7 +56,8 @@ Table_BossBehaviourhi:
 	.db HIGH(Flashman)
 	.db HIGH(Metalman)
 	.db HIGH(Crashman)
-	.db $8E, $92, $93, $96, $96, $9B
+	.db HIGH(MechDragon)
+	.db $92, $93, $96, $96, $9B
 ;8063
 ;時間停止中のボスの処理
 DoBossBehaviour_Stopping:
