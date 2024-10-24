@@ -102,11 +102,10 @@ StartStage_NoEnergyRegen:
 ;死亡時のコンティニュー位置
 StartStage_Continue:
 	mMOV #%01000000, <zConveyorVec
-	mMOV #%00010000, <z2000, $2000
+	mMOV #%10010000, <z2000, $2000
 	mMOV #%00000110, <z2001
 	jsr LoadStageGraphics
 	mMOV #$1C, aObjLife
-	jsr ChangeBodyColor
 	jsr SetContinuePoint
 	lda #$00
 	sta <zStopFlag
@@ -127,6 +126,7 @@ StartStage_Continue:
 	sta <zPaletteIndex
 	sta <zPaletteTimer
 	sta <zBossBehaviour
+	jsr ChangeBodyColor
 	ldx #$0F
 .loop_override
 	lda #$FF
@@ -815,8 +815,8 @@ DrawRoom:
 	mSTZ <$01, <$02
 	mMOV #$01, <$00
 	jsr WriteNameTableByScroll
-	lda <z2000
-	and #%10000000
+	lda <z2001
+	and #%00011000
 	beq .nowait
 	lda <zHScroll
 	sta <$FE

@@ -2,19 +2,14 @@
 ;9678
 ;
 ;___Bank0D_BeginEnterWilyCastle:
-	lda #$10
-	sta <z2000
-	sta $2000
-	lda #$06
-	sta <z2001
-	sta $2001
+	mMOV #%10010000, <z2000, $2000
+	mMOV #%00000110, <z2001, $2001
 	lda #$0F
 	jsr Write_Reg0_A
 	jsr ResetScrollPosition1A
 	lda #$01
 	jsr LoadGraphicsSet
-	lda #$20
-	sta $2006
+	mMOV #$20, $2006
 	ldy #$00
 	sty $2006
 .loop_skybg2

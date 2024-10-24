@@ -2,12 +2,8 @@
 ;8015
 ;ステージセレクト画面開始
 ;___Bank0D_BeginStageSelect:
-	lda #%00010000
-	sta <z2000
-	sta $2000
-	lda #%00000110
-	sta <z2001
-	sta $2001
+	mMOV #%10010000, <z2000, $2000
+	mMOV #%00000110, <z2001, $2001
 	jsr ResetScrollPosition1A
 	jsr LoadNameTable843C
 ;ボス撃破状況に応じ黒塗りつぶし
