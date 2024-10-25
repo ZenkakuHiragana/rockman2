@@ -1,8 +1,8 @@
 
 from os.path import abspath, dirname, join
 
-path = 'heatman.bin'
-roomdef_seek = range(0x18, 0x2C)
+path = 'airman.bin'
+roomdef_seek = range(0x18, 0x29 + 1)
 
 chip_used = set()
 def convert(byte):
