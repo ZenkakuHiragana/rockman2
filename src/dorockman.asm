@@ -1195,10 +1195,15 @@ DoRockman_CheckAttr_Center:
 .notboss
 	lda <zBGAttr2
 	cmp #$10
-	bcc .fall_to_die
+	bcc .skip_special ;落下死判定
+	and #$03
+	beq .die
+	sta <zScrollFlag
+	rts
+.die
 	mMOV #$01, <zStatus
 	jmp DieRockman
-.fall_to_die
+.skip_special
 	cmp #$01
 	bne .air
 	lda <zWaterLevel

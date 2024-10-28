@@ -348,9 +348,13 @@ Rockman_Warp_to_Land:
 ;スクロール方向$37 - 1 = 0, 1, 2, 3 → 左右上下
 ;スクロール先画面番号$38
 DoScroll:
-	;bmi .done
+	and #$02
+	beq .right
+	jsr Scroll_Vertical
+	jmp .done
+.right
 	jsr Scroll_GoForward
-
+.done
 	ldx <zStage
 	lda <zRoom
 	cmp Table_BossRoom,x
@@ -526,7 +530,7 @@ Item_OutofCapsule:
 ;8416
 ;$FD = #$60までパターンテーブルに敵の画像を転送
 Item_DrawEnemyPattern:
-	jsr Unknown_CB09
+	jsr WritePatternTable
 	jsr FrameAdvance1C
 	lda <$FD
 	cmp #$60
@@ -849,12 +853,6 @@ DrawRoom:
 ;90C9
 ;実際にループしてスクロールさせる処理を呼ぶ
 DoScroll_Loop:
-;	lda <zScrollFlag
-;	and #$01
-;	beq .right
-;	jmp DoVerticalScroll_Loop
-;.right
-	;jsr PaletteChange_RightScroll
 	mSTZ <zSliplo, <zSliphi, <$FD
 	ldy #$3F
 .loop_right
@@ -871,7 +869,7 @@ DoScroll_Loop:
 	jsr FixAtomicFireObject
 .skipatomic
 	jsr SpriteSetup
-	;jsr Unknown_CB09
+;	jsr WritePatternTable
 	jsr FrameAdvance1C
 	pla
 	tay
@@ -880,120 +878,106 @@ DoScroll_Loop:
 	sty <zHScroll
 	rts
 
-;9115
-; PaletteChange_RightScroll:
-; 	ldx <zStage
-; 	cpx #$03
-; 	bne .bubble
-; 	ldy <zScrollNumber
-; 	cpy #$04
-; 	beq .skip
-; .bubble
-; 	ldy .ptr,x
-; 	beq .skip
-; 	mMOV .size,x, <$FD
-; 	lda .begin,x
-; 	tax
-; .loop
-; 	lda .data,x
-; 	sta aPalette,y
-;	sta aPaletteAnimBuf,y
-;	sta aPaletteAnimBuf + $10,y
-;	sta aPaletteAnimBuf + $20,y
-;	sta aPaletteAnimBuf + $30,y
-; 	dex
-; 	dey
-; 	dec <$FD
-; 	bne .loop
-; .skip
-; 	rts
-;9148
-;右スクロール時のパレット変更・書き込み位置
-; .ptr
-; 	.db $00, $0B, $00, $0B, $00, $00, $00, $0F
-; 	.db $00, $00, $03, $00, $00, $0B
-;9156
-;右スクロール時のパレット変更・データ開始位置
-; .begin
-; 	.db $00, $02, $00, $05, $00, $00, $00, $0C
-; 	.db $00, $00, $0F, $00, $00, $12
-;9164
-;右スクロール時のパレット変更・書き込みサイズ
-; .size
-; 	.db $00, $03, $00, $03, $00, $00, $00, $07
-; 	.db $00, $00, $03, $00, $00, $03
-;9172
-;右スクロール時のパレット変更・書き込むデータ
-; .data
-; 	.db $2B, $1B, $0B ;エアーマンステージ(未使用)
-; 	.db $21, $01, $0F ;バブルマンステージ(ボス前の網模様壁)
-; 	.db $39, $18, $01, $0F, $39, $18, $0F ;クラッシュマンステージ(星空)
-; 	.db $27, $37, $30 ;W3(ガッツタンク用)
-; 	.db $0F, $0F, $0F ;W6(エイリアン戦前背景暗転)
-
 ;9185
 ;上下スクロールの実行処理
-;DoVerticalScroll_Loop:
-;.counter = $39
-;	lda <zScrollFlag
-;	lsr a
-;	bne .down
-;;上スクロール
-;	ldx #$09
-;	stx <zStatus
-;	pha
-;	jsr SetRockmanAnimation
-;	pla
-;.down
-;	tax
-;	lda Table_VScrollCounter_Init,x
-;	sta <.counter
-;	lda Table_VScroll_Init,x
-;	sta <zVScroll
-;	lda #$00
-;	sta <$FD
-;.loop
-;	txa
-;	pha
-;	jsr SpriteSetup
-;	jsr VerticalScroll_DrawNT
-;	jsr Unknown_CB09
-;	jsr FrameAdvance1C
-;	pla
-;	tax
-;	lda <zEquipment
-;	cmp #$01
-;	bne .skipatomic
-;	jsr FixAtomicFireObject
-;.skipatomic
-;	clc
-;	lda aObjYlo
-;	adc Table_VScroll_dylo,x
-;	sta aObjYlo
-;	lda aObjY
-;	adc Table_VScroll_dy,x
-;	sta aObjY
-;	lda <zOffscreen
-;	adc Table_VScroll_dOffscreen,x
-;	sta <zOffscreen
-;	clc
-;	lda <zVScroll
-;	adc Table_VScroll_dyhi,x
-;	sta <zVScroll
-;	clc
-;	lda <.counter
-;	adc Table_VScrollCounter_Delta,x
-;	sta <.counter
-;	bmi .done
-;	cmp #$3C
-;	beq .done
-;	bne .loop
-;.done
-;	lda #$00
-;	sta <zVScrolllo
-;	sta <zVScroll
-;	sta aObjYlo
-;	mJSR_NORTS SpriteSetup
+Scroll_Vertical:
+	lda <zScrollFlag
+	lsr a
+	lda aObjRoom
+	bcc .fix_position_down
+	adc #$10 - 1
+	ldy #$08
+	bne .write_position
+.fix_position_down
+	sbc #$10 - 1
+	ldy #$E8
+.write_position
+	sta aObjRoom
+	sty aObjY
+.loop
+	ldx #$00
+	stx <zOffscreen
+	stx aObjYlo
+	lda <zHScroll
+	beq .skip
+	bmi .1
+	ldx #$80
+.1
+	ldy #$01
+	sty <$00
+	dey
+	sty <$01
+	stx <$02
+	jsr WriteNameTableByScroll
+	lda <zHScroll
+	bmi .goright
+	sec
+	sbc #$04
+	bcs .write
+.zero
+	lda #$00
+	beq .write
+.goright
+	clc
+	adc #$04
+	bcs .zero
+.write
+	sta <zHScroll
+	mMOV #$07, <zStopFlag
+	jsr SpriteSetup
+	mSTZ <zStopFlag
+	jsr FrameAdvance1C
+	jmp .loop
+.skip
+	jsr EraseEnemiesByScroll
+	mMOV #(($0100 - $0010) / $04), <$FD
+	lda <zScrollFlag
+	lsr a
+	bcc .loop_scroll
+	mMOV #$F0, <zVScroll
+.loop_scroll
+	mAND <zScrollFlag, #$01, <$02
+	tax
+	ldy #$01
+	sty <$01
+	dey
+	sty <$00
+	clc
+	mADD <zScrollNumber, Table_DoVerticalScroll_Room,x, <zRoom, aObjRoom
+	clc
+	mADD aObjYlo, Table_DoVerticalScroll_RockmanY,x
+	lda aObjY
+	adc Table_DoVerticalScroll_RockmanYhi,x
+	cmp #$F0
+	bcc .skip_carry_rockman
+	adc Table_DoVerticalScroll_RockmanYcarry,x
+.skip_carry_rockman
+	sta aObjY
+	clc
+	lda <zVScroll
+	adc Table_DoVerticalScroll_Scroll,x
+	cmp #$F0
+	bcc .skip_carry
+	adc #$10 - 1
+.skip_carry
+	sta <zVScroll
+	jsr WriteNameTableByScroll
+	jsr SpriteSetup
+	jsr FrameAdvance1C
+	dec <$FD
+	bne .loop_scroll
+	mMOV <zScrollNumber, <zRoom, aObjRoom
+	rts
+Table_DoVerticalScroll_Scroll:
+	.db $04, -$04
+Table_DoVerticalScroll_Room:
+	.db -$10, $00
+Table_DoVerticalScroll_RockmanY:
+	.db LOW($0044), LOW(-$0044)
+Table_DoVerticalScroll_RockmanYhi:
+	.db HIGH($0044), HIGH(-$0044)
+Table_DoVerticalScroll_RockmanYcarry:
+	.db $10 - 1, $F0 - 1
 
 ;91FA
 ;アトミックファイヤーオブジェクトの位置修正
@@ -1003,35 +987,6 @@ FixAtomicFireObject:
 	mMOV aObjY, aObjY + 2
 	mSTZ aObjWait + 2
 	rts
-
-;9212
-;上下スクロールカウンター初期値
-;Table_VScrollCounter_Init:
-;	.db $3B, $00
-;9214
-;上下スクロールカウンター増減値
-;Table_VScrollCounter_Delta:
-;	.db $FF, $01
-;9216
-;ロックマンY位置loFix@上下スクロール
-;Table_VScroll_dylo:
-;	.db $BF, $41
-;9218
-;ロックマンY位置hiFix@上下スクロール
-;Table_VScroll_dy:
-;	.db $03, $FC
-;921A
-;画面位置Fix@上下スクロール
-;Table_VScroll_dyhi:
-;	.db $FC, $04
-;921C
-;初期画面位置@上下スクロール
-;Table_VScroll_Init:
-;	.db $EF, $00
-;921E
-;画面外フラグ増減値@上下スクロール
-;Table_VScroll_dOffscreen:
-;	.db $00, $FF
 
 ;9220
 ;スクロール時に敵を消す

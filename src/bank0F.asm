@@ -298,18 +298,6 @@ DieBoss:
 	inc <zNoDamage
 .loop
 	jsr SpawnBoss_Loop_Begin
-	lda <zStage
-	cmp #$08
-	bne .notwily1
-;メカドラゴン戦の時
-	lda <zScrollFlag
-	cmp #$03
-	bne .notwily1
-;ボス撃破後も落下死する可能性がある
-	mSTZ <zNoDamage
-	mMOV #$01, <zStatus
-	jmp DieRockman
-.notwily1
 	lda <zBossBehaviour
 	cmp #$FF
 	bne .loop
@@ -1775,7 +1763,7 @@ GetScreenIndex:
 
 ;20 09 CB
 ;上下スクロール時のパターンテーブル描画に密接に関わる
-Unknown_CB09:
+WritePatternTable:
 	lda <$FD
 	cmp #$60
 	bcc .do

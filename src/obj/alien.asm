@@ -311,7 +311,7 @@ Alien5:
 	lda <$FD
 	cmp #$60
 	bcs .skip
-	mJSR_NORTS Unknown_CB09
+	mJSR_NORTS WritePatternTable
 .skip
 	inc aObjVar + 1
 	mMOVW $8D00, aBossPtrhi, aBossPtrlo
