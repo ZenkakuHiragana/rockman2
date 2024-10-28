@@ -112,9 +112,7 @@ StartStage_Continue:
 	sta <zEquipment
 	sta <zGravityhi
 	sta <zHScroll
-	; sta <zHScrolllo
 	sta <zVScroll
-	; sta <zVScrolllo
 	sta <zVScrollApparentlo
 	sta <zVScrollApparenthi
 	sta <zHScrollApparentlo
@@ -129,8 +127,7 @@ StartStage_Continue:
 	jsr ChangeBodyColor
 	ldx #$0F
 .loop_override
-	lda #$FF
-	sta aPaletteOverride,x
+	mMOV #$FF, aPaletteOverride,x
 	dex
 	bpl .loop_override
 	sec
@@ -140,15 +137,15 @@ StartStage_Continue:
 	ldy #$41
 	jsr DrawRoom
 	jsr ClearSprites
-	lda <z2001
-	ora #%00011110
-	sta <z2001
-	lda <z2000
-	ora #%10000000
-	sta <z2000
-	sta $2000
-	sta <zIsLag
+	mORA <z2001,#%00011110
+	mORA <z2000, #%10000000, $2000, <zIsLag
 	mMOV #$40, <zGravity
+	lda <zStage
+	cmp #$08
+	bcc .track
+	tax
+	lda Table_StageMusic - 8,x
+.track
 	mPLAYTRACK <zStage
 	ldx #$13
 .spriteloop
@@ -214,12 +211,7 @@ MainLoop:
 	mMOV #WaterLagInterval, <zWaterWait
 .nolag
 	jsr FrameAdvance1C
-	.list
 	jmp MainLoop
-	.nolist
-
-Table_Unknown81B6:
-	.db $10, $10, $10, $15, $15, $10
 
 ;81BC
 Table_SpriteREADY:
@@ -229,7 +221,6 @@ Table_SpriteREADY:
 
 ;81D0
 Table_StageMusic:
-	.db $03, $04, $01, $07, $06, $00, $05, $02
 	.db $08, $08, $09, $09, $09, $FF
 
 ;81DE
@@ -787,9 +778,9 @@ Table_ShutterAttr:
 
 ;9061
 ;シャッター配置位置
-Table_ShutterStart:
-	.db $15, $13, $15, $13, $15, $11, $13, $11
-	.db $00, $00, $26, $25, $00, $1E
+;Table_ShutterStart:
+;	.db $15, $13, $15, $13, $15, $11, $13, $11
+;	.db $00, $00, $26, $25, $00, $1E
 
 ;906F
 ;ボスの居る画面数
@@ -1015,32 +1006,32 @@ FixAtomicFireObject:
 
 ;9212
 ;上下スクロールカウンター初期値
-Table_VScrollCounter_Init:
-	.db $3B, $00
+;Table_VScrollCounter_Init:
+;	.db $3B, $00
 ;9214
 ;上下スクロールカウンター増減値
-Table_VScrollCounter_Delta:
-	.db $FF, $01
+;Table_VScrollCounter_Delta:
+;	.db $FF, $01
 ;9216
 ;ロックマンY位置loFix@上下スクロール
-Table_VScroll_dylo:
-	.db $BF, $41
+;Table_VScroll_dylo:
+;	.db $BF, $41
 ;9218
 ;ロックマンY位置hiFix@上下スクロール
-Table_VScroll_dy:
-	.db $03, $FC
+;Table_VScroll_dy:
+;	.db $03, $FC
 ;921A
 ;画面位置Fix@上下スクロール
-Table_VScroll_dyhi:
-	.db $FC, $04
+;Table_VScroll_dyhi:
+;	.db $FC, $04
 ;921C
 ;初期画面位置@上下スクロール
-Table_VScroll_Init:
-	.db $EF, $00
+;Table_VScroll_Init:
+;	.db $EF, $00
 ;921E
 ;画面外フラグ増減値@上下スクロール
-Table_VScroll_dOffscreen:
-	.db $00, $FF
+;Table_VScroll_dOffscreen:
+;	.db $00, $FF
 
 ;9220
 ;スクロール時に敵を消す
