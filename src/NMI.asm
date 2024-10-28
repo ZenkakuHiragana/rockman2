@@ -475,20 +475,15 @@ WritePPULinear:
 
 ;20 F6 D1
 WritePPULaser:
-	lda <z2000
-	ora #%00000100
-	sta $2000
+	mORA <z2000, #%00000100, $2000
 	lda <zPPUShutterFlag
 	bne .shutter
 	ldy <zPPULaser
 	bmi .alternate
 .loop
-	lda aPPULaserhi - 1,y
-	sta $2006
-	lda aPPULaserlo - 1,y
-	sta $2006
-	lda aPPULaserData - 1,y
-	sta $2007
+	mMOV aPPULaserhi - 1,y, $2006
+	mMOV aPPULaserlo - 1,y, $2006
+	mMOV aPPULaserData - 1,y, $2007
 	clc
 	adc #$10
 	sta $2007
@@ -496,40 +491,33 @@ WritePPULaser:
 	bne .loop
 .shutter_done
 	sty <zPPULaser
-	lda <z2000
-	and #%11111011
-	sta $2000
+	mAND <z2000, #%11111011, $2000
 	rts
 
-.alternate
+.alternate ;ピコピコくんの破壊跡の書き込み
 	tya
 	and #$7F
 	tay
 .loop_alt3
-	lda #$02
-	sta <$00
-	lda #$E4
-	sta <$01
+	mMOV #$02, <$00
+	mMOV #$B2, <$01 ;ピコピコくんの破壊跡のパターンテーブル番号
 .loop_alt2
-	lda aPPULaserhi - 1,y
-	sta $2006
-	lda aPPULaserlo - 1,y
-	sta $2006
-	lda #$02
-	sta <$02
-.loop_alt
+	mMOV aPPULaserhi - 1,y, $2006
+	mMOV aPPULaserlo - 1,y, $2006
+	mMOV #$02, <$02
 	lda <$01
+.loop_alt
 	sta $2007
-	inc <$01
+	clc
+	adc #$10
 	dec <$02
 	bne .loop_alt
 	dec <$00
 	beq .jump
 	clc
-	lda aPPULaserlo - 1,y
-	adc #$01
-	sta aPPULaserlo - 1,y
-	jmp .loop_alt2
+	inc <$01
+	mADD aPPULaserlo - 1,y, #$01
+	bne .loop_alt2
 .jump
 	dey
 	bne .loop_alt3

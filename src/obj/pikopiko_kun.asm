@@ -12,10 +12,19 @@ Pikopiko_kun:
 Pikopiko_kun1:
 	lda <zBossVar
 	bne .playtrack
+	mMOV #%00001100, <zScrollClipFlag
+	mMOV <zRoom, <zScrollClipRoom
+	mMOV #$20, <$FD
 	inc <zBossVar
 	mPLAYTRACK #$0B
 .playtrack
 	jsr BossBehaviour_ChargeLifeWily
+	lda <$FD
+	beq .skip_nt
+	lda #$FD
+	jsr WriteMapAddress18
+	dec <$FD
+.skip_nt
 	lda aObjLife + 1
 	cmp #$1C
 	bne .rts
@@ -89,6 +98,39 @@ Pikopiko_kun2:
 	bne Pikopiko_kun2_rts
 	inc <zBossBehaviour
 Pikopiko_kun2_rts
+	rts
+
+WriteMapAddress18:
+	tay
+	lda <zHScroll
+	pha
+	lda <zVScroll
+	pha
+	lda <zRoom
+	pha
+	lda <$FD
+	asl a
+	asl a
+	asl a
+	adc #$D8
+	sta <zHScroll
+	tya
+	adc #$FE
+	sta <zRoom
+	mSTZ <zVScroll
+.loop
+	ldy #$01
+	sty <$00
+	dey
+	sty <$01
+	sty <$02
+	jsr WriteNameTableByScroll_AnyBank
+	pla
+	sta <zRoom
+	pla
+	sta <zVScroll
+	pla
+	sta <zHScroll
 	rts
 
 ;92DD
