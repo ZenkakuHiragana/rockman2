@@ -146,7 +146,7 @@ StartStage_Continue:
 	tax
 	lda Table_StageMusic - 8,x
 .track
-	mPLAYTRACK <zStage
+	jsr PlayTrack
 	ldx #$13
 .spriteloop
 	mMOV Table_SpriteREADY,x, aSprite,x
@@ -790,7 +790,7 @@ Table_ShutterAttr:
 ;ボスの居る画面数
 Table_BossRoom:
 	.db $63, $43, $5F, $61, $08, $8C, $43, $15
-	.db $00, $27, $27, $26, $00, $1F
+	.db $00, $FC, $27, $26, $00, $1F
 
 ;907D
 ;次の画面を描画
@@ -881,6 +881,9 @@ DoScroll_Loop:
 ;9185
 ;上下スクロールの実行処理
 Scroll_Vertical:
+	lda <zScrollNumber
+	jsr GetScrollTo
+	stx <zScrollNumber
 	lda <zScrollFlag
 	lsr a
 	lda aObjRoom
@@ -930,11 +933,14 @@ Scroll_Vertical:
 	jmp .loop
 .skip
 	jsr EraseEnemiesByScroll
-	mMOV #(($0100 - $0010) / $04), <$FD
+	mMOV #(($0100 - $0010) / $04 - 1), <$FD
 	lda <zScrollFlag
 	lsr a
-	bcc .loop_scroll
-	mMOV #$F0, <zVScroll
+	lda #$F0
+	bcs .init_scroll
+	lda #$04
+.init_scroll
+	sta <zVScroll
 .loop_scroll
 	mAND <zScrollFlag, #$01, <$02
 	tax
@@ -942,8 +948,6 @@ Scroll_Vertical:
 	sty <$01
 	dey
 	sty <$00
-	clc
-	mADD <zScrollNumber, Table_DoVerticalScroll_Room,x, <zRoom, aObjRoom
 	clc
 	mADD aObjYlo, Table_DoVerticalScroll_RockmanY,x
 	lda aObjY
@@ -961,6 +965,14 @@ Scroll_Vertical:
 	adc #$10 - 1
 .skip_carry
 	sta <zVScroll
+	clc
+	lda <zScrollNumber
+	ldy <zVScroll
+	beq .skip_room
+	adc Table_DoVerticalScroll_Room,x
+.skip_room
+	sta <zRoom
+	sta aObjRoom
 	jsr WriteNameTableByScroll
 	jsr SpriteSetup
 	jsr FrameAdvance1C
