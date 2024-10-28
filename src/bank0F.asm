@@ -642,13 +642,11 @@ SetContinuePoint:
 	beq .do
 .first
 	ldx #$00
-	stx <zPaletteOffset
 	lda <zStage
 	and #$08
 	beq .8boss
 	inx
 .8boss
-	; stx <$70
 	mMOV Stage_BeginPointY,x, <zContinuePointY
 	lda Stage_BeginPoint,x
 .do

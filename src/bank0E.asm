@@ -123,6 +123,7 @@ StartStage_Continue:
 	sta aObjXlo
 	sta <zPaletteIndex
 	sta <zPaletteTimer
+	sta <zPaletteOffset
 	sta <zBossBehaviour
 	jsr ChangeBodyColor
 	ldx #$0F
@@ -790,7 +791,7 @@ Table_ShutterAttr:
 ;ボスの居る画面数
 Table_BossRoom:
 	.db $63, $43, $5F, $61, $08, $8C, $43, $15
-	.db $00, $FC, $27, $26, $00, $1F
+	.db $00, $FC, $A8, $26, $00, $1F
 
 ;907D
 ;次の画面を描画

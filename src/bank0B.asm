@@ -45,7 +45,8 @@ Table_BossBehaviourlo:
 	.db LOW(Crashman)
 	.db LOW(MechDragon)
 	.db LOW(Pikopiko_kun)
-	.db $9B, $6E, $C0, $2A
+	.db LOW(GutsTank)
+	.db $6E, $C0, $2A
 ;8045
 ;ボスの挙動アドレス上位
 Table_BossBehaviourhi:
@@ -59,7 +60,8 @@ Table_BossBehaviourhi:
 	.db HIGH(Crashman)
 	.db HIGH(MechDragon)
 	.db HIGH(Pikopiko_kun)
-	.db $93, $96, $96, $9B
+	.db HIGH(GutsTank)
+	.db $96, $96, $9B
 ;8063
 ;時間停止中のボスの処理
 DoBossBehaviour_Stopping:
@@ -1276,8 +1278,8 @@ Table_BossDamageAmount:
 ;A9A1
 ;ガッツタンクのネームテーブル書き込み位置上位
 Table_GutsTankNTPtrhi:
-	.db $20, $20, $20, $21, $21, $21, $21, $21
-	.db $21, $21, $21
+	.db $24, $24, $24, $25, $25, $25, $25, $25
+	.db $25, $25, $25
 
 ;A9AC
 ;ガッツタンクのネームテーブル書き込み位置下位

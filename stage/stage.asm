@@ -15,6 +15,7 @@
 	.incbin "stage/woodman.bin"
 	mBEGIN $02, $A000
 	.incbin "stage/chr/toku/woodman.toku"
+	.incbin "stage/chr/toku/woodman2.toku"
 	
 	mBEGIN $03, $8000
 	.incbin "stage/bubbleman.bin"

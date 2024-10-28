@@ -1090,7 +1090,7 @@ DoRockman_WallCheckX:
 	lda <zBGAttr,x
 	cmp #$0F
 	bne .notshutter ;横にシャッターが当たった時、スクロールフラグを設定
-	ldy #$82
+	ldy #$80
 	sty <zScrollFlag
 	bne .continue
 .notshutter

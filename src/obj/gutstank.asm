@@ -13,13 +13,23 @@ GutsTank1:
 	jsr BossBehaviour_ChargeLifeWily
 	lda aObjVar + 1
 	bne .0
-	mMOV #$02, aPaletteAnim
+	mMOV #%00001100, <zScrollClipFlag
+	mMOV <zRoom, <zScrollClipRoom
+	mMOV #$02, aPaletteAnim, <zPaletteOffset
 	mMOV #$04, aPaletteAnimWait
 	mMOVWB $B200, aBossPtrhi, aBossPtrlo
-	mMOVWB $1100 - $20, aPPULinearhi
-	mMOV #$69, <zBossVar
+	mMOVWB $1100 - $40, aPPULinearhi
+	mMOV #$35, <zBossVar
+	mMOV #$20, <$FD
 	inc aObjVar + 1
 .0 ;BG読み込み
+	lda <$FD
+	beq .skip_nt
+	lda #$A9
+	jsr WriteMapAddress18
+	dec <$FD
+	bpl .rts
+.skip_nt
 	lda aObjVar + 1
 	cmp #$01
 	bne .2
@@ -27,6 +37,7 @@ GutsTank1:
 	jsr LoadBossBG
 	dec <zBossVar
 	beq .1
+.rts
 	rts
 .1
 	inc aObjVar + 1
@@ -52,7 +63,7 @@ GutsTank1:
 	stx <zBossVar
 	rts
 .3
-	mMOVWB $2200 - $20, aPPULinearhi
+	mMOVWB $2600 - $20, aPPULinearhi
 	mSTZ <zBossVar
 	inc aObjVar + 1
 .4 ;NT書き込み(非連続部分)
@@ -79,7 +90,7 @@ GutsTank1:
 	stx <zBossVar
 	rts
 .5
-	mMOVWB $23C0, aPPULinearhi
+	mMOVWB $27C0, aPPULinearhi
 	mSTZ <zBossVar
 	inc aObjVar + 1
 .6 ;属性書き込み
