@@ -65,8 +65,10 @@ DoRockman_DoScroll:
 	ldx <zRoom
 	stx <zRoomPrev
 	ldy <zScrollClipRoom
+	bmi .force_scrollclip_y
 	cpy aObjRoom
 	bne .skip_scrollclip
+.force_scrollclip_y
 ;縦スクロール制限
 	lda <zScrollClipFlag ;スクロール制限中は画面を強制移動 .... XXYY
 	beq .skip_scrollclip
@@ -103,7 +105,7 @@ DoRockman_DoScroll:
 	bmi .scrollclip_x_lowerside
 	lsr a
 .scrollclip_x_lowerside
-	ror <.clipped ;スクロール制限によるスクロールが実際に発生したか = X.Y. ....
+	ror <.clipped ;スクロール制限によるスクロールが実際に発生したか = XY.. ....
 	bpl .skip_scrollclip
 	lda <zHScroll
 	beq .skip_scrollclip

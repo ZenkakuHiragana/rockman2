@@ -1,8 +1,8 @@
 
 from os.path import abspath, dirname, join
 
-path = 'airman.bin'
-roomdef_seek = range(0x18, 0x29 + 1)
+path = 'bubbleman.bin'
+roomdef_seek = range(0x16, 0x2B + 1)
 
 chip_used = set()
 def convert(byte):
@@ -15,7 +15,7 @@ def convert(byte):
         ]
         return table[byte & 0x3F]
     else:
-        return 0x00
+        return None
 
 roomdef_offset = 0x3000
 start_offset = 0x200
@@ -29,9 +29,12 @@ with open(join(dirname(abspath(__file__)), path), 'r+b') as f:
     f.seek(start_offset)
     data = f.read(end_offset - start_offset)
     processed = list(data)
+    print([hex(c) for c in chip_used])
     for i in range(0x100):
         if i in chip_used:
             for j in range(4):
-                processed[i * 4 + j] = convert(processed[i * 4 + j])
+                converted = convert(processed[i * 4 + j])
+                if converted is not None:
+                    processed[i * 4 + j] = converted
     f.seek(start_offset)
     f.write(bytearray(processed))

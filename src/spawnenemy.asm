@@ -212,6 +212,7 @@ SpawnEnemy_SendCommand:
 	bcc .1
 	and #$3F ;敵番号C0～FF: スクロール移動先の設定
 	sta <zScrollNumber
+.bit_00010000
 	bpl .rts
 .1
 	cmp #$30 ;敵番号B0～BF: シャッター高さの設定
@@ -241,13 +242,20 @@ SpawnEnemy_SendCommand:
 .3
 	cmp #$0E ;敵番号8E: スクロール制限の開始
 	bne .4
-	mAND Stage_DefEnemiesY - 1,y, #$03, <zScrollClipFlag
+	lda Stage_DefEnemiesY - 1,y
+	and #%00000011
+	sta <zScrollClipFlag
 	lda Stage_DefEnemiesX - 1,y
-	and #$03
+	and #%00000111
 	asl a
 	asl a
 	ora <zScrollClipFlag
+	bit .bit_00010000
+	beq .noset_n
+	ora #%10000000
+.noset_n
 	sta <zScrollClipFlag
+
 	mMOV <.room, <zScrollClipRoom
 .rts
 	rts
