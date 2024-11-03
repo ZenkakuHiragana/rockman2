@@ -2969,7 +2969,7 @@ EN38:
 	bcc .rts
 	ldy aEnemyVar,x
 	dey
-	lda aObjAnim,y
+	lda aObjAnim10,y
 	cmp #$3A
 	bne .rts
 	mSTZ aObjFlags10,y

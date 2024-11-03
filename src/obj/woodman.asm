@@ -52,7 +52,7 @@ Woodman2:
 	mMOV #$01, aObjVar10,y
 	mMOV #$FE, aObjVY10,y
 	mMOV #$02, aObjVX10,y
-	mMOV $857F,x, aObjX10,y
+	mMOV Table_WoodmanLeafX,x, aObjX10,y
 	dec <$02
 	bpl .loop
 .skip

@@ -31,8 +31,6 @@ Table_StageSelectNameTable:
 	.incbin "src/bin/StageSelectNameTable.toku"
 Table_WilyCastleNameTable:
 	.incbin "src/bin/WilyCastleNameTable.toku"
-
-	mBEGIN $09, $A000
 Graphics_Opening:
 	.incbin "graphs/toku/opening-spr.toku"
 	.incbin "graphs/toku/opening-bg.toku"

@@ -2,7 +2,7 @@
 
 ;8000-85FF: Stage Graphics(General)
 
-	mBEGIN $09, $9000
+	mBEGIN $09, $A000
 ;8600
 Bank09_ShowEndingSprites:
 	jmp ___Bank09_ShowEndingSprites

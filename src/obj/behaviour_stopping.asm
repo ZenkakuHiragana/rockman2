@@ -61,7 +61,7 @@ EnemyBehaviour_Stopping4:
 	lda aObjAnim,x
 	sbc #$40
 	tay
-	lda $AF79,y ;--------------------------------------------
+	lda Goblin_Palette_Delta,y ;--------------------------------------------
 	sta <$01
 	lda aObjFlags,x
 	and #%00100000
@@ -94,7 +94,7 @@ EnemyBehaviour_Stopping4:
 	asl a
 	tay
 	ldx <$01
-	jsr $AF4C ;----------------------------------------------
+	jsr Goblin_ChangePalette
 	ldx <zObjIndex
 .jump3
 	inc aObjVar,x
