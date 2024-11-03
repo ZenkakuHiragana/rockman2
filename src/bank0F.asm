@@ -769,8 +769,6 @@ LoadBossBG:
 LoadGraphicsSet:
 	pha
 	tax
-	cmp #$05
-	bcs .original
 	mCHANGEBANK Table_CompressedSpritesBank,x
 	mMOV Table_CompressedSprites_lo,x, <$0A
 	mMOV Table_CompressedSprites_hi,x, <$0B
@@ -788,28 +786,28 @@ LoadGraphicsSet:
 .changebank
 	jsr LoadGraphicsCompressed.continue
 	mCHANGEBANK #$0D, 1
-.original
-	mMOV Table_GraphicsSetNum,x, <$01
-	mMOV Table_GraphicsBeginPointer,x, <$02
-	mSTZ <zPtrlo, $2006, $2006
-.loop2
-	ldx <$02
-	mMOV Table_GraphicsPosition,x, <zPtrhi
-	mMOV Table_GraphicsAmount,x, <$03
-	mCHANGEBANK Table_GraphicsBank,x
-	ldy #$00
-.loop
-	mMOV [zPtr],y, $2007
-	iny
-	bne .loop
-	inc <zPtrhi
-	dec <$03
-	bne .loop
-	inc <$02
-	dec <$01
-	bne .loop2
-	mCHANGEBANK #$0D, 1
-	;rts
+; .original
+; 	mMOV Table_GraphicsSetNum,x, <$01
+; 	mMOV Table_GraphicsBeginPointer,x, <$02
+; 	mSTZ <zPtrlo, $2006, $2006
+; .loop2
+; 	ldx <$02
+; 	mMOV Table_GraphicsPosition,x, <zPtrhi
+; 	mMOV Table_GraphicsAmount,x, <$03
+; 	mCHANGEBANK Table_GraphicsBank,x
+; 	ldy #$00
+; .loop
+; 	mMOV [zPtr],y, $2007
+; 	iny
+; 	bne .loop
+; 	inc <zPtrhi
+; 	dec <$03
+; 	bne .loop
+; 	inc <$02
+; 	dec <$01
+; 	bne .loop2
+; 	mCHANGEBANK #$0D, 1
+;	;rts
 
 Table_CompressedSpritesBank:
 	.db BANK(Graphics_StageSelect) / 2
@@ -838,30 +836,30 @@ Table_CompressedGraphics_lo:
 Table_CompressedGraphics_hi:
 	.db HIGH(Graphics_Ending)
 
-Table_GraphicsSetNum:
-	.db $02, $02, $02, $0D, $0E, $04
-Table_GraphicsBeginPointer:
-	.db LOW(Table_GraphicsBank.0 - Table_GraphicsBank)
-	.db LOW(Table_GraphicsBank.1 - Table_GraphicsBank)
-	.db LOW(Table_GraphicsBank.2 - Table_GraphicsBank)
-	.db LOW(Table_GraphicsBank.3 - Table_GraphicsBank)
-	.db LOW(Table_GraphicsBank.4 - Table_GraphicsBank)
-	.db LOW(Table_GraphicsBank.5 - Table_GraphicsBank)
-Table_GraphicsBank:
-.0 .public ;ステージセレクト
-.1 .public ;ワイリー城入場
-.2 .public ;オープニング
-.3 .public ;パスワード画面
-.4 .public ;エンディング
-	.db $03, $03, $04, $04, $06, $04, $05, $05, $05, $07, $07, $02, $08, $07
-.5 .public ;スタッフロール
-	.db $05, $08, $09, $08
-Table_GraphicsPosition:
-	.db $99, $9C, $9D, $9B, $B2, $97, $93, $96, $9C, $9D, $9F, $95, $A4, $B2
-	.db $90, $88, $9F, $8C
-Table_GraphicsAmount:
-	.db $02, $01, $01, $01, $02, $01, $01, $02, $01, $01, $01, $02, $0C, $02
-	.db $10, $03, $01, $0C
+; Table_GraphicsSetNum:
+; 	.db $02, $02, $02, $0D, $0E, $04
+; Table_GraphicsBeginPointer:
+; 	.db LOW(Table_GraphicsBank.0 - Table_GraphicsBank)
+; 	.db LOW(Table_GraphicsBank.1 - Table_GraphicsBank)
+; 	.db LOW(Table_GraphicsBank.2 - Table_GraphicsBank)
+; 	.db LOW(Table_GraphicsBank.3 - Table_GraphicsBank)
+; 	.db LOW(Table_GraphicsBank.4 - Table_GraphicsBank)
+; 	.db LOW(Table_GraphicsBank.5 - Table_GraphicsBank)
+; Table_GraphicsBank:
+; .0 .public ;ステージセレクト
+; .1 .public ;ワイリー城入場
+; .2 .public ;オープニング
+; .3 .public ;パスワード画面
+; .4 .public ;エンディング
+; 	.db $03, $03, $04, $04, $06, $04, $05, $05, $05, $07, $07, $02, $08, $07
+; .5 .public ;スタッフロール
+; 	.db $05, $08, $09, $08
+; Table_GraphicsPosition:
+; 	.db $99, $9C, $9D, $9B, $B2, $97, $93, $96, $9C, $9D, $9F, $95, $A4, $B2
+; 	.db $90, $88, $9F, $8C
+; Table_GraphicsAmount:
+; 	.db $02, $01, $01, $01, $02, $01, $01, $02, $01, $01, $01, $02, $0C, $02
+; 	.db $10, $03, $01, $0C
 
 ;20 09 C7
 ;[$08],yから0x20バイト分をPPU書き込み予約 Aにバンク

@@ -48,12 +48,12 @@ ___Bank09_WriteEndingBossname:
 	ldx aObjFrame
 	lda aObjWait
 	tay
-	cmp $8AD8,x
+	cmp Table_BossNameSize,x
 	beq .eq
 	clc
-	adc $8AC8,x
+	adc Table_BossNamePtr,x
 	tax
-	mMOV $8AE8,x, aPPULinearData
+	mMOV Table_BossNameData,x, aPPULinearData
 	inc <zPPULinear
 	inc aPPULinearlo
 	inc aObjWait
@@ -71,8 +71,7 @@ ___Bank09_WriteEndingBossname:
 ;8678
 ;スタッフロールの初期化かな？
 ___Bank09_InitStaffLine:
-	mMOV #$8C, <$DF
-	mMOV #$95, <$DE
+	mMOVW Table_StaffRollData, <$DE
 	rts
 
 ;8681
@@ -105,25 +104,21 @@ ___Bank09_ScrollStaffLine:
 .write_staffroll
 	ldx aObjFrame
 	lda <zVScroll
-	cmp $8BE0,x
+	cmp Table_StaffRollVScroll,x
 	bne .rts
 	lda <zVScroll
 	and #$F8
 	sta <$01
 	jsr Bank09_SetStaffLineAddr
-	mMOV $8C1D,x, aPPULinearlo
-	mMOV $8C59,x, <zPPULinear
+	mMOV Table_StaffRollPosition_lo,x, aPPULinearlo
+	mMOV Table_StaffRollLength,x, <zPPULinear
 	ldy #$00
 	ldx #$00
 .loop
 	mMOV [$DE],y, aPPULinearData,x
 	clc
-	lda <$DE
-	adc #$01
-	sta <$DE
-	lda <$DF
-	adc #$00
-	sta <$DF
+	mADD <$DE, #$01
+	mADD <$DF
 	inx
 	cpx <zPPULinear
 	bne .loop
@@ -249,5 +244,41 @@ Bank09_Sprite07: ;アイテム入手時のライト博士
 	.db $41, $1F, $01, $48
 	.db $49, $6D, $01, $40, $49, $6E, $01, $48, $49, $6F, $01, $50
 
-Table_ProbablyStaffRollText:
-	.incbin "rockman2.prg", $24AC8, $4D8
+;8AC8
+Table_BossNamePtr:
+	.db $00, $10, $1E, $2C, $3A, $4B, $59, $69, $7B, $8B, $98, $A8, $B7, $C6, $D7, $E6
+
+;8AD8
+Table_BossNameSize:
+	.db $10, $0E, $0E, $0E, $11, $0E, $10, $12, $10, $0D, $10, $0F, $0F, $11, $0F, $12
+
+Table_BossNameData:
+	.incbin "rockman2.prg", $24AE8, $F8
+
+;8BE0
+Table_StaffRollVScroll:
+	.db $24, $4C, $5C, $6C, $7C, $8C, $9C, $04, $2C, $3C, $4C, $A4, $CC, $34, $5C, $C4
+	.db $0C, $1C, $2C, $3C, $4C, $5C, $6C, $7C, $8C, $9C, $AC, $BC, $CC, $DC, $EC, $0C
+	.db $1C, $2C, $3C, $4C, $5C, $6C, $7C, $8C, $9C, $AC, $BC, $CC, $DC, $EC, $0C, $1C
+	.db $2C, $3C, $4C, $5C, $6C, $7C, $8C, $9C, $AC, $EC, $64, $74
+
+	.db $01
+
+;8C1D
+Table_StaffRollPosition_lo:
+	.db $87, $2B, $6C, $AC, $EC, $2B, $6E, $08, $AA, $EA, $28, $8B, $2D, $CC, $6E, $08
+	.db $27, $68, $A9, $E8, $27, $67, $A7, $E7, $2C, $67, $A7, $E7, $2C, $69, $AA, $28
+	.db $69, $A8, $E9, $2A, $68, $A9, $E7, $29, $69, $AB, $E7, $28, $66, $AA, $27, $67
+	.db $AA, $E9, $2A, $66, $A6, $E6, $26, $68, $AB, $A5, $8A, $CD
+;8C59
+Table_StaffRollLength:
+	.db $12, $09, $08, $07, $08, $0A, $03, $10, $0C, $0C, $10, $0A, $06, $07, $03, $0E
+	.db $10, $0D, $0F, $0D, $12, $10, $0E, $0F, $0C, $0F, $0E, $0F, $09, $0D, $0C, $0F
+	.db $0F, $10, $0C, $0C, $0D, $0D, $11, $10, $0F, $0B, $10, $0D, $0F, $0E, $0F, $0D
+	.db $0E, $0C, $0E, $10, $10, $15, $0F, $0C, $08, $18, $0C, $06
+;8C95
+Table_StaffRollData:
+	.db $03, $08 ;CARACTER DESIGNER -> CHARACTER DESIGNER
+	.incbin "rockman2.prg", $24C95 + 1, $45
+	.db $0F ;SOUND PRGRAMMER -> SOUND PROGRAMMER
+	.incbin "rockman2.prg", $24C95 + 1 + $45, $30A - 1 - $45

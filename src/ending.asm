@@ -98,10 +98,7 @@
 ;スタッフロール開始
 	jsr DisableScreen1A
 	jsr LoadNameTable843C
-	lda #$05
-	jsr LoadGraphicsSet
-	mMOV #$20, $2006
-	mSTZ $2006
+	mMOVWB $2000, $2006, $2006
 	ldy #$04
 .loop_screen2
 	ldx #$00
@@ -154,12 +151,8 @@
 	jsr SelectBoss_MoveIntroStar
 	jsr FrameAdvance1A
 	sec
-	lda <$FD
-	sbc #$01
-	sta <$FD
-	lda <$FE
-	sbc #$00
-	sta <$FE
+	mSUB <$FD, #$01
+	mSUB <$FE
 	bne .loop_staffroll
 	lda <$FD
 	beq .continue_staff
