@@ -94,7 +94,7 @@ SpawnEnemyByScroll:
 	iny
 	cpy #$04
 	bne .loop_room
-	lda <zPPUObjPtrEnd
+	lda <zPPUObjNum
 	bne .writeobj
 .rts
 	mCHANGEBANK #$0E, 1
@@ -127,7 +127,7 @@ SpawnEnemyByScroll:
 	bcc .rts
 	inc <zPPUObjhi
 	stx <zPPUObjPtr
-	dec <zPPUObjPtrEnd
+	dec <zPPUObjNum
 	bpl .rts
 SpawnEnemyByScroll_WritePalette:
 	iny
@@ -258,7 +258,7 @@ SpawnEnemy_SendCommand:
 	mSTZ <zPPUObjlo
 	mMOV Stage_LoadGraphicsPtr,y, <zPPUObjhi
 	mMOV Stage_LoadGraphicsOrg,y, <zPPUObjPtr
-	mMOV Stage_LoadGraphicsNum,y, <zPPUObjPtrEnd
+	mMOV Stage_LoadGraphicsNum,y, <zPPUObjNum
 	ldy #$FF
 	asl a
 	adc <zPPUObjPtr

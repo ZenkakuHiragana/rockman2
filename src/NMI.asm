@@ -354,9 +354,6 @@ WritePPUScroll:
 
 ;20 18 D1
 WritePPUSquare:
-	bpl .square
-	jmp .isminus
-.square
 .n = $00
 .l = $01
 .ptr = $0A
@@ -371,39 +368,29 @@ WritePPUSquare:
 	asl a
 	asl a
 	tax
-	lda #$04
-	sta <.l
-	lda aPPUSqrhi,y
-	sta <.hi
-	lda aPPUSqrlo,y
-	sta <.lo
+	mMOV #$04, <.l
+	mMOV aPPUSqrhi,y, <.hi
+	mMOV aPPUSqrlo,y, <.lo
 	cmp #$80
 	bcc .jump
 	lda <.hi
 	and #$03
 	cmp #$03
 	bne .jump
-	lda #$02
-	sta <.l
+	lsr <.l ;<.l = #$02
 .jump
-	lda aPPUSqrAttrhi,y
-	sta $2006
-	lda aPPUSqrAttrlo,y
-	sta $2006
-	lda aPPUSqrAttrData,y
-	sta $2007
+	mMOV aPPUSqrAttrhi,y, $2006
+	mMOV aPPUSqrAttrlo,y, $2006
+	mMOV aPPUSqrAttrData,y, $2007
 .line
-	lda <.hi
-	sta $2006
+	mMOV <.hi, $2006
 	clc
-	lda <.lo
-	sta $2006
+	mMOV <.lo, $2006
 	adc #$20
 	sta <.lo
 	ldy #$04
 .loop
-	lda aPPUSqrData,x
-	sta $2007
+	mMOV aPPUSqrData,x, $2007
 	inx
 	dey
 	bne .loop
@@ -413,49 +400,6 @@ WritePPUSquare:
 	iny
 	dec <zPPUSqr
 	bne .nloop
-	rts
-;縦スクロール関連らしいけどなにこれ？
-.isminus
-	ldx #$00
-	stx <zPPUSqr
-.loop2
-	lda $0300
-	sta $2006
-	lda $0301
-	sta $2006
-.loop_alt
-	lda $0302,x
-	sta $2007
-	inx
-	txa
-	and #$07
-	bne .loop_alt
-	clc
-	lda $0301
-	adc #$20
-	sta $0301
-	lda $0312
-	sta $2006
-	lda $0313
-	sta $2006
-	lda $2007
-	lda $2007
-	ldy <zPPUSqr
-	and $0314
-	ora $0315,y
-	pha
-	lda $0312
-	sta $2006
-	lda $0313
-	sta $2006
-	pla
-	sta $2007
-	inc <zPPUSqr
-	inc $0313
-	cpx #$10
-	bne .loop2
-	lda #$00
-	sta <zPPUSqr
 	rts
 
 ;20 DC D1
