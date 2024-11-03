@@ -3,15 +3,16 @@
 ;エンディングの処理
 ;___Bank0D_BeginEnding:
 	jsr ResetScrollPosition1A
-	inc <zRoom
 	lda #$04
 	jsr LoadGraphicsSet
 	mMOV #$05, <zStage
-	mMOVW $8EC0, <zPtr
+	lda #$E0
 	jsr WriteMapAddressOffScreen1A
-	mMOVW $8F00, <zPtr
+	lda #$E1
 	jsr WriteMapAddressOffScreen1A
+	inc <zRoom
 	lda #$00
+	sta <zHScroll
 	sta aObjFrame
 	sta aObjWait
 	sta aObjWait + 1
@@ -425,18 +426,17 @@ Table_EndingFallingX:
 ;B9CC
 ;降ってくるもののアニメーション定義
 Table_EndingFallingAnimation:
-	.db $8C, $8D, $8E, $8D
-	.db $92, $93, $92, $93
-	.db $97, $98, $99, $98
-	.db $9E, $9E, $9E, $9E
+	.db $26, $27, $28, $27
+	.db $5A, $5B, $5A, $5B
+	.db $9C, $9D, $9E, $9D
+	.db $A8, $A8, $A8, $A8
 
 ;B9DC
 ;降ってくるものの移り変わる方のアニメーション定義
 Table_EndingFallingAnimation2:
-	.db $92, $91, $90, $8F
-	.db $97, $96, $95, $94
-	.db $9D, $9C, $9B, $9A
-	; .db $9E, $9E, $9E, $9E
+	.db $5A, $2C, $67, $57
+	.db $9C, $9F, $8F, $7F
+	.db $1E, $1D, $1C, $1B
 
 ;B9EC
 ;降ってくるもののY速度下位

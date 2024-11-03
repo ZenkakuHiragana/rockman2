@@ -767,16 +767,25 @@ LoadBossBG:
 
 ;20 44 C6
 LoadGraphicsSet:
-	sta <$00
+	pha
 	tax
-	cmp #$04
+	cmp #$05
 	bcs .original
-	mCHANGEBANK Table_CompressedGraphicsBank,x
-	mMOV Table_CompressedGraphics_lo,x, <$0A
-	mMOV Table_CompressedGraphics_hi,x, <$0B
+	mCHANGEBANK Table_CompressedSpritesBank,x
+	mMOV Table_CompressedSprites_lo,x, <$0A
+	mMOV Table_CompressedSprites_hi,x, <$0B
 	mSTZ $2006, $2006
 	jsr LoadGraphicsCompressed
 	mMOVWB $1000, $2006, $2006
+	pla
+	tax
+	lda Table_CompressedGraphicsBank - Table_CompressedGraphicsOffset,x
+	bmi .changebank
+	jsr ChangeBank
+	mMOV Table_CompressedGraphics_lo - Table_CompressedGraphicsOffset,x, <$0A
+	mMOV Table_CompressedGraphics_hi - Table_CompressedGraphicsOffset,x, <$0B
+	ldy #$00
+.changebank
 	jsr LoadGraphicsCompressed.continue
 	mCHANGEBANK #$0D, 1
 .original
@@ -802,21 +811,33 @@ LoadGraphicsSet:
 	mCHANGEBANK #$0D, 1
 	;rts
 
-Table_CompressedGraphicsBank:
+Table_CompressedSpritesBank:
 	.db BANK(Graphics_StageSelect) / 2
 	.db BANK(Graphics_WilyCastle) / 2
 	.db BANK(Graphics_Opening) / 2
 	.db BANK(Graphics_Password) / 2
-Table_CompressedGraphics_lo:
+	.db BANK(Graphics_Password) / 2
+Table_CompressedSprites_lo:
 	.db LOW(Graphics_StageSelect)
 	.db LOW(Graphics_WilyCastle)
 	.db LOW(Graphics_Opening)
 	.db LOW(Graphics_Password)
-Table_CompressedGraphics_hi:
+	.db LOW(Graphics_Password)
+Table_CompressedSprites_hi:
 	.db HIGH(Graphics_StageSelect)
 	.db HIGH(Graphics_WilyCastle)
 	.db HIGH(Graphics_Opening)
 	.db HIGH(Graphics_Password)
+	.db HIGH(Graphics_Password)
+
+Table_CompressedGraphicsOffset = 4
+Table_CompressedGraphicsBank:
+	.db BANK(Graphics_Ending) / 2
+Table_CompressedGraphics_lo:
+	.db LOW(Graphics_Ending)
+Table_CompressedGraphics_hi:
+	.db HIGH(Graphics_Ending)
+
 Table_GraphicsSetNum:
 	.db $02, $02, $02, $0D, $0E, $04
 Table_GraphicsBeginPointer:
@@ -1762,59 +1783,70 @@ GetScreenIndex:
 
 ;20 09 CB
 ;上下スクロール時のパターンテーブル描画に密接に関わる
-WritePatternTable:
-	lda <$FD
-	cmp #$60
-	bcc .do
-	rts
-.do
+; WritePatternTable:
+; 	lda <$FD
+; 	cmp #$60
+; 	bcc .do
+; 	rts
+; .do
+; 	lda <zBank
+; 	pha
+; 	lda <$FD
+; 	and #$F0
+; 	lsr a
+; 	lsr a
+; 	lsr a
+; 	pha
+; 	lsr a
+; 	clc
+; 	adc #$0A
+; 	sta aPPULinearhi
+; 	lda <$FD
+; 	asl a
+; 	asl a
+; 	asl a
+; 	asl a
+; 	sta aPPULinearlo
+; 	sta <$08
+; 	lda <zStage
+; 	and #$07
+; 	jsr ChangeBank
+; 	ldx <$FE
+; 	jsr SetEnemyPalette
+; 	clc
+; 	pla
+; 	adc $B42C,x
+; 	tax
+; 	mMOV $B460,x, <$09
+; 	mCHANGEBANK $B461,x
+; 	ldy #$1F
+; .loop
+; 	mMOV [zPtr],y, aPPULinearData,y
+; 	dey
+; 	bpl .loop
+; 	mMOV #$20, <zPPULinear
+; 	inc <$FD
+; 	inc <$FD
+; 	pla
+; 	jsr ChangeBank
+; .rts .public
+; 	rts
+
+;敵画像読み込みセットの設定 Y = 00～0B
+SetupEnemySpritesAnyBank:
 	lda <zBank
 	pha
-	lda <$FD
-	and #$F0
-	lsr a
-	lsr a
-	lsr a
-	pha
-	lsr a
-	clc
-	adc #$0A
-	sta aPPULinearhi
-	lda <$FD
-	asl a
-	asl a
-	asl a
-	asl a
-	sta aPPULinearlo
-	sta <$08
 	lda <zStage
 	and #$07
 	jsr ChangeBank
-	ldx <$FE
-	jsr SetEnemyPalette
-	clc
+	jsr SetupEnemySprites
 	pla
-	adc $B42C,x
-	tax
-	mMOV $B460,x, <$09
-	mCHANGEBANK $B461,x
-	ldy #$1F
-.loop
-	mMOV [zPtr],y, aPPULinearData,y
-	dey
-	bpl .loop
-	mMOV #$20, <zPPULinear
-	inc <$FD
-	inc <$FD
-	pla
-	jsr ChangeBank
-.rts .public
-	rts
+	jmp ChangeBank
 
 ;敵画像書き換え
 WriteEnemySprites:
 	lda <zPPUObjNum
-	beq WritePatternTable.rts
+	beq CountBlockableObjects.rts
 
 	lda <zStage
 	and #$07
@@ -1850,27 +1882,17 @@ WriteEnemySprites:
 .rts
 	mCHANGEBANK #$0E, 1
 
-SetupEnemySpritesAnyBank:
-	lda <zBank
-	pha
-	lda <zStage
-	and #$07
-	jsr ChangeBank
-	jsr SetupEnemySprites
-	pla
-	jmp ChangeBank
-
 ;20 61 CB
 ;おそらく、スクロール番号Xから敵パレットを設定する
-SetEnemyPalette:
-	ldy $B42C,x
-	mMOV $B46C,y, aPaletteSpr + $09 ;敵パレット1
-	mMOV $B46D,y, aPaletteSpr + $0A ;
-	mMOV $B46E,y, aPaletteSpr + $0B ;
-	mMOV $B46F,y, aPaletteSpr + $0D ;敵パレット2
-	mMOV $B470,y, aPaletteSpr + $0E ;
-	mMOV $B471,y, aPaletteSpr + $0F ;
-	rts
+; SetEnemyPalette:
+; 	ldy $B42C,x
+; 	mMOV $B46C,y, aPaletteSpr + $09 ;敵パレット1
+; 	mMOV $B46D,y, aPaletteSpr + $0A ;
+; 	mMOV $B46E,y, aPaletteSpr + $0B ;
+; 	mMOV $B46F,y, aPaletteSpr + $0D ;敵パレット2
+; 	mMOV $B470,y, aPaletteSpr + $0E ;
+; 	mMOV $B471,y, aPaletteSpr + $0F ;
+; 	rts
 
 ;20 89 CB
 CountBlockableObjects:
@@ -1887,6 +1909,7 @@ CountBlockableObjects:
 	dex
 	bpl .loop
 	sty <zBlockObjNum
+.rts .public
 	rts
 
 ;20 9F CB

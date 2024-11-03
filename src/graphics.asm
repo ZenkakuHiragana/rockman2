@@ -7,11 +7,9 @@
 Graphics_StageSelect:
 	.incbin "graphs/toku/stageselect-spr.toku"
 	.incbin "graphs/toku/stageselect-bg.toku"
-	mBEGIN $08, $8800
 Graphics_WilyCastle:
 	.incbin "graphs/toku/wilycastle-spr.toku"
 	.incbin "graphs/toku/wilycastle-bg.toku"
-	mBEGIN $08, $9400
 Graphics_Ending:
 	.incbin "graphs/toku/ending.toku"
 	mBEGIN $08, $A000

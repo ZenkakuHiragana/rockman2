@@ -1,8 +1,12 @@
 
 from os.path import abspath, dirname, join
 
-path = 'quickman.bin'
-roomdef_seek = range(0x16, 0x1F + 1)
+path = 'flashman.bin'
+roomdef_seek = range(0x27, 0x28 + 1)
+# パスワード
+# roomdef_seek = [0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x29, 0x2A, 0x2B]
+# エンディング
+# roomdef_seek = [0x27, 0x28]
 
 chip_used = set()
 def convert(byte):
@@ -16,6 +20,8 @@ def convert(byte):
         return table[byte & 0x3F]
     else:
         return None
+# def convert(byte):
+#     return byte - 0x08 if byte >= 0x50 else byte
 
 roomdef_offset = 0x3000
 start_offset = 0x200
@@ -38,11 +44,11 @@ with open(join(dirname(abspath(__file__)), path), 'r+b') as f:
                     processed[i * 4 + j] = converted
 
     # 土下座部屋マップチップ置換用
-    # start_offset = 0x480
-    # f.seek(0x480)
-    # data = f.read(0x74)
+    # start_offset = 0x5C0
+    # f.seek(start_offset)
+    # data = f.read(0x40)
     # processed = list(data)
-    # for i in range(0x74):
-    #     processed[i] = (processed[i] & 0x3F) + 0x40
+    # for i in range(0x40):
+    #     processed[i] = processed[i] + 0x48
     f.seek(start_offset)
     f.write(bytearray(processed))
