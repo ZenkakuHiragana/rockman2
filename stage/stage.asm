@@ -27,6 +27,7 @@
 	.incbin "stage/quickman.bin"
 	mBEGIN $04, $A000
 	.incbin "stage/chr/toku/quickman.toku"
+	.incbin "stage/chr/toku/quickman2.toku"
 	
 	mBEGIN $05, $8000
 	.incbin "stage/flashman.bin"
