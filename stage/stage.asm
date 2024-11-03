@@ -33,6 +33,7 @@
 	.incbin "stage/flashman.bin"
 	mBEGIN $05, $A000
 	.incbin "stage/chr/toku/flashman.toku"
+	.incbin "stage/chr/toku/flashman2.toku"
 	
 	mBEGIN $06, $8000
 	.incbin "stage/metalman.bin"

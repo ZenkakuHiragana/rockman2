@@ -1,8 +1,8 @@
 
 from os.path import abspath, dirname, join
 
-path = 'bubbleman.bin'
-roomdef_seek = range(0x16, 0x2B + 1)
+path = 'quickman.bin'
+roomdef_seek = range(0x16, 0x1F + 1)
 
 chip_used = set()
 def convert(byte):
@@ -36,5 +36,13 @@ with open(join(dirname(abspath(__file__)), path), 'r+b') as f:
                 converted = convert(processed[i * 4 + j])
                 if converted is not None:
                     processed[i * 4 + j] = converted
+
+    # 土下座部屋マップチップ置換用
+    # start_offset = 0x480
+    # f.seek(0x480)
+    # data = f.read(0x74)
+    # processed = list(data)
+    # for i in range(0x74):
+    #     processed[i] = (processed[i] & 0x3F) + 0x40
     f.seek(start_offset)
     f.write(bytearray(processed))

@@ -927,6 +927,7 @@ SpawnBoss_Loop_Begin:
 	jsr DoRockman
 	jsr WeaponObjectProcess
 	jsr SpawnEnemyByScroll
+	jsr WriteEnemySprites
 	jsr DoBossBehaviour
 	jsr DoEnemyObjects
 	jsr SpriteSetup
@@ -1849,12 +1850,15 @@ WriteEnemySprites:
 .rts
 	mCHANGEBANK #$0E, 1
 
-SetupEnemySprites0E:
+SetupEnemySpritesAnyBank:
+	lda <zBank
+	pha
 	lda <zStage
 	and #$07
 	jsr ChangeBank
 	jsr SetupEnemySprites
-	mCHANGEBANK #$0E, 1
+	pla
+	jmp ChangeBank
 
 ;20 61 CB
 ;おそらく、スクロール番号Xから敵パレットを設定する

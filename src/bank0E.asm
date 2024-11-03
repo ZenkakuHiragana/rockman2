@@ -117,6 +117,8 @@ StartStage_Continue:
 	sta <zVScrollApparenthi
 	sta <zHScrollApparentlo
 	sta <zHScrollApparenthi
+	sta <zScrollClipFlag
+	sta <zScrollClipRoom
 	sta <zRoomApparent
 	sta <zOffscreen
 	sta aObjX
@@ -333,9 +335,13 @@ Rockman_Warp_to_Land:
 	and #$08
 	bne .onland
 .skip
-	.list
+	lda <zContinuePointY
+	cmp #$E0
+	bcc .valid
+	lda aObjY
+	bmi .onland
+.valid
 	jsr SpriteSetup
-	.nolist
 	jsr FrameAdvance1C
 	jmp .loop
 .onland
@@ -480,7 +486,7 @@ Item_TeleporterIn:
 	dex
 	stx <zStage
 	ldy .teleporter_patterntable,x
-	jsr SetupEnemySprites0E
+	jsr SetupEnemySpritesAnyBank
 	jsr Item_DrawEnemyPattern
 	ldx #$04
 	lda <zBossRushStage
@@ -551,7 +557,7 @@ Item_TeleporterOut:
 	cmp #$FF
 	bne .remaining
 	; ldy #$0B
-	; jsr SetupEnemySprites0E
+	; jsr SetupEnemySpritesAnyBank
 	; jsr Item_DrawEnemyPattern
 	lda <zRoom
 	ldx #$58 - 2 * 8 ;中央の4タイルだけ書き換える
@@ -602,7 +608,7 @@ Item_TeleporterWily:
 	inc aObjRoom
 	ldy #$0B
 	mMOV #$0C + 1, <zBossRushStage
-	jsr SetupEnemySprites0E
+	jsr SetupEnemySpritesAnyBank
 	jsr Item_DrawEnemyPattern
 	sec
 	lda <zRoom
@@ -725,7 +731,7 @@ Scroll_GoForward:
 	sta <zRoom
 	sta aObjRoom
 	sbc #$02
-	ldx #$18
+	ldx #$58
 	ldy #$10
 	jsr DrawRoom
 	sec
@@ -799,7 +805,7 @@ Table_ShutterAttr:
 ;ボスの居る画面数
 Table_BossRoom:
 	.db $63, $43, $5F, $61, $08, $8C, $43, $15
-	.db $00, $FC, $A8, $C8, $00, $1F
+	.db $00, $FC, $A8, $C8, $00, $41
 
 ;907D
 ;次の画面を描画

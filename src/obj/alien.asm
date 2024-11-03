@@ -170,7 +170,7 @@ Table_AlienPalette:
 ;9C6B
 ;2, エイリアン 
 Alien2:
-	jsr $9CD8
+	jsr Alien_SetVelocity
 	jsr BossBehaviour_MoveAndCollide
 	ldx #$0F
 	lda <$02
@@ -254,9 +254,9 @@ Alien_SetVelocity:
 Alien_Defeated:
 	ldx aObjVar + 1
 	bne .init
-	mMOVW $0FE0, aPPULinearlo, aPPULinearhi
-	mMOVW $9400, aBossPtrlo, aBossPtrhi
-	mMOV #$80, <zBossVar
+	mMOVW $1000 - $40, aPPULinearlo, aPPULinearhi
+	mMOVW Graphics_Dogeza, aBossPtrlo, aBossPtrhi
+	mMOV #$40, <zBossVar
 	inc aObjVar + 1
 	inx
 	mPLAYTRACK #$FF
@@ -296,44 +296,39 @@ Alien4:
 	lda <zBossVar
 	beq .end
 	lda #$08
-	jsr LoadBossBG
 	dec <zBossVar
-	rts
+	jmp LoadBossBG
 .end
 	inc aObjVar + 1
-	mMOVW $0F00, <$FD
-	rts
+	ldy #$0B
+	jmp SetupEnemySpritesAnyBank
 
 ;9D80
 ;5, エイリアン
 Alien5:
 	jsr Alien_DeathFlashScreen
-	lda <$FD
-	cmp #$60
-	bcs .skip
-	mJSR_NORTS WritePatternTable
+	lda <zPPUObjNum
+	ora <zPPUObjlo
+	beq .skip
+	rts
 .skip
 	inc aObjVar + 1
-	mMOVW $8D00, aBossPtrhi, aBossPtrlo
-	mSTZ <zNTPointer, <zPPUSqr
-	beq Alien6_Merge
+	mMOV #$20, <$FD
+	bne Alien6_Merge
 
 ;9DA2
 ;6, エイリアン
 Alien6:
 	jsr Alien_DeathFlashScreen
-	lda aBossPtrhi
-	and #$3F
+	lda <$FD
 	beq Alien6_FinishedWriting
 ;9DAC
 Alien6_Merge:
-	mMOV #$0C, <zStage
-	mMOV aBossPtrhi, <zPtrlo
-	mMOV aBossPtrlo, <zPtrhi
-	jsr WriteNameTableByScroll_AnyBank
-	mMOV #$0D, <zStage
-	inc aBossPtrhi
-	inc <zNTPointer
+	dec <zStage ;zStage = #$0C
+	lda #$42
+	jsr WriteMapAddress18
+	inc <zStage ;zStage = #$0D
+	dec <$FD
 	rts
 ;9DC7
 ;ネームテーブル書き込み終了
@@ -383,7 +378,7 @@ Table_AlienDogezaRoomPalette
 ;9E41
 ;7, エイリアン
 Alien7:
-	jsr $9E6D
+	jsr Alien7_Blink
 	lda aBossVar2
 	cmp #$24
 	beq .1
