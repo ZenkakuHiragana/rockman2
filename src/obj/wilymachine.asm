@@ -24,8 +24,8 @@ WilyMachine1:
 	sta aPalette + 4,x
 	dex
 	bpl .loop_palette_init
-	mMOVWB $15A0, aPPULinearhi
-	mMOV #$52, <zBossVar
+	mMOVWB $15C0 - $40, aPPULinearhi
+	mMOV #$2A, <zBossVar
 	inc aObjVar + 1
 ;背景画像読み込み
 .init
@@ -39,7 +39,7 @@ WilyMachine1:
 	rts
 .1
 	inc aObjVar + 1
-	mSTZ <zBossVar
+	mSTZ <zBossVar, <zPPULinear
 	mMOVWB $27CB, aPPULinearhi
 	rts
 .2 ;NT書き込み

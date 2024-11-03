@@ -195,6 +195,7 @@ MainLoop:
 	jsr DoRockman
 	jsr WeaponObjectProcess
 	jsr SpawnEnemyByScroll
+	jsr WriteEnemySprites
 	jsr DoBossBehaviour
 	jsr DoEnemyObjects
 	jsr SpriteSetup
@@ -256,6 +257,8 @@ PlaceBossRushCapsule:
 
 ;8223
 MainLoopBossRush:
+	mMOV #%10001100, <zScrollClipFlag
+	mMOV <zRoom, <zScrollClipRoom
 	jsr PlaceBossRushCapsule
 .loop
 	lda <zItemInterrupt
@@ -309,33 +312,30 @@ Rockman_Warp_to_Land:
 	mMOV aObjX, <$08
 	mMOV aObjRoom, <$09
 	clc
-	lda aObjY
-	adc #$10
-	sta aObjY
+	mADD aObjY, #$10
 	cmp <zContinuePointY
 	bcc .skip
 	sta <$0A
-	jsr PickupBlock
+	jsr PickupMap
 	lda <$00
 	and #$08
 	bne .skip
-	lda <$0A
-	adc #$10
-	sta <$0A
+	clc
+	mADD <$0A, #$10
 	cmp #$F0
 	bcc .carry
-	adc #$0F
+	adc #$10 - 1
 	sta <$0A
-	lda <$09
-	adc #$0F
-	sta <$09
+	mADD <$09, #$10 - 1
 .carry
-	jsr PickupBlock
+	jsr PickupMap
 	lda <$00
 	and #$08
 	bne .onland
 .skip
+	.list
 	jsr SpriteSetup
+	.nolist
 	jsr FrameAdvance1C
 	jmp .loop
 .onland
@@ -472,25 +472,25 @@ Item_GetExLife:
 ;838B
 Item_TeleporterIn:
 	jsr Item_IntoCapsule
-	mSTZ <$FD
+	lda <zRoom
+	ldx #$08
+	ldy #$1A
+	jsr DrawRoom
 	ldx <zBossRushStage
-	mMOV .teleporter_patterntable - 1,x, <$FE
 	dex
 	stx <zStage
+	ldy .teleporter_patterntable,x
+	jsr SetupEnemySprites0E
 	jsr Item_DrawEnemyPattern
-	mMOV #$0C, <zStage
-	ldx #$05
+	ldx #$04
 	lda <zBossRushStage
 	cmp #$04
 	bne .notbubble
-	ldx #$02
+	ldx #$05
 .notbubble
 	jsr Item_SetBossRushBG
 	inc <zRoom
 	inc aObjRoom
-	inc <zScrollNumber
-	inc <zScrollLeft
-	inc <zScrollRight
 	mMOV #$20, aObjX
 	mMOV #$B4, aObjY
 	jsr Item_OutofCapsule
@@ -502,7 +502,7 @@ Item_TeleporterIn:
 ;ボスラッシュのカプセルに入った時、パターンテーブルの書き換えを指定
 ;ステージごとのスクロール番号を指定する
 .teleporter_patterntable
-	.db $06, $04, $0D, $07, $11, $09, $04, $10
+	.db $03, $04, $04, $03, $04, $04, $01, $07
 
 ;83DF
 ;カプセルに入った時のアニメーション処理
@@ -532,10 +532,14 @@ Item_OutofCapsule:
 ;8416
 ;$FD = #$60までパターンテーブルに敵の画像を転送
 Item_DrawEnemyPattern:
-	jsr WritePatternTable
+	ldx <zBossRushStage
+	dex
+	stx <zStage
+	jsr WriteEnemySprites
+	mMOV #$0C, <zStage
 	jsr FrameAdvance1C
-	lda <$FD
-	cmp #$60
+	lda <zPPUObjNum
+	ora <zPPUObjlo
 	bne Item_DrawEnemyPattern
 	rts
 
@@ -546,21 +550,22 @@ Item_TeleporterOut:
 	mORA <zBossRushProg, StageBitTable,x
 	cmp #$FF
 	bne .remaining
-	mSTZ <$FD
-	mMOV #$14, <$FE
-	jsr Item_DrawEnemyPattern
-	lda #$28
+	; ldy #$0B
+	; jsr SetupEnemySprites0E
+	; jsr Item_DrawEnemyPattern
+	lda <zRoom
+	ldx #$58 - 2 * 8 ;中央の4タイルだけ書き換える
+	ldy #$04
 	jsr DrawRoom
-	mMOV #$28, <zRoom, aObjRoom, <zScrollLeft, <zScrollRight
+	inc <zRoom
+	inc aObjRoom
+	mMOV <zRoom, <zContinuePoint
 	bne .done
 .remaining
 	dec <zRoom
 	dec aObjRoom
-	dec <zScrollNumber
-	dec <zScrollLeft
-	dec <zScrollRight
 .done
-	ldx #$08
+	ldx #$00
 	jsr Item_SetBossRushBG
 	mSTZ <zBossBehaviour
 	ldx <zBossType
@@ -573,35 +578,37 @@ Item_TeleporterOut:
 
 ;8481
 Item_SetBossRushBG:
-	ldy #$02
-.loop
-	lda Table_BossRushBGColor,x
-	sta aPalette + $09,y
-;	sta aPaletteAnimBuf + $09,y
-;	sta aPaletteAnimBuf + $19,y
-;	sta aPaletteAnimBuf + $29,y
-;	sta aPaletteAnimBuf + $39,y
-	dex
-	dey
-	bpl .loop
+	ldy #$00
+	sty <zPaletteIndex
+	txa
+	bne .anim
+	ldy #$04
+.anim
+	sta <zPaletteOffset
+	sty aPaletteAnim
+	mMOV aPaletteAnimWait, <zPaletteTimer
 	rts
-
-;849A
-Table_BossRushBGColor:
-	.db $21, $11, $01
-	.db $19, $09, $0A
-	.db $19, $09, $21
 
 ;84A3
 Item_TeleporterWily:
 	jsr Item_IntoCapsule
-	lda #$29
+	sec
+	lda <zRoom
+	sbc #$01
+	ldx #$D8
+	ldy #$20
 	jsr DrawRoom
-	mMOV #$29, <zRoom, aObjRoom, <zScrollLeft, <zScrollRight
-	mSTZ <$FD
-	mMOV #$15, <$FE
+	inc <zRoom
+	inc aObjRoom
+	ldy #$0B
+	mMOV #$0C + 1, <zBossRushStage
+	jsr SetupEnemySprites0E
 	jsr Item_DrawEnemyPattern
-	lda #$2A
+	sec
+	lda <zRoom
+	sbc #$01
+	ldx #$D8
+	ldy #$20
 	jsr DrawRoom
 	mMOV #$B4, aObjY
 	mMOV #$28, aObjX

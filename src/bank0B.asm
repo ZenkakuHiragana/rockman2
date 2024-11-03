@@ -47,7 +47,8 @@ Table_BossBehaviourlo:
 	.db LOW(Pikopiko_kun)
 	.db LOW(GutsTank)
 	.db LOW(BooBeamTrap)
-	.db $C0, $2A
+	.db LOW(WilyMachine)
+	.db LOW(Alien)
 ;8045
 ;ボスの挙動アドレス上位
 Table_BossBehaviourhi:
@@ -63,7 +64,8 @@ Table_BossBehaviourhi:
 	.db HIGH(Pikopiko_kun)
 	.db HIGH(GutsTank)
 	.db HIGH(BooBeamTrap)
-	.db $96, $9B
+	.db HIGH(WilyMachine)
+	.db HIGH(Alien)
 ;8063
 ;時間停止中のボスの処理
 DoBossBehaviour_Stopping:

@@ -94,56 +94,8 @@ SpawnEnemyByScroll:
 	iny
 	cpy #$04
 	bne .loop_room
-	lda <zPPUObjNum
-	bne .writeobj
 .rts
 	mCHANGEBANK #$0E, 1
-;画像書き換え
-.writeobj
-	lda <zPPUHScr
-	ora <zPPUVScr
-	bne .rts
-	ldx <zPPUObjPtr
-	mMOV Stage_LoadGraphics,x, <zPtrhi
-	mMOV <zPPUObjlo, <zPtrlo
-	inx
-	mCHANGEBANK Stage_LoadGraphics,x
-	inx
-	ldy #$40
-	sty <zPPULinear
-	dey
-.loop
-	mMOV [zPtr],y, aPPULinearData,y
-	dey
-	bpl .loop
-	
-	clc
-	lda <zPPUObjlo
-	sta aPPULinearlo
-	adc #$40
-	sta <zPPUObjlo
-	lda <zPPUObjhi
-	sta aPPULinearhi
-	bcc .rts
-	inc <zPPUObjhi
-	stx <zPPUObjPtr
-	dec <zPPUObjNum
-	bpl .rts
-SpawnEnemyByScroll_WritePalette:
-	iny
-.loop_palette
-	cpy #$03
-	beq SpawnEnemyByScroll_WritePalette
-	
-	lda Stage_LoadGraphics,x
-	bmi .rts
-	sta aPaletteSpr + 9,y
-	inx
-	iny
-	cpy #$07
-	bne .loop_palette
-.rts
-	rts
 
 ;オブジェクト生成判定 Cフラグが立つ時生成中止
 ;A = 生成物のX座標
@@ -255,6 +207,7 @@ SpawnEnemy_SendCommand:
 	rts
 .4
 	tay ;敵番号80～8B: パターンテーブル転送の適用
+SetupEnemySprites:
 	mSTZ <zPPUObjlo
 	mMOV Stage_LoadGraphicsPtr,y, <zPPUObjhi
 	mMOV Stage_LoadGraphicsOrg,y, <zPPUObjPtr
@@ -263,7 +216,20 @@ SpawnEnemy_SendCommand:
 	asl a
 	adc <zPPUObjPtr
 	tax
-	jmp SpawnEnemyByScroll_WritePalette
+.write_palette
+	iny
+.loop_palette
+	cpy #$03
+	beq .write_palette
+	lda Stage_LoadGraphics,x
+	bmi .rts
+	sta aPaletteSpr + 9,y
+	inx
+	iny
+	cpy #$07
+	bne .loop_palette
+.rts
+	rts
 
 SpawnEnemy_RoomList:
 	.db $00, $01, $10, $11

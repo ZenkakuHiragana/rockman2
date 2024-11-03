@@ -1807,7 +1807,54 @@ WritePatternTable:
 	inc <$FD
 	pla
 	jsr ChangeBank
+.rts .public
 	rts
+
+;敵画像書き換え
+WriteEnemySprites:
+	lda <zPPUObjNum
+	beq WritePatternTable.rts
+
+	lda <zStage
+	and #$07
+	jsr ChangeBank
+
+	lda <zPPUHScr
+	ora <zPPUVScr
+	bne .rts
+	ldx <zPPUObjPtr
+	mMOV Stage_LoadGraphics,x, <zPtrhi
+	mMOV <zPPUObjlo, <zPtrlo
+	inx
+	mCHANGEBANK Stage_LoadGraphics,x
+	inx
+	ldy #$40
+	sty <zPPULinear
+	dey
+.loop
+	mMOV [zPtr],y, aPPULinearData,y
+	dey
+	bpl .loop
+	clc
+	lda <zPPUObjlo
+	sta aPPULinearlo
+	adc #$40
+	sta <zPPUObjlo
+	lda <zPPUObjhi
+	sta aPPULinearhi
+	bcc .rts
+	inc <zPPUObjhi
+	stx <zPPUObjPtr
+	dec <zPPUObjNum
+.rts
+	mCHANGEBANK #$0E, 1
+
+SetupEnemySprites0E:
+	lda <zStage
+	and #$07
+	jsr ChangeBank
+	jsr SetupEnemySprites
+	mCHANGEBANK #$0E, 1
 
 ;20 61 CB
 ;おそらく、スクロール番号Xから敵パレットを設定する
