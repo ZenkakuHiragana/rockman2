@@ -65,6 +65,7 @@ DoRockman_DoScroll:
 	ldx <zRoom
 	stx <zRoomPrev
 	ldy <zScrollClipRoom
+	lda <zScrollClipFlag
 	bmi .force_scrollclip_y
 	cpy aObjRoom
 	bne .skip_scrollclip
@@ -101,7 +102,7 @@ DoRockman_DoScroll:
 	lsr a
 	lsr a
 	lsr a
-	bit aObjY
+	bit aObjX
 	bmi .scrollclip_x_lowerside
 	lsr a
 .scrollclip_x_lowerside
@@ -124,16 +125,8 @@ DoRockman_DoScroll:
 	
 ;横スクロール
 	mMOV <zHScroll, <zHScrollPrev
-	lda <.dx          ;横スクロール制限によるスクロール量 = ±1
-	bne .noscrollclip_h
-	bit <.clipped
-	bpl .noscrollclip_h
-	tax
-	beq .limit_dx
-.noscrollclip_h
-	clc
-	adc <zMoveAmountX ;ロックマンの移動によるスクロール量
-	tax               ;X = スクロール制限 + ロックマンの移動による符号付きスクロール量
+	lda <zMoveAmountX ;ロックマンの移動によるスクロール量
+	tax               ;X = ロックマンの移動による符号付きスクロール量
 	clc
 	bpl .inv_dx
 	sec
@@ -145,7 +138,7 @@ DoRockman_DoScroll:
 	lda #.scroll_max
 .limit_dx
 	sta <.dx   ;最終的なスクロール量の決定
-	txa        ;X = スクロール制限 + ロックマンの移動による符号付きスクロール量
+	txa        ;X = ロックマンの移動による符号付きスクロール量
 	asl a      ;符号bitをキャリーフラグへ送る
 	ldy #$00   ;ChangeBank_GetScrollableの引数
 	ldx <zRoom ;ChangeBank_GetScrollableの引数
@@ -167,9 +160,14 @@ DoRockman_DoScroll:
 .scroll_right_force
 	inx ;現在の画面の1つ右
 	jsr ChangeBank_GetScrollable ;スクロール可能なら
+	lda #$00
+	bit <.clipped
+	bmi .scroll_right_clipped
 	tya
 	bpl .scroll_right_do
-	mMOV <zHScroll, <.dx ;不可能な場合、横スクロール値の分だけ左へスクロール
+	lda <zHScroll
+.scroll_right_clipped
+	sta <.dx ;不可能な場合、横スクロール値の分だけ左へスクロール
 	bpl .scroll_left_do
 .scroll_right_do
 	clc
@@ -195,11 +193,15 @@ DoRockman_DoScroll:
 .scroll_left_force
 	dex ;現在の画面の1つ左
 	jsr ChangeBank_GetScrollable
+	lda #$00
+	bit <.clipped
+	bmi .scroll_left_clipped
 	tya
 	bpl .scroll_left_do
 	lda <zHScroll
 	cmp <.dx
 	bcs .scroll_left_do
+.scroll_left_clipped
 	sta <.dx
 .scroll_left_do
 	mMOV #%10000000, <.f ;左スクロールフラグの設定

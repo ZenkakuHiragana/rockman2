@@ -18,6 +18,8 @@ GutsTank1:
 	mMOV #$02, aPaletteAnim, <zPaletteOffset
 	mMOV #$04, aPaletteAnimWait
 	mMOVWB $B200, aBossPtrhi, aBossPtrlo
+	lda <zPPULinear
+	bne .rts
 	mMOVWB $1100 - $40, aPPULinearhi
 	mMOV #$35, <zBossVar
 	mMOV #$20, <$FD

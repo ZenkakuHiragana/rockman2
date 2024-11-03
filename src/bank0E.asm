@@ -356,14 +356,15 @@ DoScroll:
 .right
 	jsr Scroll_GoForward
 .done
+	mSTZ <zScrollFlag
+	jsr SpawnEnemiesAll
 	ldx <zStage
 	lda <zRoom
 	cmp Table_BossRoom,x
-	bne .notspawnboss
-	jsr SpawnBoss
-.notspawnboss
-	mSTZ <zScrollFlag
-	jmp SpawnEnemiesAll
+	bne .rts
+	jmp SpawnBoss
+.rts
+	rts
 
 ;82D5
 ItemInterrupt:
