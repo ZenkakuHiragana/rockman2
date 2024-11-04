@@ -180,12 +180,15 @@ Table_Title_RockmanAnimation:
 ;ADF1
 ; 1988 BGテーブル
 Table_Opening_1988:
-	.db $00, $A7, $A5, $A1, $A1, $00
+	.db $A2, $A0, $A2, $A6
 
 ;ADF7
 ;CAPCOMBGテーブル
 Table_Opening_CAPCOM:
-	.db $C3, $C1, $D0, $C3, $CF, $CD
+	; .db $C3, $C1, $D0, $C3, $CF, $CD ;CAPCOM
+	.db $C8, $C9, $CD, $C1, $CA, $C9, $CE ;HIMAJIN
+	.db $C0
+	.db $CA, $C9, $C3, $C8, $C9, $CB, $D5 ;JICHIKU
 
 ;ADFD
 ;1988 フェードインテーブル

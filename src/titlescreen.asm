@@ -29,9 +29,9 @@
 	bpl .loop_initpalette
 	jsr ClearSprite1A
 	jsr EnableScreen1A
-	mMOV #$06, <zPPULinear
-	mMOVWB #$21CD, aPPULinearhi
-	ldx #$05
+	mMOV #$04, <zPPULinear
+	mMOVWB #$21D0 - 2, aPPULinearhi
+	ldx #$03
 .loop_write_1988
 	mMOV Table_Opening_1988,x, aPPULinearData,x ;1988 char table
 	dex
@@ -56,12 +56,13 @@
 	bne .loop_1988
 	dec <$FE
 	bpl .loop_1988_2
-	ldx #$05
+	mMOV #$D0 - 7, aPPULinearlo
+	ldx #$0E
 .loop_write_capcom
 	mMOV Table_Opening_CAPCOM,x, aPPULinearData,x ;CAPCOM char table
 	dex
 	bpl .loop_write_capcom
-	mMOV #$06, <zPPULinear
+	mMOV #$0F, <zPPULinear
 	dec <$FD
 	bpl .loop_capcom
 	mSTZ <zPPULinear

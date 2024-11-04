@@ -34,3 +34,6 @@ Table_WilyCastleNameTable:
 Graphics_Opening:
 	.incbin "graphs/toku/opening-spr.toku"
 	.incbin "graphs/toku/opening-bg.toku"
+	mBEGIN $09, $B000
+Graphics_TitleLogo:
+	.incbin "graphs/title.chr"
