@@ -548,31 +548,23 @@ LoadStageGraphics:
 
 ;敵キャラ画像読み込み
 	lda <zStage
-	and #$07
-	jsr ChangeBank
-	lda <zStage
 	and #$08
 	asl a
 	tax ; X = #$00 (8 bosses), #$10 (wily)
-	mMOV Stage_DefGraphics,x, <$00
 	ldy #$00
+	mMOV #$06, <$00
 .loop_graphics
 	lda <zStage
 	and #$07
 	jsr ChangeBank
-	inx
-	mMOV Stage_DefGraphics,x, <$01
-	inx
 	mMOV Stage_DefGraphics,x, <.ptrhi
 	inx
 	lda Stage_DefGraphics,x
+	inx
 	jsr ChangeBank
 .loop
 	mMOV [.ptr],y, $2007
 	iny
-	bne .loop
-	inc <.ptrhi
-	dec <$01
 	bne .loop
 	dec <$00
 	bne .loop_graphics
@@ -592,21 +584,54 @@ LoadStageGraphics:
 	jsr LoadGraphicsCompressed.continue
 .8boss
 ;パレット書き込み
-	ldy #$21
-.loop_palette
+	ldy #$10
 	lda <zStage
-	and #$08
-	bne .wily
-	lda Stage_Palette - 2,y
+	lsr a
+	lsr a
+	lsr a
+	lsr a
+.loop_palette
+	bcs .wily
+	lda Stage_Palette - 1,y
 	bpl .write
 .wily
-	lda Stage_PaletteWily - 2,y
+	lda Stage_PaletteWily - 1,y
 .write
-	sta aPalette - 2,y
+	sta aPalette - 1,y
+	sta aPaletteSpr - 1,y
 	dey
-	bpl .loop_palette
+	bne .loop_palette
+	bcc .wily2
+	iny ;Y = 0 (8ボス), 1(ワイリー)
+.wily2
+	mMOV Stage_PaletteAnimNum,y, aPaletteAnim
+	mMOV Stage_PaletteAnimWait,y, aPaletteAnimWait
+;スプライトのパレット書き込み
+	ldy #$05
+	bcc .wily3
+	ldy #$05 + Stage_EnemyPaletteWily - Stage_EnemyPalette
+.wily3
+	ldx #$07
+.loop_enemypalette
+	cpx #$04
+	bne .skip
+	dex
+.skip
+	mMOV Stage_EnemyPalette,y, aPaletteSpr + 8,x
+	dey
+	dex
+	bne .loop_enemypalette
+;肌色の書き込み
+	ldy #$02
+.loop_commonpalette
+	; mMOV Table_BodyColor + 1,y, aPaletteSpr + 1,y
+	mMOV .table_commonpalette,y, aPaletteSpr + 4 + 1,y
+	dey
+	bpl .loop_commonpalette
 	jsr WritePalette
 	mCHANGEBANK #$0E, 1
+.table_commonpalette
+	.db $0F, $30, $38
 
 ;背景画像読み込み $0A~$0B から
 ;decompresses a group of tiles from PRG-ROM to CHR-RAM

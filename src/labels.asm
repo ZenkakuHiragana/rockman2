@@ -581,36 +581,43 @@ Stage_DefItemsPtr = $8D20
 ;画面ごとのアイテム配置量
 Stage_DefItemsAmount = $8D60
 ;パレットアニメーション枚数
-Stage_PaletteAnimNum = $8DA0
+Stage_PaletteAnimNum = $BFC0
 ;パレットアニメーション待ち時間
-Stage_PaletteAnimWait = $8DA0 + 1
+Stage_PaletteAnimWait = $BFC2
 ;パレット定義
-Stage_Palette = $8DA0 + 2
+Stage_Palette = $8DA0
 ;パレットアニメーション定義
-Stage_PaletteAnim = $8DC0 + 2
-
-Stage_PaletteAnimNumWily = $8E60 + 2
-Stage_PaletteAnimWaitWily = $8E60 + 3
-Stage_PaletteWily = $8E60 + 4
-Stage_PaletteAnimWily = $8E80 + 4
+Stage_PaletteAnim = $8DA0
+;敵スプライトのパレット定義
+Stage_EnemyPalette = $BFE4
+;パレットアニメーション枚数（ワイリーステージ）
+Stage_PaletteAnimNumWily = $BFC1
+;パレットアニメーション待ち時間（ワイリーステージ）
+Stage_PaletteAnimWaitWily = $BFC3
+;パレット定義（ワイリーステージ）
+Stage_PaletteWily = $8E60
+;パレットアニメーション定義（ワイリーステージ）
+Stage_PaletteAnimWily = $8E60
+;敵スプライトのパレット定義（ワイリーステージ）
+Stage_EnemyPaletteWily = $BFEA
 
 ;敵画像読み込みセット読み込み開始位置
-Stage_LoadGraphicsOrg = $8F20 + 4
+Stage_LoadGraphicsOrg = $8F20
 ;敵画像読み込みセット書き込み回数
-Stage_LoadGraphicsNum = $8F20 + 4 + $0C
+Stage_LoadGraphicsNum = $8F30
 ;敵画像読み込みセット書き込み位置
-Stage_LoadGraphicsPtr = $8F20 + 4 + $18
+Stage_LoadGraphicsPtr = $8F40
 ;敵画像読み込みセット
-Stage_LoadGraphics = $8F48
+Stage_LoadGraphics = $8F50
 
-Stage_BeginPointY     = $8FE0 - 4 ;ステージ開始時降下Y座標
-Stage_BeginPointYWily = $8FE0 - 3 ;ワイリーステージ開始時降下Y座標
-Stage_BeginPoint      = $8FE0 - 2 ;ステージ開始位置定義
-Stage_BeginPointWily  = $8FE0 - 1 ;ワイリーステージ開始位置定義
+Stage_BeginPointY     = $BFD0 ;ステージ開始時降下Y座標
+Stage_BeginPointYWily = $BFD1 ;ワイリーステージ開始時降下Y座標
+Stage_BeginPoint      = $BFD2 ;ステージ開始位置定義
+Stage_BeginPointWily  = $BFD3 ;ワイリーステージ開始位置定義
 
 ;画像セット定義
-Stage_DefGraphics = $8FE0
-Stage_DefGraphicsWily = $8FF0
+Stage_DefGraphics = $BFC4
+Stage_DefGraphicsWily = $BFD4
 
 ;8x8画面定義
 Stage_DefRoom = $B000
