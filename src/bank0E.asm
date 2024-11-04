@@ -97,7 +97,7 @@ StartStage_NoEnergyRegen:
 	sta aItemLife,x
 	dex
 	bpl .itemloop
-	mSTZ <zBossRushProg, <zContinuePoint
+	mSTZ <zBossRushProg, <zContinuePoint, <zPaletteOffset
 ;80AB
 ;死亡時のコンティニュー位置
 StartStage_Continue:
@@ -125,7 +125,6 @@ StartStage_Continue:
 	sta aObjXlo
 	sta <zPaletteIndex
 	sta <zPaletteTimer
-	sta <zPaletteOffset
 	sta <zBossBehaviour
 	jsr ChangeBodyColor
 	ldx #$0F
