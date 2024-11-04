@@ -154,25 +154,14 @@ SpawnEnemy_CheckOffscreen:
 SpawnEnemy_SendCommand:
 .room = $02
 	and #$7F
+	cmp #$7F
+	beq .set_continuepoint
 	cmp #$40
 	bcc .1
-	and #$3F ;敵番号C0～FF: スクロール移動先の設定
-	sta <zScrollNumber
-.bit_00010000
-	bpl .rts
-.1
-	cmp #$30 ;敵番号B0～BF: シャッター高さの設定
-	bcc .2
-	sbc #$30
-	asl a
-	asl a
-	asl a
-	asl a
-	sta <zShutterHeight
-	bcc .rts
-.2
-	cmp #$0F ;敵番号8F: 中間ポイントの設定
-	bne .3
+	and #$3F
+	sta <zScrollNumber ;敵番号C0～FE: スクロール移動先の設定
+	rts
+.set_continuepoint ;敵番号FF: 中間ポイントの設定
 	mMOV <.room, <zContinuePoint
 	lda Stage_DefEnemiesY - 1,y
 	and #$0F
@@ -185,9 +174,19 @@ SpawnEnemy_SendCommand:
 	and #$0F
 	sta <zContinuePaletteOffset
 	rts
-.3
-	cmp #$0E ;敵番号8E: スクロール制限の開始
-	bne .4
+.1
+	cmp #$3F
+	beq .set_scrollclip
+	cmp #$30 ;敵番号B0～BB: シャッター高さの設定
+	bcc .2
+	sbc #$30
+	asl a
+	asl a
+	asl a
+	asl a
+	sta <zShutterHeight
+	rts
+.set_scrollclip ;敵番号BF: スクロール制限の開始
 	lda Stage_DefEnemiesY - 1,y
 	and #%00000011
 	sta <zScrollClipFlag
@@ -196,17 +195,15 @@ SpawnEnemy_SendCommand:
 	asl a
 	asl a
 	ora <zScrollClipFlag
-	bit .bit_00010000
+	bit SpawnEnemiesAll.bit_00010000
 	beq .noset_n
 	ora #%10000000
 .noset_n
 	sta <zScrollClipFlag
-
 	mMOV <.room, <zScrollClipRoom
-.rts
 	rts
-.4
-	tay ;敵番号80～8D: パターンテーブル転送の適用
+.2
+	tay ;敵番号80～8F: パターンテーブル転送の適用
 SetupEnemySprites:
 	mSTZ <zPPUObjlo
 	mMOV Stage_LoadGraphicsPtr,y, <zPPUObjhi
@@ -276,6 +273,7 @@ SpawnEnemiesAll:
 .loop
 	sty <.ptr
 	lda Stage_DefEnemies - 1,y
+.bit_00010000 .public
 	bpl .sendchr
 	jsr SpawnEnemy_SendCommand
 	jmp .1

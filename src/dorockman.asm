@@ -230,16 +230,22 @@ DoRockman_DoScroll:
 	jmp .merge_v
 .onscreen_v
 	mMOV <zVScroll, <zVScrollPrev
+	mMOV <.clipped, <$C1
+	mMOV <zMoveAmountY, <$C2
 	lda <.dy          ;縦スクロール制限によるスクロール量 = ±1
-	bne .noscrollclip_v
+	sta <$C0
 	bit <.clipped
 	bvc .noscrollclip_v
 	tax
 	beq .limit_dy
+	eor <zMoveAmountY
+	asl a ;移動方向が制限とロックマンの移動で異なる -> Cセット
+	txa
+	bcs .noadd_dy
 .noscrollclip_v
-	; asl a
 	clc
 	adc <zMoveAmountY ;ロックマンの移動によるスクロール量
+.noadd_dy
 	tax               ;X = スクロール制限 + ロックマンの移動による符号付きスクロール量
 	clc
 	bpl .inv_dy
