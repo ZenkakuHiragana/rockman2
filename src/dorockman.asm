@@ -690,6 +690,20 @@ DoRockman0A_LadderTop:
 	lda #$00
 	sta aObjWait
 .skip4
+	ldx <zOffscreen
+	dex
+	beq .do_scrollflag
+	sec
+	lda aObjY
+	sbc <zVScroll
+	bcs .borrow
+	sbc #$10 - 1
+.borrow
+	cmp #$08
+	bcs .skip_scrollflag
+.do_scrollflag
+	mMOV #$03, <zScrollFlag
+.skip_scrollflag
 	mJSR_NORTS SetRockmanAnimation
 ;8769
 .shoot
@@ -1199,7 +1213,7 @@ DoRockman_CheckAttr_Center:
 	cmp #$03
 	beq .water
 .notboss
-	lda <zBGAttr2
+	lda <zBGAttr3
 	cmp #$10
 	bcc .skip_special ;落下死判定
 	and #$03
@@ -1210,7 +1224,8 @@ DoRockman_CheckAttr_Center:
 	mMOV #$01, <zStatus
 	jmp DieRockman
 .skip_special
-	cmp #$01
+	ldy <zBGAttr2
+	dey
 	bne .air
 	lda <zWaterLevel
 	bne .water
