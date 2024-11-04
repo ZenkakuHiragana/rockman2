@@ -105,6 +105,7 @@ Partial Class Form1
         Me.ChangeScreenNumberToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.bg_chipinfo = New System.ComponentModel.BackgroundWorker()
         Me.bg_tileinfo = New System.ComponentModel.BackgroundWorker()
+        Me.CheckBoxTerrainView = New System.Windows.Forms.CheckBox()
         CType(Me.scr, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.MenuStrip1.SuspendLayout()
         Me.TabControl1.SuspendLayout()
@@ -156,19 +157,19 @@ Partial Class Form1
         'Menu_Open
         '
         Me.Menu_Open.Name = "Menu_Open"
-        Me.Menu_Open.Size = New System.Drawing.Size(180, 22)
+        Me.Menu_Open.Size = New System.Drawing.Size(113, 22)
         Me.Menu_Open.Text = "開く(&O)"
         '
         'Menu_Save
         '
         Me.Menu_Save.Name = "Menu_Save"
-        Me.Menu_Save.Size = New System.Drawing.Size(180, 22)
+        Me.Menu_Save.Size = New System.Drawing.Size(113, 22)
         Me.Menu_Save.Text = "保存(&S)"
         '
         'Menu_Exit
         '
         Me.Menu_Exit.Name = "Menu_Exit"
-        Me.Menu_Exit.Size = New System.Drawing.Size(180, 22)
+        Me.Menu_Exit.Size = New System.Drawing.Size(113, 22)
         Me.Menu_Exit.Text = "終了(&X)"
         '
         'Menu_ShowAll
@@ -214,6 +215,7 @@ Partial Class Form1
         '
         'tmap
         '
+        Me.tmap.Controls.Add(Me.CheckBoxTerrainView)
         Me.tmap.Controls.Add(Me.Panel1)
         Me.tmap.Controls.Add(Me.TextBoxScreenNum)
         Me.tmap.Controls.Add(Me.TextBoxObjY)
@@ -839,6 +841,17 @@ Partial Class Form1
         'bg_tileinfo
         '
         '
+        'CheckBoxTerrainView
+        '
+        Me.CheckBoxTerrainView.Appearance = System.Windows.Forms.Appearance.Button
+        Me.CheckBoxTerrainView.Location = New System.Drawing.Point(478, 614)
+        Me.CheckBoxTerrainView.Name = "CheckBoxTerrainView"
+        Me.CheckBoxTerrainView.Size = New System.Drawing.Size(40, 40)
+        Me.CheckBoxTerrainView.TabIndex = 15
+        Me.CheckBoxTerrainView.Text = "判定表示"
+        Me.CheckBoxTerrainView.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        Me.CheckBoxTerrainView.UseVisualStyleBackColor = True
+        '
         'Form1
         '
         Me.AllowDrop = True
@@ -962,4 +975,5 @@ Partial Class Form1
     Friend WithEvents ColumnD As DataGridViewTextBoxColumn
     Friend WithEvents ColumnE As DataGridViewTextBoxColumn
     Friend WithEvents ColumnF As DataGridViewTextBoxColumn
+    Friend WithEvents CheckBoxTerrainView As CheckBox
 End Class

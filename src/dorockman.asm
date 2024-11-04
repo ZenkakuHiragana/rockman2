@@ -1574,6 +1574,7 @@ DoRockman_CheckLift:
 .x = $08
 .r = $01
 .y = $0A
+.y2 = $0B
 	lda <zOffscreen
 	bne .done_all
 	sec
@@ -1581,11 +1582,29 @@ DoRockman_CheckLift:
 	sec
 	lda aObjY
 	sbc <zVScroll
-	bcs .skip_offsety
+	bcs .skip_offsety1
 	sbc #$10 - 1
-.skip_offsety
+.skip_offsety1
 	adc #$0C - 1
+	cmp #$F0
+	bcc .skip_offsety2
+	adc #$10 - 1
+.skip_offsety2
 	sta <.y
+	
+	sec
+	lda <zMoveAmountY
+	sbc <zVScroll
+	bcs .skip_offsety3
+	sbc #$10 - 1
+.skip_offsety3
+	adc #$0C - 1
+	cmp #$F0
+	bcc .skip_offsety4
+	adc #$10 - 1
+.skip_offsety4
+	sta <.y2
+
 	lda <zEquipment
 	cmp #$09
 	bcc .enemylift_begin
@@ -1602,6 +1621,8 @@ DoRockman_CheckLift:
 .enemylift_begin
 	ldx #$0F
 .loop_enemy
+	lda aObjFlags10,x
+	bpl .done_enemy
 	lda aPlatformWidth10,x
 	bne .enemylift
 .done_enemy
@@ -1629,7 +1650,7 @@ DoRockman_CheckLift:
 	bcs .borrow_enemyy
 	sbc #$10 - 1
 .borrow_enemyy
-	cmp <.y
+	cmp <.y2
 	bcc .done_enemy
 	lda aPlatformY10,x
 	sbc <zVScroll
@@ -1690,7 +1711,7 @@ DoRockman_CheckLift:
 	bcs .borrow_itemy
 	sbc #$10 - 1
 .borrow_itemy
-	cmp <.y
+	cmp <.y2
 	bcc .skip_item
 	lda aWeaponPlatformY,x
 	sbc <zVScroll

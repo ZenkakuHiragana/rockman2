@@ -194,6 +194,7 @@ Partial Public Class Form1
 
     Private Sub Draw16Tile(ByRef g As Graphics, ByRef cur As Point, ByVal a As UInteger, ByVal at As UInteger, ByVal mag As UInteger)
         Dim graphnum As UInteger
+        Dim cur0 As Point = cur
 
         For x8 As UInteger = 0 To 1
             For y8 As UInteger = 0 To 1
@@ -206,6 +207,25 @@ Partial Public Class Form1
         Next
     End Sub
 
+    Dim flagbrushes() As SolidBrush = {
+        New SolidBrush(Color.FromArgb(0, Color.Transparent)),
+        New SolidBrush(Color.FromArgb(192, Color.LightBlue)),
+        New SolidBrush(Color.FromArgb(192, Color.Green)),
+        New SolidBrush(Color.FromArgb(192, Color.White)),
+        New SolidBrush(Color.FromArgb(192, Color.Magenta)),
+        New SolidBrush(Color.FromArgb(192, Color.Magenta)),
+        New SolidBrush(Color.FromArgb(192, Color.Magenta)),
+        New SolidBrush(Color.FromArgb(192, Color.Magenta)),
+        New SolidBrush(Color.FromArgb(192, Color.Yellow)),
+        New SolidBrush(Color.FromArgb(192, Color.Red)),
+        New SolidBrush(Color.FromArgb(192, Color.Orange)),
+        New SolidBrush(Color.FromArgb(192, Color.YellowGreen)),
+        New SolidBrush(Color.FromArgb(192, Color.Cyan)),
+        New SolidBrush(Color.FromArgb(192, Color.Magenta)),
+        New SolidBrush(Color.FromArgb(192, Color.Magenta)),
+        New SolidBrush(Color.FromArgb(192, Color.Gray))
+    }
+
     ' <param name="mag">倍率。</param>
     ''' <summary>
     ''' 32x32を描画します。
@@ -214,7 +234,7 @@ Partial Public Class Form1
     ''' <param name="cur">描画する左上の位置。</param>
     ''' <param name="a">タイル番号。</param>
     Private Sub Draw32Chip(ByRef g As Graphics, ByRef cur As Point, ByVal a As UInteger, ByVal mag As UInteger)
-        Dim tilenum, at As UInteger '属性、ドットの色、8x8グラのデータ読み取り位置
+        Dim tilenum, at, f As UInteger 'タイル番号、属性、地形判定番号
         'Dim bitmask_inv() As Byte = {1, 2, 4, 8, &H10, &H20, &H40, &H80}
         Dim attrmask() As Byte = {&H3, &H30, &HC, &HC0}
         Dim attrshiftmask() As Byte = {0, 4, 2, 6}
@@ -223,8 +243,17 @@ Partial Public Class Form1
             For y16 As UInteger = 0 To 1
                 tilenum = chip(a * 4 + x16 * 2 + y16) And &H7F
                 at = ((attr(a) And attrmask(x16 * 2 + y16)) >> attrshiftmask(x16 * 2 + y16)) And 3
+                f = If(y16 > 0, flag(a * 2 + x16) And &HF, flag(a * 2 + x16) >> 4)
                 Draw16Tile(g, cur, tilenum, at, mag)
                 cur += New Point(-16, 16)
+
+                '判定表示
+                If CheckBoxTerrainView.Checked Then
+                    SyncLock Me
+                        g.FillRectangle(flagbrushes(f),
+                        cur.X * mag, (cur.Y - 16) * mag, 16 * mag, 16 * mag)
+                    End SyncLock
+                End If
             Next
             cur += New Point(16, -32)
         Next
@@ -249,6 +278,7 @@ Partial Public Class Form1
             For Ym As UInteger = 0 To 1
                 roomnum = map((((ViewOrigin.Y + Ym) * 16) + ViewOrigin.X + Xm) Mod &H100)
                 If roomnum < &H40 Then
+                    '地形描画
                     For x32 As UInteger = 0 To 7 '32x32 chip loop
                         For y32 As UInteger = 0 To 7
                             chipnum = room(roomnum * &H40 + x32 * 8 + y32)

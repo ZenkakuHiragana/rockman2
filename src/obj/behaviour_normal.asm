@@ -891,14 +891,10 @@ EN12:
 .merge_set
 	ldx <zObjIndex
 	tay
-	lda .vylo,y
-	sta aObjVYlo,x
-	lda .vy,y
-	sta aObjVY,x
-	lda .vx,y
-	sta aObjVXlo,x
-	lda .vec,y
-	sta aObjFlags,x
+	mMOV .vylo,y, aObjVYlo,x
+	mMOV .vy,y, aObjVY,x
+	mMOV .vx,y, aObjVXlo,x
+	mMOV .vec,y, aObjFlags,x
 	mMOV aEnemyOrder,x, <$00
 	jsr MoveEnemy
 	bcc .still_exists

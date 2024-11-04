@@ -1550,6 +1550,11 @@ Public Class Form1
         End If
     End Sub
 
+    Private Sub CheckBoxTerrainView_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBoxTerrainView.CheckedChanged
+        DrawScr(scr)
+        scr.Refresh()
+    End Sub
+
     '地形/オブジェクト切り替えのラジオボタン
     Private Sub Radio_EditTerrain_CheckedChanged(sender As Object, e As EventArgs) Handles Radio_EditTerrain.CheckedChanged, Radio_EditEnemies.CheckedChanged
         scr.ContextMenuStrip = If(Radio_EditTerrain.Checked, Nothing, ContextMenuStripObj)
