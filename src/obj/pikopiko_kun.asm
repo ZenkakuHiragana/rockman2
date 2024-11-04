@@ -112,14 +112,15 @@ WriteMapAddress18:
 	lda <$FD
 	asl a
 	asl a
+	sbc #($02 << 2) - 1
+	bcs .skip
+	dey
+.skip
 	asl a
-	adc #$D8
 	sta <zHScroll
-	tya
-	adc #$FE
-	sta <zRoom
+	dey
+	sty <zRoom
 	mSTZ <zVScroll
-.loop
 	ldy #$01
 	sty <$00
 	dey

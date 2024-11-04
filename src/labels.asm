@@ -651,6 +651,8 @@ SpawnEnemyBoundaryY = $08
 ;水中ラグの間隔
 WaterLagInterval = $03
 
+;1フレームあたりの最大スクロール量
+Scroll_MaxAmount = $08
 ;スクロールが始まるロックマンの画面内X座標
 Scroll_LeftBound = $80
 Scroll_RightBound = $80

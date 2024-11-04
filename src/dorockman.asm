@@ -53,7 +53,6 @@ DoRockman_DoScroll:
 .dy  = $04 ;移動差Y
 .clipped = $05 ;スクロール制限によるスクロールが実際に発生したか
 .screeny = $06 ;ロックマンの画面内Y座標
-.scroll_max = $08 ;スクロール可能な最大量
 	txa
 	sta <.nth
 	sta <.ntv
@@ -133,9 +132,9 @@ DoRockman_DoScroll:
 	eor #$FF
 .inv_dx
 	adc #$01
-	cmp #.scroll_max ;A = abs(横スクロール量)
+	cmp #Scroll_MaxAmount ;A = abs(横スクロール量)
 	bcc .limit_dx    ;スクロール最大量の制限
-	lda #.scroll_max
+	lda #Scroll_MaxAmount
 .limit_dx
 	sta <.dx   ;最終的なスクロール量の決定
 	txa        ;X = ロックマンの移動による符号付きスクロール量
@@ -250,9 +249,9 @@ DoRockman_DoScroll:
 	eor #$FF
 .inv_dy
 	adc #$01
-	cmp #.scroll_max ;スクロール最大量の制限
+	cmp #Scroll_MaxAmount ;スクロール最大量の制限
 	bcc .limit_dy
-	lda #.scroll_max
+	lda #Scroll_MaxAmount
 .limit_dy
 	sta <.dy   ;最終的なスクロール量の決定
 	sec
@@ -1413,10 +1412,10 @@ DoRockman_BodyMoveY_NoHit:
 	sbc <zGravityhi
 	sta aObjVY
 	bpl DoRockman_BodyMoveY_NoHit_Done
-	cmp #$F8
+	cmp #-Scroll_MaxAmount
 	bcs DoRockman_BodyMoveY_NoHit_Done
 	mSTZ aObjVYlo
-	mMOV #$F8, aObjVY
+	mMOV #-Scroll_MaxAmount, aObjVY
 DoRockman_BodyMoveY_NoHit_Done:
 .r = $01
 	lda aObjRoom

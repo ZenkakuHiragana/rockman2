@@ -136,8 +136,8 @@ StartStage_Continue:
 	sec
 	lda <zRoom
 	sbc #$02
-	ldx #$00
-	ldy #$41
+	ldx #$F8 - 3 * 8
+	ldy #$20 + 3 + 2
 	jsr DrawRoom
 	jsr ClearSprites
 	mORA <z2001,#%00011110
@@ -480,7 +480,7 @@ Item_TeleporterIn:
 	jsr Item_IntoCapsule
 	lda <zRoom
 	ldx #$08
-	ldy #$1A
+	ldy #$1E
 	jsr DrawRoom
 	ldx <zBossRushStage
 	dex
@@ -560,7 +560,7 @@ Item_TeleporterOut:
 	; jsr SetupEnemySpritesAnyBank
 	; jsr Item_DrawEnemyPattern
 	lda <zRoom
-	ldx #$58 - 2 * 8 ;中央の4タイルだけ書き換える
+	ldx #$78 - 2 * 8 ;中央の4タイルだけ書き換える
 	ldy #$04
 	jsr DrawRoom
 	inc <zRoom
@@ -601,7 +601,7 @@ Item_TeleporterWily:
 	sec
 	lda <zRoom
 	sbc #$01
-	ldx #$D8
+	ldx #$F8
 	ldy #$20
 	jsr DrawRoom
 	inc <zRoom
@@ -613,7 +613,7 @@ Item_TeleporterWily:
 	sec
 	lda <zRoom
 	sbc #$01
-	ldx #$D8
+	ldx #$F8
 	ldy #$20
 	jsr DrawRoom
 	mMOV #$B4, aObjY
@@ -691,7 +691,7 @@ Scroll_GoForward:
 	sta <zScrollNumber
 	sec
 	sbc #$02
-	ldx #$D8
+	ldx #$F8
 	ldy #$20
 	jsr DrawRoom
 	mMOV #$19, <$FD
@@ -731,13 +731,13 @@ Scroll_GoForward:
 	sta <zRoom
 	sta aObjRoom
 	sbc #$02
-	ldx #$58
+	ldx #$78
 	ldy #$10
 	jsr DrawRoom
 	sec
 	lda <zScrollNumber
 	sbc #$01
-	ldx #$D8
+	ldx #$F8
 	ldy #$10
 	jsr DrawRoom
 ;シャッター閉じる処理

@@ -683,7 +683,7 @@ WriteMapAddressOffScreen1A:
 	sec
 	sbc #$02
 	sta <zRoom
-	mMOV #$D8, <zHScroll
+	mMOV #$F8, <zHScroll
 	mSTZ <zVScroll
 	mMOV #$20, <$FD
 .loop
