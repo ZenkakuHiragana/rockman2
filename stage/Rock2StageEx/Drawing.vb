@@ -32,17 +32,19 @@ Partial Public Class Form1
 
     'アニメーション用、タイマースレ
     Private Sub AnimationTimer(ByVal o As Object)
-        If numpalanim = 0 Or palwait = 0 Then Exit Sub
+        Dim wily As Boolean = WilyToolStripMenuItem.Checked
+        Dim n As Integer = If(wily, numpalanimwily, numpalanim)
+        Dim wait As Integer = If(wily, palwaitwily, palwait)
+        If n = 0 OrElse wait = 0 Then Exit Sub
+
         'みょ～に例外が出やすいので、出たら中断
         Try
             _Pi += CByte(1) '枚数 + 1
-            If _Pi >= numpalanim Then _Pi = 0 'ループ
+            If _Pi >= n Then _Pi = 0 'ループ
             '現在のパレットを変える
-            SyncLock palette
-                For i As UInteger = 0 To 15
-                    palette(i) = palanim(_Pi * 16 + i)
-                Next
-            End SyncLock
+            For i As UInteger = 0 To 15
+                palette(i) = If(wily, palanimwily, palanim)(_Pi * 16 + i)
+            Next
             DrawAll()
 
             Me.Invoke(LblBkColorDelegate, New Object() {Nothing})
@@ -118,6 +120,8 @@ Partial Public Class Form1
         For Each o As Control In GetAllControls(Me)
             If TypeOf o Is PictureBox Then
                 o.Refresh()
+            ElseIf TypeOf o Is DataGridView Then
+                o.Refresh()
             End If
         Next
         Application.DoEvents()
@@ -135,23 +139,29 @@ Partial Public Class Form1
 
         '32x32 line
         For i As UInteger = 1 To 15
-            g.DrawLine(chain, New Point(0, sender.ClientSize.Height / 16 * i), New Point(sender.ClientSize.Width, sender.ClientSize.Height / 16 * i))
-            g.DrawLine(chain, New Point(sender.ClientSize.Width / 16 * i, 0), New Point(sender.ClientSize.Width / 16 * i, sender.ClientSize.Height))
+            Dim p11 As New Point(0, sender.ClientSize.Height / 16 * i)
+            Dim p12 As New Point(sender.ClientSize.Width, sender.ClientSize.Height / 16 * i)
+            Dim p21 As New Point(sender.ClientSize.Width / 16 * i, 0)
+            Dim p22 As New Point(sender.ClientSize.Width / 16 * i, sender.ClientSize.Height)
+            SyncLock Me
+                g.DrawLine(chain, p11, p12)
+                g.DrawLine(chain, p21, p22)
+            End SyncLock
         Next
 
         chain.Brush = Brushes.White
-        'horizontal center line
-        g.DrawLine(chain, New Point(0, center.Y), New Point(sender.ClientSize.Width, center.Y))
-        'vertical center line
-        g.DrawLine(chain, New Point(center.X, 0), New Point(center.X, sender.ClientSize.Height))
+        SyncLock Me
+            g.DrawLine(chain, 0, center.Y, sender.ClientSize.Width, center.Y) 'horizontal center line
+            g.DrawLine(chain, center.X, 0, center.X, sender.ClientSize.Height) 'vertical center line
+        End SyncLock
     End Sub
 
 
-    Private Function GetPalette(c As Byte)
+    Private Function GetPalette(c As Byte) As SolidBrush
         c = c And &H3F
         Dim cr = Color.FromArgb(255, My.Resources.nes(c * 3),
-                               My.Resources.nes(c * 3 + 1),
-                               My.Resources.nes(c * 3 + 2))
+                                     My.Resources.nes(c * 3 + 1),
+                                     My.Resources.nes(c * 3 + 2))
         Return New SolidBrush(cr)
     End Function
 
@@ -173,7 +183,11 @@ Partial Public Class Form1
                     c = c Or 2
                 End If
 
-                g.FillRectangle(PaletteBrushes(palette(4 * at + c)), (cur.X + x) * mag, (cur.Y + y) * mag, mag, mag)
+                Dim b As Brush = PaletteBrushes(palette(4 * at + c))
+                Dim r As New Rectangle((cur.X + x) * mag, (cur.Y + y) * mag, mag, mag)
+                SyncLock Me
+                    g.FillRectangle(b, r)
+                End SyncLock
             Next
         Next
     End Sub
@@ -219,234 +233,225 @@ Partial Public Class Form1
     Private Sub DrawScr(sender As Object)
         If scrBuf Is Nothing Then Exit Sub
 
-        SyncLock scrBuf
-            Dim g As Graphics = scrBuf.Graphics
+        Dim g As Graphics = scrBuf.Graphics
 
-            '地形描画用
-            Dim mapimage As New Bitmap(256, 256)
-            Dim cur As New Point(0, 0)
-            Dim roomnum, chipnum As UInteger
+        '地形描画用
+        Dim mapimage As New Bitmap(256, 256)
+        Dim cur As New Point(0, 0)
+        Dim roomnum, chipnum As UInteger
 
-            '敵位置描画用
-            Dim p As Point
-            Dim type As UInteger
-            Dim s As String
-            Dim pen As Pen, brush As Brush
-            SyncLock palette
-                For Xm As UInteger = 0 To 1
-                    For Ym As UInteger = 0 To 1
-                        roomnum = map((((ViewOrigin.Y + Ym) * 16) + ViewOrigin.X + Xm) Mod &H100)
-                        If roomnum < &H40 Then
-                            For x32 As UInteger = 0 To 7 '32x32 chip loop
-                                For y32 As UInteger = 0 To 7
-                                    chipnum = room(roomnum * &H40 + x32 * 8 + y32)
-                                    Draw32Chip(g, cur, chipnum, zoom)
-                                    cur += New Point(-32, 32)
-                                Next
-                                cur += New Point(32, -256)
-                            Next
-
-                            '敵配置編集モード有効の時、敵の位置情報を描く
-                            If Radio_EditEnemies.Checked Then
-                                If obj_isenemy Then
-                                    pen = Pens.White
-                                    brush = Brushes.White
-                                Else
-                                    pen = Pens.Violet
-                                    brush = Brushes.Violet
-                                End If
-                                For Each en As EnemyStructure In EnemiesArray(roomnum)
-                                    type = en.TypeID
-                                    p = en.Origin
-                                    p += New Point(Xm * 256, Ym * 256)
-                                    If type < 16 Then
-                                        s = "0"
-                                    Else
-                                        s = ""
-                                    End If
-                                    s += Hex(type)
-                                    g.DrawRectangle(pen, p.X - 15, p.Y - 15, 30, 30)
-                                    If obj_isenemy And objroom_selected = roomnum And objindex_selected - 1 = EnemiesArray(roomnum).IndexOf(en) Then
-                                        g.DrawRectangle(pen, p.X - 13, p.Y - 13, 26, 26)
-                                    End If
-                                    g.DrawString(s, New Font("MS UI Gothic", 12), brush, _
-                                                 New Rectangle(p - New Point(10, 10), New Size(32, 32)))
-                                Next
-
-                                If Not obj_isenemy Then
-                                    pen = Pens.White
-                                    brush = Brushes.White
-                                Else
-                                    pen = Pens.Violet
-                                    brush = Brushes.Violet
-                                End If
-                                For Each it As EnemyStructure In ItemsArray(roomnum)
-                                    type = it.TypeID
-                                    p = it.Origin
-                                    p += New Point(Xm * 256, Ym * 256)
-                                    If type < 16 Then
-                                        s = "0"
-                                    Else
-                                        s = ""
-                                    End If
-                                    s += Hex(type)
-                                    g.DrawRectangle(pen, p.X - 15, p.Y - 15, 30, 30)
-                                    If (Not obj_isenemy) And objroom_selected = roomnum And objindex_selected - 1 = ItemsArray(roomnum).IndexOf(it) Then
-                                        g.DrawRectangle(pen, p.X - 13, p.Y - 13, 26, 26)
-                                    End If
-                                    g.DrawString(s, New Font("MS UI Gothic", 12), brush, _
-                                                 New Rectangle(p - New Point(10, 10), New Size(32, 32)))
-                                Next
-                            End If
-                        Else
-                            g.FillRectangle(Brushes.Black, cur.X, cur.Y, cur.X + 256, cur.Y + 256)
-                            cur += New Point(256, 0)
-                        End If
-                        cur += New Point(-256, 256)
+        '敵位置描画用
+        Dim p As Point
+        Dim type As UInteger
+        Dim s As String
+        Dim pen As Pen, brush As Brush
+        For Xm As UInteger = 0 To 1
+            For Ym As UInteger = 0 To 1
+                roomnum = map((((ViewOrigin.Y + Ym) * 16) + ViewOrigin.X + Xm) Mod &H100)
+                If roomnum < &H40 Then
+                    For x32 As UInteger = 0 To 7 '32x32 chip loop
+                        For y32 As UInteger = 0 To 7
+                            chipnum = room(roomnum * &H40 + x32 * 8 + y32)
+                            Draw32Chip(g, cur, chipnum, zoom)
+                            cur += New Point(-32, 32)
+                        Next
+                        cur += New Point(32, -256)
                     Next
-                    cur += New Point(256, -512)
-                Next
-            End SyncLock
-            DrawCenterLine(sender, g)
-        End SyncLock
+
+                    '敵配置編集モード有効の時、敵の位置情報を描く
+                    If Radio_EditEnemies.Checked Then
+                        If obj_isenemy Then
+                            pen = Pens.White
+                            brush = Brushes.White
+                        Else
+                            pen = Pens.Violet
+                            brush = Brushes.Violet
+                        End If
+                        For Each en As EnemyStructure In EnemiesArray(roomnum)
+                            type = en.TypeID
+                            p = en.Origin
+                            p += New Point(Xm * 256, Ym * 256)
+                            If type < 16 Then
+                                s = "0"
+                            Else
+                                s = ""
+                            End If
+                            s += Hex(type)
+                            SyncLock Me
+                                g.DrawRectangle(pen, p.X - 15, p.Y - 15, 30, 30)
+                                If obj_isenemy And objroom_selected = roomnum And objindex_selected - 1 = EnemiesArray(roomnum).IndexOf(en) Then
+                                    g.DrawRectangle(pen, p.X - 13, p.Y - 13, 26, 26)
+                                End If
+                                g.DrawString(s, New Font("MS UI Gothic", 12), brush,
+                                                New Rectangle(p - New Point(10, 10), New Size(32, 32)))
+                            End SyncLock
+                        Next
+
+                        If Not obj_isenemy Then
+                            pen = Pens.White
+                            brush = Brushes.White
+                        Else
+                            pen = Pens.Violet
+                            brush = Brushes.Violet
+                        End If
+                        For Each it As EnemyStructure In ItemsArray(roomnum)
+                            type = it.TypeID
+                            p = it.Origin
+                            p += New Point(Xm * 256, Ym * 256)
+                            If type < 16 Then
+                                s = "0"
+                            Else
+                                s = ""
+                            End If
+                            s += Hex(type)
+                            SyncLock Me
+                                g.DrawRectangle(pen, p.X - 15, p.Y - 15, 30, 30)
+                                If (Not obj_isenemy) And objroom_selected = roomnum And objindex_selected - 1 = ItemsArray(roomnum).IndexOf(it) Then
+                                    g.DrawRectangle(pen, p.X - 13, p.Y - 13, 26, 26)
+                                End If
+                                g.DrawString(s, New Font("MS UI Gothic", 12), brush,
+                                                New Rectangle(p - New Point(10, 10), New Size(32, 32)))
+                            End SyncLock
+                        Next
+                    End If
+                Else
+                    SyncLock Me
+                        g.FillRectangle(Brushes.Black, cur.X, cur.Y, cur.X + 256, cur.Y + 256)
+                    End SyncLock
+                    cur += New Point(256, 0)
+                End If
+                cur += New Point(-256, 256)
+            Next
+            cur += New Point(256, -512)
+        Next
+        DrawCenterLine(sender, g)
     End Sub
 
     Private Sub DrawP32(sender As Object)
-        SyncLock p32Buf
-            Dim g As Graphics = p32Buf.Graphics
-            Dim cur As New Point(0, 0)
-            Dim chipnum As UInteger
+        Dim g As Graphics = p32Buf.Graphics
+        Dim cur As New Point(0, 0)
+        Dim chipnum As UInteger
 
-            SyncLock palette
-                For y32 As UInteger = 0 To 15 '32x32 chip loop
-                    For x32 As UInteger = 0 To 15
-                        chipnum = y32 * 16 + x32
-                        Draw32Chip(g, cur, chipnum, zoom)
-                    Next
-                    cur += New Point(-512, 32)
-                Next
-            End SyncLock
+        For y32 As UInteger = 0 To 15 '32x32 chip loop
+            For x32 As UInteger = 0 To 15
+                chipnum = y32 * 16 + x32
+                Draw32Chip(g, cur, chipnum, zoom)
+            Next
+            cur += New Point(-512, 32)
+        Next
 
-            DrawCenterLine(sender, g)
-        End SyncLock
+        DrawCenterLine(sender, g)
     End Sub
 
     Private Sub DrawP16(sender As Object)
-        SyncLock p16Buf
-            Dim g As Graphics = p16Buf.Graphics
-            Dim cur As New Point(0, 0)
-            Dim tilenum As UInteger
+        Dim g As Graphics = p16Buf.Graphics
+        Dim cur As New Point(0, 0)
+        Dim tilenum As UInteger
 
-            SyncLock palette
-                For y16 As UInteger = 0 To 7 '16x16 tile loop
-                    For x16 As UInteger = 0 To 15
-                        tilenum = y16 * 16 + x16
-                        Draw16Tile(g, cur, tilenum, tile_attr, zoom * 2)
-                    Next
-                    cur += New Point(-256, 16)
-                Next
+        For y16 As UInteger = 0 To 7 '16x16 tile loop
+            For x16 As UInteger = 0 To 15
+                tilenum = y16 * 16 + x16
+                Draw16Tile(g, cur, tilenum, tile_attr, zoom * 2)
+            Next
+            cur += New Point(-256, 16)
+        Next
+
+        Dim center As New Point(sender.ClientSize.Width / 2, sender.ClientSize.Height / 2)
+        Dim chain As New Pen(Brushes.Gray, 1) With {
+            .DashStyle = Drawing2D.DashStyle.Custom,
+            .DashPattern = New Single() {16, 2, 4, 2}
+        }
+
+        '32x32 line
+        For i As UInteger = 1 To 7
+            Dim p1 As New Point(0, sender.ClientSize.Height / 16 * 2 * i)
+            Dim p2 As New Point(sender.ClientSize.Width, sender.ClientSize.Height / 16 * 2 * i)
+            SyncLock Me
+                g.DrawLine(chain, p1, p2)
             End SyncLock
+        Next
 
-            Dim center As New Point(sender.ClientSize.Width / 2, sender.ClientSize.Height / 2)
-            Dim chain As New Pen(Brushes.Gray, 1) With {
-                .DashStyle = Drawing2D.DashStyle.Custom,
-                .DashPattern = New Single() {16, 2, 4, 2}
-            }
+        For i As UInteger = 1 To 15
+            Dim p1 As New Point(sender.ClientSize.Width / 16 * i, 0)
+            Dim p2 As New Point(sender.ClientSize.Width / 16 * i, sender.ClientSize.Height)
+            SyncLock Me
+                g.DrawLine(chain, p1, p2)
+            End SyncLock
+        Next
 
-            '32x32 line
-            For i As UInteger = 1 To 7
-                g.DrawLine(chain, New Point(0, sender.ClientSize.Height / 16 * 2 * i), New Point(sender.ClientSize.Width, sender.ClientSize.Height / 16 * 2 * i))
-            Next
-
-            For i As UInteger = 1 To 15
-                g.DrawLine(chain, New Point(sender.ClientSize.Width / 16 * i, 0), New Point(sender.ClientSize.Width / 16 * i, sender.ClientSize.Height))
-            Next
-
-            chain.Brush = Brushes.White
-            'horizontal center line
-            g.DrawLine(chain, New Point(0, center.Y), New Point(sender.ClientSize.Width, center.Y))
-            'vertical center line
-            g.DrawLine(chain, New Point(center.X, 0), New Point(center.X, sender.ClientSize.Height))
+        chain.Brush = Brushes.White
+        SyncLock Me
+            g.DrawLine(chain, 0, center.Y, sender.ClientSize.Width, center.Y) 'horizontal center line
+            g.DrawLine(chain, center.X, 0, center.X, sender.ClientSize.Height) 'vertical center line
         End SyncLock
     End Sub
 
     Private Sub DrawP8(sender As Object)
-        SyncLock p8Buf
-            Dim g As Graphics = p8Buf.Graphics
-            Dim cur As New Point(0, 0)
-            SyncLock palette
-                For y As UInteger = 0 To 15
-                    For x As UInteger = 0 To 15
-                        Draw8Graph(g, cur, y * 16 + x, tile_attr, zoom * 2)
-                        cur += New Point(8, 0)
-                    Next
-                    cur += New Point(-128, 8)
-                Next
-            End SyncLock
-            DrawCenterLine(sender, g)
-        End SyncLock
+        Dim g As Graphics = p8Buf.Graphics
+        Dim cur As New Point(0, 0)
+        For y As UInteger = 0 To 15
+            For x As UInteger = 0 To 15
+                Draw8Graph(g, cur, y * 16 + x, tile_attr, zoom * 2)
+                cur += New Point(8, 0)
+            Next
+            cur += New Point(-128, 8)
+        Next
+        DrawCenterLine(sender, g)
     End Sub
 
     Private Sub DrawP32Focus(sender As Object)
-        SyncLock p32selectedBuf
-            Dim g As Graphics = p32selectedBuf.Graphics
-            SyncLock palette
-                Draw32Chip(g, New Point(0, 0), focus32, zoom * 4) '4x
-            End SyncLock
+        Dim g As Graphics = p32selectedBuf.Graphics
+        Draw32Chip(g, New Point(0, 0), focus32, zoom * 4) '4x
 
-            Dim center As New Point(sender.ClientSize.Width / 2, sender.ClientSize.Height / 2)
-            Dim chain As New Pen(Brushes.White, 1)
-            'horizontal center line
-            g.DrawLine(chain, New Point(0, center.Y), New Point(sender.ClientSize.Width, center.Y))
-            'vertical center line
-            g.DrawLine(chain, New Point(center.X, 0), New Point(center.X, sender.ClientSize.Height))
+        Dim center As New Point(sender.ClientSize.Width / 2, sender.ClientSize.Height / 2)
+        Dim chain As New Pen(Brushes.White, 1)
+        SyncLock Me
+            g.DrawLine(chain, 0, center.Y, sender.ClientSize.Width, center.Y) 'horizontal center line
+            g.DrawLine(chain, center.X, 0, center.X, sender.ClientSize.Height) 'vertical center line
         End SyncLock
     End Sub
 
     Private Sub DrawP16Focus(sender As Object)
-        SyncLock p16selectedBuf
-            Dim g As Graphics = p16selectedBuf.Graphics
-            If sender.Name = p3216focus.Name Then g = p3216selectedBuf.Graphics
-            SyncLock palette
-                Draw16Tile(g, New Point(0, 0), focus16, tile_attr, zoom * sender.Size.Width / 16)
-            End SyncLock
+        Dim g As Graphics = p16selectedBuf.Graphics
+        If sender.Name = p3216focus.Name Then g = p3216selectedBuf.Graphics
+        Draw16Tile(g, New Point(0, 0), focus16, tile_attr, zoom * sender.Size.Width / 16)
 
-            Dim center As New Point(sender.ClientSize.Width / 2, sender.ClientSize.Height / 2)
-            Dim chain As New Pen(Brushes.White, 1)
-            'horizontal center line
-            g.DrawLine(chain, New Point(0, center.Y), New Point(sender.ClientSize.Width, center.Y))
-            'vertical center line
-            g.DrawLine(chain, New Point(center.X, 0), New Point(center.X, sender.ClientSize.Height))
+        Dim center As New Point(sender.ClientSize.Width / 2, sender.ClientSize.Height / 2)
+        Dim chain As New Pen(Brushes.White, 1)
+        SyncLock Me
+            g.DrawLine(chain, 0, center.Y, sender.ClientSize.Width, center.Y) 'horizontal center line
+            g.DrawLine(chain, center.X, 0, center.X, sender.ClientSize.Height) 'vertical center line
         End SyncLock
     End Sub
 
     Private Sub DrawP8Focus(sender As Object)
-        SyncLock p8selectedBuf
-            Dim g As Graphics = p8selectedBuf.Graphics
-            SyncLock palette
-                Draw8Graph(g, New Point(0, 0), focus8, tile_attr, zoom * sender.Size.Width / 8)
-            End SyncLock
+        Dim g As Graphics = p8selectedBuf.Graphics
+        Draw8Graph(g, New Point(0, 0), focus8, tile_attr, zoom * sender.Size.Width / 8)
 
-            Dim center As New Point(sender.ClientSize.Width / 2, sender.ClientSize.Height / 2)
-            Dim chain As New Pen(Brushes.White, 1)
-            'horizontal center line
-            g.DrawLine(chain, New Point(0, center.Y), New Point(sender.ClientSize.Width, center.Y))
-            'vertical center line
-            g.DrawLine(chain, New Point(center.X, 0), New Point(center.X, sender.ClientSize.Height))
+        Dim center As New Point(sender.ClientSize.Width / 2, sender.ClientSize.Height / 2)
+        Dim chain As New Pen(Brushes.White, 1)
+        SyncLock Me
+            g.DrawLine(chain, 0, center.Y, sender.ClientSize.Width, center.Y) 'horizontal center line
+            g.DrawLine(chain, center.X, 0, center.X, sender.ClientSize.Height) 'vertical center line
         End SyncLock
     End Sub
 
     Private Sub DrawPaletteBar(sender As Object)
-        SyncLock paletteBuf
-            SyncLock palette
-                Dim g As Graphics = paletteBuf.Graphics
-                For i As UInteger = 0 To 15
-                    g.FillRectangle(GetPalette(palette(i)), New Rectangle(sender.Size.Height * i, 0, sender.Size.Height, sender.Size.Height))
-                    If i > 0 And i Mod 4 = 0 Then
-                        g.DrawLine(Pens.White, sender.Size.Height * i, 0, sender.Size.Height * i, sender.Size.Height)
-                    End If
-                Next
+        Dim g As Graphics = paletteBuf.Graphics
+        Dim s As New Size(sender.Size.Height, sender.Size.Height)
+        For i As UInteger = 0 To 15
+            Dim b As SolidBrush = GetPalette(palette(i))
+            Dim p As New Point(sender.Size.Height * i, 0)
+            Dim r As New Rectangle(p, s)
+            SyncLock Me
+                g.FillRectangle(b, r)
             End SyncLock
-        End SyncLock
+            If i > 0 And i Mod 4 = 0 Then
+                Dim p2 As New Point(sender.Size.Height * i, sender.Size.Height)
+                SyncLock Me
+                    g.DrawLine(Pens.White, p, p2)
+                End SyncLock
+            End If
+        Next
     End Sub
 End Class

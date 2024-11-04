@@ -183,7 +183,7 @@ SpawnEnemy_SendCommand:
 	sta <zContinuePointY
 	lda Stage_DefEnemiesX - 1,y
 	and #$0F
-	sta <zPaletteOffset
+	sta <zContinuePaletteOffset
 	rts
 .3
 	cmp #$0E ;敵番号8E: スクロール制限の開始
@@ -206,27 +206,32 @@ SpawnEnemy_SendCommand:
 .rts
 	rts
 .4
-	tay ;敵番号80～8B: パターンテーブル転送の適用
+	tay ;敵番号80～8D: パターンテーブル転送の適用
 SetupEnemySprites:
 	mSTZ <zPPUObjlo
 	mMOV Stage_LoadGraphicsPtr,y, <zPPUObjhi
 	mMOV Stage_LoadGraphicsOrg,y, <zPPUObjPtr
-	mMOV Stage_LoadGraphicsNum,y, <zPPUObjNum
-	ldy #$FF
+	lda Stage_LoadGraphicsNum,y
+	cmp #$80
+	and #$7F
+	sta <zPPUObjNum
+	adc #$00
 	asl a
 	adc <zPPUObjPtr
 	tax
-.write_palette
-	iny
+	ldy #$00
 .loop_palette
-	cpy #$03
-	beq .write_palette
 	lda Stage_LoadGraphics,x
 	bmi .rts
-	sta aPaletteSpr + 9,y
+	sta aPaletteSpr + 8 + 2,y
 	inx
 	iny
-	cpy #$07
+	cpy #$02
+	bne .loop_palette1
+	iny
+	iny
+.loop_palette1
+	cpy #$06
 	bne .loop_palette
 .rts
 	rts

@@ -15,6 +15,7 @@ Pikopiko_kun1:
 	mMOV #%00001100, <zScrollClipFlag
 	mMOV <zRoom, <zScrollClipRoom
 	mMOV #$20, <$FD
+	mMOV #$24, aPaletteSpr + 8 + 1 ;パレットの黒の部分を書き換え
 	inc <zBossVar
 	mPLAYTRACK #$0B
 .playtrack

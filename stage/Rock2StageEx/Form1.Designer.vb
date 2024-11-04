@@ -23,15 +23,17 @@ Partial Class Form1
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
+        Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Me.scr = New System.Windows.Forms.PictureBox()
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip()
         Me.Menu_File = New System.Windows.Forms.ToolStripMenuItem()
         Me.Menu_Open = New System.Windows.Forms.ToolStripMenuItem()
-        Me.保存SToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.Menu_Save = New System.Windows.Forms.ToolStripMenuItem()
         Me.Menu_Exit = New System.Windows.Forms.ToolStripMenuItem()
         Me.Menu_ShowAll = New System.Windows.Forms.ToolStripMenuItem()
         Me.Menu_ShowPartial = New System.Windows.Forms.ToolStripMenuItem()
         Me.UndoToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.WilyToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.tmap = New System.Windows.Forms.TabPage()
         Me.Panel1 = New System.Windows.Forms.Panel()
@@ -74,18 +76,35 @@ Partial Class Form1
         Me.p8focus = New System.Windows.Forms.PictureBox()
         Me.p16focus = New System.Windows.Forms.PictureBox()
         Me.ptile = New System.Windows.Forms.PictureBox()
+        Me.tpal = New System.Windows.Forms.TabPage()
+        Me.PaletteGridView = New System.Windows.Forms.DataGridView()
+        Me.Column0 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.Column1 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.Column2 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.Column3 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.Column4 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.Column5 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.Column6 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.Column7 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.Column8 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.Column9 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.ColumnA = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.ColumnB = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.ColumnC = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.ColumnD = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.ColumnE = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.ColumnF = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.BottomToolStripPanel = New System.Windows.Forms.ToolStripPanel()
         Me.TopToolStripPanel = New System.Windows.Forms.ToolStripPanel()
         Me.RightToolStripPanel = New System.Windows.Forms.ToolStripPanel()
         Me.LeftToolStripPanel = New System.Windows.Forms.ToolStripPanel()
         Me.ContentPanel = New System.Windows.Forms.ToolStripContentPanel()
         Me.ContextMenuStripObj = New System.Windows.Forms.ContextMenuStrip(Me.components)
-        Me.オブジェクトの新規作成ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.選択したオブジェクトの削除ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.画面番号の変更ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.CreateObjectToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.DeleteObjectToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ChangeScreenNumberToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.bg_chipinfo = New System.ComponentModel.BackgroundWorker()
         Me.bg_tileinfo = New System.ComponentModel.BackgroundWorker()
-        Me.WilyToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         CType(Me.scr, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.MenuStrip1.SuspendLayout()
         Me.TabControl1.SuspendLayout()
@@ -104,6 +123,8 @@ Partial Class Form1
         CType(Me.p8focus, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.p16focus, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.ptile, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.tpal.SuspendLayout()
+        CType(Me.PaletteGridView, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ContextMenuStripObj.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -127,7 +148,7 @@ Partial Class Form1
         '
         'Menu_File
         '
-        Me.Menu_File.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.Menu_Open, Me.保存SToolStripMenuItem, Me.Menu_Exit})
+        Me.Menu_File.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.Menu_Open, Me.Menu_Save, Me.Menu_Exit})
         Me.Menu_File.Name = "Menu_File"
         Me.Menu_File.Size = New System.Drawing.Size(67, 20)
         Me.Menu_File.Text = "ファイル(&F)"
@@ -135,19 +156,19 @@ Partial Class Form1
         'Menu_Open
         '
         Me.Menu_Open.Name = "Menu_Open"
-        Me.Menu_Open.Size = New System.Drawing.Size(113, 22)
+        Me.Menu_Open.Size = New System.Drawing.Size(180, 22)
         Me.Menu_Open.Text = "開く(&O)"
         '
-        '保存SToolStripMenuItem
+        'Menu_Save
         '
-        Me.保存SToolStripMenuItem.Name = "保存SToolStripMenuItem"
-        Me.保存SToolStripMenuItem.Size = New System.Drawing.Size(113, 22)
-        Me.保存SToolStripMenuItem.Text = "保存(&S)"
+        Me.Menu_Save.Name = "Menu_Save"
+        Me.Menu_Save.Size = New System.Drawing.Size(180, 22)
+        Me.Menu_Save.Text = "保存(&S)"
         '
         'Menu_Exit
         '
         Me.Menu_Exit.Name = "Menu_Exit"
-        Me.Menu_Exit.Size = New System.Drawing.Size(113, 22)
+        Me.Menu_Exit.Size = New System.Drawing.Size(180, 22)
         Me.Menu_Exit.Text = "終了(&X)"
         '
         'Menu_ShowAll
@@ -169,6 +190,13 @@ Partial Class Form1
         Me.UndoToolStripMenuItem.Size = New System.Drawing.Size(62, 20)
         Me.UndoToolStripMenuItem.Text = "元に戻す"
         '
+        'WilyToolStripMenuItem
+        '
+        Me.WilyToolStripMenuItem.BackColor = System.Drawing.SystemColors.Control
+        Me.WilyToolStripMenuItem.Name = "WilyToolStripMenuItem"
+        Me.WilyToolStripMenuItem.Size = New System.Drawing.Size(77, 20)
+        Me.WilyToolStripMenuItem.Text = "ワイリー！！"
+        '
         'TabControl1
         '
         Me.TabControl1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
@@ -177,6 +205,7 @@ Partial Class Form1
         Me.TabControl1.Controls.Add(Me.tmap)
         Me.TabControl1.Controls.Add(Me.tchip)
         Me.TabControl1.Controls.Add(Me.ttile)
+        Me.TabControl1.Controls.Add(Me.tpal)
         Me.TabControl1.Location = New System.Drawing.Point(12, 29)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
@@ -627,6 +656,123 @@ Partial Class Form1
         Me.ptile.TabIndex = 2
         Me.ptile.TabStop = False
         '
+        'tpal
+        '
+        Me.tpal.Controls.Add(Me.PaletteGridView)
+        Me.tpal.Location = New System.Drawing.Point(4, 22)
+        Me.tpal.Name = "tpal"
+        Me.tpal.Size = New System.Drawing.Size(524, 706)
+        Me.tpal.TabIndex = 3
+        Me.tpal.Text = "パレット"
+        Me.tpal.UseVisualStyleBackColor = True
+        '
+        'PaletteGridView
+        '
+        Me.PaletteGridView.AllowUserToAddRows = False
+        Me.PaletteGridView.AllowUserToDeleteRows = False
+        Me.PaletteGridView.AllowUserToResizeColumns = False
+        Me.PaletteGridView.AllowUserToResizeRows = False
+        Me.PaletteGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill
+        Me.PaletteGridView.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText
+        Me.PaletteGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing
+        Me.PaletteGridView.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.Column0, Me.Column1, Me.Column2, Me.Column3, Me.Column4, Me.Column5, Me.Column6, Me.Column7, Me.Column8, Me.Column9, Me.ColumnA, Me.ColumnB, Me.ColumnC, Me.ColumnD, Me.ColumnE, Me.ColumnF})
+        DataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter
+        DataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window
+        DataGridViewCellStyle1.Font = New System.Drawing.Font("MS UI Gothic", 12.5!)
+        DataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.ControlText
+        DataGridViewCellStyle1.NullValue = Nothing
+        DataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.PaletteGridView.DefaultCellStyle = DataGridViewCellStyle1
+        Me.PaletteGridView.ImeMode = System.Windows.Forms.ImeMode.Off
+        Me.PaletteGridView.Location = New System.Drawing.Point(3, 3)
+        Me.PaletteGridView.Name = "PaletteGridView"
+        Me.PaletteGridView.RowHeadersVisible = False
+        Me.PaletteGridView.RowTemplate.Height = 28
+        Me.PaletteGridView.Size = New System.Drawing.Size(518, 409)
+        Me.PaletteGridView.TabIndex = 4
+        '
+        'Column0
+        '
+        Me.Column0.HeaderText = "0"
+        Me.Column0.Name = "Column0"
+        '
+        'Column1
+        '
+        Me.Column1.HeaderText = "1"
+        Me.Column1.Name = "Column1"
+        '
+        'Column2
+        '
+        Me.Column2.HeaderText = "2"
+        Me.Column2.Name = "Column2"
+        '
+        'Column3
+        '
+        Me.Column3.HeaderText = "3"
+        Me.Column3.Name = "Column3"
+        '
+        'Column4
+        '
+        Me.Column4.HeaderText = "4"
+        Me.Column4.Name = "Column4"
+        '
+        'Column5
+        '
+        Me.Column5.HeaderText = "5"
+        Me.Column5.Name = "Column5"
+        '
+        'Column6
+        '
+        Me.Column6.HeaderText = "6"
+        Me.Column6.Name = "Column6"
+        '
+        'Column7
+        '
+        Me.Column7.HeaderText = "7"
+        Me.Column7.Name = "Column7"
+        '
+        'Column8
+        '
+        Me.Column8.HeaderText = "8"
+        Me.Column8.Name = "Column8"
+        '
+        'Column9
+        '
+        Me.Column9.HeaderText = "9"
+        Me.Column9.Name = "Column9"
+        '
+        'ColumnA
+        '
+        Me.ColumnA.HeaderText = "A"
+        Me.ColumnA.Name = "ColumnA"
+        '
+        'ColumnB
+        '
+        Me.ColumnB.HeaderText = "B"
+        Me.ColumnB.Name = "ColumnB"
+        '
+        'ColumnC
+        '
+        Me.ColumnC.HeaderText = "C"
+        Me.ColumnC.Name = "ColumnC"
+        '
+        'ColumnD
+        '
+        Me.ColumnD.HeaderText = "D"
+        Me.ColumnD.Name = "ColumnD"
+        '
+        'ColumnE
+        '
+        Me.ColumnE.HeaderText = "E"
+        Me.ColumnE.Name = "ColumnE"
+        '
+        'ColumnF
+        '
+        Me.ColumnF.HeaderText = "F"
+        Me.ColumnF.Name = "ColumnF"
+        '
         'BottomToolStripPanel
         '
         Me.BottomToolStripPanel.Location = New System.Drawing.Point(0, 0)
@@ -665,40 +811,33 @@ Partial Class Form1
         '
         'ContextMenuStripObj
         '
-        Me.ContextMenuStripObj.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.オブジェクトの新規作成ToolStripMenuItem, Me.選択したオブジェクトの削除ToolStripMenuItem, Me.画面番号の変更ToolStripMenuItem})
+        Me.ContextMenuStripObj.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CreateObjectToolStripMenuItem, Me.DeleteObjectToolStripMenuItem, Me.ChangeScreenNumberToolStripMenuItem})
         Me.ContextMenuStripObj.Name = "ContextMenuStrip1"
         Me.ContextMenuStripObj.Size = New System.Drawing.Size(201, 70)
         '
-        'オブジェクトの新規作成ToolStripMenuItem
+        'CreateObjectToolStripMenuItem
         '
-        Me.オブジェクトの新規作成ToolStripMenuItem.Name = "オブジェクトの新規作成ToolStripMenuItem"
-        Me.オブジェクトの新規作成ToolStripMenuItem.Size = New System.Drawing.Size(200, 22)
-        Me.オブジェクトの新規作成ToolStripMenuItem.Text = "オブジェクトの新規作成"
+        Me.CreateObjectToolStripMenuItem.Name = "CreateObjectToolStripMenuItem"
+        Me.CreateObjectToolStripMenuItem.Size = New System.Drawing.Size(200, 22)
+        Me.CreateObjectToolStripMenuItem.Text = "オブジェクトの新規作成"
         '
-        '選択したオブジェクトの削除ToolStripMenuItem
+        'DeleteObjectToolStripMenuItem
         '
-        Me.選択したオブジェクトの削除ToolStripMenuItem.Name = "選択したオブジェクトの削除ToolStripMenuItem"
-        Me.選択したオブジェクトの削除ToolStripMenuItem.Size = New System.Drawing.Size(200, 22)
-        Me.選択したオブジェクトの削除ToolStripMenuItem.Text = "選択したオブジェクトの削除"
+        Me.DeleteObjectToolStripMenuItem.Name = "DeleteObjectToolStripMenuItem"
+        Me.DeleteObjectToolStripMenuItem.Size = New System.Drawing.Size(200, 22)
+        Me.DeleteObjectToolStripMenuItem.Text = "選択したオブジェクトの削除"
         '
-        '画面番号の変更ToolStripMenuItem
+        'ChangeScreenNumberToolStripMenuItem
         '
-        Me.画面番号の変更ToolStripMenuItem.Name = "画面番号の変更ToolStripMenuItem"
-        Me.画面番号の変更ToolStripMenuItem.Size = New System.Drawing.Size(200, 22)
-        Me.画面番号の変更ToolStripMenuItem.Text = "画面番号の変更"
+        Me.ChangeScreenNumberToolStripMenuItem.Name = "ChangeScreenNumberToolStripMenuItem"
+        Me.ChangeScreenNumberToolStripMenuItem.Size = New System.Drawing.Size(200, 22)
+        Me.ChangeScreenNumberToolStripMenuItem.Text = "画面番号の変更"
         '
         'bg_chipinfo
         '
         '
         'bg_tileinfo
         '
-        '
-        'WilyToolStripMenuItem
-        '
-        Me.WilyToolStripMenuItem.BackColor = System.Drawing.SystemColors.Control
-        Me.WilyToolStripMenuItem.Name = "WilyToolStripMenuItem"
-        Me.WilyToolStripMenuItem.Size = New System.Drawing.Size(77, 20)
-        Me.WilyToolStripMenuItem.Text = "ワイリー！！"
         '
         'Form1
         '
@@ -735,6 +874,8 @@ Partial Class Form1
         CType(Me.p8focus, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.p16focus, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.ptile, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.tpal.ResumeLayout(False)
+        CType(Me.PaletteGridView, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ContextMenuStripObj.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
@@ -790,17 +931,35 @@ Partial Class Form1
     Friend WithEvents Radio_IsEnemy As System.Windows.Forms.RadioButton
     Friend WithEvents Panel1 As System.Windows.Forms.Panel
     Friend WithEvents ContextMenuStripObj As System.Windows.Forms.ContextMenuStrip
-    Friend WithEvents オブジェクトの新規作成ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents 選択したオブジェクトの削除ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents CreateObjectToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents DeleteObjectToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents TextBoxScreenNum As System.Windows.Forms.TextBox
     Friend WithEvents Label_ScreenNum As System.Windows.Forms.Label
-    Friend WithEvents 画面番号の変更ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents ChangeScreenNumberToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents Button32Info As System.Windows.Forms.Button
     Friend WithEvents bg_chipinfo As System.ComponentModel.BackgroundWorker
     Friend WithEvents bg_tileinfo As System.ComponentModel.BackgroundWorker
     Friend WithEvents ButtonTileInfo As System.Windows.Forms.Button
-    Friend WithEvents 保存SToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents Menu_Save As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents LabelViewOrigin As System.Windows.Forms.Label
     Friend WithEvents UndoToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents WilyToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents tpal As TabPage
+    Friend WithEvents PaletteGridView As DataGridView
+    Friend WithEvents Column0 As DataGridViewTextBoxColumn
+    Friend WithEvents Column1 As DataGridViewTextBoxColumn
+    Friend WithEvents Column2 As DataGridViewTextBoxColumn
+    Friend WithEvents Column3 As DataGridViewTextBoxColumn
+    Friend WithEvents Column4 As DataGridViewTextBoxColumn
+    Friend WithEvents Column5 As DataGridViewTextBoxColumn
+    Friend WithEvents Column6 As DataGridViewTextBoxColumn
+    Friend WithEvents Column7 As DataGridViewTextBoxColumn
+    Friend WithEvents Column8 As DataGridViewTextBoxColumn
+    Friend WithEvents Column9 As DataGridViewTextBoxColumn
+    Friend WithEvents ColumnA As DataGridViewTextBoxColumn
+    Friend WithEvents ColumnB As DataGridViewTextBoxColumn
+    Friend WithEvents ColumnC As DataGridViewTextBoxColumn
+    Friend WithEvents ColumnD As DataGridViewTextBoxColumn
+    Friend WithEvents ColumnE As DataGridViewTextBoxColumn
+    Friend WithEvents ColumnF As DataGridViewTextBoxColumn
 End Class

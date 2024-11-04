@@ -1005,13 +1005,13 @@ DoTimeStopper:
 	dec <zEnergyFlash
 	bne .do
 	lsr aObjFlags,x
-	lda #$00
+	lda #%00000000
 	sta <zStopFlag
 	lda #$01
 	sta <zWindhi
 	rts
 .do
-	lda #$01
+	lda #%00000001
 	sta <zStopFlag
 	lda #$00
 	sta <zWindhi

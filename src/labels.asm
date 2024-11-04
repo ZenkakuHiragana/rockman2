@@ -125,6 +125,7 @@ zRand = $4A             ;乱数
 
 zInvincible = $4B       ;無敵時間
 
+;未使用
 zItemIndexPrev = $4C    ;アイテム番号・戻る方
 zItemIndexNext = $4D    ;アイテム番号・進む方
 
@@ -196,8 +197,9 @@ zBossRushStage = $BA    ;ボスラッシュで選択したボス番号
 zBossRushProg = $BC     ;ボスラッシュの進行状況
 zNoDamage = $BD         ;当たり判定無効フラグ
 
-zRestartTitle = $BE     ;タイトルスクリーンの時間切れで1
-zContinuePointY = $BE   ;ワープ棒降下時このY座標未満で着地判定をしない
+zRestartTitle = $BE          ;タイトルスクリーンの時間切れで1
+zContinuePointY = $BE        ;ワープ棒降下時このY座標未満で着地判定をしない
+zContinuePaletteOffset = $BF ;復活時に設定するパレットアニメーションオフセット
 
 zTitleScreenWaitlo = $C0;タイトル画面の待ち時間
 zTitleScreenWaithi = $C1;タイトル画面の待ち時間

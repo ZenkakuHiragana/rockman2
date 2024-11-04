@@ -23,6 +23,12 @@ MechDragon1:
 	inc aObjVar + 1
 	mSTZ <zBossVar
 	mMOV #$80, aBossVar1
+	ldx #$02
+.loop_spritepalette
+	mMOV Table_MechaDragonSpritePalette,x, aPaletteSpr + $08 + 1,x
+	mMOV Table_MechaDragonSpritePalette2,x, aPaletteSpr + $0C + 1,x
+	dex
+	bpl .loop_spritepalette
 	rts
 .1
 	cmp #$01
@@ -167,6 +173,10 @@ Table_MechDragonPalette:
 	.db $0F, $27, $11, $19
 	.db $0F, $11, $29, $19
 	.db $0F, $27, $29, $19
+Table_MechaDragonSpritePalette:
+	.db $30, $15, $28
+Table_MechaDragonSpritePalette2:
+	.db $27, $29, $19
 
 ;8F8A
 ;3, メカドラゴン 追いかける

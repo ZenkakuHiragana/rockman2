@@ -385,7 +385,7 @@
 	sta aObjFrame
 	lda #$1A
 	sta aObjAnim
-	lda #$03
+	lda #%00000011
 	sta <zStopFlag
 	lda #$30
 	mJSR_NORTS PlayTrack

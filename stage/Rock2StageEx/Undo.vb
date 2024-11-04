@@ -50,14 +50,26 @@ Partial Public Class Form1
     Private Sub DefaultUndoMethod(ByRef writeTo As Object, ByRef data As Object)
         writeTo = data
     End Sub
+    '画面番号の変更のUndo(Point, UInteger)
+    Private Sub UndoScreenNumber(ByRef writeTo As Object, ByRef data As Object)
+        map(CUInt(writeTo)) = CByte(data)
+    End Sub
     'マップの変更用のUndo(UInteger, Byte)
     Private Sub UndoMap(ByRef roomptr As Object, ByRef data As Object)
         room(CUInt(roomptr)) = CByte(data)
     End Sub
+    'パレット編集のUndo(Uinteger, Byte)
+    Private Sub UndoPalette(ByRef wily As Object, ByRef objKeyValues As Object)
+        Dim keyvalues As ArrayList = DirectCast(objKeyValues, ArrayList)
+        If keyvalues Is Nothing Then Exit Sub
+        For Each kv As PaletteUndoData In keyvalues
+            palanim(kv.Index) = kv.Value
+        Next
+    End Sub
     'マップの貼り付け処理のUndo(UInteger, ArrayList)
     Private Sub UndoPasteMap(ByRef numroom As Object, ByRef data As Object)
         Dim undolist() As ArrayList = DirectCast(data, ArrayList())
-        If undolist Is Nothing Then Return
+        If undolist Is Nothing Then Exit Sub
 
         Dim i As UInteger = 0 'ループ用一時変数
         For Each o As Byte In undolist(0)

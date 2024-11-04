@@ -97,10 +97,11 @@ StartStage_NoEnergyRegen:
 	sta aItemLife,x
 	dex
 	bpl .itemloop
-	mSTZ <zBossRushProg, <zContinuePoint, <zPaletteOffset
+	mSTZ <zBossRushProg, <zContinuePoint, <zContinuePaletteOffset
 ;80AB
 ;死亡時のコンティニュー位置
 StartStage_Continue:
+	mMOV <zContinuePaletteOffset, <zPaletteOffset
 	mMOV #%01000000, <zConveyorVec
 	mMOV #%10010000, <z2000, $2000
 	mMOV #%00000110, <z2001
@@ -393,7 +394,7 @@ Item_RecoverLifeStart:
 	lda aObjLife
 	cmp #$1C
 	bcs .done
-	mMOV #%00000111, <zStopFlag
+	mMOV #%00001111, <zStopFlag
 .loop
 	ldx <zEquipment
 	lda aObjLife
@@ -429,7 +430,7 @@ Item_RecoverEnergyStart:
 	lda <zEnergyArray - 1,x
 	cmp #$1C
 	beq Item_RecoverEnd_Done
-	mMOV #%00000111, <zStopFlag
+	mMOV #%00001111, <zStopFlag
 .loop
 	ldx <zEquipment
 	lda <zEnergyArray - 1,x
@@ -940,7 +941,7 @@ Scroll_Vertical:
 	bcs .zero
 .write
 	sta <zHScroll
-	mMOV #$07, <zStopFlag
+	mMOV #%00001111, <zStopFlag
 	jsr SpriteSetup
 	mSTZ <zStopFlag
 	jsr FrameAdvance1C

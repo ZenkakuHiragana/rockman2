@@ -3,6 +3,7 @@
 ;フラッシュマン
 Flashman:
 	dex
+	mMOV #$30, aPaletteSpr + 8 + 1 ;パレットの黒の部分を書き換え
 	mMOV Table_FlashmanBehaviourlo,x, <zPtrlo
 	mMOV Table_FlashmanBehaviourhi,x, <zPtrhi
 	jmp [zPtr]
@@ -57,7 +58,7 @@ Flashman3:
 	sta aObjVXlo + $0F
 	sta aObjWait + $0F
 	sta aObjFrame + $0F
-	mMOV #$04, <zStopFlag
+	mMOV #%00000100, <zStopFlag
 	mMOV #$20, aPaletteSpr
 	mMOV #$06, aObjVar + 1
 	mMOV #$1F, <zBossVar

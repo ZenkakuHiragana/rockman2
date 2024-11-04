@@ -28,6 +28,7 @@ BooBeamTrap1:
 	dec <$02
 	bpl .loop_spawn
 	inc <zBossBehaviour
+	mMOV #$25, aPaletteSpr + 8 + 1 ;パレットの黒の部分を書き換え
 	rts
 
 ;96AD

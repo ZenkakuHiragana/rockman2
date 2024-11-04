@@ -3,6 +3,8 @@ Imports System.ComponentModel
 Imports System.Threading
 Imports System.Windows.Forms
 Imports System.Collections.Generic
+Imports System.Windows.Forms.VisualStyles
+Imports System.Text.RegularExpressions
 
 Public Class Form1
 
@@ -61,6 +63,14 @@ Public Class Form1
         End Operator
     End Class
 
+    ''' <summary>パレットの編集をUndoする時に必要な情報をまとめます。</summary>
+    Private Class PaletteUndoData
+        Property Index As UInteger
+        Property Value As Byte
+    End Class
+
+    Const NumRooms As UInteger = &H3F
+    Const NumPaletteAnim As UInteger = 12
     Const SizeTile16x16 As UInteger = &H200
     Const SizeChip32x32 As UInteger = 4 * &H100
     Const SizeAttr32x32 As UInteger = &H100
@@ -68,33 +78,33 @@ Public Class Form1
     Const SizeMaps16x16 As UInteger = &H100
     Const SizeEnemies As UInteger = &HC0
     Const SizeItems As UInteger = &H20
-    Const SizePaletteAnim As UInteger = &H10 * 10
+    Const SizePaletteAnim As UInteger = &H10 * NumPaletteAnim
     Const SizeBG As UInteger = &H1000
-    Const SizeRoom As UInteger = &H1000
+    Const SizeRoom As UInteger = &H40 * NumRooms
 
-    Const AddrTile16x16 As UInteger = &H0           '16x16グラ定義
-    Const AddrChip32x32 As UInteger = &H200         '32x32グラ定義
-    Const AddrAttr32x32 As UInteger = &H600         '属性テーブル, 配色
-    Const AddrFlag32x32 As UInteger = &H700         '地形判定フラグ
-    Const AddrMaps16x16 As UInteger = &H900         'マップの配置
-    Const AddrEnemiesX As UInteger = &HA00          '敵配置X
-    Const AddrEnemiesY As UInteger = &HAC0          '敵配置Y
-    Const AddrEnemies As UInteger = &HB80           '敵の種類
-    Const AddrEnemiesPtr As UInteger = &HC40        '画面ごとの敵配置ポインタ
-    Const AddrEnemiesAmount As UInteger = &HC80     '画面ごとの敵配置量
-    Const AddrItemsX As UInteger = &HCC0            'アイテム配置X
-    Const AddrItemsY As UInteger = &HCE0            'アイテム配置Y
-    Const AddrItems As UInteger = &HD00             'アイテムの種類
-    Const AddrItemsPtr As UInteger = &HD20          '画面ごとのアイテム配置ポインタ
-    Const AddrItemsAmount As UInteger = &HD60       '画面ごとのアイテム配置量
-    Const PaletteAnimFrames As UInteger = &HDA0     'パレットアニメーション枚数
-    Const PaletteAnimWait As UInteger = &HDA1       'パレットアニメーション待ち
-    Const PaletteAddr As UInteger = &HDA2           'パレット
-    Const PaletteAnimAddr As UInteger = &HDC2       'パレットアニメーション定義(0x0A)
-    Const PaletteAnimFramesWily As UInteger = &HE62 'ワイリー用パレットアニメーション枚数
-    Const PaletteAnimWaitWily As UInteger = &HE63   'ワイリー用パレットアニメーション待ち
-    Const PaletteAddrWily As UInteger = &HE64       'ワイリー用パレット
-    Const PaletteAnimAddrWily As UInteger = &HE84   'ワイリー用パレットアニメーション定義(0x0A)
+    Const AddrTile16x16 As UInteger = &H0            '16x16グラ定義
+    Const AddrChip32x32 As UInteger = &H200          '32x32グラ定義
+    Const AddrAttr32x32 As UInteger = &H600          '属性テーブル, 配色
+    Const AddrFlag32x32 As UInteger = &H700          '地形判定フラグ
+    Const AddrMaps16x16 As UInteger = &H900          'マップの配置
+    Const AddrEnemiesX As UInteger = &HA00           '敵配置X
+    Const AddrEnemiesY As UInteger = &HAC0           '敵配置Y
+    Const AddrEnemies As UInteger = &HB80            '敵の種類
+    Const AddrEnemiesPtr As UInteger = &HC40         '画面ごとの敵配置ポインタ
+    Const AddrEnemiesAmount As UInteger = &HC80      '画面ごとの敵配置量
+    Const AddrItemsX As UInteger = &HCC0             'アイテム配置X
+    Const AddrItemsY As UInteger = &HCE0             'アイテム配置Y
+    Const AddrItems As UInteger = &HD00              'アイテムの種類
+    Const AddrItemsPtr As UInteger = &HD20           '画面ごとのアイテム配置ポインタ
+    Const AddrItemsAmount As UInteger = &HD60        '画面ごとのアイテム配置量
+    Const PaletteAnimFrames As UInteger = &H3FC0     'パレットアニメーション枚数
+    Const PaletteAnimWait As UInteger = &H3FC2       'パレットアニメーション待ち
+    Const PaletteAddr As UInteger = &HDA0            'パレット
+    Const PaletteAnimAddr As UInteger = &HDA0        'パレットアニメーション定義(0x0C)
+    Const PaletteAnimFramesWily As UInteger = &H3FC1 'ワイリー用パレットアニメーション枚数
+    Const PaletteAnimWaitWily As UInteger = &H3FC3   'ワイリー用パレットアニメーション待ち
+    Const PaletteAddrWily As UInteger = &HE60        'ワイリー用パレット
+    Const PaletteAnimAddrWily As UInteger = &HE60    'ワイリー用パレットアニメーション定義(0x0A)
 
     Const AddrBG As UInteger = &H2000       'BG画像位置
     Const AddrRoom As UInteger = &H3000     '画面定義
@@ -123,25 +133,31 @@ Public Class Form1
     Dim enemiesx(SizeEnemies) As Byte '敵の位置X
     Dim enemiesy(SizeEnemies) As Byte '敵の位置Y
     Dim enemies(SizeEnemies) As Byte '敵の種類
-    Dim enemies_ptr(&H40) As Byte '敵の配置定義の開始位置
-    Dim enemies_amount(&H40) As Byte '敵の数
+    Dim enemies_ptr(NumRooms) As Byte '敵の配置定義の開始位置
+    Dim enemies_amount(NumRooms) As Byte '敵の数
 
     Dim itemsx(SizeItems) As Byte 'アイテムの位置X
     Dim itemsy(SizeItems) As Byte 'アイテムの位置Y
     Dim items(SizeItems) As Byte 'アイテムの種類
-    Dim items_ptr(&H40) As Byte 'アイテムの配置定義の開始位置
-    Dim items_amount(&H40) As Byte 'アイテムの数
+    Dim items_ptr(NumRooms) As Byte 'アイテムの配置定義の開始位置
+    Dim items_amount(NumRooms) As Byte 'アイテムの数
 
     ''' <summary>パレットアニメーションの枚数です。</summary>
     Dim numpalanim As Byte
+    ''' <summary>ワイリーステージのパレットアニメーションの枚数です。</summary>
+    Dim numpalanimwily As Byte
     ''' <summary>パレットアニメーションの待ちフレーム数です。</summary>
     Dim palwait As Byte
+    ''' <summary>ワイリーステージのパレットアニメーションの待ちフレーム数です。</summary>
+    Dim palwaitwily As Byte
     ''' <summary>現在のパレット情報です。</summary>
     Dim palette(16) As Byte
     ''' <summary>パレットアニメーションバッファです。</summary>
     Dim palanim(SizePaletteAnim) As Byte
+    ''' <summary>ワイリーステージのパレットアニメーションバッファです。</summary>
+    Dim palanimwily(SizePaletteAnim) As Byte
     ''' <summary>ファミコンのパレットとブラシを対応付けたテーブルです。</summary>
-    Dim PaletteBrushes(&H40) As Brush
+    Dim PaletteBrushes(&H40) As SolidBrush
     ''' <summary>選択したタイル番号を格納します。</summary>
     Dim focus32, focus16, focus8 As UInteger
     ''' <summary>16x16タイル、8x8タイルを描画する時に使用するパレット番号です。</summary>
@@ -155,9 +171,9 @@ Public Class Form1
     ''' <summary>選択したオブジェクトを表すインデックスです。</summary>
     Dim objindex_selected As UInteger
     ''' <summary>画面内に定義された敵の情報を格納するコレクションです。</summary>
-    Dim EnemiesArray(&H40) As List(Of EnemyStructure)
+    Dim EnemiesArray(NumRooms) As List(Of EnemyStructure)
     ''' <summary>画面内に定義されたアイテムの情報を格納するコレクションです。</summary>
-    Dim ItemsArray(&H40) As List(Of EnemyStructure)
+    Dim ItemsArray(NumRooms) As List(Of EnemyStructure)
     ''' <summary>右クリックメニューを適用する画面数です。</summary>
     Dim ContextRoom As UInteger
     ''' <summary>右クリックメニューを適用する位置です。</summary>
@@ -189,20 +205,25 @@ Public Class Form1
 
     Private Sub LoadPalette()
         Dim wily As Boolean = WilyToolStripMenuItem.Checked
-        Dim frames As UInteger = If(wily, PaletteAnimFramesWily, PaletteAnimFrames)
-        Dim wait As UInteger = If(wily, PaletteAnimWaitWily, PaletteAnimWait)
-        Dim addr As UInteger = If(wily, PaletteAddrWily, PaletteAddr)
-        Dim anim As UInteger = If(wily, PaletteAnimAddrWily, PaletteAnimAddr)
+        Dim frames As UInteger = PaletteAnimFrames
+        Dim wait As UInteger = PaletteAnimWait
+        Dim addr As UInteger = PaletteAddr
+        Dim anim As UInteger = PaletteAnimAddr
+        Dim frameswily As UInteger = PaletteAnimFramesWily
+        Dim waitwily As UInteger = PaletteAnimWaitWily
+        Dim addrwily As UInteger = PaletteAddrWily
+        Dim animwily As UInteger = PaletteAnimAddrWily
         numpalanim = testfile(frames)
+        numpalanimwily = testfile(frameswily)
         palwait = testfile(wait)
-        SyncLock palette
-            For i As UInteger = 0 To 16 - 1
-                palette(i) = testfile(addr + i)
-            Next
-        End SyncLock
+        palwaitwily = testfile(waitwily)
+        For i As UInteger = 0 To 16 - 1
+            palette(i) = testfile(If(wily, addrwily, addr) + i)
+        Next
 
         For i As UInteger = 0 To SizePaletteAnim - 1
             palanim(i) = testfile(anim + i)
+            palanimwily(i) = testfile(animwily + i)
         Next
     End Sub
 
@@ -212,7 +233,6 @@ Public Class Form1
         Next
         For i As UInteger = 0 To SizeBG - 1
             bg(i) = 0
-            room(i) = 0
         Next
         For i As UInteger = 0 To SizeTile16x16 - 1
             tile(i) = 0
@@ -234,15 +254,18 @@ Public Class Form1
         Next
 
         numpalanim = 0
+        numpalanimwily = 0
         palwait = 0
-        SyncLock palette
-            For i As UInteger = 0 To 16 - 1
-                palette(i) = 0
-            Next
-        End SyncLock
-
+        palwaitwily = 0
+        For i As Integer = 0 To &H3F
+            PaletteBrushes(i) = GetPalette(i)
+        Next
+        For i As UInteger = 0 To 16 - 1
+            palette(i) = 0
+        Next
         For i As UInteger = 0 To SizePaletteAnim - 1
             palanim(i) = 0
+            palanimwily(i) = 0
         Next
         For i As UInteger = 0 To SizeEnemies
             enemiesx(i) = 0
@@ -254,8 +277,7 @@ Public Class Form1
             itemsy(i) = 0
             items(i) = 0
         Next
-        For i As UInteger = 0 To &H40 - 1
-            PaletteBrushes(i) = GetPalette(i)
+        For i As UInteger = 0 To NumRooms - 1
             enemies_ptr(i) = 0
             enemies_amount(i) = 0
             EnemiesArray(i) = New List(Of EnemyStructure)
@@ -264,7 +286,6 @@ Public Class Form1
             ItemsArray(i) = New List(Of EnemyStructure)
         Next
 
-        palwait = 0
         focus32 = 0
         focus16 = 0
         focus8 = 0
@@ -287,6 +308,15 @@ Public Class Form1
         p3216selectedBuf = BufContext.Allocate(p3216focus.CreateGraphics(), p3216focus.DisplayRectangle())
         p8selectedBuf = BufContext.Allocate(p8focus.CreateGraphics(), p8focus.DisplayRectangle())
         paletteBuf = BufContext.Allocate(ppalette.CreateGraphics(), ppalette.DisplayRectangle())
+
+        'パレット編集表の初期化
+        PaletteGridView.Rows.Add(CInt(NumPaletteAnim))
+        For Each column As DataGridViewTextBoxColumn In PaletteGridView.Columns
+            column.MaxInputLength = 2
+        Next
+        For Each row As DataGridViewRow In PaletteGridView.Rows
+            row.Height = PaletteGridView.Width / 16
+        Next
 
         Dim cmd As String() = Environment.GetCommandLineArgs()
         If cmd.Count() > 1 Then
@@ -355,16 +385,22 @@ Public Class Form1
         Try
             Dim f As New FileStream(path, FileMode.Open, FileAccess.ReadWrite)
             TimeStamp = File.GetLastWriteTime(path)
+            If f.Length < &H4000 Then
+                Throw New InvalidDataException("File size is less than 0x4000 bytes.")
+            End If
             ReDim testfile(f.Length - 1)
             f.Read(testfile, 0, f.Length)
             f.Close()
         Catch ex As FileNotFoundException
             MessageBox.Show("File not found.", "", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
             Exit Sub
+        Catch ex As InvalidDataException
+            MessageBox.Show(ex.Message, "", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+            Exit Sub
         End Try
         BinFilePath = path
 
-        For i As UInteger = 0 To SizeBG - 1
+        For i As UInteger = 0 To SizeRoom - 1
             room(i) = testfile(AddrRoom + i)
         Next
 
@@ -437,9 +473,11 @@ Public Class Form1
             items(i) = testfile(AddrItems + i)
         Next
 
-        For i As UInteger = 0 To &H40 - 1
+        For i As Integer = 0 To PaletteBrushes.Length - 1
             PaletteBrushes(i) = GetPalette(i)
+        Next
 
+        For i As UInteger = 0 To NumRooms - 1
             enemies_ptr(i) = testfile(AddrEnemiesPtr + i)
             enemies_amount(i) = testfile(AddrEnemiesAmount + i)
             items_ptr(i) = testfile(AddrItemsPtr + i)
@@ -448,20 +486,20 @@ Public Class Form1
             EnemiesArray(i) = New List(Of EnemyStructure)
             If enemies_amount(i) > 0 And enemies_ptr(i) > 0 Then
                 For a As UInteger = 0 To enemies_amount(i) - 1
-                    EnemiesArray(i).Add(New EnemyStructure( _
-                                        New Point(enemiesx(enemies_ptr(i) - 1 + a), _
-                                                  enemiesy(enemies_ptr(i) - 1 + a)), _
-                                        enemies(enemies_ptr(i) - 1 + a)))
+                    EnemiesArray(i).Add(New EnemyStructure(
+                                        New Point(enemiesx(enemies_ptr(i) - 1 + a),
+                                                  enemiesy(enemies_ptr(i) - 1 + a)),
+                                                  enemies(enemies_ptr(i) - 1 + a)))
                 Next
             End If
 
             ItemsArray(i) = New List(Of EnemyStructure)
             If items_amount(i) > 0 And items_ptr(i) > 0 Then
                 For a As UInteger = 0 To items_amount(i) - 1
-                    ItemsArray(i).Add(New EnemyStructure( _
-                                        New Point(itemsx(items_ptr(i) - 1 + a), _
-                                                  itemsy(items_ptr(i) - 1 + a)), _
-                                        items(items_ptr(i) - 1 + a)))
+                    ItemsArray(i).Add(New EnemyStructure(
+                                      New Point(itemsx(items_ptr(i) - 1 + a),
+                                                itemsy(items_ptr(i) - 1 + a)),
+                                                items(items_ptr(i) - 1 + a)))
                 Next
             End If
         Next
@@ -477,10 +515,10 @@ Public Class Form1
 
         If palwait > 0 Then
             Dim wait As Integer = palwait * 16
-            If wait < 350 Then wait = 350
+            If wait < 334 Then wait = 334
             'Timerのインスタンスを作成
             Dim timerDelegate As New TimerCallback(AddressOf AnimationTimer)
-            Dim timer As New Threading.Timer(timerDelegate, Nothing, 100, wait)
+            Dim timer As New Threading.Timer(timerDelegate, Nothing, 0, wait)
             'インスタンスをコピー
             TimerStats = timer
         End If
@@ -491,7 +529,7 @@ Public Class Form1
         ClearUndo()
     End Sub
 
-    Private Sub 保存SToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles 保存SToolStripMenuItem.Click
+    Private Sub Menu_Save_Click(sender As Object, e As EventArgs) Handles Menu_Save.Click
         Dim f As FileStream
 
         For i As UInteger = 0 To SizeTile16x16 - 1
@@ -519,7 +557,7 @@ Public Class Form1
             enemiesx(i) = 0
             enemiesy(i) = 0
         Next
-        For i As UInteger = 0 To &H40 - 1
+        For i As UInteger = 0 To NumRooms - 1
             enemies_amount(i) = 0
             enemies_ptr(i) = 0
             For Each a As EnemyStructure In EnemiesArray(i)
@@ -537,7 +575,7 @@ Public Class Form1
             testfile(AddrEnemiesY + i) = enemiesy(i)
             testfile(AddrEnemies + i) = enemies(i)
         Next
-        For i As UInteger = 0 To &H40 - 1
+        For i As UInteger = 0 To NumRooms - 1
             testfile(AddrEnemiesPtr + i) = enemies_ptr(i)
             testfile(AddrEnemiesAmount + i) = enemies_amount(i)
         Next
@@ -548,7 +586,7 @@ Public Class Form1
             itemsx(i) = 0
             itemsy(i) = 0
         Next
-        For i As UInteger = 0 To &H40 - 1
+        For i As UInteger = 0 To NumRooms - 1
             items_amount(i) = 0
             items_ptr(i) = 0
             For Each a As EnemyStructure In ItemsArray(i)
@@ -566,9 +604,14 @@ Public Class Form1
             testfile(AddrItemsY + i) = itemsy(i)
             testfile(AddrItems + i) = items(i)
         Next
-        For i As UInteger = 0 To &H40 - 1
+        For i As UInteger = 0 To NumRooms - 1
             testfile(AddrItemsPtr + i) = items_ptr(i)
             testfile(AddrItemsAmount + i) = items_amount(i)
+        Next
+
+        For i As UInteger = 0 To SizePaletteAnim - 1
+            testfile(PaletteAnimAddr + i) = palanim(i)
+            testfile(PaletteAnimAddrWily + i) = palanimwily(i)
         Next
 
         If BinFilePath = "" Then
@@ -614,7 +657,7 @@ Public Class Form1
     '敵配置もここで描く
     Private Sub scr_Paint(sender As Object, e As PaintEventArgs) Handles scr.Paint
         'DrawScr(sender)
-        SyncLock scrBuf
+        SyncLock Me
             scrBuf.Render(e.Graphics)
         End SyncLock
         Dim s As String = "画面位置: (" & Hex(ViewOrigin.X) & ", " & Hex(ViewOrigin.Y) & ")"
@@ -623,14 +666,14 @@ Public Class Form1
 
     Private Sub p32_Paint(sender As Object, e As PaintEventArgs) Handles p32.Paint
         'DrawP32(sender)
-        SyncLock p32Buf
+        SyncLock Me
             p32Buf.Render(e.Graphics)
         End SyncLock
     End Sub
 
     Private Sub ptile_Paint(sender As Object, e As PaintEventArgs) Handles ptile.Paint
         'DrawP16(sender)
-        SyncLock p16Buf
+        SyncLock Me
             p16Buf.Render(e.Graphics)
         End SyncLock
     End Sub
@@ -642,19 +685,18 @@ Public Class Form1
         If focus32 < 16 Then ss += "0"
         ss += Hex(focus32)
         If ss <> Label_32Chip1.Text Then Label_32Chip1.Text = ss
-        SyncLock p32selectedBuf
+        SyncLock Me
             p32selectedBuf.Render(e.Graphics)
         End SyncLock
     End Sub
 
     Private Sub p32focus_Paint(sender As Object, e As PaintEventArgs) Handles p32focus.Paint
         'DrawP32Focus(sender)
-
         Dim ss As String = "No.: "
         If focus32 < 16 Then ss += "0"
         ss += Hex(focus32)
         If ss <> Label_32Chip2.Text Then Label_32Chip2.Text = ss
-        SyncLock p32selectedBuf
+        SyncLock Me
             p32selectedBuf.Render(e.Graphics)
         End SyncLock
     End Sub
@@ -662,21 +704,21 @@ Public Class Form1
     '32x32タイル選択枠、属性表示の方
     Private Sub p32focus_attr_Paint(sender As Object, e As PaintEventArgs) Handles p32focus_attr.Paint
         'DrawP32Focus(sender)
-        SyncLock p32selectedBuf
+        SyncLock Me
             p32selectedBuf.Render(e.Graphics)
         End SyncLock
 
-        Dim s As String
-        Dim a As UInteger
-        Dim g As Graphics = e.Graphics
+        Dim f As New Font("MS UI Gothic", sender.Size.Width / 3)
+        Dim s As New SizeF(sender.Size.Width / 2, sender.Size.Width / 2)
         For i As UInteger = 0 To 1
             For k As UInteger = 0 To 1
-                a = flag(focus32 * 2 + i)
-                a = If(k = 0, a >> 4, a And &HF)
-                s = Hex(a)
-                g.DrawString(s, New Font("MS UI Gothic", sender.Size.Width / 3), Brushes.Cyan, _
-                             New RectangleF(sender.Size.Width / 2 * i, sender.Size.Width / 2 * k, _
-                                            sender.Size.Width / 2, sender.Size.Width / 2))
+                Dim a As UInteger = flag(focus32 * 2 + i)
+                Dim ss As String = Hex(If(k = 0, a >> 4, a And &HF))
+                Dim p As New PointF(sender.Size.Width / 2 * i, sender.Size.Width / 2 * k)
+                Dim r As New RectangleF(p, s)
+                SyncLock Me
+                    e.Graphics.DrawString(ss, f, Brushes.Cyan, r)
+                End SyncLock
             Next
         Next
     End Sub
@@ -687,7 +729,7 @@ Public Class Form1
         If focus16 < 16 Then ss += "0"
         ss += Hex(focus16)
         If ss <> Label_16Chip1.Text Then Label_16Chip1.Text = ss
-        SyncLock p16selectedBuf
+        SyncLock Me
             p16selectedBuf.Render(e.Graphics)
         End SyncLock
     End Sub
@@ -697,7 +739,7 @@ Public Class Form1
         If focus16 < 16 Then ss += "0"
         ss += Hex(focus16)
         If ss <> Label_16Chip2.Text Then Label_16Chip2.Text = ss
-        SyncLock p3216selectedBuf
+        SyncLock Me
             p3216selectedBuf.Render(e.Graphics)
         End SyncLock
     End Sub
@@ -708,23 +750,43 @@ Public Class Form1
         If focus8 < 16 Then ss += "0"
         ss += Hex(focus8)
         If ss <> Label_8Graph.Text Then Label_8Graph.Text = ss
-        SyncLock p8selectedBuf
+        SyncLock Me
             p8selectedBuf.Render(e.Graphics)
         End SyncLock
     End Sub
 
     '8x8タイルのパレット
     Private Sub pgraphs_Paint(sender As Object, e As PaintEventArgs) Handles pgraphs.Paint
-        SyncLock p8Buf
+        SyncLock Me
             p8Buf.Render(e.Graphics)
         End SyncLock
     End Sub
 
     'パレットバーの表示
     Private Sub ppalette_Paint(sender As Object, e As PaintEventArgs) Handles ppalette.Paint, ppalette32.Paint
-        SyncLock paletteBuf
+        SyncLock Me
             paletteBuf.Render(e.Graphics)
         End SyncLock
+    End Sub
+
+    'パレット編集画面の表示
+    Private Sub PaletteGridView_Paint(sender As Object, e As PaintEventArgs) Handles PaletteGridView.Paint
+        Dim wily As Boolean = WilyToolStripMenuItem.Checked
+        For iy As Integer = 0 To PaletteGridView.Rows.Count - 1
+            Dim row As DataGridViewRow = PaletteGridView.Rows(iy)
+            For ix As Integer = 0 To &H10 - 1
+                Dim cell As DataGridViewCell = row.Cells(ix)
+                If Not cell.IsInEditMode Then
+                    Dim p As Byte = If(wily, palanimwily, palanim)(iy * &H10 + ix)
+                    Dim b As SolidBrush = PaletteBrushes(p And &H3F)
+                    PaletteGridView.Tag = True
+                    cell.Value = String.Format("{0:X2}", p)
+                    cell.Style.BackColor = b.Color
+                    cell.Style.ForeColor = If(b.Color.GetBrightness() > 0.7, Color.Black, Color.White)
+                    PaletteGridView.Tag = False
+                End If
+            Next
+        Next
     End Sub
 
     'マップ画面の選択
@@ -747,7 +809,7 @@ Public Class Form1
         roomptr = numroom * &H40 + selected
 
         '位置情報を取得したら、選択や書き込みなどの処理へ
-        If numroom < &H40 Then
+        If numroom < NumRooms Then
             If (Control.ModifierKeys And Keys.Control) = Keys.Control Then 'Ctrl + クリックで画面単位のコピー&ペースト
                 If e.Button = MouseButtons.Left AndAlso numroom <> ClipScr Then
                     Dim UndoData() As ArrayList = {New ArrayList, New ArrayList, New ArrayList} 'Undo情報のセットアップ
@@ -852,7 +914,7 @@ Public Class Form1
             numroom = map((Y * &H10 + X) Mod &H100)
             roomptr = numroom * &H40 + selected
 
-            If numroom < &H40 Then
+            If numroom < NumRooms Then
                 If e.Button = MouseButtons.Left AndAlso room(roomptr) <> focus32 Then
                     AddUndo(roomptr, room(roomptr), AddressOf UndoMap) 'Undoの設定
                     room(roomptr) = focus32
@@ -1206,8 +1268,8 @@ Public Class Form1
     End Sub
 
     '敵の新規作成
-    Private Sub CreateObjectToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles オブジェクトの新規作成ToolStripMenuItem.Click
-        If ContextRoom >= 0 And ContextRoom < &H40 Then
+    Private Sub CreateObjectToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CreateObjectToolStripMenuItem.Click
+        If ContextRoom >= 0 And ContextRoom < NumRooms Then
             Dim type As UInteger = 0
 
             If TextBoxObjType.Text <> "" Then
@@ -1235,7 +1297,7 @@ Public Class Form1
     End Sub
 
     '敵の削除
-    Private Sub DeleteObjectToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles 選択したオブジェクトの削除ToolStripMenuItem.Click
+    Private Sub DeleteObjectToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles DeleteObjectToolStripMenuItem.Click
         If objindex_selected = 0 Then Exit Sub
 
         If obj_isenemy Then
@@ -1250,7 +1312,7 @@ Public Class Form1
         scr.Refresh()
     End Sub
 
-    Private Sub 画面番号の変更ToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles 画面番号の変更ToolStripMenuItem.Click
+    Private Sub ChangeScreenNumberToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ChangeScreenNumberToolStripMenuItem.Click
         Label_ScreenNum.Visible = True
         TextBoxScreenNum.Visible = True
         TextBoxScreenNum.Text = Hex(ContextRoom)
@@ -1261,7 +1323,11 @@ Public Class Form1
     Private Sub TextBoxScreenNum_Validating(sender As Object, e As CancelEventArgs) Handles TextBoxScreenNum.Validating
         Try
             Dim t As UInteger = Convert.ToUInt32(TextBoxScreenNum.Text, 16)
-            map((ViewOrigin.Y + ContextViewOrigin.Y) * 16 + ViewOrigin.X + ContextViewOrigin.X) = t
+            Dim x As UInteger = ViewOrigin.X + ContextViewOrigin.X
+            Dim y As UInteger = ViewOrigin.Y + ContextViewOrigin.Y
+            Dim index As UInteger = y * 16 + x
+            AddUndo(index, map(index), AddressOf UndoScreenNumber)
+            map(index) = t
             RefreshAll()
         Catch ex As Exception
             e.Cancel = True
@@ -1271,6 +1337,45 @@ Public Class Form1
         Label_ScreenNum.Visible = False
         DrawScr(scr)
         scr.Refresh()
+    End Sub
+
+    'パレット定義の変更
+    Private Sub PaletteGridView_CellValidating(sender As Object, e As DataGridViewCellValidatingEventArgs) Handles PaletteGridView.CellValidating
+    End Sub
+
+    Private Sub PaletteGridView_CellValueChanged(sender As Object, e As DataGridViewCellEventArgs) Handles PaletteGridView.CellValueChanged
+        If PaletteGridView.Tag = True OrElse e.RowIndex < 0 OrElse e.ColumnIndex < 0 Then
+            Exit Sub
+        End If
+
+        Try
+            Dim wily As Boolean = WilyToolStripMenuItem.Checked
+            Dim value As Object = PaletteGridView(e.ColumnIndex, e.RowIndex).Value
+            Dim t As UInteger = Convert.ToUInt32(value, 16)
+            Dim n As Integer = PaletteGridView.SelectedCells.Count
+            Dim keyvalues As New ArrayList
+            PaletteGridView.Tag = True
+            For i As Integer = 0 To n - 1
+                Dim cell As DataGridViewCell = PaletteGridView.SelectedCells(i)
+                Dim index As UInteger = cell.RowIndex * 16 + cell.ColumnIndex
+                keyvalues.Add(New PaletteUndoData With {
+                    .Index = index,
+                    .Value = If(wily, palanimwily, palanim)(index)
+                })
+                cell.Value = value
+            Next
+            PaletteGridView.Tag = False
+
+            For Each kv As PaletteUndoData In keyvalues
+                If wily Then
+                    palanimwily(kv.Index) = t
+                Else
+                    palanim(kv.Index) = t
+                End If
+            Next
+            AddUndo(wily, keyvalues, AddressOf UndoPalette)
+        Catch ex As Exception
+        End Try
     End Sub
 
     '32x32タイル情報の表示
@@ -1283,7 +1388,7 @@ Public Class Form1
 
             For i As UInteger = 0 To &H100 - 1
                 f = True
-                For k As UInteger = 0 To &H40 * &H40 - 1
+                For k As UInteger = 0 To &H40 * NumRooms - 1
                     If i = room(k) Then
                         f = False
                         Exit For
@@ -1428,6 +1533,21 @@ Public Class Form1
         LoadPalette()
         DrawAll()
         RefreshAll()
+    End Sub
+
+    Private Sub PaletteGridViewCell_KeyPress(sender As Object, e As KeyPressEventArgs)
+        If e.KeyChar <> ControlChars.Back AndAlso
+           Not Regex.IsMatch(e.KeyChar, "[0-9A-Fa-f]") Then
+            e.Handled = True
+        End If
+    End Sub
+
+    Private Sub PaletteGridView_EditingControlShowing(sender As Object, e As DataGridViewEditingControlShowingEventArgs) Handles PaletteGridView.EditingControlShowing
+        If e.Control.Tag <> True Then
+            e.Control.Tag = True
+            AddHandler e.Control.KeyPress, AddressOf PaletteGridViewCell_KeyPress
+            DirectCast(e.Control, TextBox).CharacterCasing = CharacterCasing.Upper
+        End If
     End Sub
 
     '地形/オブジェクト切り替えのラジオボタン

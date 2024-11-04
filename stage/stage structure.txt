@@ -1,66 +1,66 @@
-0000-01FF 16x16 tile definition (80h tiles) (LT LB RT RB)
+0000-01FF 16x16タイル定義 (80h) (LT LB RT RB)
 	13 -> 11111111 22222222 33333333 44444444
 	24
-0200-05FF 32x32 graphics (100h mapchips)
-0600-06FF 32x32 palette
-0700-08FF 32x32 attribute
+0200-05FF 32x32タイル定義 (100h)
+0600-06FF 32x32属性
+0700-08FF 32x32地形判定
 	13 -> 11112222 33334444
 	24
-0900-09FF 16x16 map
-	+80 block
-	+40 scroll stops
-0A00-0ABF enemies position(X)
-0AC0-0B7F enemies position(Y)
-0B80-0C3F enemies
-0C40-0C7F enemies ptr
-0C80-0CBF enemies amount
-0CC0-0CDF item position(X)
-0CE0-0CFF item position(Y)
-0D00-0D1F items
-0D20-0D5F items ptr
-0D60-0D9F items amount
-0DA0-0DBF palettes(default)
-0DC0-0E5F palette animation
-0E60-0E7F palettes(wily stage)
-0E80-0F1F palette animation(wily stage)
-0F20-0F2F graphics loading ptr
-0F30-0F3F graphics loading amount
-0F40-0F4F graphics loading address
-0F50-0FFF graphics loading table
+0900-09FF 16x16マップ（画面同士の繋がり方）
+	+80 画面全体を1つの地形判定として扱う（落下、場外など）
+	+40 場外（スクロールしない）
+0A00-0ABF 敵位置X
+0AC0-0B7F 敵位置Y
+0B80-0C3F 敵種類
+0C40-0C7F 画面定義（00～3F）ごとの敵配置テーブルポインタ
+0C80-0CBF 画面定義（00～3F）ごとの敵の数
+0CC0-0CDF アイテム位置X
+0CE0-0CFF アイテム位置Y
+0D00-0D1F アイテム種類
+0D20-0D5F 画面定義（00～3F）ごとのアイテム配置テーブルポインタ
+0D60-0D9F 画面定義（00～3F）ごとのアイテムの数
+0DA0-0E5F パレット・パレットアニメーション定義（0Ch枚）
+0E60-0F1F パレット・パレットアニメーション定義（0Ch枚、ワイリーステージ）
+0F20-0F2F 敵画像書き換え定義番号ごとのテーブルへのポインタ
+0F30-0F3F 敵画像書き換え列数 +80hで敵の第2パレットのみを書き換える
+0F40-0F4F 敵画像書き換えPPUアドレス上位
+0F50-0FFF 敵画像書き換え定義 基本は2のそれと同じ パレットは右2色のみ指定
 
-1000-1FFF enemies graphics
-2000-2FFF stage graphics(compressed)
+1000-1FFF 画像（スプライト）
+2000-2FFF 画像（ステージ・圧縮形式）
 
-3000-3FBF 8x8 room definition(40h rooms)
+3000-3FBF 画面定義（00～3E）
 
-3FC0 the number of palette animation frames
-3FC1 the number of palette animation frames (wily stage)
-3FC2 palette animation wait
-3FC3 palette animation wait (wily stage)
-3FC4-3FCF initial graphics set
-3FD0 spawn position Y
-3FD1 spawn position Y (wily stage)
-3FD2 spawn position
-3FD3 spawn position (wily stage)
-3FD4-3FDF initial graphics set (wily stage)
+3FC0 パレットアニメーション枚数
+3FC1 パレットアニメーション枚数（ワイリーステージ）
+3FC2 パレットアニメーション速さ
+3FC3 パレットアニメーション速さ（ワイリーステージ
+3FC4-3FCF 初期出現時の敵画像定義
+3FD0 最低出現位置Y（この座標未満では着地のための地形判定をしない、F0hで強制的にY = 80hに着地）
+3FD1 最低出現位置Y（ワイリーステージ）
+3FD2 初期出現画面位置 = YYYY XXXX
+3FD3 初期出現画面位置（ワイリーステージ）
+3FD4-3FDF 初期出現時の敵画像定義（ワイリーステージ）
+3FE4-3FE9 初期出現時の敵パレット
+3FEA-3FEF 初期出現時の敵パレット（ワイリーステージ）
 
-300 horizontal scroll ppu addr hi
-301 horizontal scroll ppu addr lo
-302-320 horizontal scroll data
-321 horizontal scroll ppu attr hi
-322 horizontal scroll ppu attr lo
-323 horizontal scroll ppu attr data
+300 横スクロールネームテーブル書き込み位置上位
+301 横スクロールネームテーブル書き込み位置下位
+302-320 横スクロールネームテーブル書き込みデータ
+321 横スクロール属性テーブル書き込み位置上位
+322 横スクロール属性テーブル書き込み位置下位
+323 横スクロール属性テーブル書き込みデータ
 ... x8
-339 vertical scroll ppu addr hi 1
-33A vertical scroll ppu addr hi 2
-33B vertical scroll ppu addr lo
-33C-35B vertical scroll ppu data 1
-35C-37B vertical scroll ppu data 2
-37C vertical scroll attr hi 1
-37D vertical scroll attr hi 2
-37E vertical scroll attr lo
-37F-386 vertical scroll attr data 1
-387-38E vertical scroll attr data 2
+339 縦スクロールネームテーブル書き込み位置上位1
+33A 縦スクロールネームテーブル書き込み位置上位2
+33B 縦スクロールネームテーブル書き込み位置下位
+33C-35B 縦スクロールネームテーブル書き込みデータ1
+35C-37B 縦スクロールネームテーブル書き込みデータ2
+37C 縦スクロール属性テーブル書き込み位置上位1
+37D 縦スクロール属性テーブル書き込み位置上位2
+37E 縦スクロール属性テーブル書き込み位置下位
+37F-386 縦スクロール属性テーブル書き込みデータ1
+387-38E 縦スクロール属性テーブル書き込みデータ2
 
 地形判定0～F
 0 背景
@@ -88,7 +88,7 @@ Y and 0F > 0のとき:
   パレットオーバーライドをリセットする
 
 敵80～FF
-80～8B 画像読み込みセットの適用
+80～8D 画像読み込みセットの適用
 8E スクロール制限オブジェクト
   X座標の下2bit → 横方向のスクロールを制限する（左半分、右半分）
     1画面左 or 右に画面定義があってもそこにスクロールしないようにする
