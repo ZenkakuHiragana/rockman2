@@ -1095,9 +1095,14 @@ EN15:
 	sbc <$01
 	bcs .onscreen
 	lsr aObjFlags,x
+	lda #$15
+	jsr FindObject
+	bcc .rts
+	mMOV #$0F, aPaletteSpr + $0C + 1 ;パレットの黒の部分を書き換え
 .rts
 	rts
 .onscreen
+	mMOV #$37, aPaletteSpr + $0C + 1 ;パレットの黒の部分を書き換え
 	lda aObjVar,x
 	beq .do
 	dec aObjVar,x

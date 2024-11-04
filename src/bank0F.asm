@@ -1268,13 +1268,6 @@ WriteNameTableByScroll:
 
 	lda <$02
 	bmi .horizontal_v ;右スクロール時
-	sec
-	lda <$08
-	sbc #$C0
-	sta <$08
-	bcs .carry_h_v
-	dec <$09
-.carry_h_v
 ;	tya ;横の書き込み開始位置を-8[dot]
 ;	eor #$02
 ;	tay
@@ -1285,10 +1278,16 @@ WriteNameTableByScroll:
 ;	tax
 ;	and #$02
 ;	beq .horizontal_v
+	sec
+	lda <$08
+	sbc #$E0
+	sta <$08
+	bcc .nocarry_h_v
 	inc <$09
+.nocarry_h_v
 	clc
 	lda <$03
-	adc #$10
+	adc #$08
 	and #$3F
 	sta <$03
 	bpl .done_h
@@ -1447,15 +1446,11 @@ WriteNameTableByScroll:
 	lda <$02
 	lsr a
 	bcs .up_dy ;下スクロールの時
-	lda <$10 ;縦の書き込み開始位置-8[dot]
-	sbc #$07
-	sta <$10
+	mSUB <$10, #$08 - 1 ;縦の書き込み開始位置-8[dot]
 	bcs .borrow_nt
 	sbc #$0F
 	sta <$10
-	lda <$09
-	sbc #$10
-	sta <$09
+	mSUB <$09, #$10
 	clc
 .borrow_nt
 	tya
@@ -1504,8 +1499,11 @@ WriteNameTableByScroll:
 	and #$3F
 	sta <$06 ;$06: ppu write data index
 	sta <$07 ;$07: ppu write data index
-	mMOV #$20 >> 2, aPPUVScrhi
-	mSTZ aPPUVScrlo
+	clc
+	adc #$20 + 3 + 2
+	and #$3F
+	sta <$01 ;ppu write data index, endpos
+	mMOVWB #$2000 >> 2, aPPUVScrhi, aPPUVScrlo
 	lda <$10
 	asl a
 	rol aPPUVScrhi
@@ -1563,7 +1561,7 @@ WriteNameTableByScroll:
 
 	inc <$06
 	inx
-	cpx <$07
+	cpx <$01
 	beq .skip_yscroll ;横スクロール境界
 	cpx #$40
 	bcs .end_ptr_v ;ネームテーブル右端
@@ -1576,16 +1574,12 @@ WriteNameTableByScroll:
 	and #$02
 	bne .loop_nt_v_8
 .go_right16
-	lda <$04
-	eor #$02
-	sta <$04
+	mEOR <$04, #$02
 	and #$02
 	bne .loop_nt_v_16
 
 	clc
-	lda <$03
-	adc #$08
-	sta <$03
+	mADD <$03, #$08
 	bne .loop_nt_v_32
 .end_ptr_v
 	cpx #$40
@@ -1596,15 +1590,9 @@ WriteNameTableByScroll:
 .noreset
 	inc <$09
 	sec
-	lda <$03
-	and #$07
-	sta <$03
-	lda <$05
-	and #$FD
-	sta <$05
-	lda <$04
-	and #$FD
-	sta <$04
+	mAND <$03, #$07
+	mAND <$05, #~$02
+	mAND <$04, #~$02
 	jmp .loop_nt_v
 .skip_yscroll
 ;属性テーブルをora
@@ -1626,7 +1614,10 @@ WriteNameTableByScroll:
 .loop_attr_y
 	jsr WriteNameTable_GetMapPtr
 .loop_attr_y_32
-	jsr WriteNameTable_GetChip32
+	ldy <$03
+	clc
+	lda [$0A],y
+	tay ;WriteNameTable_GetChip32からYレジスタセットまでを切り出し
 	lda aPPUVScrAttrMask
 	and Stage_Def32Pal,y
 	ora aPPUVScrAttrData,x
@@ -1656,9 +1647,6 @@ WriteNameTableByScroll:
 	bpl .loop_attr_y
 .end_scroll
 	mCHANGEBANK #$0E, 1
-
-;スクロール位置の補正
-WriteNameTable_GetOrigin:
 
 ;画面位置に対応する画面定義へのポインタを返す
 ;$09 = 画面位置 = YYYY XXXX

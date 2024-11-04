@@ -230,10 +230,7 @@ DoRockman_DoScroll:
 	jmp .merge_v
 .onscreen_v
 	mMOV <zVScroll, <zVScrollPrev
-	mMOV <.clipped, <$C1
-	mMOV <zMoveAmountY, <$C2
 	lda <.dy          ;縦スクロール制限によるスクロール量 = ±1
-	sta <$C0
 	bit <.clipped
 	bvc .noscrollclip_v
 	tax
