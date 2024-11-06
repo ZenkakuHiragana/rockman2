@@ -1053,13 +1053,13 @@ EN14:
 	.db $A7, $67, $B7, $27, $47, $67, $77, $A7
 	.db $17, $27, $67, $A7
 .length
-	.db $FF, $00, $FF, $00, $00, $FF, $A0, $60
+	.db $FC, $04, $FC, $04, $04, $FC, $A0, $60
 	.db $60, $80, $80, $80, $80, $80, $80, $80
 	.db $80, $80, $80, $80, $80, $80, $80, $80
 	.db $80, $60, $A0, $80, $80, $80, $80, $80
-	.db $80, $80, $80, $00, $00, $00, $FF, $FF
-	.db $00, $00, $00, $00, $00, $80, $00, $70
-	.db $00, $00, $FF, $20
+	.db $80, $80, $80, $04, $04, $04, $FC, $FC
+	.db $04, $04, $04, $04, $04, $80, $04, $70
+	.db $04, $04, $FC, $20
 .timer
 	.db $01, $1F, $01, $1F, $3E, $01, $1F, $3E
 	.db $5D, $01, $01, $1F, $1F, $3E, $3E, $5D
@@ -1072,18 +1072,22 @@ EN14:
 ;9DCE
 ;レーザー
 EN15:
-	lda aObjRoom,x
-	lsr a
-	lsr a
-	lsr a
-	lsr a
-	sta <$00
 	lda <zRoom
 	lsr a
 	lsr a
 	lsr a
 	lsr a
 	sta <$01
+	lda aObjRoom,x
+	lsr a
+	lsr a
+	lsr a
+	lsr a
+	cmp <$01
+	bcs .borrow_room
+	adc #$10
+.borrow_room
+	sta <$00
 	lda aObjY,x
 	sbc #$08
 	sbc <zVScroll
@@ -1109,16 +1113,14 @@ EN15:
 	lda aObjFlags,x
 	and #%00100000
 	bne .checkhit
+	lda aObjX,x
+	cmp aEnemyVar,x
 	lda aObjFlags,x
 	and #%01000000
 	bne .right
-	lda aObjX,x
-	cmp aEnemyVar,x
 	bcs .continue
 	bcc .stop
 .right
-	lda aObjX,x
-	cmp aEnemyVar,x
 	bcc .continue
 .stop
 	mMOV aEnemyVar,x, aObjX,x
