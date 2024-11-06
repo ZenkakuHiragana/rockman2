@@ -320,9 +320,19 @@ DoRockman_DoScroll:
 	adc #$10 - 1
 	sta <zVScroll
 	mADD <zRoom, #$10 - 1
+	clc
+	adc #$10
+	tax
+	ldy #$01
+	jsr ChangeBank_GetScrollable
+	tya
+	asl a
 .cross_page_down
 	lda #$00 ;ネームテーブル書き込み予約の判定
-	beq .merge_v
+	bcc .merge_v
+	sta <zVScroll
+	clc
+	bcc .merge_v
 ;上スクロール
 .scroll_up
 	lda <.screeny
@@ -357,11 +367,15 @@ DoRockman_DoScroll:
 	sec
 	mSUB <zRoom, #$10
 .cross_page_up
-	lda #$FF
+	sec
 .merge_v ;ネームテーブル書き込み予約の判定
-	clc
-	eor <zVScrollPrev
+	lda <zVScrollPrev
+	bcc .invert_scrollv
+	eor #$FF
+	adc #$00
+.invert_scrollv
 	and #$07
+	clc
 	adc <.dy
 	lsr a
 	lsr a

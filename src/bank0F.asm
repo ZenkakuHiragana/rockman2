@@ -1194,58 +1194,33 @@ Table_ShutterAttrMask:
 ;$0E~$0F 16x16タイル定義へのポインタ
 ;$10 縦スクロール始点
 ;$11 縦スクロール時、$09をバックアップ
+;$12 PPU書き込みポインタ終点（縦スクロールで使用）
 WriteNameTableByScroll:
 .xscroll = $00
 .yscroll = $01
 .f = $02
+.ppuend = $12
 	lda <zStage
 	and #$07
 	jsr ChangeBank
-;書き込み開始位置の設定
-	ldx <zRoom
+
+	clc
+	mMOV <zRoom, <$09
+	mADD <zVScroll, #$07, <$10
+	cmp #$F0
+	bcc .carry_init
+	adc #$10 - 1
+	sta <$10
+	mADD <$09, #$10 - 1
+.carry_init
 	clc
 	lda <zHScroll
 	adc #$E8
 	bcc .carry_x_init
-	inx
+	inc <$09
 .carry_x_init
 	sta <$08
-	lsr a
-	lsr a
-	and #$38
-	sta <$03 ;$03: 00XX X000
-	stx <$09
-
-	lda <zVScroll
-	sta <$10
-
-	lda <$08
-	and #$08
-	lsr a
-	lsr a
-	tay ;Y = 0, 2
-	lda <$08
-	and #$10
-	lsr a
-	lsr a
-	lsr a
-	tax ;X = 0, 2
-	lda <$10
-	asl a
-	rol a
-	rol a
-	rol a
-	bpl .iny_8
-	iny
-.iny_8
-	bcc .iny_16
-	inx
-.iny_16
-	and #$07
-	ora <$03
-	sta <$03 ;$03: 00XX XYYY
-	stx <$04 ;$04: 32x32 LT LB RT RB
-	sty <$05 ;$05: 16x16 LT LB RT RB
+	jsr WriteNameTable_SetReadPointers
 
 ;横スクロール
 	lda <.xscroll
@@ -1294,8 +1269,8 @@ WriteNameTableByScroll:
 .horizontal_v
 	dec <$09
 .done_h
-	stx <$04
-	sty <$05
+	; stx <$04
+	; sty <$05
 
 ;ネームテーブル書き込み位置指定
 	lda <$09
@@ -1441,38 +1416,17 @@ WriteNameTableByScroll:
 	jmp .end_scroll
 .do_yscroll
 
-	ldx <$04
-	ldy <$05
-	lda <$02
+	lda <.f
 	lsr a
 	bcs .up_dy ;下スクロールの時
-	mSUB <$10, #$08 - 1 ;縦の書き込み開始位置-8[dot]
+	mSUB <$10, #$0F - 1 ;縦の書き込み開始位置-8[dot]
 	bcs .borrow_nt
-	sbc #$0F
+	sbc #$10 - 1
 	sta <$10
 	mSUB <$09, #$10
-	clc
 .borrow_nt
-	tya
-	eor #$01
-	tay
-	and #$01
-	beq .up_dy
-	bcc .pagebreak
-	txa
-	eor #$01
-	tax
-	lsr a
-	bcc .up_dy
-.pagebreak
-	sec
-	lda <$03
-	sbc #$01
-	and #$3F
-	sta <$03
+	jsr WriteNameTable_SetReadPointers
 .up_dy
-	stx <$04
-	sty <$05
 
 	ldy <$09
 	dey
@@ -1502,7 +1456,7 @@ WriteNameTableByScroll:
 	clc
 	adc #$20 + 3 + 2
 	and #$3F
-	sta <$01 ;ppu write data index, endpos
+	sta <.ppuend ;ppu write data index, endpos
 	mMOVWB #$2000 >> 2, aPPUVScrhi, aPPUVScrlo
 	lda <$10
 	asl a
@@ -1561,7 +1515,7 @@ WriteNameTableByScroll:
 
 	inc <$06
 	inx
-	cpx <$01
+	cpx <.ppuend
 	beq .skip_yscroll ;横スクロール境界
 	cpx #$40
 	bcs .end_ptr_v ;ネームテーブル右端
@@ -1585,7 +1539,7 @@ WriteNameTableByScroll:
 	cpx #$40
 	bcc .noreset
 	mSTZ <$06
-	lda <$07
+	lda <.ppuend
 	beq .skip_yscroll
 .noreset
 	inc <$09
@@ -1606,11 +1560,19 @@ WriteNameTableByScroll:
 .skip3
 	sbc #$F0
 	sta <$09
+	lda <.ppuend
+	lsr a
+	lsr a
+	sta <.ppuend
 	lda <$07
 	lsr a
 	lsr a
-	sta <$07
 	tax
+	sec
+	lda <$03
+	sbc #$08
+	and #$3F
+	sta <$03
 .loop_attr_y
 	jsr WriteNameTable_GetMapPtr
 .loop_attr_y_32
@@ -1624,29 +1586,65 @@ WriteNameTableByScroll:
 	sta aPPUVScrAttrData,x
 
 	inx
-	cpx <$07
+	cpx <.ppuend
 	beq .end_scroll
 	cpx #$10
 	bcs .end_ptr
 	cpx #$08
 	beq .end_ptr_noreset
 	clc
-	lda <$03
-	adc #$08
-	sta <$03
+	mADD <$03, #$08
 	bne .loop_attr_y_32
 .end_ptr
-	ldx <$07
+	ldx <.ppuend
 	beq .end_scroll
 	ldx #$00
 .end_ptr_noreset
 	inc <$09
-	lda <$03
-	and #$07
-	sta <$03
+	mAND <$03, #$07
 	bpl .loop_attr_y
 .end_scroll
 	mCHANGEBANK #$0E, 1
+
+;書き込み開始位置の設定
+;$08 横スクロール始点
+;$09 画面単位始点
+;$10 縦スクロール始点
+WriteNameTable_SetReadPointers:
+	lda <$08
+	lsr a
+	lsr a
+	and #$38
+	sta <$03 ;$03: 00XX X000
+
+	lda <$08
+	and #$08
+	lsr a
+	lsr a
+	tay ;Y = 0, 2
+	lda <$08
+	and #$10
+	lsr a
+	lsr a
+	lsr a
+	tax ;X = 0, 2
+	lda <$10
+	asl a
+	rol a
+	rol a
+	rol a
+	bpl .iny_8
+	iny
+.iny_8
+	bcc .iny_16
+	inx
+.iny_16
+	and #$07
+	ora <$03
+	sta <$03 ;$03: 00XX XYYY
+	stx <$04 ;$04: 32x32 LT LB RT RB
+	sty <$05 ;$05: 16x16 LT LB RT RB
+	rts
 
 ;画面位置に対応する画面定義へのポインタを返す
 ;$09 = 画面位置 = YYYY XXXX
