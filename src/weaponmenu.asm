@@ -87,66 +87,93 @@
 	lsr a
 	and #%00011110
 	adc #$06
+	sta <$00
 	cmp #$20
 	bcc .add_voffset
-	adc #$02
-	pha
-	lda <$53
-	adc #$10
-	sta <$53
-	pla
+	adc #$03 - 1
+	sta <$00
+	mADD <$53, #$10
+	lda <$00
 .add_voffset
 	and #%00011100
 	ora <$52
 	sta <$52
+	and #%00011100
+	cmp #$0C
+	ldx #$0F
+	bcc .noneed_additional_tiles
+	ldx #$0F + 3
+.noneed_additional_tiles
+	stx <$11
 	ldx #$00
+	mMOV #$10, <$10
 .loop_drawmenu_open
 	stx <$FD
 	jsr .write_ppuaddr_loop
 	lda #$00
 	sta <zPPUSqr
 	jsr SetPPUSquareInfo
+	ldx <$FD
+	lda <$08
+	lsr a
+	lsr a
+	sta <$03
+	jsr WriteNameTable_WeaponMenu
 	ldy <$FD
-	ldx .table_menubg_map,y
-	cpx #$08
-	beq .add_drawmenu_offset
-	cpx #$1C
-	beq .add_drawmenu_offset
-	cpx #$30
-	bne .skip_drawmenu_offset
-.add_drawmenu_offset
 	lda <$52
 	and #%00011100
 	cmp #$0C
-	bne .skip_drawmenu_offset
-	txa
-	adc #$08 - 1
-	tax
-.skip_drawmenu_offset
+	bcc .skip_tile_offset
+	cpy #$0C
+	bcc .skip_tile_offset
+	tya
+	adc #$03 - 1
+	tay
+.skip_tile_offset
+	ldx .table_menubg_map,y
 	ldy #$00
 .loop_drawmenuppu_open
 	lda .table_menubg_tile,x
 	sta aPPUSqrData,y
 	inx
 	iny
-	cpy #$10
+	cpy <$10
 	bne .loop_drawmenuppu_open
 	ldx <zStage
 	lda .table_menubg_attr,x
+	ldx <$FD
+	cpx #$0F
+	bcc .skip_attrmask
+	and # %00001111
+	sta <$00
+	lda aPPUSqrAttrData
+	and #~%00001111
+	ora <$00
+.skip_attrmask
 	sta aPPUSqrAttrData
 	inc <zPPUSqr
+	cpx #$10
+	bcs .skip_loadgraphs_init
 	ldy #$9A
 	ldx #$00
 	jsr LoadWeaponMenuGraphics
+.skip_loadgraphs_init
 	jsr FrameAdvance1A
 	ldx <$FD
 	inx
 	cpx #$0F
+	bne .skip_start_additional_tiles
+	lsr <$10
+.skip_start_additional_tiles
+	cpx <$11
 	bne .loop_drawmenu_open
 	stx <$FD
+	cpx #$10
+	bcs .skip_loadgraphs_init_final
 	ldy #$9A
 	ldx #$00
 	jsr LoadWeaponMenuGraphics
+.skip_loadgraphs_init_final
 	lda #$00
 	sta <$FE
 	sta <$FF
@@ -312,7 +339,6 @@
 	jsr SetPPUSquareInfo
 
 	ldx <$FD
-	; mMOV <$53, <$09
 	lda <$08
 	lsr a
 	lsr a
@@ -321,6 +347,8 @@
 	inc <zPPUSqr
 
 	lda <$FD
+	cmp #$10
+	bcs .skip_loadgraphs
 	cmp #$08
 	lda #$05
 	ldy #$92
@@ -330,15 +358,19 @@
 .loadrockmangraphs
 	tax
 	jsr LoadWeaponMenuGraphics
+.skip_loadgraphs
 	jsr FrameAdvance1A
 	ldx <$FD
 	inx
-	cpx #$0F
+	cpx <$11
 	bne .loop_endmenu
 	stx <$FD
+	cpx #$10
+	bcs .skip_loadgraphs_final
 	ldy #$92
 	ldx #$05
 	jsr LoadWeaponMenuGraphics
+.skip_loadgraphs_final
 	jsr ChangeBodyColor
 	jsr FrameAdvance1A
 	pla
@@ -424,7 +456,6 @@
 .showsprites
 .basex = $08
 .basey = $05
-.shrinky = $06
 .x = $01
 .y = $02
 	jsr ClearSprites
@@ -435,22 +466,17 @@
 	sta <.basex
 	lda <$52
 	and #$1C
-	cmp #$0C
-	lda #$00
-	ror a
-	sta <.shrinky ; = ($52 & #$1C) ≧ #$0C
-	lda <zVScroll
-	cmp #$D0
-	bcc .add_basey
-	sbc #$10
-.add_basey
-	eor #$1F
-	and #$1F
-	cmp #$10
-	bcc .skip_basey
-	sbc #$20
-.skip_basey
+	asl a
+	asl a
+	asl a
+	adc #-$04 << 3
+	sbc <zVScroll
 	sta <.basey
+	ldy <zVScroll
+	cpy #$D0
+	bcc .skip_basey
+	mSUB <.basey, #$10
+.skip_basey
 
 	ldy #$00
 .loop_next ;$962C($00≦Y＜$14) →NEXTを描く
@@ -460,31 +486,6 @@
 	cpy #$14
 	bne .loop_next
 ;$07に武器取得フラグとアイテム取得フラグを格納
-	.ifndef ___OPTIMIZE
-	lda <zClearFlags
-	asl a
-	ora #$01
-	sta <$07
-	lda #$05
-	sta <$01
-	ldx #$00
-	lda <.2ndscrflag
-	beq .showsprites_2nd
-	ldx #$06
-	lda <zClearFlags
-	sta <$07
-	lda <zItemFlags
-	asl <$07
-	rol a
-	asl <$07
-	rol a
-	asl <$07
-	rol a
-	sta <$07
-.showsprites_2nd
-	lda <$07
-;-------------最適化コード-----------
-	.else
 	lda #$05
 	sta <$01
 	lda <zClearFlags
@@ -503,8 +504,6 @@
 .showsprites_2nd
 	rol a
 	sta <$07
-	.endif
-;-------------------------------------
 	sta <$02
 	lda #$44 ;武器の頭文字の一番上Y座標
 	sta <$00
@@ -597,18 +596,8 @@
 .is2nd_showbars
 	ldx #$04
 .basesprites2 ;$964C($04≦X＜$17) 1UPの顔と:を描く
-	bit <.shrinky
-	bpl .skip_basesprites2
-	txa
-	and #$03
-	bne .skip_basesprites2
-	lda #$F5
-	bne .shrink_basesprites2
-.skip_basesprites2
-	lda #$00
-.shrink_basesprites2
 	clc
-	adc .table_1upicon,x
+	lda .table_1upicon,x
 	sta aSprite,y
 	iny
 	inx
@@ -696,24 +685,6 @@
 	lda aSprite + 0,x
 	cmp #$F8
 	bcs .skip_movey
-	bit <.shrinky
-	bpl .skip_shrinky
-	ldy aSprite + 1,x ;1UP表示は別に調整
-	cpy #$8D
-	beq .skip_shrinky
-	cpy #$8E
-	beq .skip_shrinky
-	cpy #$1E
-	beq .skip_shrinky
-	sbc #$10
-	lsr a
-	lsr a
-	lsr a
-	lsr a
-	eor #$FF
-	adc aSprite + 0,x
-	clc
-.skip_shrinky
 	adc <.basey
 	sta aSprite + 0,x
 .skip_movey
@@ -784,6 +755,9 @@
 	.db $04, $2C, $18
 	.db $04, $2C, $18
 	.db $08, $30, $1C
+.table_menubg_map_accross_nametable
+	.db $04, $2C, $18
+	.db $10, $38, $24
 ;957F
 ;武器メニューのBG部分の書き込み位置
 .table_menubg_writepos_x
@@ -792,12 +766,14 @@
 	.db $08 & $E0, $28 & $E0, $48 & $E0
 	.db $0C & $E0, $2C & $E0, $4C & $E0
 	.db $10 & $E0, $30 & $E0, $50 & $E0
+	.db $14 & $E0, $34 & $E0, $54 & $E0
 .table_menubg_writepos_y
 	.db $00 & $1C, $20 & $1C, $40 & $1C
 	.db $04 & $1C, $24 & $1C, $44 & $1C
 	.db $08 & $1C, $28 & $1C, $48 & $1C
 	.db $0C & $1C, $2C & $1C, $4C & $1C
 	.db $10 & $1C, $30 & $1C, $50 & $1C
+	.db $14 & $1C, $34 & $1C, $54 & $1C
 ;958E
 ;武器メニューBG部分のタイル定義
 .table_menubg_tile
