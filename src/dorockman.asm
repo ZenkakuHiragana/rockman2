@@ -26,7 +26,19 @@
 	sec ;ロックマンの実際の移動量X
 	mSUB aObjX, <zMoveAmountX, <zMoveAmountX
 	sec ;ロックマンの実際の移動量Y
-	mSUB aObjY, <zMoveAmountY, <zMoveAmountY
+	lda aObjY
+	sbc <zMoveAmountY
+	bmi .check_negative_movey
+	cmp #$10
+	bcc .carry_movey ;|Y移動量| < #$10を前提にページ境界移動の対策
+	sbc #$10
+	bpl .carry_movey
+.check_negative_movey
+	cmp #$F0
+	bcs .carry_movey
+	adc #$10
+.carry_movey
+	sta <zMoveAmountY
 	sec ;ロックマンの画面内のX座標
 	mSUB aObjX, <zHScroll, <zRScreenX
 	ldx #$00
@@ -293,7 +305,7 @@ DoRockman_DoScroll:
 	clc
 	lda <zRoom
 	adc #$10
-	tax        ;ChangeBank_GetScrollableの引数
+	tax ;ChangeBank_GetScrollableの引数
 	ldy #$01
 	jsr ChangeBank_GetScrollable
 	tya
@@ -325,7 +337,7 @@ DoRockman_DoScroll:
 	sec
 	lda <zRoom
 	sbc #$10
-	tax        ;ChangeBank_GetScrollableの引数
+	tax ;ChangeBank_GetScrollableの引数
 	ldy #$01
 	jsr ChangeBank_GetScrollable
 	tya
@@ -622,11 +634,9 @@ DoRockman0A_LadderTop:
 	sbc #$0C
 	sta aObjY
 	bcs .borrow_up
-	sbc #$0F
+	sbc #$10 - 1
 	sta aObjY
-	lda aObjRoom
-	sbc #$10
-	sta aObjRoom
+	mSUB aObjRoom, #$10
 .borrow_up
 	ldx #$03
 	bne .done
@@ -646,11 +656,9 @@ DoRockman0A_LadderTop:
 	sta aObjY
 	cmp #$F0
 	bcc .skip2
-	adc #$0F
+	adc #$10 - 1
 	sta aObjY
-	lda aObjRoom
-	adc #$0F
-	sta aObjRoom
+	mADD aObjRoom, #$10 - 1
 .skip2
 	ldy #$FF
 	ldx #$40
@@ -976,12 +984,8 @@ DoRockman_BodyMoveX:
 	bvc .left
 ;右へ移動
 	clc
-	lda aObjXlo
-	adc aObjVXlo
-	sta aObjXlo
-	lda aObjX
-	adc aObjVX
-	sta aObjX
+	mADD aObjXlo, aObjVXlo
+	mADD aObjX, aObjVX
 	bcc .carry_right
 	inc aObjRoom
 .carry_right
@@ -1354,46 +1358,37 @@ DoRockman_BodyMoveY:
 ;	sta <.y
 ;	lda aObjYlo
 ;	sta <.ylo
-	mSTZ <.vyhi
 	lda aObjRoom
 	lsr a
 	lsr a
 	lsr a
 	lsr a
 	sta <.r
-	lda aObjVY
-	bpl .up
-	dec <.vyhi
-.up
 	sec
-	lda aObjYlo
-	sbc aObjVYlo
-	sta aObjYlo
+	mSUB aObjYlo, aObjVYlo
 	lda aObjY
 	sbc aObjVY
-	ldx <.vyhi
+	bit aObjVY
 	bmi .down
 	bcs .skip_scrolly
-	sbc #$0F
-	clc
-	bcc .skip_scrolly
+	sbc #$10 - 1
+	dec <.r
+	bcs .skip_scrolly
 .down
 	cmp #$F0
 	bcc .skip_scrolly
 	adc #$10 - 1
+	inc <.r
 .skip_scrolly
 	sta aObjY
-	lda <.r
-	sbc <.vyhi
-	sta <.r
-	lda aObjVY
+	bit aObjVY
 	bmi DoRockman_BodyMoveY_CheckWallDown
 ;壁判定・上方向
 	sec
 	lda aObjY
 	sbc #$0C
 	bcs .boundary_y
-	sbc #$0F
+	sbc #$10 - 1
 	clc
 .boundary_y
 	sta <$0A
@@ -1409,10 +1404,11 @@ DoRockman_BodyMoveY:
 	sec
 	adc aObjY
 	sta aObjY
+	cmp #$F0
 	bcc DoRockman_BodyMoveY_Done
-	lda <$09
-	adc #$0F
-	sta <.r
+	adc #$10 - 1
+	sta aObjY
+	inc <.r
 	
 ;壁判定・下方向から合流 重力加速度の適用など
 DoRockman_BodyMoveY_Done:
@@ -1420,12 +1416,8 @@ DoRockman_BodyMoveY_Done:
 DoRockman_BodyMoveY_NoHit:
 .r = $01
 	sec
-	lda aObjVYlo
-	sbc <zGravity
-	sta aObjVYlo
-	lda aObjVY
-	sbc <zGravityhi
-	sta aObjVY
+	mSUB aObjVYlo, <zGravity
+	mSUB aObjVY, <zGravityhi
 	bpl DoRockman_BodyMoveY_NoHit_Done
 	cmp #-Scroll_MaxAmount
 	bcs DoRockman_BodyMoveY_NoHit_Done
@@ -1433,9 +1425,7 @@ DoRockman_BodyMoveY_NoHit:
 	mMOV #-Scroll_MaxAmount, aObjVY
 DoRockman_BodyMoveY_NoHit_Done:
 .r = $01
-	lda aObjRoom
-	and #$0F
-	sta aObjRoom
+	mAND aObjRoom, #$0F
 	lda <.r
 	asl a
 	asl a
@@ -1478,10 +1468,10 @@ DoRockman_BodyMoveY_CheckWallDown:
 	sec
 	sbc aObjY
 	sta aObjY
-	bcs .borrow_wallhitdown
-	lda <$09
-	sbc #$0F
-	sta <.r
+	bcs DoRockman_BodyMoveY_Done
+	dec <.r
+	bpl .borrow_wallhitdown
+	dec aObjRoom
 .borrow_wallhitdown
 	jmp DoRockman_BodyMoveY_Done
 
