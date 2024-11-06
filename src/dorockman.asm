@@ -1035,7 +1035,7 @@ DoRockman_BodyMoveX:
 	inc aObjRoom
 .skip_offscreen_left
 	sec
-	mSUB aObjX, #$08, <$08
+	mSUB aObjX, #$08 + 1, <$08 ;ワープマン防止
 	lda aObjRoom
 	and #$0F
 	sbc #$00
@@ -1046,7 +1046,7 @@ DoRockman_BodyMoveX:
 	lda <$08
 	and #$0F
 	eor #$0F
-	sec
+	clc
 	adc aObjX
 	sta aObjX
 	bcc .nohit_left
