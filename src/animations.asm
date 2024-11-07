@@ -211,7 +211,7 @@ en\8:
 	inc_en 70, 71, 72, 73, 74, 75, 76, 77
 	inc_en 78, 79, 7A, 7B, 7C, 7D, 7E, 7F
 	
-;アニメーションのポインタの修正
+;繧｢繝九Γ繝ｼ繧ｷ繝ｧ繝ｳ縺ｮ繝昴う繝ｳ繧ｿ縺ｮ菫ｮ豁｣
 ;F900
 	.org Table_AnimationPointerEnemy_Low + $4D
 	.db LOW(en35)

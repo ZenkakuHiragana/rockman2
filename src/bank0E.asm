@@ -201,10 +201,7 @@ MainLoop:
 	jsr DoBossBehaviour
 	jsr DoEnemyObjects
 	jsr SpriteSetup
-	lda <zScrollFlag
-	beq .scroll
 	jsr DoScroll
-.scroll
 	lda <zWaterLevel
 	beq .nolag
 	dec <zWaterWait
@@ -279,10 +276,7 @@ MainLoopBossRush:
 	jsr DoBossBehaviour
 	jsr DoEnemyObjects
 	jsr SpriteSetup
-	lda <zScrollFlag
-	beq .scroll
 	jsr DoScroll
-.scroll
 	lda <zWaterLevel
 	beq .nolag
 	dec <zWaterWait
@@ -355,6 +349,8 @@ Rockman_Warp_to_Land:
 ;スクロール方向$37 - 1 = 0, 1, 2, 3 → 左右上下
 ;スクロール先画面番号$38
 DoScroll:
+	lda <zScrollFlag
+	beq .rts
 	and #$02
 	beq .right
 	jsr Scroll_Vertical
@@ -916,6 +912,7 @@ Scroll_Vertical:
 	ldx #$00
 	stx <zOffscreen
 	stx aObjYlo
+	stx <zPPUSqr
 	lda <zHScroll
 	beq .skip
 	bmi .1
@@ -948,6 +945,10 @@ Scroll_Vertical:
 	jmp .loop
 .skip
 	jsr EraseEnemiesByScroll
+	mMOV <zRoom, <$00
+	mMOV <zScrollNumber, <zRoom
+	jsr SpawnCommandsAll
+	mMOV <$00, <zRoom
 	mMOV #(($0100 - $0010) / $04 - 1), <$FD
 	lda <zScrollFlag
 	lsr a
@@ -988,7 +989,12 @@ Scroll_Vertical:
 .skip_room
 	sta <zRoom
 	sta aObjRoom
+	lda <$FD
+	lsr a
+	bcs .bcs
 	jsr WriteNameTableByScroll
+.bcs
+	jsr WriteEnemySprites
 	jsr SpriteSetup
 	jsr FrameAdvance1C
 	dec <$FD

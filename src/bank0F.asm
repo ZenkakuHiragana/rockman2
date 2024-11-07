@@ -1856,14 +1856,13 @@ SetupEnemySpritesAnyBank:
 WriteEnemySprites:
 	lda <zPPUObjNum
 	beq CountBlockableObjects.rts
+	lda <zPPUHScr
+	ora <zPPUVScr
+	bne CountBlockableObjects.rts
 
 	lda <zStage
 	and #$07
 	jsr ChangeBank
-
-	lda <zPPUHScr
-	ora <zPPUVScr
-	bne .rts
 	ldx <zPPUObjPtr
 	mMOV Stage_LoadGraphics,x, <zPtrhi
 	mMOV <zPPUObjlo, <zPtrlo
@@ -2320,6 +2319,23 @@ MoveItem:
 	lda #$01
 	.db $2C
 ;20 98 EE
+EN0B:
+EN0E:
+EN18:
+EN24:
+EN35:
+EN3B:
+EN3F:
+EN4D:
+EN5A:
+EN5C:
+EN5F:
+EN60:
+EN61:
+EN68:
+EN6C:
+EN6E:
+EN6F:
 MoveEnemy:
 	lda #$00
 	sta <zObjItemFlag
@@ -2384,6 +2400,7 @@ CheckOffscreenItem:
 	lda #$01
 	.db $2C
 ;20 91 EF
+EN06:
 CheckOffscreenEnemy:
 	lda #$00
 	sta <zObjItemFlag

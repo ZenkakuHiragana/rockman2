@@ -260,8 +260,8 @@ EN05_DeleteObjects:
 
 ;9671
 ;消滅エフェクト
-EN06:
-	mJSR_NORTS CheckOffscreenEnemy
+;EN06:
+;	mJSR_NORTS CheckOffscreenEnemy
 
 ;9675
 ;クロウ生成器
@@ -506,24 +506,24 @@ EN0A:
 ;メカドラゴンの炎
 ;ワイリーマシンの変形時の赤いの
 ;ブービームトラップの弾
-EN0B:
-EN0E:
-EN18:
-EN24:
-EN35:
-EN3B:
-EN3F:
-EN4D:
-EN5A:
-EN5C:
-EN5F:
-EN60:
-EN61:
-EN68:
-EN6C:
-EN6E:
-EN6F:
-	mJSR_NORTS MoveEnemy
+;EN0B:
+;EN0E:
+;EN18:
+;EN24:
+;EN35:
+;EN3B:
+;EN3F:
+;EN4D:
+;EN5A:
+;EN5C:
+;EN5F:
+;EN60:
+;EN61:
+;EN68:
+;EN6C:
+;EN6E:
+;EN6F:
+;	mJSR_NORTS MoveEnemy
 
 ;982F
 ;ケロッグ
@@ -1591,13 +1591,67 @@ EN1C:
 	lda #$00
 	sta aObjVY,x
 	jsr CheckOffscreenEnemy
+	bcc .onscreen
+	mMOV #$FF, aObjVar,x
+	lda aObjXlo,x
+	cmp #%00000011
+	beq .onscreen
+	asl aObjFlags,x
+	lda #$1A
+	jsr FindObject
+	bcs .onscreen
+	lda #%00000000
+	sta aObjFlags10,y
+	lda #$FF
+	sta aEnemyOrder10,y
+.onscreen
 	lda <zPPUHScr
 	ora <zPPUVScr
 	ora <zPPULinear
-	bne .skip_scroll
+	beq .write_nametable
+.spawn_head
+	ldx <zObjIndex
 	lda aObjFrame,x
+	cmp #$03
+	bne .rts
+	lda aObjVar,x
+	bne .rts
+	lda #$19
+	jsr CreateEnemyHere
+	mMOV #$08, aObjVar10,y
+	mMOV #$03, aObjVX10,y
+	mMOV #$14, aObjYlo,x
+	lda <zRand
+	and #$03
+	beq .velocity
 	pha
-	tay
+	lda aObjVX10,y
+	asl a
+	sta aObjVX10,y
+	pla
+	lsr a
+	bcs .velocity
+	mADD aObjVX10,y, #$03
+.velocity
+	lda #$1A
+	jsr FindObject
+	bcc .skip_spawntail
+	lda #$1A
+	jsr CreateEnemyHere
+	clc
+	mADD aObjX10,y, #$2F
+	mSUB aObjY10,y, #$0C - 1
+.skip_spawntail
+	inc aObjVar,x
+	mMOV #%10100000, aObjFlags,x
+.rts
+	rts
+;背景描き込み
+.write_nametable
+	mMOV #$04, <$02
+	ldy aObjFrame,x
+.loop_ppusqr
+	sty <$00
 	clc
 	lda aObjY,x
 	adc .table_bgy,y
@@ -1613,98 +1667,63 @@ EN1C:
 	jsr SetPPUPos
 	jsr SetPPUPos_Attr
 	ldy <zPPUSqr
-	lda aPPULaserhi
-	sta aPPUSqrhi,y
-	lda aPPULaserlo
-	sta aPPUSqrlo,y
-	lda aPPUShutterAttrhi
-	sta aPPUSqrAttrhi,y
-	lda aPPUShutterAttrlo
-	sta aPPUSqrAttrlo,y
-	lda #$FF
-	sta aPPUSqrAttrData,y
+	mMOV aPPULaserhi, aPPUSqrhi,y
+	mMOV aPPULaserlo, aPPUSqrlo,y
+	mMOV aPPUShutterAttrhi, aPPUSqrAttrhi,y
+	mMOV aPPUShutterAttrlo, aPPUSqrAttrlo,y
+	mMOV #$FF, aPPUSqrAttrData,y
 	tya
 	asl a
 	asl a
 	asl a
 	asl a
-	tay
-	pla
-	sta <$00
+	sta <$01
 	ldx <zObjIndex
+	ldy <$00
 	lda aObjVar,x
 	cmp #$FF
 	bne .skip
-	clc
-	lda <$00
-	adc #$04
-	sta <$00
+	tya
+	lsr a
+	lda #$01
+	bcs .skip_shift
+	rol a
+.skip_shift
+	ora aObjXlo,x
+	sta aObjXlo,x
+	iny
+	iny
+	iny
+	iny
 .skip
-	lda <$00
+	tya
 	asl a
 	asl a
 	asl a
 	asl a
 	tax
-	lda #$10
-	sta <$00
+	ldy <$01
+	mMOV #$10, <$01
 .loop
 	lda .table_data,x
 	sta aPPUSqrData,y
 	inx
 	iny
-	dec <$00
+	dec <$01
 	bne .loop
 	inc <zPPUSqr
-.skip_scroll
-	ldx <zObjIndex
-	lda aObjFrame,x
-	cmp #$03
-	bne .rts
-	lda aObjVar,x
-	bne .rts
-	lda #$19
-	jsr CreateEnemyHere
-	lda #$08
-	sta aObjVar10,y
-	lda #$03
-	sta aObjVX10,y
-	lda #$14
-	sta aObjYlo,x
-	lda <zRand
+	clc
+	lda <$00
+	adc #$01
 	and #$03
-	beq .velocity
-	pha
-	lda aObjVX10,y
-	asl a
-	sta aObjVX10,y
-	pla
-	and #$01
-	bne .velocity
-	clc
-	lda aObjVX10,y
-	adc #$03
-	sta aObjVX10,y
-.velocity
-	lda #$1A
-	jsr FindObject
-	bcc .skip_spawntail
-	lda #$1A
-	jsr CreateEnemyHere
-	clc
-	lda aObjX10,y
-	adc #$2F
-	sta aObjX10,y
-	sec
-	lda aObjY10,y
-	sbc #$0C
-	sta aObjY10,y
-.skip_spawntail
-	inc aObjVar,x
-	lda #%10100000
-	sta aObjFlags,x
-.rts
-	rts
+	tay
+	ldx <zObjIndex
+	dec <$02
+	beq .end
+	jmp .loop_ppusqr
+.end
+	jmp .spawn_head
+
 ;A269
 ;フレンダー着地Y座標
 .table_land

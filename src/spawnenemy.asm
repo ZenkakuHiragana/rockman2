@@ -153,6 +153,7 @@ SpawnEnemy_CheckOffscreen:
 ;敵画像読み込みセットの設定
 SpawnEnemy_SendCommand:
 .room = $02
+.temp = $07
 	and #$7F
 	cmp #$7F
 	beq .set_continuepoint
@@ -177,8 +178,10 @@ SpawnEnemy_SendCommand:
 .1
 	cmp #$3F
 	beq .set_scrollclip
+	cmp #$3E
+	beq .2
 	cmp #$30 ;敵番号B0～BB: シャッター高さの設定
-	bcc .2
+	bcc .3
 	sbc #$30
 	asl a
 	asl a
@@ -202,7 +205,30 @@ SpawnEnemy_SendCommand:
 	sta <zScrollClipFlag
 	mMOV <.room, <zScrollClipRoom
 	rts
-.2
+.2 ;敵番号BE: 敵番号 0XXX YYYY を消滅エフェクトにする
+	mAND Stage_DefEnemiesY - 1,y, #%00001111, <.temp
+	lda Stage_DefEnemiesX - 1,y
+	and #%00000111
+	asl a
+	asl a
+	asl a
+	asl a
+	ora <.temp ;A = 0XXX YYYY
+	sta <.temp
+	ldy #$0F
+.loop_findobj
+	lda aObjFlags10,y
+	bpl .skip_findobj
+	lda aObjAnim10,y
+	cmp <.temp
+	bne .skip_findobj
+	mMOV #$06, aObjAnim10,y
+	mSTZ aObjFrame10,y, aObjWait10,y
+.skip_findobj
+	dey
+	bpl .loop_findobj
+	rts
+.3
 	tay ;敵番号80～8F: パターンテーブル転送の適用
 SetupEnemySprites:
 	mSTZ <zPPUObjlo
@@ -210,13 +236,15 @@ SetupEnemySprites:
 	mMOV Stage_LoadGraphicsOrg,y, <zPPUObjPtr
 	lda Stage_LoadGraphicsNum,y
 	cmp #$80
+	ldy #$00
+	bcc .write_secondpalette
+	ldy #$04
+.write_secondpalette
 	and #$7F
 	sta <zPPUObjNum
-	adc #$00
 	asl a
 	adc <zPPUObjPtr
 	tax
-	ldy #$00
 .loop_palette
 	lda Stage_LoadGraphics,x
 	bmi .rts
@@ -236,15 +264,22 @@ SetupEnemySprites:
 SpawnEnemy_RoomList:
 	.db $00, $01, $10, $11
 
+;スクロール処理で使用, 指定した画面内の制御オブジェクトを強制的に出現
+SpawnCommandsAll:
+	ldy #$00
+	.db $2C
 ;指定した画面内の敵を強制的に出現
 SpawnEnemiesAll:
 .seek = $00
 .ptr = $01
 .room = $02
 .num = $03
+	ldy #$01
 	lda <zStage
 	and #$07
 	jsr ChangeBank
+	dey
+	bmi .skip_item
 ;アイテムの出現
 	ldy <zRoom
 	sty <.room
@@ -262,7 +297,8 @@ SpawnEnemiesAll:
 	bne .loop_item
 ;敵の出現
 .skip_item
-	; sta <$70
+	tya
+	asl a
 	ldy <zRoom
 	sty <.room
 	ldx Stage_DefMap16,y
@@ -278,6 +314,7 @@ SpawnEnemiesAll:
 	jsr SpawnEnemy_SendCommand
 	jmp .1
 .sendchr
+	bcs .1 ;C = true if SpawnCommandsAll
 	jsr CreateEnemy
 .1
 	ldy <.ptr

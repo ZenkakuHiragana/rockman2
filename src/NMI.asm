@@ -355,51 +355,58 @@ WritePPUScroll:
 ;20 18 D1
 WritePPUSquare:
 .n = $00
-.l = $01
-.ptr = $0A
 .lo = $0A
 .hi = $0B
-	ldy #$00
+	mSTZ <.n
 .nloop
-	sty <.n
-	tya
+	tay
 	asl a
 	asl a
 	asl a
 	asl a
 	tax
-	mMOV #$04, <.l
-	mMOV aPPUSqrhi,y, <.hi
-	mMOV aPPUSqrlo,y, <.lo
-	cmp #$80
-	bcc .jump
-	lda <.hi
-	and #$03
-	cmp #$03
-	bne .jump
-	lsr <.l ;<.l = #$02
-.jump
 	mMOV aPPUSqrAttrhi,y, $2006
 	mMOV aPPUSqrAttrlo,y, $2006
 	mMOV aPPUSqrAttrData,y, $2007
-.line
-	mMOV <.hi, $2006
-	clc
-	mMOV <.lo, $2006
+	mMOV aPPUSqrhi,y, <.hi, $2006
+	mMOV aPPUSqrlo,y, <.lo, $2006
 	adc #$20
-	sta <.lo
-	ldy #$04
-.loop
-	mMOV aPPUSqrData,x, $2007
-	inx
-	dey
-	bne .loop
-	dec <.l
-	bne .line
-	ldy <.n
-	iny
+	tay
+	mMOV aPPUSqrData + 4 * 0 + 0,x, $2007
+	mMOV aPPUSqrData + 4 * 0 + 1,x, $2007
+	mMOV aPPUSqrData + 4 * 0 + 2,x, $2007
+	mMOV aPPUSqrData + 4 * 0 + 3,x, $2007
+	mMOV <.hi, $2006
+	sty $2006
+	tya
+	adc #$20
+	tay
+	mMOV aPPUSqrData + 4 * 1 + 0,x, $2007
+	mMOV aPPUSqrData + 4 * 1 + 1,x, $2007
+	mMOV aPPUSqrData + 4 * 1 + 2,x, $2007
+	mMOV aPPUSqrData + 4 * 1 + 3,x, $2007
+	mMOV <.hi, $2006
+	sty $2006
+	tya
+	adc #$20
+	tay
+	mMOV aPPUSqrData + 4 * 2 + 0,x, $2007
+	mMOV aPPUSqrData + 4 * 2 + 1,x, $2007
+	mMOV aPPUSqrData + 4 * 2 + 2,x, $2007
+	mMOV aPPUSqrData + 4 * 2 + 3,x, $2007
+	mMOV <.hi, $2006
+	sty $2006
+	mMOV aPPUSqrData + 4 * 3 + 0,x, $2007
+	mMOV aPPUSqrData + 4 * 3 + 1,x, $2007
+	mMOV aPPUSqrData + 4 * 3 + 2,x, $2007
+	mMOV aPPUSqrData + 4 * 3 + 3,x, $2007
+
 	dec <zPPUSqr
-	bne .nloop
+	beq .rts
+	inc <.n
+	lda <.n
+	jmp .nloop
+.rts
 	rts
 
 ;20 DC D1

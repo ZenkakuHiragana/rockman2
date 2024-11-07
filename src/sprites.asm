@@ -47,9 +47,7 @@
 	cpx #$0F
 	bne .loopenemyodd
 .loopobjodd
-	.list
 	jsr AnimateObjects
-	.nolist
 	bcs .done
 	dec <zObjIndex
 	ldx <zObjIndex
