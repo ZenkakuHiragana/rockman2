@@ -3912,10 +3912,8 @@ EN4E:
 	lda #$4F
 	jsr CreateEnemyHere
 	bcs .rts2
-	lda #$7E
-	sta aObjVar10,y
-	lda <$0F
-	sta aEnemyOrder10,y
+	mMOV #$7E, aObjVar10,y
+	mMOV <$0F, aEnemyOrder10,y
 	rts
 .vylo
 	.db $6A, $A0, $88, $12, $58

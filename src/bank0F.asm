@@ -1551,7 +1551,11 @@ WriteNameTableByScroll:
 .skip_yscroll
 ;属性テーブルをora
 
+	lda <zObjItemFlag ;スクロール中は使わないので使いまわし
+	ldx <zScrollFlag
+	bne .is_scrolling
 	lda <$11
+.is_scrolling
 	ldx <.f
 	sec
 	bne .skip3

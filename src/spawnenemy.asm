@@ -155,12 +155,17 @@ SpawnEnemy_SendCommand:
 .room = $02
 .temp = $07
 	and #$7F
+	bcc .is_scroll
+	cmp #$0F
+	bcs .rts2
+.is_scroll
 	cmp #$7F
 	beq .set_continuepoint
 	cmp #$40
 	bcc .1
 	and #$3F
 	sta <zScrollNumber ;敵番号C0～FE: スクロール移動先の設定
+.rts2
 	rts
 .set_continuepoint ;敵番号FF: 中間ポイントの設定
 	mMOV <.room, <zContinuePoint
@@ -266,7 +271,7 @@ SpawnEnemy_RoomList:
 
 ;スクロール処理で使用, 指定した画面内の制御オブジェクトを強制的に出現
 SpawnCommandsAll:
-	ldy #$00
+	ldy #$01
 	.db $2C
 ;指定した画面内の敵を強制的に出現
 SpawnEnemiesAll:
@@ -274,12 +279,13 @@ SpawnEnemiesAll:
 .ptr = $01
 .room = $02
 .num = $03
-	ldy #$01
+	ldy #$00
+	sty <zObjItemFlag
 	lda <zStage
 	and #$07
 	jsr ChangeBank
 	dey
-	bmi .skip_item
+	bpl .skip_item
 ;アイテムの出現
 	ldy <zRoom
 	sty <.room
@@ -297,8 +303,6 @@ SpawnEnemiesAll:
 	bne .loop_item
 ;敵の出現
 .skip_item
-	tya
-	asl a
 	ldy <zRoom
 	sty <.room
 	ldx Stage_DefMap16,y
@@ -308,6 +312,8 @@ SpawnEnemiesAll:
 	ldy Stage_DefEnemiesPtr,x
 .loop
 	sty <.ptr
+	lda <zObjItemFlag
+	lsr a
 	lda Stage_DefEnemies - 1,y
 .bit_00010000 .public
 	bpl .sendchr

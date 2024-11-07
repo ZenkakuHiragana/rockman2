@@ -948,13 +948,17 @@ Scroll_Vertical:
 	mMOV <zRoom, <$00
 	mMOV <zScrollNumber, <zRoom
 	jsr SpawnCommandsAll
-	mMOV <$00, <zRoom
-	mMOV #(($0100 - $0010) / $04 - 1), <$FD
+	mAND <zScrollFlag, #$01, <$02
+	tax
+	dec <$00
+	sec
+	mADD <$00, Table_DoVerticalScroll_RockmanYcarry,x, <zObjItemFlag
+	mMOV #$3C, <$FD
 	lda <zScrollFlag
 	lsr a
 	lda #$F0
 	bcs .init_scroll
-	lda #$04
+	lda #$00
 .init_scroll
 	sta <zVScroll
 .loop_scroll
@@ -991,7 +995,7 @@ Scroll_Vertical:
 	sta aObjRoom
 	lda <$FD
 	lsr a
-	bcs .bcs
+	bcc .bcs
 	jsr WriteNameTableByScroll
 .bcs
 	jsr WriteEnemySprites

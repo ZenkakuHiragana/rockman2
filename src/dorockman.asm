@@ -1231,12 +1231,28 @@ DoRockman_CheckAttr_Center:
 	cmp #$03
 	beq .water
 .notboss
+	lda <zStatus
+	cmp #$06
+	bne .check_upscroll
+	lda aObjVY
+	bmi .skip_check_upscroll
+.check_upscroll
+	lda <zBGAttr
+	cmp #$13
+	beq .write_scrollflag
+.skip_check_upscroll
 	lda <zBGAttr3
 	cmp #$10
 	bcc .skip_special ;落下死判定
 	and #$03
 	beq .die
+	cmp #$02
+	bne .rts
+	bit aObjVY
+	bpl .rts
+.write_scrollflag
 	sta <zScrollFlag
+.rts
 	rts
 .die
 	mMOV #$01, <zStatus
