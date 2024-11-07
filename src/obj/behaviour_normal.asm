@@ -1989,16 +1989,19 @@ EN20:
 EN21:
 	lda aObjVar,x
 	bne .skip
-	lda #$03
-	sta <$01
+	mMOV #$03, <$01
 	lda #$22
 	jsr FindObjectsA
 	bcs .overflow
 	lda #$22
 	jsr CreateEnemyHere
+	bcs .overflow
+	lda aObjX,x
+	lsr a
+	bcc .overflow
+	mMOV #$03, aEnemyVar10,y
 .overflow
-	lda #$DA
-	sta aObjVar,x
+	mMOV #$DA, aObjVar,x
 .skip
 	dec aObjVar,x
 	mJSR_NORTS CheckOffscreenEnemy
@@ -2006,18 +2009,19 @@ EN21:
 ;A4A6
 ;テリー
 EN22:
-	lda aObjVar,x
-	bne .skip
-	lda #$00
-	sta <$09
-	lda #$42
-	sta <$08
-	jsr SetVelocityAtRockman
-	lda #$10
-	sta aObjVar,x
-.skip
+	mSTZ aEnemyFlash,x
 	dec aObjVar,x
-	mJSR_NORTS MoveEnemy
+	bpl .skip
+	sta <$09
+	mMOV #$42, <$08
+	jsr SetVelocityAtRockman
+	mMOV #$10, aObjVar,x
+.skip
+	jsr MoveEnemy
+	bcs .end
+	mMOV aEnemyVar,x, aEnemyFlash,x
+.end
+	rts
 
 ;A4C2
 ;チャンキーメーカー
