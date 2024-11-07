@@ -385,6 +385,13 @@ WritePPUSquare:
 	mMOV aPPUSqrData + 4 * 1 + 1,x, $2007
 	mMOV aPPUSqrData + 4 * 1 + 2,x, $2007
 	mMOV aPPUSqrData + 4 * 1 + 3,x, $2007
+	lda <.hi
+	and #$03
+	cmp #$03
+	bne .skip
+	cpy #$C0
+	bcs .done
+.skip
 	mMOV <.hi, $2006
 	sty $2006
 	tya
@@ -400,7 +407,7 @@ WritePPUSquare:
 	mMOV aPPUSqrData + 4 * 3 + 1,x, $2007
 	mMOV aPPUSqrData + 4 * 3 + 2,x, $2007
 	mMOV aPPUSqrData + 4 * 3 + 3,x, $2007
-
+.done
 	dec <zPPUSqr
 	beq .rts
 	inc <.n

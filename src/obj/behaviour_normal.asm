@@ -1485,8 +1485,8 @@ EN19:
 	lda #$1C
 	jsr FindObject
 	bcs .loop_wall
-	lda #$FF
-	sta aObjVar10,y
+	mMOV #$FF, aObjVar10,y
+	mSTZ aObjYlo10,y
 .loop_wall
 	lda #$2E
 	jsr FindObject
@@ -1576,51 +1576,50 @@ EN1C:
 	lda .table_land,y
 	cmp aObjY,x
 	beq .land
+	mAND aObjFlags,x, #~%00100000
+	mSTZ aObjFrame,x, aObjWait,x
 	bcs .skip_init
-	lda #$00
 	sta aObjY,x
 .skip_init
-	lda aObjFlags,x
-	and #%11011111
-	sta aObjFlags,x
-	lda #$00
-	sta aObjFrame,x
-	sta aObjWait,x
-	mJSR_NORTS MoveEnemy
+	jmp MoveEnemy
 .land
-	lda #$00
-	sta aObjVY,x
+	mSTZ aObjVY,x
 	jsr CheckOffscreenEnemy
 	bcc .onscreen
-	mMOV #$FF, aObjVar,x
-	lda aObjXlo,x
-	cmp #%00000011
-	beq .onscreen
-	asl aObjFlags,x
 	lda #$1A
 	jsr FindObject
+	dec aObjYlo,x
+	mMOV #$FF, aObjVar,x
 	bcs .onscreen
-	lda #%00000000
-	sta aObjFlags10,y
-	lda #$FF
 	sta aEnemyOrder10,y
+	mMOV #$00, aObjFlags10,y
 .onscreen
-	lda <zPPUHScr
-	ora <zPPUVScr
-	ora <zPPULinear
-	beq .write_nametable
-.spawn_head
-	ldx <zObjIndex
+	lda <zEScreenX
+	cmp #$D8
+	bcc .skip_scrollcheck
+	lda <zHScroll
+	cmp <zHScrollPrev
+	bne .do_rewrite ;横スクロールでBGが消えるので対策
+.skip_scrollcheck
+	lda <zVScroll
+	cmp <zVScrollPrev
+	bne .do_rewrite ;一応縦も
+	lda <zStatus
+	bne .skip_rewrite ;ポーズメニューを押した時、BG再描画予約
+	lda aObjFlags
+	bpl .skip_rewrite ;死亡時と条件が被るので除外
+.do_rewrite
+	mSTZ aObjYlo,x
+.skip_rewrite
+	lda aObjVar,x
+	bne .write_nametable
 	lda aObjFrame,x
 	cmp #$03
-	bne .rts
-	lda aObjVar,x
 	bne .rts
 	lda #$19
 	jsr CreateEnemyHere
 	mMOV #$08, aObjVar10,y
 	mMOV #$03, aObjVX10,y
-	mMOV #$14, aObjYlo,x
 	lda <zRand
 	and #$03
 	beq .velocity
@@ -1644,10 +1643,18 @@ EN1C:
 .skip_spawntail
 	inc aObjVar,x
 	mMOV #%10100000, aObjFlags,x
+	bne .write_nametable
 .rts
 	rts
 ;背景描き込み
-.write_nametable
+.write_nametable .public
+	lda aObjYlo,x
+	bne .rts
+	lda <zPPUHScr
+	ora <zPPUVScr
+	ora <zPPULinear
+	bne .rts
+	inc aObjYlo,x
 	mMOV #$04, <$02
 	ldy aObjFrame,x
 .loop_ppusqr
@@ -1722,7 +1729,7 @@ EN1C:
 	beq .end
 	jmp .loop_ppusqr
 .end
-	jmp .spawn_head
+	rts
 
 ;A269
 ;フレンダー着地Y座標
