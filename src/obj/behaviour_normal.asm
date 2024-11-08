@@ -1530,18 +1530,19 @@ EN19_Destroydy:
 ;A136
 ;フレンダーの尻尾
 EN1A:
-	lda aObjVar,x
-	bne .skip
-	lda #$6E
-	sta aObjVar,x
-	lda #$01
-	sta aObjFrame,x
+	lda <zStopFlag
+	lsr a
+	bcs .stopping
+	dec aObjVar,x
+	bpl .skip
+	mMOV #$6E, aObjVar,x
+	inc aObjFrame,x
 .skip
 	lda aObjFrame,x
 	bne .wait
+.stopping
 	sta aObjWait,x
 .wait
-	dec aObjVar,x
 	jsr CheckOffscreenEnemy
 	lda #%10000000
 	bcc .write
@@ -1576,12 +1577,17 @@ EN1C:
 	lda .table_land,y
 	cmp aObjY,x
 	beq .land
+	lda <zStopFlag
+	and #$01
+	bne .stopping
 	mAND aObjFlags,x, #~%00100000
 	mSTZ aObjFrame,x, aObjWait,x
 	bcs .skip_init
 	sta aObjY,x
 .skip_init
 	jmp MoveEnemy
+.stopping
+	jmp CheckOffscreenEnemy
 .land
 	mSTZ aObjVY,x
 	jsr CheckOffscreenEnemy

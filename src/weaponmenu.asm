@@ -410,15 +410,9 @@
 	sta <zVScrollApparenthi
 	pla
 	sta <zVScrollApparentlo
-	lda #$00
-	sta <zWeaponEnergy
-	sta <zStatus
-	sta aObjWait
-	sta aObjFrame
-	lda #$1A
-	sta aObjAnim
-	lda #%00000011
-	sta <zStopFlag
+	mSTZ <zWeaponEnergy, <zStatus, aObjWait, aObjFrame
+	mMOV #$1A, aObjAnim
+	mMOV #%00000011, <zStopFlag
 	lda #$30
 	mJSR_NORTS PlayTrack
 
