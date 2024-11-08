@@ -104,33 +104,20 @@ EnemyBehaviour_Stopping4:
 ;EE5A
 EnemyBehaviour_Stopping5:
 	lda aObjVXlo,x
-	bne .jump
-	lda #$6E
-	sta aObjVar,x
+	bne .do
 	inc aObjVXlo,x
-	lda #%00000000
-	sta aObjFlags,x
-	lda #$01
-	sta <$01
-	lda #$23
-	jsr FindObjectsA
-	lda #%10000011
-	sta aObjFlags,x
-	bcs .jump
-	lda #$26
-	jsr CreateEnemyHere
-.jump
+	lda #ENPaletteTable_QuickManStage.dark_to_red - ENPaletteTable_QuickManStage
+	bne .jmp
+.do
 	jsr CheckOffscreenEnemy
-	bcc .done
+	bcc .rts
 	lda #$23
 	jsr FindObject
-	bcc .done
-	lda #$28
-	jsr CreateEnemyHere
-.done
-	rts
-
+	bcc .rts
+	lda #ENPaletteTable_QuickManStage.red_to_dark - ENPaletteTable_QuickManStage
+.jmp
+	jmp ENPaletteChange_QuickManStage
+.rts
 ;EE93
 EnemyBehaviour_Stopping6:
 	rts
-

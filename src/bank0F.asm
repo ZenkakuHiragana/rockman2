@@ -470,11 +470,7 @@ SpawnTiwnRound_Specified:
 	rts
 
 TiwnRoundVXlo:
-	.ifndef ___BUGFIX
-	.db $00, $00, $00, $00, $60, $60, $60, $60, $00, $C0, $00, $E0
-	.else
 	.db $00, $00, $00, $00, $60, $60, $60, $60, $00, $C0, $00, $C0
-	.endif
 TiwnRoundVXhi:
 	.db $00, $02, $00, $02, $01, $01, $01, $01, $00, $00, $00, $00
 TiwnRoundVYlo:
@@ -487,6 +483,7 @@ TiwnRoundVector:
 ;20 27 C4
 DoPaletteAnimation:
 	lda <zStopFlag
+	and #%00001000
 	bne .isnoanim
 	lda aPaletteAnimWait
 	beq .isnoanim
@@ -496,9 +493,19 @@ DoPaletteAnimation:
 	mSTZ <zPaletteTimer
 	inc <zPaletteIndex
 	lda <zPaletteIndex
+	and #$7F
 	cmp aPaletteAnim
+	bit <zPaletteIndex
+	bpl .advance_index
+	bcc .advance_index
+	lda aPaletteAnim
+	adc #$80 - 1 - 1
+	bne .noadvance_index
+.advance_index
 	bcc .noloop
-	mSTZ <zPaletteIndex
+	lda #$00
+.noadvance_index
+	sta <zPaletteIndex
 	clc
 .noloop
 	adc <zPaletteOffset
@@ -530,7 +537,6 @@ DoPaletteAnimation:
 	cpy #$10
 	bne .loop
 
-	; inc <z3A ;------------------------
 	pla
 	jmp ChangeBank
 .isnoanim

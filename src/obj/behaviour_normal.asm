@@ -2001,29 +2001,17 @@ EN22:
 EN23:
 	lda aObjVXlo,x
 	bne .do
-	lda #$6E
-	sta aObjVar,x
+	mMOV #$6E, aObjVar,x
 	inc aObjVXlo,x
-	lda #%00000000
-	sta aObjFlags,x
-	lda #$01
-	sta <$01
-	lda #$23
-	jsr FindObjectsA
-	lda #%10000011
-	sta aObjFlags,x
-	bcs .done
-	lda #$26
-	jsr CreateEnemyHere
-	jmp .done
+	lda #ENPaletteTable_QuickManStage.dark_to_red - ENPaletteTable_QuickManStage
+	bne ENPaletteChange_QuickManStage
 .do
 	lda aObjVar,x
 	beq .skip
 	lda aObjFrame,x
 	cmp #$02
 	bne .done
-	lda #$00
-	sta aObjFrame,x
+	mSTZ aObjFrame,x
 	beq .done
 .skip
 	lda aObjFrame,x
@@ -2036,13 +2024,9 @@ EN23:
 	jsr CreateEnemyHere
 	bcs .overflow
 	sec
-	lda <zRand
-	and #$1F
-	sta <zRand
+	mAND <zRand, #$1F
 	sec
-	lda <$00
-	sbc <zRand
-	sta <$00
+	mSUB <$00, <zRand
 	lda #$00
 	asl <$00
 	rol a
@@ -2051,14 +2035,12 @@ EN23:
 	asl <$00
 	rol a
 	sta aObjVX10,y
-	lda <$00
-	sta aObjVXlo10,y
+	mMOV <$00, aObjVXlo10,y
 .overflow
 	lda <zRand
 	and #$03
 	tay
-	lda .table_wait,y
-	sta aObjVar,x
+	mMOV .table_wait,y, aObjVar,x
 .done
 	dec aObjVar,x
 .done2
@@ -2067,100 +2049,75 @@ EN23:
 	lda #$23
 	jsr FindObject
 	bcc .rts
-	lda #$28
-	mJSRJMP CreateEnemyHere
+	lda #ENPaletteTable_QuickManStage.red_to_dark - ENPaletteTable_QuickManStage
+	bne ENPaletteChange_QuickManStage
 .rts
 	rts
 .table_wait
 	.db $12, $1F, $1F, $3D
 
-;A55A
-;パレット変更・暗闇
-EN25:
-	lda aPalette + 1
-	cmp #$0F
-	beq EN25_Skip
-	lda #$23
-	jsr FindObject
-	bcc EN25_Skip
-	lda #$26
-	jsr FindObject
-	bcc EN25_Skip
-	lda aObjVar,x
-	bne EN25_Wait
-	lda aObjVXlo,x
-EN25_Write:
-	asl a
-	asl a
-	sta <$00
-	asl a
-	clc
-	adc <$00
-	tax
-	ldy #$00
-.loop
-	lda Table_EN25PaletteChange,x
-	sta aPalette,y
-	inx
-	iny
-	cpy #$0C
-	bne .loop
-	ldx <zObjIndex
-	inc aObjVXlo,x
-	lda aObjVXlo,x
-	cmp #$04
-EN25_Skip:
-	bne .done
-	lsr aObjFlags,x
-	lda #$FF
-	sta aEnemyOrder,x
-.done
-	lda #$08
-	sta aObjVar,x
-EN25_Wait:
-	dec aObjVar,x
-	rts
-
 ;A5AB
 ;パレット変更・チャンキー
 EN26:
-	lda aObjVar,x
-	bne EN25_Wait
-	clc
-	lda aObjVXlo,x
-	adc #$03
-	bne EN25_Write
-
-;A5B8
-;パレット変更・元に戻す
-EN27:
-	lda aObjVar,x
-	bne EN25_Wait
-	lda aObjVXlo,x
-	eor #$03
-	jmp EN25_Write
-
 ;A5C5
 ;パレット変更・チャンキー撃破
 EN28:
-	lda aObjVar,x
-	bne EN25_Wait
-	mSEC
-	lda aObjVXlo,x
-	eor #$03
+;A5B8
+;パレット変更・元に戻す
+EN27:
+	lda #ENPaletteTable_QuickManStage.dark_to_lit - ENPaletteTable_QuickManStage
+	bne EN25.write
+;A55A
+;パレット変更・暗闇
+EN25:
+	lda #ENPaletteTable_QuickManStage.lit_to_dark - ENPaletteTable_QuickManStage
+.write .public
+	lsr aObjFlags,x
+	sec
+	ror aEnemyOrder,x
+ENPaletteChange_QuickManStage:
 	clc
-	adc #$03
-	jmp EN25_Write
+	adc <zPaletteIndex
+	bpl .isfirst
+	sbc #$80 - 1
+	clc
+.isfirst
+	adc <zPaletteOffset
+	cmp #$0C
+	bne .1
+	lda #$00
+.1
+	tay
+	mMOV ENPaletteTable_QuickManStage,y, <zPaletteOffset
+	mMOV ENPaletteTable_QuickManStage.frames,y, aPaletteAnim
+	mMOV #$80, <zPaletteIndex
+	rts
+ENPaletteTable_QuickManStage:
+;	    lit    --->   dark    --->    red   --->    dark   --->
+.lit_to_dark .public
+	.db $00, $01, $02, $03, $08, $07, $06, $07, $08, $09, $02, $01
+.dark_to_lit .public
+	.db $00, $0B, $0A, $09, $04, $05, $06, $05, $04, $09, $0A, $0B
+.red_to_dark .public
+	.db $00, $01, $02, $09, $08, $07, $06, $07, $08, $09, $0A, $0B
+.dark_to_red .public
+	.db $00, $01, $02, $03, $04, $05, $06, $05, $04, $03, $0A, $0B
+.frames .public
+	.db $04, $03, $02, $01, $02, $03, $04, $03, $02, $01, $02, $03
+	.db $01, $02, $03, $04, $03, $02, $01, $02, $03, $04, $03, $02
+	.db $04, $03, $02, $01, $02, $03, $04, $03, $02, $01, $02, $03
+	.db $01, $02, $03, $04, $03, $02, $01, $02, $03, $04, $03, $02
 
 ;A5D6
 ;パレット変更テーブル
-Table_EN25PaletteChange:
-	.db $0F, $2C, $10, $1C, $0F, $37, $27, $07, $0F, $28, $16, $07, $0F, $1C, $00, $0C
-	.db $0F, $37, $27, $08, $0F, $17, $06, $08, $0F, $0C, $0C, $0F, $0F, $37, $27, $08
-	.db $0F, $07, $07, $08, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
-	.db $0F, $16, $07, $08, $0F, $37, $27, $08, $0F, $07, $07, $08, $0F, $26, $16, $06
-	.db $0F, $37, $27, $08, $0F, $17, $06, $08, $0F, $36, $26, $16, $0F, $37, $27, $07
-	.db $0F, $27, $16, $07
+;Table_EN25PaletteChange:
+;	.db $0F, $2C, $10, $1C, $0F, $37, $27, $07, $0F, $28, $16, $07
+;	.db $0F, $1C, $00, $0C, $0F, $37, $27, $08, $0F, $17, $06, $08
+;	.db $0F, $0C, $0C, $0F, $0F, $37, $27, $08, $0F, $07, $07, $08
+;	.db $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
+;	.db $0F, $16, $07, $08, $0F, $37, $27, $08, $0F, $07, $07, $08
+;	.db $0F, $26, $16, $06, $0F, $37, $27, $08, $0F, $17, $06, $08
+;	.db $0F, $36, $26, $16, $0F, $37, $27, $07, $0F, $27, $16, $07
 
 ;A62A
 ;ピエロボット歯車
