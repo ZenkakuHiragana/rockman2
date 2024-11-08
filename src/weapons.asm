@@ -1203,24 +1203,15 @@ DoItem2:
 DoItem3:
 	lda aObjVar,x
 	bne .do
-	lda aObjVY,x
-	sta <$04
-	lda #$0A
-	sta <$01
-	lda #$08
-	sta <$02
+	mMOV aObjVY,x, <$04
+	mMOV #$0A, <$01
+	mMOV #$08, <$02
 	jsr WallCollisionXY
 	lda <$03
 	beq .bump
-	lda #$62
-	sta aObjVYlo,x
-	lda #$00
-	sta aObjVY,x
-	sta aObjVXlo,x
-	sta aObjVX,x
-	lda aObjFlags,x
-	and #%11111011
-	sta aObjFlags,x
+	mMOV #$62, aObjVYlo,x
+	mSTZ aObjVY,x, aObjVXlo,x, aObjVX,x
+	mAND aObjFlags,x, #~%00000100
 	inc aObjVar,x
 	bne .lift
 .bump
@@ -1228,23 +1219,17 @@ DoItem3:
 	bpl .lift
 	lda <$00
 	beq .lift
-	lda #$03
-	sta aObjVY,x
-	lda #$76
-	sta aObjVYlo,x
+	mMOVW $0376, aObjVYlo,x, aObjVY,x
 .lift
-	lda #$00
-	sta aWeaponCollision,x
-	lda aObjFrame,x
-	cmp #$04
-	bne .loopanim
-	lda #$00
+	mSTZ aWeaponCollision,x
+	ldy aObjFrame,x
+	cpy #$04
+	bcc .loopanim
 	sta aObjFrame,x
 .loopanim
 	dec aObjLife,x
 	bne .jump
-	lda #$1F
-	sta aObjLife,x
+	mMOV #$1F, aObjLife,x
 	dec <zEnergy3
 	beq .del
 .jump
@@ -1257,8 +1242,7 @@ DoItem3:
 	sbc #$10 - 1
 .skip_offsety
 	sta aWeaponPlatformY - 2,x
-	lda #$14
-	sta aWeaponPlatformW - 2,x
+	mMOV #$14, aWeaponPlatformW - 2,x
 	mMOV #$0C, <$01
 	mMOV #$21, <$02
 	mMOV #$08, <$03
@@ -1275,29 +1259,21 @@ DoItem3:
 	bne .del
 	lda <$03
 	bne .lift
-	lda #$00
-	sta aObjVY,x
-	sta aObjVYlo,x
+.disappear_on_top
+	mSTZ aObjVY,x, aObjVYlo,x
 	lda aObjFrame,x
 	cmp #$09
 	bne .loopanim_disappear
-	lda #$05
-	sta aObjFrame,x
+	mMOV #$05, aObjFrame,x
 .loopanim_disappear
 	inc aWeaponCollision,x
 	lda aWeaponCollision,x
 	cmp #$3E
 	bcc .loopanim
 .del
-	lda #$0A
-	sta aObjFrame,x
-	lda #$00
-	sta aObjVY,x
-	sta aObjVYlo,x
-	sta aObjWait,x
-	sta aWeaponPlatformW - 2,x
-	lda #%10000000
-	sta aObjFlags,x
+	mMOV #$0A, aObjFrame,x
+	mSTZ aObjVY,x, aObjVYlo,x, aObjWait,x, aWeaponPlatformW - 2,x
+	mMOV #%10000000, aObjFlags,x
 	rts
 
 .skip
@@ -1305,10 +1281,14 @@ DoItem3:
 	bpl .skip4
 	and #$0F
 	sta aObjVar,x
-	lda #$62
-	sta aObjVYlo,x
-	lda #$00
-	sta aObjVY,x
+	lda aObjY,x
+	sbc <zVScroll
+	bcs .borrow
+	sbc #$10 - 1
+.borrow
+	cmp #$15
+	bcc .disappear_on_top
+	mMOVW $0062, aObjVYlo,x, aObjVY,x
 	beq .skip2
 .skip4
 	lda aObjVY,x
@@ -1316,18 +1296,14 @@ DoItem3:
 	lda <$00
 	bne .del
 .skip5
-	lda #$9E
-	sta aObjVYlo,x
-	lda #$FF
-	sta aObjVY,x
-	jmp .skip2
+	mMOVW -$0062, aObjVYlo,x, aObjVY,x
+	bne .skip2
 
 ;E3DF
 .tmp
 	jsr MoveObjectForWeapon
 	bcc .exists
-	lda #$00
-	sta aWeaponPlatformW - 2,x
+	mSTZ aWeaponPlatformW - 2,x
 .exists
 	rts
 

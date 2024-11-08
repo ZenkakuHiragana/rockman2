@@ -125,10 +125,10 @@ zRand = $4A             ;乱数
 
 zInvincible = $4B       ;無敵時間
 
-;未使用
-zItemIndexPrev = $4C    ;アイテム番号・戻る方
-zItemIndexNext = $4D    ;アイテム番号・進む方
+; zItemIndexPrev = $4C    ;アイテム番号・戻る方
+; zItemIndexNext = $4D    ;アイテム番号・進む方
 
+z4C            = $4C    ;未使用
 zShutterHeight = $4D    ;シャッター高さ
 
 zObjItemFlag = $4E      ;移動処理時に使用する、アイテムフラグ

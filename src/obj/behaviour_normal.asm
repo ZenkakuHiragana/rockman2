@@ -998,16 +998,13 @@ EN14:
 	lda <$00
 	sbc #$03
 	tay
-	lda .lasernum,y
-	sta <$02
-	lda .begin,y
-	sta <$01
+	mMOV .lasernum,y, <$02
+	mMOV .begin,y, <$01
 .loop
 	lda #$15
 	jsr CreateEnemyHere
 	ldx <$01
-	lda .vector,x
-	sta aObjFlags10,y
+	mMOV .vector,x, aObjFlags10,y
 	and #%01000000
 	bne .right
 	lda #$FC
@@ -1016,19 +1013,15 @@ EN14:
 	lda #$04
 .setx
 	sta aObjX10,y
-	lda .y,x
-	sta aObjY10,y
-	lda .length,x
-	sta aEnemyVar10,y
-	lda .timer,x
-	sta aObjVar10,y
+	mMOV .y,x, aObjY10,y
+	mMOV .length,x, aEnemyVar10,y
+	mMOV .timer,x, aObjVar10,y
 	ldx <zObjIndex
 	inc <$01
 	dec <$02
 	bne .loop
 	lsr aObjFlags,x
-	lda #$00
-	sta aEnemyOrder,x
+	mSTZ aEnemyOrder,x
 	jmp CheckOffscreenEnemy
 .lasernum
 	.db $02, $03, $04, $00, $00, $00, $00, $00
