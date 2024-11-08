@@ -1065,29 +1065,8 @@ EN14:
 ;9DCE
 ;レーザー
 EN15:
-	lda <zRoom
-	lsr a
-	lsr a
-	lsr a
-	lsr a
-	sta <$01
-	lda aObjRoom,x
-	lsr a
-	lsr a
-	lsr a
-	lsr a
-	cmp <$01
-	bcs .borrow_room
-	adc #$10
-.borrow_room
-	sta <$00
-	lda aObjY,x
-	sbc #$08
-	sbc <zVScroll
-	lda <$00
-	sbc <$01
-	bcs .onscreen
-	lsr aObjFlags,x
+	jsr CheckOffscreenEnemy
+	bcc .onscreen
 	lda #$15
 	jsr FindObject
 	bcc .rts
@@ -1137,11 +1116,6 @@ EN15:
 	inc <zPPULaser
 	ldx <zObjIndex
 	jsr MoveEnemy
-	bcc .checkhit
-	lda aObjFlags,x
-	asl a
-	ora #%00100000
-	sta aObjFlags,x
 .checkhit
 	lda <zInvincible
 	bne .done
