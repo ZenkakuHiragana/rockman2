@@ -2448,13 +2448,21 @@ EN31_Part:
 	lda #$33
 	jsr CreateEnemyHere
 	bcs .overflow
-	lda #$E0
+	lda <zVScroll
+	sbc #$10 - 1
+	bcs .borrow
+	sbc #$10 - 1
+	clc
+.borrow
 	sta aObjY10,y
-	lda #%10101000
-	sta aObjFlags10,y
+	lda aObjRoom10,y
+	bcc .borrow2
+	adc #$10 - 1
+.borrow2
+	sta aObjRoom10,y
+	mMOV #%10101000, aObjFlags10,y
 	ldx <$01
-	lda Table_EN31PartsWait,x
-	sta aObjVar10,y
+	mMOV Table_EN31PartsWait,x, aObjVar10,y
 	ldx <zObjIndex
 	txa
 	sta aEnemyVar10,y
@@ -2648,8 +2656,12 @@ EN33:
 	lda #$04
 	sta aObjVY,x
 .skip2
+	sec
+	mSUB aObjY,y, <zVScroll, <$00
+	sec
 	lda aObjY,x
-	cmp aObjY,y
+	sbc <zVScroll
+	cmp <$00
 	bcs .move
 	clc
 	lda aEnemyVar,y
