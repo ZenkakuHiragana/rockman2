@@ -1065,8 +1065,23 @@ EN14:
 ;9DCE
 ;レーザー
 EN15:
-	jsr CheckOffscreenEnemy
+	lda aObjY,x
+	pha
+	sec
+	sbc #$08
+	sta aObjY,x
+	jsr CheckOffscreenEnemy.do
+	pla
+	sta aObjY,x
 	bcc .onscreen
+	lda <zRoom
+	cmp aObjRoom,x
+	bcs .del
+	lda aObjVar,x
+	beq .del
+	asl aObjFlags,x
+	bmi .onscreen
+.del
 	lda #$15
 	jsr FindObject
 	bcc .rts
@@ -1079,7 +1094,7 @@ EN15:
 	beq .do
 	dec aObjVar,x
 	bne .rts
-	mAND aObjFlags,x, #%11011111
+	mAND aObjFlags,x, #~%00100000
 	mPLAYTRACK #$27
 .do
 	lda aObjFlags,x
@@ -2076,37 +2091,38 @@ EN25:
 	sec
 	ror aEnemyOrder,x
 ENPaletteChange_QuickManStage:
+	.list
 	clc
+	.nolist
 	adc <zPaletteIndex
 	bpl .isfirst
 	sbc #$80 - 1
 	clc
 .isfirst
 	adc <zPaletteOffset
-	cmp #$0C
-	bne .1
-	lda #$00
-.1
 	tay
-	mMOV ENPaletteTable_QuickManStage,y, <zPaletteOffset
+	lda ENPaletteTable_QuickManStage,y
+	bmi .rts
+	sta <zPaletteOffset
 	mMOV ENPaletteTable_QuickManStage.frames,y, aPaletteAnim
 	mMOV #$80, <zPaletteIndex
+.rts
 	rts
 ENPaletteTable_QuickManStage:
 ;	    lit    --->   dark    --->    red   --->    dark   --->
 .lit_to_dark .public
-	.db $00, $01, $02, $03, $08, $07, $06, $07, $08, $09, $02, $01
+	.db $00, $01, $02, $03, $FF, $FF, $FF, $FF, $FF, $03, $02, $01, $00
 .dark_to_lit .public
-	.db $00, $0B, $0A, $09, $04, $05, $06, $05, $04, $09, $0A, $0B
+	.db $00, $0B, $0A, $09, $FF, $FF, $FF, $FF, $FF, $09, $0A, $0B, $00
 .red_to_dark .public
-	.db $00, $01, $02, $09, $08, $07, $06, $07, $08, $09, $0A, $0B
+	.db $FF, $FF, $FF, $09, $08, $07, $06, $07, $08, $09, $FF, $FF, $FF
 .dark_to_red .public
-	.db $00, $01, $02, $03, $04, $05, $06, $05, $04, $03, $0A, $0B
+	.db $FF, $FF, $FF, $03, $04, $05, $06, $05, $04, $03, $FF, $FF, $FF
 .frames .public
-	.db $04, $03, $02, $01, $02, $03, $04, $03, $02, $01, $02, $03
-	.db $01, $02, $03, $04, $03, $02, $01, $02, $03, $04, $03, $02
-	.db $04, $03, $02, $01, $02, $03, $04, $03, $02, $01, $02, $03
-	.db $01, $02, $03, $04, $03, $02, $01, $02, $03, $04, $03, $02
+	.db $04, $03, $02, $01, $FF, $FF, $FF, $FF, $FF, $01, $02, $03, $04
+	.db $01, $02, $03, $04, $FF, $FF, $FF, $FF, $FF, $04, $03, $02, $01
+	.db $FF, $FF, $FF, $01, $02, $03, $04, $03, $02, $01, $FF, $FF, $FF
+	.db $FF, $FF, $FF, $04, $03, $02, $01, $02, $03, $04, $FF, $FF, $FF
 
 ;A5D6
 ;パレット変更テーブル

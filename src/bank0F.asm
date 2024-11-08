@@ -513,16 +513,15 @@ DoPaletteAnimation:
 	asl a
 	asl a
 	asl a
+	adc #$0F
 	tax
 	lda <zBank
 	pha
 	lda <zStage
 	and #$07
 	jsr ChangeBank
-	ldy #$00
+	ldy #$0F
 .loop
-	lda aPaletteOverride,y
-	bpl .skip
 	lda <zStage
 	and #$08
 	bne .wily
@@ -532,14 +531,21 @@ DoPaletteAnimation:
 	lda Stage_PaletteAnimWily,x
 .skip
 	sta aPalette,y
-	inx
-	iny
-	cpy #$10
-	bne .loop
+	dex
+	dey
+	bpl .loop
 
 	pla
-	jmp ChangeBank
+	jsr ChangeBank
 .isnoanim
+	ldy #$0F
+.loop_override
+	lda aPaletteOverride,y
+	bmi .skip_override
+	sta aPalette,y
+.skip_override
+	dey
+	bpl .loop_override
 	rts
 
 ;20 5D C4

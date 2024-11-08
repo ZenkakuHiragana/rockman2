@@ -20,9 +20,9 @@
 	pha
 	lda <zHScroll
 	pha
-	ldx #$11
+	ldx #$0F
 .loop_backup_palette
-	lda aPalette - 2,x
+	lda aPalette,x
 	sta aPaletteBackup,x
 	dex
 	bpl .loop_backup_palette
@@ -40,7 +40,7 @@
 	ldx #$0F
 	txa
 .loop_blackout_quickman
-	sta aPalette,x
+	sta aPaletteOverride,x
 	dex
 	bpl .loop_blackout_quickman
 	inc <zRoom
@@ -390,10 +390,10 @@
 	dex
 	bpl .loop_gutstank_palette
 .not_gutstank_endmenu
-	ldx #$11
+	ldx #$0F
 .loop_palette_restore
-	lda aPaletteBackup,x
-	sta aPalette - 2,x
+	mMOV aPaletteBackup,x, aPalette,x
+	mMOV #$FF, aPaletteOverride,x
 	dex
 	bpl .loop_palette_restore
 	pla
