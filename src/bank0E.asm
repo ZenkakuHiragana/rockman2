@@ -722,7 +722,6 @@ Scroll_GoForward:
 	mPLAYTRACK #$FE
 .vertical
 	jsr DoScroll_Loop
-	inc <zRoom
 	jsr FrameAdvance1C
 	lda <zScrollFlag
 	and #$01
@@ -782,7 +781,7 @@ Scroll_GoForward:
 	mPLAYTRACK #$FE
 .done
 	mMOV #$40, <zMoveVec
-	mJSR_NORTS SpawnEnemyByScroll
+	rts
 
 ;9045
 ;ステージごとのシャッターの高さ
@@ -870,12 +869,15 @@ DrawRoom:
 ;実際にループしてスクロールさせる処理を呼ぶ
 DoScroll_Loop:
 	mSTZ <zSliplo, <zSliphi, <$FD
-	ldy #$3F
+	ldy #$40
 .loop_right
 	tya
 	pha
 	clc
 	mADD <zHScroll, #$04
+	bcc .carry
+	inc <zRoom
+.carry
 	clc
 	mADD aObjXlo, #$C0
 	mADD aObjX
@@ -891,7 +893,6 @@ DoScroll_Loop:
 	tay
 	dey
 	bne .loop_right
-	sty <zHScroll
 	rts
 
 ;9185
