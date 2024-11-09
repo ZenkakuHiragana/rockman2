@@ -1998,6 +1998,13 @@ EN21:
 ;テリー
 EN22:
 	mSTZ aEnemyFlash,x
+	lda <zStopFlag
+	lsr a
+	bcc .nostop
+	jsr CheckOffscreenEnemy
+	bcc .done
+	rts
+.nostop
 	dec aObjVar,x
 	bpl .skip
 	sta <$09
@@ -2007,6 +2014,7 @@ EN22:
 .skip
 	jsr MoveEnemy
 	bcs .end
+.done
 	mMOV aEnemyVar,x, aEnemyFlash,x
 .end
 	rts
@@ -2567,19 +2575,11 @@ EN31:
 	bcs .overflow
 	ldx <$01
 	clc
-	lda aObjY10,y
-	adc .dy,x
-	sta aObjY10,y
-	lda .vx,x
-	sta aObjVX10,y
-	lda .vxlo,x
-	sta aObjVXlo10,y
-	lda #$04
-	sta aObjVY10,y
-	lda #$00
-	sta aObjVYlo10,y
-	lda #$FF
-	sta aEnemyVar10,y
+	mADD aObjY10,y, .dy,x
+	mMOV .vx,x, aObjVX10,y
+	mMOV .vxlo,x, aObjVXlo10,y
+	mMOVW $0400, aObjVYlo10,y, aObjVY10,y
+	mMOV #$FF, aEnemyVar10,y
 	ldx <zObjIndex
 	dec <$01
 	bpl .loop

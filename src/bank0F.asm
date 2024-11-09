@@ -26,6 +26,8 @@ ChangeBank:
 	.ifdef ___BUGFIX
 	tya
 	pha
+	txa
+	pha
 	.endif
 	lda #$0C
 	sta $FFF0
@@ -48,6 +50,8 @@ ChangeBank:
 .end_postsound
 	mSTZ <zPostProcessSound
 	.ifdef ___BUGFIX
+	pla
+	tax
 	pla
 	tay
 	.endif
@@ -497,9 +501,9 @@ DoPaletteAnimation:
 	cmp aPaletteAnim
 	bit <zPaletteIndex
 	bpl .advance_index
-	bcc .advance_index
-	lda aPaletteAnim
-	adc #$80 - 1 - 1
+	bcc .noloop
+	lda aPaletteAnim ;zPaletteIndex >= aPaletteAnimのとき、
+	adc #$80 - 1 - 1 ;A → $80 OR (aPaletteAnim - 1 + C - 1)
 	bne .noadvance_index
 .advance_index
 	bcc .noloop
@@ -513,18 +517,20 @@ DoPaletteAnimation:
 	asl a
 	asl a
 	asl a
+	clc
 	adc #$0F
 	tax
 	lda <zBank
 	pha
 	lda <zStage
+	cmp #$08
+	php
 	and #$07
 	jsr ChangeBank
+	plp
 	ldy #$0F
 .loop
-	lda <zStage
-	and #$08
-	bne .wily
+	bcs .wily
 	lda Stage_PaletteAnim,x
 	bpl .skip
 .wily
@@ -2876,7 +2882,7 @@ Reset_JMP:
 	mMOV #%00010000, $2000
 	mMOV #%00000110, $2001
 	mCHANGEBANK #$0E
-	jmp $8000
+	jmp Reset_Continue
 ;zPtrに示すアドレスへjsr
 IndirectJSR:
 	jmp [zPtr]

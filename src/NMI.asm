@@ -10,20 +10,12 @@
 	beq .notlag
 	jmp .lag
 .notlag
-	lda <z2000
-	and #%01111100
-	sta <z2000
-	sta $2000 ;PPU Reg0
-	lda <z2001
-	and #%11100111
-	sta <z2001
-	sta $2001 ;PPU Reg1
+	mAND <z2000, #%01111100, <z2000, $2000 ;PPU Reg0
+	mAND <z2001, #%11100111, <z2001, $2001 ;PPU Reg1
 	lda $2002 ;PPU Stats
 	jsr WritePPUScroll ;スクロール用NT書き込み
-	lda #$00
-	sta $2003 ;Sprite Address
-	lda #$02
-	sta $4014 ;Sprite DMA
+	mSTZ $2003 ;Sprite Address
+	mMOV #$02, $4014 ;Sprite DMA
 	lda <zPPUSqr ;矩形書き込み
 	beq .sqr
 	jsr WritePPUSquare
@@ -40,39 +32,26 @@
 .s = $00
 .r = $01
 	mSTZ <$01
-	lda <zHScroll
-	sta <.s
+	mMOV <zHScroll, <.s
 	lda <zHScrollApparenthi
 	beq .nofake_x
 	sec
-	lda <.s
-	sbc <zHScrollApparenthi
-	sta <.s
+	mSUB <.s, <zHScrollApparenthi
 	lda #$00
 	sbc <zRoomApparent
 	and #$01
 	sta <.r
 .nofake_x
-	lda <.s
-	sta $2005 ;PPU Scroll Register
-	lda <zVScroll
-	sta <.s
+	mMOV <.s, $2005 ;PPU Scroll Register
+	mMOV <zVScroll, <.s
 	lda <zVScrollApparenthi
 	beq .nofake_y
 	sec
-	lda <.s
-	sbc <zVScrollApparenthi
-	sta <.s
+	mSUB <.s, <zVScrollApparenthi
 .nofake_y
-	lda <.s
-	sta $2005 ;PPU Scroll Register
-	lda <z2001
-	ora #%00011110
-	sta <z2001
-	sta $2001
-	lda <z2000
-	ora #%10000000
-	sta <z2000
+	mMOV <.s, $2005 ;PPU Scroll Register
+	mORA <z2001, #%00011110, <z2001, $2001
+	mORA <z2000, #%10000000, <z2000
 	lda <zRoom
 	eor <.r
 	and #$01

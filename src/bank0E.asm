@@ -4,8 +4,6 @@
 
 Reset_Continue;
 	sei
-	ldx #$FF
-	txs
 	ldx #$01
 .vblankloop1
 	lda $2002
@@ -27,6 +25,13 @@ Reset_Continue;
 	ldx <$01
 	cpx #$08
 	bne .memloop
+	lda #$FF
+	ldx #$0F
+.loop_palette_override
+	sta aPaletteOverride,x
+	dex
+	bpl .loop_palette_override
+	txs
 	lda #$0E
 	jsr Write_Reg0_A
 	lda #$01
