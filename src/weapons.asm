@@ -1105,70 +1105,58 @@ DoItem2:
 .zero
 	dec aObjLife,x
 	bne .skip
-	lda #$13
-	sta aObjLife,x
+	mMOV #$13, aObjLife,x
 	dec <zEnergy2
 	bne .skip
 .hit
-	lda #$05
-	sta aObjFrame,x
-	lda #$00
+	mMOV #$05, aObjFrame,x
+	mMOV #%10000000, aObjFlags,x
+	asl a
 	sta aWeaponPlatformW
 	sta aObjVX,x
 	sta aObjVXlo,x
 	sta aObjWait,x
-	lda #%10000000
-	sta aObjFlags,x
-	beq .skip
-	jmp .loopanim
+	rts
 .skip
 	lda aObjVX,x
 	cmp #$02
 	beq .accel
 	clc
-	lda aObjVXlo,x
-	adc #$08
-	sta aObjVXlo,x
-	lda aObjVX,x
-	adc #$00
-	sta aObjVX,x
+	mADD aObjVXlo,x, #$08
+	mADD aObjVX,x
 	cmp #$02
 	bne .accel
-	lda #$00
-	sta aObjVXlo,x
+	mSTZ aObjVXlo,x
 .accel
-	lda #$0F
-	sta <$01
-	lda #$08
-	sta <$02
+	mMOV #$0F, <$01
+	mMOV #$08, <$02
 	jsr WallCollisionXY
 	lda <$03
 	bne .hit
 	sec
-	lda aObjY,x
-	sbc #$20
+	mMOV aObjRoom,x, <$09
+	mSUB aObjY,x, #$20, <$0A
+	bcs .borrow
+	sbc #$10 - 1
 	sta <$0A
-	lda #$00
-	sta <$0B
+	mSUB <$09, #$10
+.borrow
+	mSTZ <$0B
 	sec
-	lda aObjX,x
-	sbc #$10
-	sta <$08
-	lda aObjRoom,x
-	sbc #$00
-	sta <$09
+	mSUB aObjX,x, #$10, <$08
+	bcs .borrow2
+	dec <$09
+.borrow2
 	jsr PickupBlock
 	ldx <zObjIndex
 	ldy <$00
 	lda Table_TerrainList,y
 	bne .jumphit
 	clc
-	lda <$08
-	adc #$20
-	sta <$08
-	lda <$09
-	adc #$00
-	sta <$09
+	mADD <$08, #$20
+	bcc .carry
+	inc <$09
+.carry
 	jsr PickupBlock
 	ldx <zObjIndex
 	ldy <$00
@@ -1184,18 +1172,15 @@ DoItem2:
 	sbc #$10 - 1
 .skip_offsety
 	sta aWeaponPlatformY - 2,x
-	lda #$18
-	sta aWeaponPlatformW - 2,x
+	mMOV #$18, aWeaponPlatformW - 2,x
 	lda aObjFrame,x
 	cmp #$04
 	bne .loopanim
-	lda #$00
-	sta aObjFrame,x
+	mSTZ aObjFrame,x
 .loopanim
 	jsr MoveObjectForWeapon
 	bcc .del
-	lda #$00
-	sta aWeaponPlatformW - 2,x
+	mSTZ aWeaponPlatformW - 2,x
 .del
 	rts
 
