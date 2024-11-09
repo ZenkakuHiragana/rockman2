@@ -2099,9 +2099,7 @@ EN25:
 	sec
 	ror aEnemyOrder,x
 ENPaletteChange_QuickManStage:
-	.list
 	clc
-	.nolist
 	adc <zPaletteIndex
 	bpl .isfirst
 	sbc #$80 - 1

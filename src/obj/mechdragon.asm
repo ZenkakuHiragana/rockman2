@@ -319,7 +319,7 @@ MechDragon_MergeBehaviour:
 	lda aObjVY + 1
 	bpl .goup
 	lda aObjY + 1
-	cmp #$A0
+	cmp #$80
 	bcc .skip
 	bcs .inv_y
 .goup
@@ -350,9 +350,17 @@ MechDragon_SetMoveVelocity:
 	stx <zObjIndex
 	lda aObjX
 	pha
+	lda aObjY
+	pha
+	lda <zOffscreen
+	beq .onscreen
+	sta aObjY
+.onscreen
 	sty aObjX
 	jsr BossBehaviour_SetVelocityAtRockman
 	mMOV #%11000011, aBossVar1
+	pla
+	sta aObjY
 	pla
 	sta aObjX
 	rts
@@ -439,9 +447,9 @@ MechDragon_Defeated:
 ;9165
 ;メカドラゴンの位置と背景位置を合わせる
 MechDragon_BodyMoveXY:
-	lda aObjY
-	cmp #$B0
-	bcc .player_alive
+	lda <zStatus
+	cmp #$02
+	bcs .player_alive
 	mSTZ aObjVYlo + 1, aObjVY + 1
 .player_alive
 	mMOV #$0F, aPaletteSpr
