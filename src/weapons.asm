@@ -859,59 +859,56 @@ DoQuickBoomerang_MOVE:
 ;E013
 DoCrashBomb:
 	lda aObjVar,x
-	bne .deployed
-	lda #$00
+	beq .flying
+	jmp .deployed
+.flying
+;	lda #$00
 	sta aObjFrame,x
 	sta aObjWait,x
-	sec
-	lda aObjY,x
-	sbc #$08
-	sta <$0A
-	lda #$00
 	sta <$0B
-	lda aObjFlags,x
-	and #%01000000
-	bne .right
 	sec
-	lda aObjX,x
-	sbc #$06
-	sta <$08
-	lda aObjRoom,x
-	sbc #$00
-	jmp .write
+	mMOV aObjRoom,x, <$09
+	mSUB aObjY,x, #$08, <$0A
+	bcs .borrow
+	mSUB <$09, #$10 - 1
+.borrow
+	lda aObjFlags,x
+	asl a
+	bmi .right
+	mSUB aObjX,x, #$06, <$08
+	bcs .write
+	dec <$09
+	bcc .write
 .right
-	clc
-	lda aObjX,x
-	adc #$06
-	sta <$08
-	lda aObjRoom,x
-	adc #$00
+	mADD aObjX,x, #$06 - 1, <$08
+	bcc .write
+	inc <$09
 .write
-	sta <$09
 	jsr PickupBlock
-	ldy <$00
 	ldx <zObjIndex
-	lda Table_TerrainList,y ;----------------------------
-	bne .hit
+	lda <$00
+	cmp #$08
+	bcs .hit
 	clc
-	lda <$0A
-	adc #$10
+	mADD <$0A, #$10
+	cmp #$F0
+	bcc .carry
+	adc #$10 - 1
 	sta <$0A
+	mADD <$09, #$10 - 1
+.carry
 	jsr PickupBlock
-	ldy <$00
 	ldx <zObjIndex
-	lda Table_TerrainList,y ;----------------------------
-	bne .hit
+	lda <$00
+	cmp #$08
+	bcs .hit
 	mJSR_NORTS MoveObjectForWeapon
 .hit
 	mPLAYTRACK #$2E
-	lda aObjFlags,x
-	and #%11111110
-	sta aObjFlags,x
+	mAND aObjFlags,x, #~%00000001
 	inc aObjFrame,x
 	inc aObjVar,x
-	lda #$7E
-	sta aObjLife,x
+	mMOV #$7E, aObjLife,x
 	bne .done
 .deployed
 	cmp #$01
@@ -919,23 +916,18 @@ DoCrashBomb:
 	lda aObjFrame,x
 	cmp #$04
 	bne .loopanim
-	lda #$02
-	sta aObjFrame,x
+	lsr aObjFrame,x ;=> 2
 .loopanim
 	dec aObjLife,x
 	bne .done
-	lda #$05
-	sta aObjFrame,x
-	lda #$00
-	sta aObjWait,x
-	lda #$38
-	sta aObjLife,x
+	mSTZ aObjWait,x
+	mMOV #$05, aObjFrame,x
+	mMOV #$38, aObjLife,x
 	inc aObjVar,x
 .done
-	mJSR_NORTS CheckOffscreen_Easy
+	mJSR_NORTS CheckOffscreenEnemy.do
 .explode
-	lda #$00
-	sta aObjWait,x
+	mSTZ aObjWait,x
 	lda aObjLife,x
 	and #$07
 	bne .skip
@@ -944,8 +936,7 @@ DoCrashBomb:
 	lsr a
 	and #$0C
 	sta <$02
-	lda #$06
-	sta <$01
+	mMOV #$06, <$01
 .loop
 	lda <$01
 	cmp #$02
@@ -956,14 +947,19 @@ DoCrashBomb:
 	ldy <$00
 	ldx <$02
 	clc
-	lda aObjY,y
-	adc CrashBomb_Spawndy,x
-	sta aObjY,y
+	mADD aObjY,y, CrashBomb_Spawndy,x
+	lda #$00
+	adc CrashBomb_Spawndr_y,x
+	asl a
+	asl a
+	asl a
+	asl a
 	clc
-	lda aObjX,y
-	adc CrashBomb_Spawndx,x
-	sta aObjX,y
-	lda aObjRoom,y
+	adc aObjRoom,y
+	pha
+	clc
+	mADD aObjX,y, CrashBomb_Spawndx,x
+	pla
 	adc CrashBomb_Spawndr,x
 	sta aObjRoom,y
 	ldx <zObjIndex
@@ -977,12 +973,15 @@ DoCrashBomb:
 	lsr aObjFlags,x
 	rts
 .exists
-	mJSR_NORTS CheckOffscreen_Easy
+	mJSR_NORTS CheckOffscreenEnemy.do
 
 ;E11C
 CrashBomb_Spawndy:
 	.db $F8, $F0, $08, $00, $F8, $F8, $08, $00
 	.db $F0, $00, $10, $10, $F0, $F8, $08, $08
+CrashBomb_Spawndr_y:
+	.db $FF, $FF, $00, $00, $FF, $FF, $00, $00
+	.db $FF, $00, $00, $00, $FF, $FF, $00, $00
 ;E12C
 CrashBomb_Spawndx:
 	.db $F8, $08, $00, $10, $F8, $10, $F0, $08
@@ -992,8 +991,8 @@ CrashBomb_Spawndr:
 	.db $FF, $00, $00, $00, $FF, $00, $FF, $00
 	.db $00, $00, $FF, $00, $FF, $00, $FF, $00
 ;E14C
-Table_TerrainList:
-	.db $00, $01, $00, $00, $00, $01, $01, $01, $01
+;Table_TerrainList:
+;	.db $00, $01, $00, $00, $00, $01, $01, $01, $01
 
 ;E155
 DoMetalBlade:
@@ -1149,9 +1148,9 @@ DoItem2:
 .borrow2
 	jsr PickupBlock
 	ldx <zObjIndex
-	ldy <$00
-	lda Table_TerrainList,y
-	bne .jumphit
+	lda <$00
+	cmp #$08
+	bcs .jumphit
 	clc
 	mADD <$08, #$20
 	bcc .carry
@@ -1159,9 +1158,9 @@ DoItem2:
 .carry
 	jsr PickupBlock
 	ldx <zObjIndex
-	ldy <$00
-	lda Table_TerrainList,y
-	beq .nohit
+	lda <$00
+	cmp #$08
+	bcc .nohit
 .jumphit
 	jmp .hit
 .nohit
@@ -1410,30 +1409,17 @@ DoLeafShield_Disabled:
 .done
 	dec aObjLife,x
 	mJSR_NORTS MoveObjectForWeapon
-;E4E1
-DoQuickBoomerang_Disabled:
-DoAirShooter_Disabled:
-	mJSR_NORTS CheckOffscreen_Easy
 ;E4E5
 DoWaterSplash:
 	rts
 
+;E4E1
+DoQuickBoomerang_Disabled:
+DoAirShooter_Disabled:
 ;20 E6 E4
 ;Obj[x]横方向に画面外なら消す
-CheckOffscreen_Easy:
-	sec
-	lda aObjX,x
-	sbc <zHScroll
-	lda aObjRoom,x
-	sbc <zRoom
-	bcc .del
-	bne .del
-	clc
-	rts
-.del
-	lsr aObjFlags,x
-	sec
-	rts
+;CheckOffscreen_Easy:
+	jmp CheckOffscreenEnemy.do
 
 ;20 FC E4
 CreateWeaponObjectFromObject:

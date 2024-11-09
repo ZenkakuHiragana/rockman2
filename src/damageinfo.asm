@@ -84,24 +84,23 @@
 ;20 E9 E5
 ;Obj[x]とロックマンの武器とのヒット処理
 EnemyTakeDamage:
+	lda aEnemyFlash,x
+	bne .abort
 	sec
-	lda aObjY,x
-	sbc <zVScroll
-	sta <$00
-	lda aObjCollision,x
-	sta <$08
+	mSUB aObjY,x, <zVScroll, <$00
+	mMOV aObjCollision,x, <$08
 ;時間方向への間引きによる最適化らしい
 	ldx #$09
 	lda <zFrameCounter
-	and #$01
-	bne .loop
+	lsr a
+	bcs .loop
 	dex
 .loop
 ;武器一つずつに対してのループ
 	lda aObjFlags,x
 	bpl .skip
-	and #%00000001
-	beq .skip
+	lsr a
+	bcc .skip
 	clc
 	ldy aWeaponCollision,x
 	lda Table_WeaponCollisionOffset,y
@@ -135,24 +134,22 @@ EnemyTakeDamage:
 	cpx #$02
 	bcs .loop
 	ldx <zObjIndex
-	lda #$00
-	sta aEnemyFlash,x
+.abort
+	mSTZ aEnemyFlash,x
 	clc
 	rts
 .hit
 	ldy <zEquipment
-	lda Table_EnemyTakeDamageInfolo,y
-	sta <zPtrlo
-	lda Table_EnemyTakeDamageInfohi,y
-	sta <zPtrhi
+	mMOV Table_EnemyTakeDamageInfolo,y, <zPtrlo
+	mMOV Table_EnemyTakeDamageInfohi,y, <zPtrhi
+	ldy <zObjIndex
+	lda aObjFlags,y
+	and #%00001000
 	jmp [zPtr]
 
 ;E64F
 ;ロックバスターダメージ処理
 EnemyTakeDamageByRockBuster:
-	ldy <zObjIndex
-	lda aObjFlags,y
-	and #%00001000
 	bne .guard
 	lda aObjAnim,y
 	tay
@@ -162,8 +159,6 @@ EnemyTakeDamageByRockBuster:
 	lsr aObjFlags,x
 	mPLAYTRACK #$2B
 	ldx <zObjIndex
-	lda aEnemyFlash,x
-	bne .abort
 	inc aEnemyFlash,x
 	sec
 	lda aObjLife,x
@@ -193,9 +188,6 @@ EnemyTakeDamageByRockBuster:
 ;E6A4
 ;アトミックファイアーダメージ処理
 EnemyTakeDamageByAtomicFire:
-	ldy <zObjIndex
-	lda aObjFlags,y
-	and #%00001000
 	bne .guard
 	lda aObjAnim,y
 	tay
@@ -222,8 +214,6 @@ EnemyTakeDamageByAtomicFire:
 	pla
 	tay
 	ldx <zObjIndex
-	lda aEnemyFlash,x
-	bne AtomicFire_TakeDamageAbort
 	inc aEnemyFlash,x
 	sec
 	lda aObjLife,x
@@ -251,9 +241,6 @@ AtomicFire_TakeDamageAbort:
 ;E70D
 ;エアーシューターダメージ処理
 EnemyTakeDamageByAirShooter:
-	ldy <zObjIndex
-	lda aObjFlags,y
-	and #%00001000
 	bne .guard
 	lda aObjAnim,y
 	tay
@@ -266,8 +253,6 @@ EnemyTakeDamageByAirShooter:
 	pla
 	tay
 	ldx <zObjIndex
-	lda aEnemyFlash,x
-	bne .abort
 	inc aEnemyFlash,x
 	sec
 	lda aObjLife,x
@@ -298,9 +283,6 @@ EnemyTakeDamageByAirShooter:
 ;E766
 ;リーフシールドダメージ処理
 EnemyTakeDamageByLeafShield:
-	ldy <zObjIndex
-	lda aObjFlags,y
-	and #%00001000
 	bne .guard
 	lda aObjAnim,y
 	tay
@@ -313,8 +295,6 @@ EnemyTakeDamageByLeafShield:
 	pla
 	tay
 	ldx <zObjIndex
-	lda aEnemyFlash,x
-	bne LeafShield_TakeDamageAbort
 	inc aEnemyFlash,x
 	sec
 	lda aObjLife,x
@@ -352,9 +332,6 @@ LeafShield_TakeDamageAlive:
 ;E7CC
 ;バブルリードダメージ処理
 EnemyTakeDamageByBubbleLead:
-	ldy <zObjIndex
-	lda aObjFlags,y
-	and #%00001000
 	bne .guard
 	lda aObjAnim,y
 	tay
@@ -367,8 +344,6 @@ EnemyTakeDamageByBubbleLead:
 	pla
 	tay
 	ldx <zObjIndex
-	lda aEnemyFlash,x
-	bne .abort
 	inc aEnemyFlash,x
 	sec
 	lda aObjLife,x
@@ -399,9 +374,6 @@ EnemyTakeDamageByBubbleLead:
 ;E825
 ;クイックブーメランダメージ処理
 EnemyTakeDamageByQuickBoomerang:
-	ldy <zObjIndex
-	lda aObjFlags,y
-	and #%00001000
 	bne .guard
 	lda aObjAnim,y
 	tay
@@ -414,8 +386,6 @@ EnemyTakeDamageByQuickBoomerang:
 	pla
 	tay
 	ldx <zObjIndex
-	lda aEnemyFlash,x
-	bne QuickBoomerang_TakeDamageAbort
 	inc aEnemyFlash,x
 	sec
 	lda aObjLife,x
@@ -459,14 +429,10 @@ QuickBoomerang_TakeDamageAlive:
 ;E899
 ;クラッシュボムダメージ処理
 EnemyTakeDamageByCrashBomb:
-	ldy <zObjIndex
-	lda aObjFlags,y
-	and #%00001000
 	bne .guard
 	lda aObjAnim,y
 	tay
-	lda Table_DamageAmount_CrashBomb,y
-	sta <$00
+	mMOV Table_DamageAmount_CrashBomb,y, <$00
 	beq .guard
 	txa
 	pha
@@ -474,18 +440,13 @@ EnemyTakeDamageByCrashBomb:
 	pla
 	tay
 	ldx <zObjIndex
-	lda aEnemyFlash,x
-	bne .abort
 	inc aEnemyFlash,x
 	sec
-	lda aObjLife,x
-	sbc <$00
-	sta aObjLife,x
+	mSUB aObjLife,x, <$00
 	beq .dead
 	bcs QuickBoomerang_TakeDamageAlive
 .dead
-	lda #$00
-	sta aObjLife,x
+	mSTZ aObjLife,x
 	sec
 	rts
 .guard
@@ -497,12 +458,11 @@ EnemyTakeDamageByCrashBomb:
 	cmp #$02
 	beq .abort
 ;爆発へ移行する
-	lda #$05
-	sta aObjFrame,x
-	lda #$00
+	mAND aObjFlags,x, #~$00000001
+	mMOV #$05, aObjFrame,x
+	mMOV #$01, aObjLife,x
+	lsr a
 	sta aObjWait,x
-	lda #$38
-	sta aObjLife,x
 	inc aObjVar,x
 	mPLAYTRACK #$2D
 .abort
@@ -513,9 +473,6 @@ EnemyTakeDamageByCrashBomb:
 ;E8FD
 ;メタルブレードダメージ処理
 EnemyTakeDamageByMetalBlade:
-	ldy <zObjIndex
-	lda aObjFlags,y
-	and #%00001000
 	bne .guard
 	lda aObjAnim,y
 	tay
@@ -528,8 +485,6 @@ EnemyTakeDamageByMetalBlade:
 	pla
 	tay
 	ldx <zObjIndex
-	lda aEnemyFlash,x
-	bne .abort
 	inc aEnemyFlash,x
 	sec
 	lda aObjLife,x
