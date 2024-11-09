@@ -4478,7 +4478,7 @@ EN64:
 .do
 	bne .1
 	mMOV aObjRoom, <zScrollClipRoom
-	mMOV #%00001100, <zScrollClipFlag
+	mMOV #%10001100, <zScrollClipFlag
 	mMOV #$07, aObjLife,x
 	mMOV #$08, <zBossType
 	mMOV #$01, <zBossBehaviour

@@ -456,6 +456,14 @@ DoAtomicFire:
 	beq .manage
 	jmp .bullet
 .manage
+	lda <zStatus
+	cmp #$02
+	bcs .alive
+	ldy #$00
+	jsr .changepalette
+	lsr aObjFlags,x
+	rts
+.alive
 	lda #$00
 	sta aObjFrame,x
 	sta aObjWait,x
@@ -517,7 +525,6 @@ DoAtomicFire:
 	dex
 	cpx #$02
 	bne .loopseek
-.ifdead
 	rts
 .ok
 	lda <zOffscreen
@@ -543,8 +550,6 @@ DoAtomicFire:
 	mPLAYTRACK #$38
 	lda #$04
 	sta aObjVX,x
-	lda <zStatus
-	beq .ifdead
 	jmp FireRockBuster_SetShootPose
 
 .bullet

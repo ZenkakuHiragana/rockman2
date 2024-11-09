@@ -1422,13 +1422,14 @@ DoRockman_BodyMoveY:
 	clc
 .boundary_y
 	sta <$0A
+	sta <$10
 	lda <.r
 	sbc #$00
 	jsr DoRockman_WallCheckY
 	lda <$00
 	beq DoRockman_BodyMoveY_NoHit
 	mSTZ aObjYlo
-	lda <$0A
+	lda <$10
 	and #$0F
 	eor #$0F
 	sec
@@ -1523,9 +1524,7 @@ DoRockman_WallCheckY:
 .loop
 	ldx <.n
 	clc
-	lda aObjX
-	adc Table_WallCheckY_dx,x
-	sta <.x
+	mADD aObjX, Table_WallCheckY_dx,x, <.x
 	lda aObjRoom
 	and #$0F
 	adc Table_WallCheckY_dr,x
@@ -1544,7 +1543,7 @@ DoRockman_WallCheckY:
 .loop2
 	lda <zBGAttr,x
 	cmp #$0F ;0x0F = シャッター判定ならスキップ
-	bcs .skip
+	bcs .notspike
 	cmp #$0A ;0x0A = 左コンベア未満の値 = トゲか壁ならスキップ
 	bcc .skip
 	sbc #$0A
@@ -1567,12 +1566,12 @@ DoRockman_WallCheckY:
 	bne .done
 .skip
 	cmp #$09
-	bne .spike
+	bne .notspike
 	ldy <zInvincible
-	bne .spike
+	bne .notspike
 	sty <zStatus
 	jmp DieRockman
-.spike
+.notspike
 	dex
 	bpl .loop2
 	
