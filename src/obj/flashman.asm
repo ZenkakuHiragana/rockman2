@@ -124,8 +124,8 @@ Flashman4:
 	sta aObjX,x
 	pla
 	tay
-	mMOV #$60, <$00
-	jsr BossBehaviour_SetVelocityAtRockman_Writedx
+	lda #$60
+	jsr SetVelocityAtRockman.do
 	mMOV #$01, <zObjIndex
 .skip
 	pla

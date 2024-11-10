@@ -11,6 +11,7 @@ ___NOSEC                ;不要と思われるsecを無効化
 ___NORTS                ;jsr→rtsとつながる部分をjmpに置き換え
 ___JSRJMP               ;jsr→rtsの部分をjmpに置き換え(ただしrtsを残す)
 ___BUGFIX               ;バグを修正
+___ACCURATE_AIM         ;自機狙い処理で速度が√2倍になる現象を修正
 ;ディレイスクロール、割り算処理のミスを修正
 ___BUGFIXENEMYBUBBLELEAD;敵バブルリードの地形判定処理に間違いがあるみたい？
 

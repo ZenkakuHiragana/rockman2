@@ -72,14 +72,36 @@ Quickman2:
 	bne .rts
 	lda <zBossBehaviour
 	cmp #$02
-	bne .rts
+	beq .do
+.rts
+	rts
+.do
 	mSTZ aObjWait + 1
 	mMOV #$01, aObjFrame + 1
 	lda aObjY
-	pha
+	sbc aObjY + 1
+	bcs .borrow_y
+	eor #$FF
+	adc #$01
+.borrow_y
+	sta <$00
+	lda aObjX
+	sbc aObjX + 1
+	bcs .borrow_x
+	eor #$FF
+	adc #$01
+.borrow_x
+	cmp <$00
+	ldy #aObjY - aObjX
+	bcs .larger_dx
+	ldy #$00
 	sec
+.larger_dx
+	sty <$03
+	lda aObjX,y
+	pha
 	sbc #$18
-	sta aObjY
+	sta aObjX,y
 	mMOV #$03, <$02
 .loop_obj
 	lda #$59
@@ -96,15 +118,14 @@ Quickman2:
 	mMOV #$00, <$08
 	jsr BossBehaviour_SetVelocityAtRockman
 	clc
-	lda aObjY
-	adc #$18
-	sta aObjY
+	ldy <$03
+	mADD aObjX,y, #$18
 	dec <$02
 	bne .loop_obj
 .skip_obj
 	pla
-	sta aObjY
-.rts
+	ldy <$03
+	sta aObjX,y
 	rts
 
 ;8893

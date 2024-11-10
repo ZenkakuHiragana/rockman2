@@ -2760,22 +2760,18 @@ SetVelocityAtRockman:
 	sec
 	lda <zRScreenX
 	sbc <zEScreenX
-	bcs .inv_x
+	bcs .do
 	eor #$FF
 	adc #$01
 	ldy #$00
-.inv_x
+.do .public ;ボスの自機狙いルーチンと統合
 	sta <.lx
-	lda aObjFlags,x
-	and #%10111111
-	sta aObjFlags,x
+	mAND aObjFlags,x, #~%01000000
 	tya
 	ora aObjFlags,x
 	sta aObjFlags,x
 	sec
-	lda aObjY,x
-	sbc <zVScroll
-	sta <.ly
+	mSUB aObjY,x, <zVScroll, <.ly
 	sec
 	lda aObjY
 	sbc <zVScroll
@@ -2788,11 +2784,12 @@ SetVelocityAtRockman:
 	sta <.ly
 	cmp <.lx
 	bcs .vertical
+	.ifndef ___ACCURATE_AIM
 	mMOV <.vhi, <$0D, aObjVX,x
 	mMOV <.vlo, <$0C, aObjVXlo,x
 	mMOV <.lx, <$0B
 	mSTZ <$0A
-	jsr Divide
+	jsr Divide ; $0A~$0B / $0C~$0D = $0E~$0F
 	mMOV <$0F, <$0D
 	mMOV <$0E, <$0C
 	mMOV <.ly, <$0B
@@ -2801,8 +2798,39 @@ SetVelocityAtRockman:
 	ldx <zObjIndex
 	mMOV <$0F, aObjVY,x
 	mMOV <$0E, aObjVYlo,x
+	.else
+	sta <$0B
+	mMOV <.lx, <$0D
+	mSTZ <$0A, <$0C
+	jsr Divide ;.ly~#$00 / .lx~#$00 < #$01.00
+	lsr <$0F
+	ror a
+	lsr a
+	lsr a
+	tay ;y = θ
+	mMOV <.vhi, <$0B
+	mMOV <.vlo, <$0A
+	mMOV #$01, <$0D
+	mMOV .cosine_table,y, <$0C
+	jsr Divide ;.v / (1 / cosθ) = v cosθ
+	ldx <zObjIndex
+	mMOV <$0F, <$0D, aObjVX,x
+	mMOV <$0E, <$0C, aObjVXlo,x
+	mMOV <.lx, <$0B
+	mSTZ <$0A
+	jsr Divide ;.lx~#$00 / (v cosθ)
+	mMOV <$0F, <$0D
+	mMOV <$0E, <$0C
+	mMOV <.ly, <$0B
+	mSTZ <$0A
+	jsr Divide ;(.ly / .lx) * (v cosθ)
+	ldx <zObjIndex
+	mMOV <$0F, aObjVY,x
+	mMOV <$0E, aObjVYlo,x
+	.endif
 	jmp .done
 .vertical
+	.ifndef ___ACCURATE_AIM
 	mMOV <.vhi, <$0D, aObjVY,x
 	mMOV <.vlo, <$0C, aObjVYlo,x
 	mMOV <.ly, <$0B
@@ -2816,6 +2844,37 @@ SetVelocityAtRockman:
 	ldx <zObjIndex
 	mMOV <$0F, aObjVX,x
 	mMOV <$0E, aObjVXlo,x
+	.else
+	sta <$0D
+	mMOV <.lx, <$0B
+	mSTZ <$0A, <$0C
+	jsr Divide ;.lx~#$00 / .ly~#$00 < #$01.00
+	lda <$0E
+	lsr <$0F
+	ror a
+	lsr a
+	lsr a
+	tay ;y = θ
+	mMOV <.vhi, <$0B
+	mMOV <.vlo, <$0A
+	mMOV #$01, <$0D
+	mMOV .cosine_table,y, <$0C
+	jsr Divide ;.v / (1 / cosθ) = v cosθ
+	ldx <zObjIndex
+	mMOV <$0F, <$0D, aObjVY,x
+	mMOV <$0E, <$0C, aObjVYlo,x
+	mMOV <.ly, <$0B
+	mSTZ <$0A
+	jsr Divide ;.ly~#$00 / (v cosθ)
+	mMOV <$0F, <$0D
+	mMOV <$0E, <$0C
+	mMOV <.lx, <$0B
+	mSTZ <$0A
+	jsr Divide ;(.lx / .ly) * (v cosθ)
+	ldx <zObjIndex
+	mMOV <$0F, aObjVX,x
+	mMOV <$0E, aObjVXlo,x
+	.endif
 .done
 	plp
 	bcc .inv_v
@@ -2823,6 +2882,15 @@ SetVelocityAtRockman:
 	mNEGhi aObjVY,x
 .inv_v
 	rts
+	.ifdef ___ACCURATE_AIM
+.cosine_table
+	.db $00, $00, $00, $01, $01, $02, $03, $04
+	.db $05, $07, $08, $0A, $0C, $0F, $11, $14
+	.db $17, $1A, $1D, $21, $25, $29, $2E, $33
+	.db $38, $3E, $44, $4A, $51, $59, $61, $6A
+;	.db $00, $00, $01, $03, $06, $09, $0D, $12
+;	.db $18, $1F, $28, $31, $3C, $49, $58, $6A
+	.endif
 
 ;20 38 F2
 ;Obj[10-1F]の位置にランダムで回復アイテムを生成する。

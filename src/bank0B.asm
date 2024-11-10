@@ -630,80 +630,91 @@ BossBehaviour_SetVelocityAtRockman:
 	sec
 	lda aObjX
 	sbc aObjX,x
-	.ifndef ___OPTIMIZE
-	sta <$00
-	.endif
-	bcs .inv_x
-	.ifndef ___OPTIMIZE
-	lda <$00
-	.endif
+	bcs .do
 	eor #$FF
 	adc #$01
 	ldy #$00
-	.ifndef ___OPTIMIZE
-	sta <$00
-.inv_x
-	.else
-.inv_x
-	sta <$00
-	.endif
-;A3A3
-BossBehaviour_SetVelocityAtRockman_Writedx:
-	mAND aObjFlags,x, #%10111111
-	tya
-	ora aObjFlags,x
-	sta aObjFlags,x
+.do
+	jmp SetVelocityAtRockman.do
 
-	sec
-	lda aObjY
-	sbc aObjY,x
-	php
-	bcs .inv_y
-	eor #$FF
-	adc #$01
-.inv_y
-	sta <$01
-	cmp <$00
-	bcs .sety
-;dx > dy
-	mMOV <$09, <$0D, aObjVX,x
-	mMOV <$08, <$0C, aObjVXlo,x
-
-	mMOV <$00, <$0B
-	mSTZ <$0A
-	jsr Divide
-	mMOV <$0F, <$0D
-	mMOV <$0E, <$0C
-	mMOV <$01, <$0B
-	mSTZ <$0A
-	jsr Divide
-	ldx <zObjIndex
-	mMOV <$0F, aObjVY,x
-	mMOV <$0E, aObjVYlo,x
-	jmp .done
-;dy >= dx
-.sety
-	mMOV <$09, <$0D, aObjVY,x
-	mMOV <$08, <$0C, aObjVYlo,x
-	mMOV <$01, <$0B
-	mSTZ <$0A
-	jsr Divide
-	mMOV <$0F, <$0D
-	mMOV <$0E, <$0C
-	mMOV <$00, <$0B
-	mSTZ <$0A
-	jsr Divide
-	ldx <zObjIndex
-	mMOV <$0F, aObjVX,x
-	mMOV <$0E, aObjVXlo,x
-
-.done
-	plp
-	bcc .rts
-	mNEG aObjVYlo,x
-	mNEGhi aObjVY,x
-.rts
-	rts
+;	ldy #$40
+;	sec
+;	lda aObjX
+;	sbc aObjX,x
+;	.ifndef ___OPTIMIZE
+;	sta <$00
+;	.endif
+;	bcs .inv_x
+;	.ifndef ___OPTIMIZE
+;	lda <$00
+;	.endif
+;	eor #$FF
+;	adc #$01
+;	ldy #$00
+;	.ifndef ___OPTIMIZE
+;	sta <$00
+;.inv_x
+;	.else
+;.inv_x
+;	sta <$00
+;	.endif
+;;A3A3
+;BossBehaviour_SetVelocityAtRockman_Writedx:
+;	mAND aObjFlags,x, #%10111111
+;	tya
+;	ora aObjFlags,x
+;	sta aObjFlags,x
+;
+;	sec
+;	lda aObjY
+;	sbc aObjY,x
+;	php
+;	bcs .inv_y
+;	eor #$FF
+;	adc #$01
+;.inv_y
+;	sta <$01
+;	cmp <$00
+;	bcs .sety
+;;dx > dy
+;	mMOV <$09, <$0D, aObjVX,x
+;	mMOV <$08, <$0C, aObjVXlo,x
+;
+;	mMOV <$00, <$0B
+;	mSTZ <$0A
+;	jsr Divide
+;	mMOV <$0F, <$0D
+;	mMOV <$0E, <$0C
+;	mMOV <$01, <$0B
+;	mSTZ <$0A
+;	jsr Divide
+;	ldx <zObjIndex
+;	mMOV <$0F, aObjVY,x
+;	mMOV <$0E, aObjVYlo,x
+;	jmp .done
+;;dy >= dx
+;.sety
+;	mMOV <$09, <$0D, aObjVY,x
+;	mMOV <$08, <$0C, aObjVYlo,x
+;	mMOV <$01, <$0B
+;	mSTZ <$0A
+;	jsr Divide
+;	mMOV <$0F, <$0D
+;	mMOV <$0E, <$0C
+;	mMOV <$00, <$0B
+;	mSTZ <$0A
+;	jsr Divide
+;	ldx <zObjIndex
+;	mMOV <$0F, aObjVX,x
+;	mMOV <$0E, aObjVXlo,x
+;
+;.done
+;	plp
+;	bcc .rts
+;	mNEG aObjVYlo,x
+;	mNEGhi aObjVY,x
+;.rts
+;	rts
 
 ;A451
 ;ボスが出現する
