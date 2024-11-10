@@ -63,6 +63,7 @@
 	sta aObjFlags
 	jsr DamageRockman
 	inc <$01
+	ldx <zObjIndex
 .nodmg
 	rts
 .isitem

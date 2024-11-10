@@ -363,8 +363,8 @@ DoScroll:
 .right
 	jsr Scroll_GoForward
 .done
-	mSTZ <zScrollFlag
 	jsr SpawnEnemiesAll
+	mSTZ <zScrollFlag, <zPPUObjNum
 	ldx <zStage
 	lda <zRoom
 	cmp Table_BossRoom,x
@@ -868,6 +868,10 @@ DrawRoom:
 ;90C9
 ;実際にループしてスクロールさせる処理を呼ぶ
 DoScroll_Loop:
+	mMOV <zRoom, <$00
+	mMOV <zScrollNumber, <zRoom
+	jsr SpawnCommandsAll
+	mMOV <$00, <zRoom
 	mSTZ <zSliplo, <zSliphi, <$FD
 	ldy #$40
 .loop_right
@@ -887,7 +891,7 @@ DoScroll_Loop:
 	jsr FixAtomicFireObject
 .skipatomic
 	jsr SpriteSetup
-;	jsr WritePatternTable
+	jsr WriteEnemySprites
 	jsr FrameAdvance1C
 	pla
 	tay
