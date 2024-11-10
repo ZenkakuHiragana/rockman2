@@ -77,10 +77,10 @@
 	lda <zHScroll
 	adc #$80
 	and #%11100000
-	sta <$52 ;-----------------------------------------------
+	sta <zMenuPtr
 	lda <zRoom
 	adc #$00
-	sta <$53 ;-----------------------------------------------
+	sta <zMenuPtrhi
 	lda <zVScroll
 	lsr a
 	lsr a
@@ -92,12 +92,12 @@
 	bcc .add_voffset
 	adc #$03 - 1
 	sta <$00
-	mADD <$53, #$10
+	mADD <zMenuPtrhi, #$10
 	lda <$00
 .add_voffset
 	and #%00011100
-	ora <$52
-	sta <$52
+	ora <zMenuPtr
+	sta <zMenuPtr
 	and #%00011100
 	cmp #$0C
 	ldx #$0F
@@ -120,7 +120,7 @@
 	sta <$03
 	jsr WriteNameTable_WeaponMenu
 	ldy <$FD
-	lda <$52
+	lda <zMenuPtr
 	and #%00011100
 	cmp #$0C
 	bcc .skip_tile_offset
@@ -328,8 +328,8 @@
 .is1st
 	stx <zEquipment
 	jsr ClearSprites
-	lda <zNTPointer
-	pha
+;	lda <zNTPointer
+;	pha
 	ldx #$00
 .loop_endmenu
 	stx <$FD
@@ -373,8 +373,8 @@
 .skip_loadgraphs_final
 	jsr ChangeBodyColor
 	jsr FrameAdvance1A
-	pla
-	sta <zNTPointer
+;	pla
+;	sta <zNTPointer
 	lda <zStage
 	cmp #$0A
 	bne .not_gutstank_endmenu
@@ -419,12 +419,12 @@
 ;ループ中のPPU書き込み開始位置の指定
 .write_ppuaddr_loop
 	clc
-	lda <$52 ;A = XXXY YY00
+	lda <zMenuPtr ;A = XXXY YY00
 	tay
 	adc .table_menubg_writepos_x,x
 	and #%11100000
 	sta <$08
-	lda <$53
+	lda <zMenuPtrhi
 	adc #$00
 	sta <$09
 	tya
@@ -453,12 +453,12 @@
 .x = $01
 .y = $02
 	jsr ClearSprites
-	lda <$52
+	lda <zMenuPtr
 	and #$E0
 	sec
 	sbc <zHScroll
 	sta <.basex
-	lda <$52
+	lda <zMenuPtr
 	and #$1C
 	asl a
 	asl a

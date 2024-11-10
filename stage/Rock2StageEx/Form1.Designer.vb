@@ -36,6 +36,7 @@ Partial Class Form1
         Me.WilyToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.tmap = New System.Windows.Forms.TabPage()
+        Me.CheckBoxTerrainView = New System.Windows.Forms.CheckBox()
         Me.Panel1 = New System.Windows.Forms.Panel()
         Me.Radio_IsEnemy = New System.Windows.Forms.RadioButton()
         Me.Radio_IsItem = New System.Windows.Forms.RadioButton()
@@ -105,7 +106,6 @@ Partial Class Form1
         Me.ChangeScreenNumberToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.bg_chipinfo = New System.ComponentModel.BackgroundWorker()
         Me.bg_tileinfo = New System.ComponentModel.BackgroundWorker()
-        Me.CheckBoxTerrainView = New System.Windows.Forms.CheckBox()
         CType(Me.scr, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.MenuStrip1.SuspendLayout()
         Me.TabControl1.SuspendLayout()
@@ -242,6 +242,17 @@ Partial Class Form1
         Me.tmap.TabIndex = 0
         Me.tmap.Text = "マップ"
         Me.tmap.UseVisualStyleBackColor = True
+        '
+        'CheckBoxTerrainView
+        '
+        Me.CheckBoxTerrainView.Appearance = System.Windows.Forms.Appearance.Button
+        Me.CheckBoxTerrainView.Location = New System.Drawing.Point(478, 614)
+        Me.CheckBoxTerrainView.Name = "CheckBoxTerrainView"
+        Me.CheckBoxTerrainView.Size = New System.Drawing.Size(40, 40)
+        Me.CheckBoxTerrainView.TabIndex = 15
+        Me.CheckBoxTerrainView.Text = "判定表示"
+        Me.CheckBoxTerrainView.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        Me.CheckBoxTerrainView.UseVisualStyleBackColor = True
         '
         'Panel1
         '
@@ -692,7 +703,7 @@ Partial Class Form1
         Me.PaletteGridView.Name = "PaletteGridView"
         Me.PaletteGridView.RowHeadersVisible = False
         Me.PaletteGridView.RowTemplate.Height = 28
-        Me.PaletteGridView.Size = New System.Drawing.Size(518, 409)
+        Me.PaletteGridView.Size = New System.Drawing.Size(518, 700)
         Me.PaletteGridView.TabIndex = 4
         '
         'Column0
@@ -840,17 +851,6 @@ Partial Class Form1
         '
         'bg_tileinfo
         '
-        '
-        'CheckBoxTerrainView
-        '
-        Me.CheckBoxTerrainView.Appearance = System.Windows.Forms.Appearance.Button
-        Me.CheckBoxTerrainView.Location = New System.Drawing.Point(478, 614)
-        Me.CheckBoxTerrainView.Name = "CheckBoxTerrainView"
-        Me.CheckBoxTerrainView.Size = New System.Drawing.Size(40, 40)
-        Me.CheckBoxTerrainView.TabIndex = 15
-        Me.CheckBoxTerrainView.Text = "判定表示"
-        Me.CheckBoxTerrainView.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
-        Me.CheckBoxTerrainView.UseVisualStyleBackColor = True
         '
         'Form1
         '

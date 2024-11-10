@@ -70,7 +70,7 @@ Public Class Form1
     End Class
 
     Const NumRooms As UInteger = &H3F
-    Const NumPaletteAnim As UInteger = 12
+    Const NumPaletteAnim As UInteger = &H18
     Const SizeTile16x16 As UInteger = &H200
     Const SizeChip32x32 As UInteger = 4 * &H100
     Const SizeAttr32x32 As UInteger = &H100
@@ -101,10 +101,9 @@ Public Class Form1
     Const PaletteAnimWait As UInteger = &H3FC2       'パレットアニメーション待ち
     Const PaletteAddr As UInteger = &HDA0            'パレット
     Const PaletteAnimAddr As UInteger = &HDA0        'パレットアニメーション定義(0x0C)
+    Const PaletteAnimOffset As UInteger = &H3FEF     'ワイリー用パレット定義始点 >> 4bit
     Const PaletteAnimFramesWily As UInteger = &H3FC1 'ワイリー用パレットアニメーション枚数
     Const PaletteAnimWaitWily As UInteger = &H3FC3   'ワイリー用パレットアニメーション待ち
-    Const PaletteAddrWily As UInteger = &HE60        'ワイリー用パレット
-    Const PaletteAnimAddrWily As UInteger = &HE60    'ワイリー用パレットアニメーション定義(0x0A)
 
     Const AddrBG As UInteger = &H2000       'BG画像位置
     Const AddrRoom As UInteger = &H3000     '画面定義
@@ -152,10 +151,10 @@ Public Class Form1
     Dim palwaitwily As Byte
     ''' <summary>現在のパレット情報です。</summary>
     Dim palette(16) As Byte
+    ''' <summary>パレットアニメーションの始点です。</summary>
+    Dim paletteoffset As Byte
     ''' <summary>パレットアニメーションバッファです。</summary>
     Dim palanim(SizePaletteAnim) As Byte
-    ''' <summary>ワイリーステージのパレットアニメーションバッファです。</summary>
-    Dim palanimwily(SizePaletteAnim) As Byte
     ''' <summary>ファミコンのパレットとブラシを対応付けたテーブルです。</summary>
     Dim PaletteBrushes(&H40) As SolidBrush
     ''' <summary>選択したタイル番号を格納します。</summary>
@@ -211,19 +210,32 @@ Public Class Form1
         Dim anim As UInteger = PaletteAnimAddr
         Dim frameswily As UInteger = PaletteAnimFramesWily
         Dim waitwily As UInteger = PaletteAnimWaitWily
-        Dim addrwily As UInteger = PaletteAddrWily
-        Dim animwily As UInteger = PaletteAnimAddrWily
+        Dim addrwily As UInteger = PaletteAddr + (paletteoffset << 4)
         numpalanim = testfile(frames)
         numpalanimwily = testfile(frameswily)
         palwait = testfile(wait)
         palwaitwily = testfile(waitwily)
+        paletteoffset = testfile(PaletteAnimOffset)
         For i As UInteger = 0 To 16 - 1
-            palette(i) = testfile(If(wily, addrwily, addr) + i)
+            If wily Then
+                palette(i) = palanim((paletteoffset << 4) + i)
+            Else
+                palette(i) = palanim(i)
+            End If
         Next
+    End Sub
 
-        For i As UInteger = 0 To SizePaletteAnim - 1
-            palanim(i) = testfile(anim + i)
-            palanimwily(i) = testfile(animwily + i)
+    'パレット編集表の初期化
+    Private Sub InitializePaletteGridView()
+        Dim wily As Boolean = WilyToolStripMenuItem.Checked
+        Dim numrows As Integer = If(wily, NumPaletteAnim - paletteoffset, paletteoffset)
+        PaletteGridView.Rows.Clear()
+        PaletteGridView.Rows.Add(numrows)
+        For Each column As DataGridViewTextBoxColumn In PaletteGridView.Columns
+            column.MaxInputLength = 2
+        Next
+        For Each row As DataGridViewRow In PaletteGridView.Rows
+            row.Height = PaletteGridView.Width / 16
         Next
     End Sub
 
@@ -257,6 +269,7 @@ Public Class Form1
         numpalanimwily = 0
         palwait = 0
         palwaitwily = 0
+        paletteoffset = &HC
         For i As Integer = 0 To &H3F
             PaletteBrushes(i) = GetPalette(i)
         Next
@@ -265,7 +278,6 @@ Public Class Form1
         Next
         For i As UInteger = 0 To SizePaletteAnim - 1
             palanim(i) = 0
-            palanimwily(i) = 0
         Next
         For i As UInteger = 0 To SizeEnemies
             enemiesx(i) = 0
@@ -308,15 +320,6 @@ Public Class Form1
         p3216selectedBuf = BufContext.Allocate(p3216focus.CreateGraphics(), p3216focus.DisplayRectangle())
         p8selectedBuf = BufContext.Allocate(p8focus.CreateGraphics(), p8focus.DisplayRectangle())
         paletteBuf = BufContext.Allocate(ppalette.CreateGraphics(), ppalette.DisplayRectangle())
-
-        'パレット編集表の初期化
-        PaletteGridView.Rows.Add(CInt(NumPaletteAnim))
-        For Each column As DataGridViewTextBoxColumn In PaletteGridView.Columns
-            column.MaxInputLength = 2
-        Next
-        For Each row As DataGridViewRow In PaletteGridView.Rows
-            row.Height = PaletteGridView.Width / 16
-        Next
 
         Dim cmd As String() = Environment.GetCommandLineArgs()
         If cmd.Count() > 1 Then
@@ -460,7 +463,9 @@ Public Class Form1
             map(i) = testfile(AddrMaps16x16 + i)
         Next
 
-        LoadPalette()
+        For i As UInteger = 0 To SizePaletteAnim - 1
+            palanim(i) = testfile(PaletteAddr + i)
+        Next
 
         For i As UInteger = 0 To SizeEnemies
             enemiesx(i) = testfile(AddrEnemiesX + i)
@@ -510,6 +515,8 @@ Public Class Form1
         tile_attr = 0
         flags_selected = 0
         ComboBox_attr.SelectedIndex = 0
+        LoadPalette()
+        InitializePaletteGridView()
         ClearObjectSelection()
         RefreshAll()
 
@@ -611,7 +618,6 @@ Public Class Form1
 
         For i As UInteger = 0 To SizePaletteAnim - 1
             testfile(PaletteAnimAddr + i) = palanim(i)
-            testfile(PaletteAnimAddrWily + i) = palanimwily(i)
         Next
 
         If BinFilePath = "" Then
@@ -771,13 +777,15 @@ Public Class Form1
 
     'パレット編集画面の表示
     Private Sub PaletteGridView_Paint(sender As Object, e As PaintEventArgs) Handles PaletteGridView.Paint
+        If PaletteGridView.Rows.Count = 0 Then Exit Sub
         Dim wily As Boolean = WilyToolStripMenuItem.Checked
-        For iy As Integer = 0 To PaletteGridView.Rows.Count - 1
+        Dim numrows As Integer = If(wily, NumPaletteAnim - paletteoffset, paletteoffset)
+        For iy As Integer = 0 To numrows - 1
             Dim row As DataGridViewRow = PaletteGridView.Rows(iy)
             For ix As Integer = 0 To &H10 - 1
                 Dim cell As DataGridViewCell = row.Cells(ix)
                 If Not cell.IsInEditMode Then
-                    Dim p As Byte = If(wily, palanimwily, palanim)(iy * &H10 + ix)
+                    Dim p As Byte = palanim((iy + If(wily, paletteoffset, 0)) * &H10 + ix)
                     Dim b As SolidBrush = PaletteBrushes(p And &H3F)
                     PaletteGridView.Tag = True
                     cell.Value = String.Format("{0:X2}", p)
@@ -1358,20 +1366,17 @@ Public Class Form1
             For i As Integer = 0 To n - 1
                 Dim cell As DataGridViewCell = PaletteGridView.SelectedCells(i)
                 Dim index As UInteger = cell.RowIndex * 16 + cell.ColumnIndex
+                index += If(wily, paletteoffset << 4, 0)
                 keyvalues.Add(New PaletteUndoData With {
                     .Index = index,
-                    .Value = If(wily, palanimwily, palanim)(index)
+                    .Value = palanim(index)
                 })
                 cell.Value = value
             Next
             PaletteGridView.Tag = False
 
             For Each kv As PaletteUndoData In keyvalues
-                If wily Then
-                    palanimwily(kv.Index) = t
-                Else
-                    palanim(kv.Index) = t
-                End If
+                palanim(kv.Index) = t
             Next
             AddUndo(wily, keyvalues, AddressOf UndoPalette)
         Catch ex As Exception
@@ -1530,6 +1535,7 @@ Public Class Form1
             WilyToolStripMenuItem.BackColor = SystemColors.Control
         End If
 
+        InitializePaletteGridView()
         LoadPalette()
         DrawAll()
         RefreshAll()

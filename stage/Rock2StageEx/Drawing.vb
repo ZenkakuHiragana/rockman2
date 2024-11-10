@@ -43,7 +43,11 @@ Partial Public Class Form1
             If _Pi >= n Then _Pi = 0 'ループ
             '現在のパレットを変える
             For i As UInteger = 0 To 15
-                palette(i) = If(wily, palanimwily, palanim)(_Pi * 16 + i)
+                If wily Then
+                    palette(i) = palanim((_Pi + paletteoffset) * 16 + i)
+                Else
+                    palette(i) = palanim(_Pi * 16 + i)
+                End If
             Next
             DrawAll()
 

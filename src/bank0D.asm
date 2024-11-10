@@ -308,21 +308,21 @@ DisableScreen1A:
 
 ;A50A
 ;予約されたPPU矩形書き込みを実行する(画面OFF時に実行可能)
-WritePPUSquare1A:
-	lda <$08
-	pha
-	lda <$09
-	pha
-	lda <zPPUSqr
-	jsr WritePPUSquare
-	clc
-	pla
-	sta <$09
-	pla
-	sta <$08
-	inc <$08
-	inc <zNTPointer
-	rts
+;WritePPUSquare1A:
+;	lda <$08
+;	pha
+;	lda <$09
+;	pha
+;	lda <zPPUSqr
+;	jsr WritePPUSquare
+;	clc
+;	pla
+;	sta <$09
+;	pla
+;	sta <$08
+;	inc <$08
+;	inc <zNTPointer
+;	rts
 
 ;A521
 ;$FDで指定したオープニングのセリフを書き込む

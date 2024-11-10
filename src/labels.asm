@@ -22,15 +22,17 @@ zPtrlo = $08            ;汎用ポインタ下位
 zPtrhi = $09            ;汎用ポインタ上位
 
 ;原作での割り当て
-zScrollLeft = $14       ;横スクロール左端
-zScrollRight = $15      ;横スクロール右端
-zNTPrevlo = $16         ;マップ書き込みアドレス・戻る方下位
-zNTPrevhi = $17         ;マップ書き込みアドレス・戻る方上位
-zNTNextlo = $18         ;マップ書き込みアドレス・進む方下位
-zNTNexthi = $19         ;マップ書き込みアドレス・進む方上位
-zNTPointer = $1A        ;マップ読み込み位置
+;zScrollLeft = $14       ;横スクロール左端
+;zScrollRight = $15      ;横スクロール右端
+;zNTPrevlo = $16         ;マップ書き込みアドレス・戻る方下位
+;zNTPrevhi = $17         ;マップ書き込みアドレス・戻る方上位
+;zNTNextlo = $18         ;マップ書き込みアドレス・進む方下位
+;zNTNexthi = $19         ;マップ書き込みアドレス・進む方上位
+;zNTPointer = $1A        ;マップ読み込み位置
 
 ;再割り当て済み
+zMenuPtr = $12          ;メニューの矩形転送位置 = XXXY YY00
+zMenuPtrhi = $13        ;メニューの矩形転送位置上位
 zPPUObjhi = $14         ;敵画像書き込み位置上位
 zPPUObjlo = $15         ;敵画像書き込み位置下位
 zPPUObjPtr = $16        ;敵画像読み込みセット番号
@@ -137,8 +139,8 @@ zWindlo = $4F           ;風の強さ下位
 zWindhi = $50           ;風の強さ上位
 
 zPPULaser = $51
-z52 = $52               ;ポーズメニューを開く時にPPUへアドレスがここに書き込まれている
-z53 = $53               ;具体的に何に使ってるのかは未調査
+zPalettePtr = $52       ;パレット定義へのポインタ
+zPalettePtrhi = $53     ;
 zPPUShutterFlag = $54   ;シャッターの書き込み時に使う
 
 zBlockObjNum = $55      ;ブロック属性のオブジェクトの数
@@ -591,7 +593,9 @@ Stage_Palette = $8DA0
 ;パレットアニメーション定義
 Stage_PaletteAnim = $8DA0
 ;敵スプライトのパレット定義
-Stage_EnemyPalette = $BFE4
+Stage_EnemyPalette = $BFF0
+;パレットアニメーション始点（ワイリーステージ）
+Stage_PaletteOffsetWily = $BFEF
 ;パレットアニメーション枚数（ワイリーステージ）
 Stage_PaletteAnimNumWily = $BFC1
 ;パレットアニメーション待ち時間（ワイリーステージ）
@@ -601,7 +605,7 @@ Stage_PaletteWily = $8E60
 ;パレットアニメーション定義（ワイリーステージ）
 Stage_PaletteAnimWily = $8E60
 ;敵スプライトのパレット定義（ワイリーステージ）
-Stage_EnemyPaletteWily = $BFEA
+Stage_EnemyPaletteWily = $BFF6
 
 ;敵画像読み込みセット読み込み開始位置
 Stage_LoadGraphicsOrg = $8F20

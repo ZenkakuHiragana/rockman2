@@ -509,7 +509,7 @@ Item_TeleporterIn:
 ;ボスラッシュのカプセルに入った時、パターンテーブルの書き換えを指定
 ;ステージごとのスクロール番号を指定する
 .teleporter_patterntable
-	.db $03, $04, $04, $03, $04, $04, $01, $07
+	.db $03, $04, $05, $03, $04, $04, $02, $0B
 
 ;83DF
 ;カプセルに入った時のアニメーション処理
@@ -575,9 +575,10 @@ Item_TeleporterOut:
 	ldx #$00
 	jsr Item_SetBossRushBG
 	mSTZ <zBossBehaviour
+	mMOV #$0F, aPaletteSpr + 4 * 2 + 1 ;フラッシュマン用 パレット戻す
 	ldx <zBossType
 	clc
-	mADD Table_BossRushCapsuleY,x, #$07, aObjY
+	mADD Table_BossRushCapsuleY,x, #$09, aObjY
 	mMOV Table_BossRushCapsuleX,x, aObjX
 	jsr Item_OutofCapsule
 	mPLAYTRACK #$09

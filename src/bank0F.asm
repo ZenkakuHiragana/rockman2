@@ -519,26 +519,17 @@ DoPaletteAnimation:
 	asl a
 	clc
 	adc #$0F
-	tax
+	tay
 	lda <zBank
 	pha
 	lda <zStage
-	cmp #$08
-	php
 	and #$07
 	jsr ChangeBank
-	plp
-	ldy #$0F
+	ldx #$0F
 .loop
-	bcs .wily
-	lda Stage_PaletteAnim,x
-	bpl .skip
-.wily
-	lda Stage_PaletteAnimWily,x
-.skip
-	sta aPalette,y
-	dex
+	mMOV [zPalettePtr],y, aPalette,x
 	dey
+	dex
 	bpl .loop
 
 	pla
@@ -593,6 +584,7 @@ LoadStageGraphics:
 	lda <zStage
 	and #$07
 	jsr ChangeBank
+	mMOVW Stage_Palette, <zPalettePtr
 	mMOV #$A0, <.ptrhi
 	jsr LoadGraphicsCompressed
 	lda <zStage
@@ -600,28 +592,35 @@ LoadStageGraphics:
 	beq .8boss
 	mMOVWB $1300, $2006, $2006
 	jsr LoadGraphicsCompressed.continue
+	lda Stage_PaletteOffsetWily
+	asl a
+	asl a
+	asl a
+	asl a
+	adc <zPalettePtr
+	sta <zPalettePtr
+	php
+	lda Stage_PaletteOffsetWily
+	lsr a
+	lsr a
+	lsr a
+	lsr a
+	plp
+	adc <zPalettePtrhi
+	sta <zPalettePtrhi
 .8boss
 ;パレット書き込み
-	ldy #$10
+	ldy #$0F
+.loop_palette
+	mMOV [zPalettePtr],y, aPalette,y, aPaletteSpr,y
+	dey
+	bpl .loop_palette
 	lda <zStage
 	lsr a
 	lsr a
 	lsr a
+	tay ;Y = 0 (8ボス), 1(ワイリー)
 	lsr a
-.loop_palette
-	bcs .wily
-	lda Stage_Palette - 1,y
-	bpl .write
-.wily
-	lda Stage_PaletteWily - 1,y
-.write
-	sta aPalette - 1,y
-	sta aPaletteSpr - 1,y
-	dey
-	bne .loop_palette
-	bcc .wily2
-	iny ;Y = 0 (8ボス), 1(ワイリー)
-.wily2
 	mMOV Stage_PaletteAnimNum,y, aPaletteAnim
 	mMOV Stage_PaletteAnimWait,y, aPaletteAnimWait
 ;スプライトのパレット書き込み
