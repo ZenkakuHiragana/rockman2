@@ -600,14 +600,15 @@ Item_SetBossRushBG:
 ;84A3
 Item_TeleporterWily:
 	jsr Item_IntoCapsule
-	sec
+	clc
+	mADD aObjRoom, #$03
 	lda <zRoom
-	sbc #$01
+	adc #$01
 	ldx #$F8
 	ldy #$20
 	jsr DrawRoom
-	inc <zRoom
-	inc aObjRoom
+	clc
+	mADD <zRoom, #$03
 	ldy #$0B
 	mMOV #$0C + 1, <zBossRushStage
 	jsr SetupEnemySpritesAnyBank
