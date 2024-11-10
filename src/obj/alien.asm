@@ -261,6 +261,7 @@ Alien_Defeated:
 	inx
 	mPLAYTRACK #$FF
 	lsr aObjFlags + 1
+	mMOV #$0F, aPaletteSpr + 4 * 2 + 1, aPaletteSpr + 4 * 3 + 1 ;パレットの黒の部分を書き換え
 .init
 	dex
 	mMOV Table_AlienBehaviourhi + 3,x, <zPtrhi
