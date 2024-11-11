@@ -872,6 +872,12 @@ Password_SetScreenPalette:
 	mMOV Table_Password_Palette,x, aPalette,x
 	dex
 	bpl .loop
+	txa
+	ldx #$0F
+.loop_override
+	sta aPaletteOverride,x
+	dex
+	bpl .loop_override
 	jsr ClearSprite1A
 	mJSR_NORTS EnableScreen1A
 
