@@ -2599,7 +2599,7 @@ Table_EN31PartsWait:
 EN32:
 	lda aObjFlags,x
 	and #$08
-	beq .isoriginal
+	bne .isoriginal
 	dec aObjVar,x
 	bne .rts
 	beq .del
