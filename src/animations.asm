@@ -215,8 +215,8 @@ en\8:
 ;F900
 	.org Table_AnimationPointerEnemy_Low + $4D
 	.db LOW(en35)
-	.org Table_AnimationPointerEnemy_Low + $52
-	.db LOW(en50)
+;	.org Table_AnimationPointerEnemy_Low + $52
+;	.db LOW(en50)
 	.org Table_AnimationPointerEnemy_Low + $57
 	.db LOW(en2F)
 	.org Table_AnimationPointerEnemy_Low + $67

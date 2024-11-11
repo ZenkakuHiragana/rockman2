@@ -2398,14 +2398,13 @@ EN30:
 	lda #$2B
 	sta aObjVar,x
 	inc aEnemyVar,x
-	lda #$52
+	lda #$32
 	jsr CreateEnemyHere
+	bcs .move
 	sec
-	lda aObjY10,y
-	sbc #$28
-	sta aObjY10,y
-	lda #$2B
-	sta aObjVar10,y
+	mSUB aObjY10,y, #$28
+	mMOV #$2B, aObjVar10,y
+	mMOV #%10100001, aObjFlags10,y
 	bne .move
 .reel
 	lda aObjVar,x
@@ -2596,7 +2595,15 @@ Table_EN31PartsWait:
 
 ;A9C3
 ;ブロッキーの判定部分
+;EN52 プレスの判定部分と統合
 EN32:
+	lda aObjFlags,x
+	and #$08
+	beq .isoriginal
+	dec aObjVar,x
+	bne .rts
+	beq .del
+.isoriginal
 	ldy aObjVar,x
 	lda aObjFlags,y
 	bpl .del
@@ -2614,6 +2621,7 @@ EN32:
 	lda aObjY,y
 	adc #$08
 	sta aObjY,x
+.rts
 	mJSR_NORTS CheckOffscreenEnemy
 
 ;A9EC
@@ -4033,81 +4041,121 @@ EN51:
 
 ;B55C
 ;プレスの鎖判定
+;ブーンブロック#0
 EN52:
-	dec aObjVar,x
-	beq .del
-	mJSR_NORTS CheckOffscreenEnemy
-.del
-	lsr aObjFlags,x
-	rts
-
+	lda #$00
+	beq EN53_55_Begin
 ;B569
 ;ブーンブロック#1
 EN53:
-	lda #$7D
+	lda #$C0
 	bne EN53_55_Begin
 ;B56D
 ;ブーンブロック#2
 EN54:
-	lda #$BB
+	lda #$80
 	bne EN53_55_Begin
 ;B571
 ;ブーンブロック#3
 EN55:
-	lda #$FA
+	lda #$40
 ;B573
 ;ブーンブロック共有部分
 EN53_55_Begin:
+.offset = $00
+.temp = $01
 .waittimer = $160
-	sta <$00
+.waittimer10 = .waittimer + $10
+	sta <.offset
 	lda aEnemyVar,x
 	bne .initialized
-	lda <$00
+	lsr aObjFlags,x
+	.list
+	ldy #$0F
+	.nolist
+.loop_existence
+	lda aObjFlags10,y
+	bpl .skip_existence
+	lda aEnemyVar10,y
+	beq .skip_existence
+	sec
+	lda aObjAnim10,y
+	sbc #$52
+	cmp #$04
+	bcc .exit_existence
+.skip_existence
+	dey
+	bpl .loop_existence
+.exit_existence
+	lda <zFrameCounter
+	bcs .exists
+	lda .waittimer10,y
+.exists
 	sta .waittimer,x
+	asl aObjFlags,x
 	inc aEnemyVar,x
-	bne .wait
 .initialized
-	cmp #$01
-	bne .boom
-;消えている時
+	inc .waittimer,x
 	lda .waittimer,x
-	bne .wait
-	lda #%10010000
-	sta aObjFlags,x
+	and #$3F
+	clc
+	bne .add_counter
+	inc .waittimer,x
+	sec
+.add_counter
+	lda .waittimer,x
+	adc <.offset
+	bpl .boom
+;消えている時
+	cmp #$FF
+	mMOV #%10100000, aObjFlags,x
+	bcc .rts
 	mPLAYTRACK #$3C
-	lda #$7D
-	sta .waittimer,x
-	inc aEnemyVar,x
-	lda #$00
-	sta aObjWait,x
-	sta aObjFrame,x
-	beq .wait
+	mMOV #%10010000, aObjFlags,x
+	mSTZ aObjWait,x, aObjFrame,x
+	beq .rts
 ;現れた時
 .boom
+	tay
+	lda aObjFlags,x
+	and #%00010000
+	bne .skip
+	cpy #$70
+	bcs .rts
+	mMOV #%10010000, aObjFlags,x
+	mSTZ aObjWait,x
+	tya
+	;Divide by 6
+	;17 bytes, 30 cycles
+	lsr a
+	sta <.temp
+	lsr a
+	lsr a
+	adc <.temp
+	ror a
+	lsr a
+	adc <.temp
+	ror a
+	lsr a
+	adc <.temp
+	ror a
+	lsr a
+	cmp #$05
+	bcc .max_frames
+	lda #$05
+.max_frames
+	sta aObjFrame,x
+.skip
 	lda aObjFrame,x
 	cmp #$05
-	bne .loopanim
-	lda #$00
-	sta aObjWait,x
-.loopanim
-	lda #$08
-	sta aObjVar,x
-	lda aObjX,x
-	and aObjBlockW,x
-	sta aObjBlockX,x
-	lda aObjY,x
-	and aObjBlockH,x
-	sta aObjBlockY,x
-	lda .waittimer,x
-	bne .wait
-	lda #%10100000
-	sta aObjFlags,x
-	lda #$7D
-	sta .waittimer,x
-	dec aEnemyVar,x
-.wait
-	dec .waittimer,x
-	mJSR_NORTS CheckOffscreenEnemy
+	bne .stop_anim
+	mSTZ aObjWait,x
+.stop_anim
+	mMOV #$08, aObjVar,x
+	mAND aObjX,x, aObjBlockW,x, aObjBlockX,x
+	mAND aObjY,x, aObjBlockH,x, aObjBlockY,x
+.rts
+	jmp CheckOffscreenEnemy
 
 ;B5E5
 ;パレット変更・クラッシュマンステージ
