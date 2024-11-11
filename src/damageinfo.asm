@@ -310,6 +310,7 @@ EnemyTakeDamageByLeafShield:
 	rts
 .guard
 	mPLAYTRACK #$2D
+LeafShield_Fall:
 	lda aObjFlags,x
 	and #%11110010
 	sta aObjFlags,x

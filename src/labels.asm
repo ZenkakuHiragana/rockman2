@@ -290,12 +290,11 @@ aPPUSqrAttrData = $350  ;PPU矩形書き込み・属性テーブルのデータ
 ;aPalette = $356         ;現在のパレット
 ;aPaletteSpr = $366      ;現在のスプライトのパレット
 ;aPaletteAnimBuf = $376  ;パレットアニメーションのバッファ
-aPaletteAnim = $720     ;パレットアニメーション枚数
-aPaletteAnimWait = $721 ;パレットアニメーション速さ
-aPalette = $722         ;現在のパレット
-aPaletteSpr = $732      ;現在のスプライトのパレット
-;aPaletteAnimBuf = $742  ;パレットアニメーションのバッファ
-aPaletteOverride = $742 ;パレット上書き情報
+aPaletteAnim = $760     ;パレットアニメーション枚数
+aPaletteAnimWait = $761 ;パレットアニメーション速さ
+aPalette = $740         ;現在のパレット
+aPaletteSpr = $750      ;現在のスプライトのパレット
+aPaletteOverride = $730 ;パレット上書き情報
 
 aPPULinearhi = $3B6     ;PPU線形書き込み上位
 aPPULinearlo = $3B7     ;PPU線形書き込み下位

@@ -257,6 +257,7 @@ Alien_Defeated:
 	mMOVW $1000 - $40, aPPULinearlo, aPPULinearhi
 	mMOVW Graphics_Dogeza, aBossPtrlo, aBossPtrhi
 	mMOV #$40, <zBossVar
+	mMOV #$7C, <$FD
 	inc aObjVar + 1
 	inx
 	mPLAYTRACK #$FF
@@ -281,7 +282,7 @@ Alien_DeathFlashScreen:
 	lda <zFrameCounter
 	and #$04
 	bne .flashscreen
-	ldy #$30
+	ldy #$10
 .flashscreen
 	tya
 .loop
@@ -300,6 +301,8 @@ Alien4:
 	dec <zBossVar
 	jmp LoadBossBG
 .end
+	dec <$FD
+	bne Alien5.rts
 	inc aObjVar + 1
 	ldy #$0B
 	jmp SetupEnemySpritesAnyBank
@@ -311,6 +314,7 @@ Alien5:
 	lda <zPPUObjNum
 	ora <zPPUObjlo
 	beq .skip
+.rts .public
 	rts
 .skip
 	inc aObjVar + 1

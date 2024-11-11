@@ -302,7 +302,7 @@ EnableScreen1A:
 ;A4FB
 ;画面をOFFにする
 DisableScreen1A:
-	mMOV #%00010000, <z2000, $2000
+	mMOV #%10010000, <z2000, $2000
 	mMOV #%00000110, <z2001, $2001
 	rts
 
@@ -776,7 +776,7 @@ FadeinPaletteSpecified:
 	bne .notblack
 	lda Table_Password_Palette,y
 	and #$0F
-	jmp .write
+	bpl .write
 .notblack
 	clc
 	lda aPalette,x
@@ -866,10 +866,10 @@ WriteKeyword1A:
 ;さらにスプライトを消して画面表示を有効にする。なんだこれ。
 Password_SetScreenPalette:
 	sta <zRoom
-	mSTZ <zHScroll, <zVScroll
-	ldx #$21
+	mSTZ <zHScroll, <zVScroll, aPaletteAnim, aPaletteAnimWait
+	ldx #$1F
 .loop
-	mMOV Table_Password_PaletteData,x, aPaletteAnim,x
+	mMOV Table_Password_Palette,x, aPalette,x
 	dex
 	bpl .loop
 	jsr ClearSprite1A

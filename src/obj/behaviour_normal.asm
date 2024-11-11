@@ -697,9 +697,7 @@ EN0F_ChangePalette:
 .loop_changepalette
 	lda EN0F_Palette,y
 	sta aPalette + $09,x
-	sta aPalette + $29,x
-	; sta aPalette + $39,x
-	; sta aPalette + $49,x
+	sta aPaletteOverride + $09,x
 	dey
 	dex
 	bpl .loop_changepalette

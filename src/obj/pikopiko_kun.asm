@@ -200,7 +200,7 @@ WilyBoss_Defeated_FlashScreen:
 	and #$07
 	bne .skip
 	mPLAYTRACK #$2B
-	ldx #$30
+	ldx #$10
 .skip
 	stx aPaletteSpr
 	rts

@@ -333,7 +333,8 @@ DieBoss:
 	bne .isnotwily7
 	mCHANGEBANK #$0D
 	jsr Bank0D_BeginEnding
-	lda #$0E
+	mPLAYTRACK #$FE
+	jsr FrameAdvance1A
 	jmp Reset_JMP ;エンディング終了 → リセット
 .isnotwily7
 	jmp StartStage_All ;ワイリーステージ続行

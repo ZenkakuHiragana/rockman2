@@ -20,10 +20,9 @@
 	pha
 	lda <zHScroll
 	pha
-	ldx #$0F
+	ldx #$2F
 .loop_backup_palette
-	lda aPalette,x
-	sta aPaletteBackup,x
+	mMOV aPaletteOverride,x, aPaletteBackup,x
 	dex
 	bpl .loop_backup_palette
 	lda #$00
@@ -371,7 +370,6 @@
 	ldx #$05
 	jsr LoadWeaponMenuGraphics
 .skip_loadgraphs_final
-	jsr ChangeBodyColor
 	jsr FrameAdvance1A
 ;	pla
 ;	sta <zNTPointer
@@ -390,12 +388,12 @@
 	dex
 	bpl .loop_gutstank_palette
 .not_gutstank_endmenu
-	ldx #$0F
+	ldx #$2F
 .loop_palette_restore
-	mMOV aPaletteBackup,x, aPalette,x
-	mMOV #$FF, aPaletteOverride,x
+	mMOV aPaletteBackup,x, aPaletteOverride,x
 	dex
 	bpl .loop_palette_restore
+	jsr ChangeBodyColor
 	pla
 	sta <zHScroll
 	pla

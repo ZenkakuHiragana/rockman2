@@ -260,6 +260,15 @@ BossBehaviour_DyingAfterSplash:
 	cmp #$FD
 	bcs .clearmusic
 	inc aBossVar1
+	lda <zWaterLevel
+	beq .waterwait
+	lda <zWaterWait
+	bne .waterwait
+	lda aBossVar1
+	cmp #$FD
+	bcs .clearmusic
+	inc aBossVar1
+.waterwait
 	rts
 .clearmusic
 	bne .wait
@@ -270,7 +279,18 @@ BossBehaviour_DyingAfterSplash:
 	cmp #$FE
 	bne .skip
 	dec aBossVar2
+	lda <zWaterLevel
+	beq .waterwait2
+	lda <zWaterWait
+	bne .waterwait2
+	dec aBossVar2
+.waterwait2
+	lda aBossVar2
+	cmp #$FF
+	beq .gonext
+	lda aBossVar2
 	bne .rts
+.gonext
 	inc aBossVar1
 	mMOV #$D0, aBossVar2
 .skip
@@ -283,6 +303,11 @@ BossBehaviour_DyingAfterSplash:
 	mSTZ aObjFrame, aObjWait
 	mMOV #$0B, <zStatus
 	mPLAYTRACK #$3A
+	ldx #$02
+	lda aObjAnim,x
+	cmp #$32
+	bne .moveup
+	jsr LeafShield_Fall
 .moveup
 	lda aObjFrame
 	cmp #$03
@@ -295,6 +320,17 @@ BossBehaviour_DyingAfterSplash:
 	lsr aObjFlags
 .dec
 	dec aBossVar2
+	lda <zWaterLevel
+	beq .waterwait3
+	lda <zWaterWait
+	bne .waterwait3
+	lda aBossVar2
+	beq .waterwait3
+	cmp #$40
+	beq .waterwait3
+	dec aBossVar2
+.waterwait3
+	lda aBossVar2
 	bne .rts
 	mMOV #$FF, <zBossBehaviour
 .rts
@@ -1162,9 +1198,11 @@ BossBehaviour_TakeCrashBomb:
 	lda aObjVar,x
 	cmp #$02
 	beq .end
+	mAND aObjFlags,x, #~$00000001
 	mMOV #$05, aObjFrame,x
-	mSTZ aObjWait,x
-	mMOV #$38, aObjLife,x
+	mMOV #$01, aObjLife,x
+	lsr a
+	sta aObjWait,x
 	inc aObjVar,x
 	mPLAYTRACK #$2D
 	mMOV #$01, <$02

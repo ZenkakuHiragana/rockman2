@@ -466,7 +466,7 @@ MechDragon_BodyMoveXY:
 	lda <$02
 	cmp #$01
 	bne WilyBoss_MoveWithBG
-	mMOV #$30, aPaletteSpr
+	mMOV #$10, aPaletteSpr
 ;91A4
 ;ボス本体と背景を移動する
 WilyBoss_MoveWithBG:

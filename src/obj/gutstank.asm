@@ -317,7 +317,7 @@ GutsTank_IsAlive:
 	lda <$02
 	cmp #$01
 	bne GutsTank_End
-	mMOV #$30, aPaletteSpr
+	mMOV #$10, aPaletteSpr
 GutsTank_End:
 	mMOV aBossVar1, aObjFlags + 1
 	jsr WilyBoss_MoveWithBG

@@ -197,7 +197,7 @@
 	lda <zKeyPress
 	and #$08
 	beq .loop_reset
-	mJSR_NORTS DisableScreen1A
+	rts
 
 ;B812
 ;エンディングの歩くロックマンと落ちるあれを表示する
