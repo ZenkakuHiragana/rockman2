@@ -452,7 +452,7 @@ Item_RecoverEnergyStart:
 Item_RecoverEnd:
 	mSTZ <$FD, <zStopFlag
 	mMOV #$03, <zStatus
-	jsr SetRockmanAnimation
+	jmp SetRockmanAnimation
 Item_RecoverEnd_Done:
 	rts
 

@@ -5057,8 +5057,10 @@ Obj_Item_Behaviour:
 .rts
 	rts
 .stop
+	lda aEnemyOrder,x
+	bmi .isitem
 	lda aObjVar,x
-	beq .isitem
+	beq .end
 	dec aEnemyVar,x
 	bne .end
 	lsr aObjFlags,x

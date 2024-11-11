@@ -74,11 +74,15 @@
 	inc <$01
 	lda aObjVar,x
 	bne .skip
-	ldy aItemOrder,x
 	lda #$FF
+	ldy aEnemyOrder,x
+	bmi .notenemy
+	sta aEnemyOrder,x
+.notenemy
+	ldy aItemOrder,x
+	bmi .skip
 	sta aItemOrder,x
-	lda #$00
-	sta aItemLife - 1,y
+	mSTZ aItemLife - 1,y
 .skip
 	rts
 
