@@ -123,8 +123,8 @@ Quickman3:
 	ldx #$00
 Quickman3_Do:
 	mSTZ aObjVar + 1, <zBossVar
-	mMOV $88B4,x, <zBossBehaviour
-	lda $88B6,x
+	mMOV Table_QuickmanBehaviour,x, <zBossBehaviour
+	lda Table_QuickmanAnimations,x
 	jsr SetBossAnimation
 	mJSR_NORTS Quickman_Move
 

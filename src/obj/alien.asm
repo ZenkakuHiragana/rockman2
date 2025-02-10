@@ -170,7 +170,7 @@ Table_AlienPalette:
 ;9C6B
 ;2, エイリアン 
 Alien2:
-	jsr $9CD8
+	jsr Alien_SetVelocity
 	jsr BossBehaviour_MoveAndCollide
 	ldx #$0F
 	lda <$02
@@ -383,7 +383,7 @@ Table_AlienDogezaRoomPalette
 ;9E41
 ;7, エイリアン
 Alien7:
-	jsr $9E6D
+	jsr Alien7_Blink
 	lda aBossVar2
 	cmp #$24
 	beq .1
