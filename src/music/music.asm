@@ -1,10 +1,6 @@
 
 ;曲の定義
 	mBEGIN #$0C, Table_TrackStartPointers
-	.list
-	.incbin "rockman2.prg", $30A50, $86
-	.nolist
-	mBEGIN #$0C, Table_TrackStartPointers
 	.dw STONE_COLD
 	.dw IGNEOUS_ROCK
 	; .dw EXE6BOSS ; FLASH MAN
