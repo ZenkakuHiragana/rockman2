@@ -1,6 +1,6 @@
 
 ;939B
-;ガッツtンク
+;ガッツタンク
 GutsTank:
 	dex
 	mMOV Table_GutsTankBehaviourlo,x, <zPtrlo
